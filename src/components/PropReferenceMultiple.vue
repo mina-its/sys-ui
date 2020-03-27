@@ -13,7 +13,10 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property, Pair} from "../../../sys/src/types";
+	import {MenuItem} from '@/types';
+
+	const main = require("./main");
 
 	@Component
 	export default class PropReferenceMultiple extends Vue {
@@ -24,53 +27,45 @@
 
 		update() {
 			let val = (event.target as any).value;
-			let items = val == "" ? prop(this)._.items : _.filter(prop(this)._.items, (item: Pair) => {
-				return item.title.toLowerCase().indexOf(val.toLowerCase()) > -1;
-			});
-			items.forEach((item) => {
-				item.hover = false;
-			});
+			let items = val == "" ? this.meta._.items : this.meta._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
+			items.forEach(item => item.hover = false);
 			this.showDropDown(items);
 		}
 
 		refreshText() {
-			let val = this.doc[prop(this).name];
-			this.doc[prop(this).name] = null;
-			this.doc[prop(this).name] = val;
+			let val = this.doc[this.meta.name];
+			this.doc[this.meta.name] = null;
+			this.doc[this.meta.name] = val;
 		}
 
 		remove(item) {
-			let val = this.doc[prop(this).name];
-			this.doc[prop(this).name] = _.filter(val, (v) => {
-				return JSON.stringify(v) != JSON.stringify(item.ref);
-			});
-			this.$emit("changed", prop(this), val);
+			let val = this.doc[this.meta.name];
+			this.doc[this.meta.name] = val.filter(v => JSON.stringify(v) != JSON.stringify(item.ref));
+			this.$emit("changed", this.meta, val);
 		}
 
 		showDropDown(items) {
 			let valueStrKeys = this.value.map((v) => {
 				return JSON.stringify(v);
 			});
-			items = _.filter(items, (item) => {
-				return !valueStrKeys.includes(JSON.stringify(item.ref));
-			});
-			main.showCmenu(prop(this), items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
+			items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
+			main.showCmenu(this.meta, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
 				if (item == null) { // Esc
 					this.refreshText();
 					return;
 				}
-				let val = this.doc[prop(this).name];
+				let val = this.doc[this.meta.name];
 				if (!val)
-					this.doc[prop(this).name] = val = [];
+					this.doc[this.meta.name] = val = [];
 				val.push(item.ref);
-				this.$emit("changed", prop(this), val);
+				this.$emit("changed", this.meta, val);
 			});
 		}
 
 		get value() {
-			let val = this.doc[prop(this).name];
+			let val = this.doc[this.meta.name];
 			if (!val)
-				this.doc[prop(this).name] = val = [];
+				this.doc[this.meta.name] = val = [];
 			else if (!Array.isArray(val))
 				val = [val];
 			return val;
@@ -79,7 +74,7 @@
 		get items() {
 			let items: Pair[] = [];
 			for (let v of this.value) {
-				let item = _.find(prop(this)._.items, {ref: v}) as Pair;
+				let item = this.meta._.items.find(i => i.ref == v);
 				if (item)
 					items.push(item);
 				else

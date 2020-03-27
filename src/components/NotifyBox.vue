@@ -1,6 +1,7 @@
 <template>
     <transition name="fade">
-        <div v-if="st.notify && !st.modal" ref="notifyBox" id="notify-box" :class="'text-left w-100 navbar notify-type-'+st.notify.type" role="alert" @click="st.notify=null;">
+        <div v-if="st.notify && !st.modal" ref="notifyBox" id="notify-box"
+             :class="'text-left w-100 navbar notify-type-'+st.notify.type" role="alert" @click="st.notify=null">
 	    <span>
 	    	<i v-if="st.notify.type==3" class="m-1 fa fa-exclamation-circle fa-2x"></i>
 	    	<i v-if="st.notify.type==4" class="m-1 fa fa-exclamation-triangle fa-2x"></i>

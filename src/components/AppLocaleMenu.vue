@@ -3,7 +3,7 @@
         <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdownLocale" role="button"
            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{st.config.locale.toUpperCase()}}</a>
         <div class="dropdown-menu">
-            <a v-for="item in st.config.appLocales" class="dropdown-item" @click="sys.changeLocale(item.ref)" href="#">{{item.title}}</a>
+            <a v-for="item in st.config.appLocales" class="dropdown-item" @click="main.changeLocale(item.ref)" href="#">{{item.title}}</a>
         </div>
     </span>
 </template>

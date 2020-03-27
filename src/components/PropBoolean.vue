@@ -5,7 +5,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property} from "../../../sys/src/types";
 
 	@Component
 	export default class PropBoolean extends Vue {
@@ -17,12 +17,12 @@
 		}
 
 		update() {
-			this.doc[prop(this).name] = (event.target as any).checked;
-			this.$emit("changed", prop(this), this.value);
+			this.doc[this.meta.name] = (event.target as any).checked;
+			this.$emit("changed", this.meta, this.value);
 		}
 
 		get value() {
-			return this.doc[prop(this).name];
+			return this.doc[this.meta.name];
 		}
 	}
 </script>

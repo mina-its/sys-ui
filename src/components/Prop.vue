@@ -40,7 +40,7 @@
 
 			changed (meta, val) {
 				this.$emit('changed', meta, this.item, val);
-				sys.setPropertyEmbeddedError(this.item, meta.name, null);
+				main.setPropertyEmbeddedError(this.item, meta.name, null);
 			}
 
 			focused (e) {
@@ -129,7 +129,7 @@
 								props: pr,
 							});
 						else {
-							if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && sys.getBsonId(this.item)) {
+							if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && main.getBsonId(this.item)) {
 								return ce('prop-link', {
 									attrs: {"class": styles},
 									on: {keydown: this.keydown, focus: this.focused},

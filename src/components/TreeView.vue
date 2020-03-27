@@ -9,8 +9,13 @@
 </template>
 
 <script lang="ts">
+	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property, Keys, GlobalType} from "../../../sys/src/types";
+	import {st} from "@/main";
+		import { TreeViewNode, TreeViewLine, TreeViewAttribute } from '@/types';
+
+	const main = require("./main");
 
 	@Component
 	export default class TreeView extends Vue {

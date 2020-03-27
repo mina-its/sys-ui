@@ -1,7 +1,15 @@
-import {Pair, Property, Form, WebMethod, Reference, DirFile, Drive, LogType, MultilangText} from "../../sys/src/types";
-import {FunctionMeta, ObjectMeta} from "../../web/src/types";
-import {NotificationInfo} from "../../sys/client/types";
-import {st} from "../../web/client/main";
+import {
+	Pair,
+	Property,
+	Form,
+	WebMethod,
+	DirFile,
+	Drive,
+	LogType,
+	NotificationInfo,
+	ObjectMeta,
+	FunctionMeta
+} from "../../sys/src/types";
 
 export const ChartColors = [
 	'rgba(54, 162, 235, 0.8)',//blue:

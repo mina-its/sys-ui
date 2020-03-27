@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts">
+	declare let marked: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
 
 	@Component
 	export default class Markdown extends Vue {

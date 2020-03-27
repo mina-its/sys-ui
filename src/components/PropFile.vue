@@ -61,7 +61,7 @@
 
 		fileSelect(path: string, item: DirFile) {
 			let val = this.doc[prop(this).name];
-			let uri = `http://${sys.joinUri(prop(this).file.drive.uri, path, item.name)}`;
+			let uri = `http://${main.joinUri(prop(this).file.drive.uri, path, item.name)}`;
 			let newItem = {_id: -Math.random(), name: item.name, path, _: {uri}, size: item.size};
 			if (Array.isArray(val))
 				val.push(newItem);
@@ -87,7 +87,7 @@
 					}
 					if (prop(this).file && prop(this).file.sizeLimit) {
 						if (files.find(file => file.size > prop(this).file.sizeLimit)) {
-							sys.notify(`File size must be less than ${prop(this).file.sizeLimit}`, LogType.Error);
+							main.notify(`File size must be less than ${prop(this).file.sizeLimit}`, LogType.Error);
 							return;
 						}
 					}
@@ -143,13 +143,13 @@
 
 		size(file) {
 			if (file.size)
-				return "(" + sys.toFriendlyFileSizeString(file.size) + ")";
+				return "(" + main.toFriendlyFileSizeString(file.size) + ")";
 			else
 				return null;
 		}
 
 		title(file) {
-			return file.path ? sys.joinUri(file.path, file.name) : file.name;
+			return file.path ? main.joinUri(file.path, file.name) : file.name;
 		}
 
 		getInfo() {

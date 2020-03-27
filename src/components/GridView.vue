@@ -96,7 +96,7 @@
 					break;
 
 				case NewItemMode.modal:
-					sys.notify('not supported!', LogType.Error);
+					main.notify('not supported!', LogType.Error);
 					break;
 			}
 		}
@@ -146,11 +146,11 @@
 					this.items.splice(i, 1);
 
 					if (!(item._id < 0)) { // not newly added item
-						let url = `${this.meta._ref}/${sys.getBsonId(item)}`;
+						let url = `${this.meta._ref}/${main.getBsonId(item)}`;
 						glob.md.push({type: WebMethod.del, ref: url} as Modify);
 
 						glob.od[this.meta._ref].forEach((oitem, oi) => {
-								if (sys.getBsonId(oitem) == sys.getBsonId(item)) {
+								if (main.getBsonId(oitem) == main.getBsonId(item)) {
 									glob.od[this.meta._ref].splice(oi, 1);
 								}
 							}
@@ -208,7 +208,7 @@
 				{ref: "delete", title: $t('delete')},
 			];
 
-			if (item._id && sys.getBsonId(item)) {
+			if (item._id && main.getBsonId(item)) {
 				if (this.root)
 					items.unshift({ref: "tree", title: $t('tree-view')});
 				items.unshift({ref: "details", title: $t('details')});
@@ -230,11 +230,11 @@
 
 					case "details": {
 						if (!state._id) {
-							sys.notify("ID is expected, please check the item data!", LogType.Error);
+							main.notify("ID is expected, please check the item data!", LogType.Error);
 							console.error(state);
 							return;
 						}
-						let href = main.prepareServerUrl(`${this.meta._ref}/${sys.getBsonId(state)}`);
+						let href = main.prepareServerUrl(`${this.meta._ref}/${main.getBsonId(state)}`);
 						history.pushState(null, null, href);
 						main.load(href);
 						break;
@@ -242,11 +242,11 @@
 
 					case "tree": {
 						if (!state._id) {
-							sys.notify("ID is expected, please check the item data!", LogType.Error);
+							main.notify("ID is expected, please check the item data!", LogType.Error);
 							console.error(state);
 							return;
 						}
-						let href = main.prepareServerUrl(`${this.meta._ref}/${sys.getBsonId(state)}?t=${ObjectViewType.TreeView}`);
+						let href = main.prepareServerUrl(`${this.meta._ref}/${main.getBsonId(state)}?t=${ObjectViewType.TreeView}`);
 						history.pushState(null, null, href);
 						main.load(href);
 						break;

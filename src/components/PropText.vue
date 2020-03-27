@@ -5,7 +5,9 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property, Keys} from "../../../sys/src/types";
+
+	const main = require("./main");
 
 	@Component
 	export default class PropText extends Vue {
@@ -24,27 +26,27 @@
 		update() {
 			let val = this.type == "number" ? (event.target as any).valueAsNumber : (event.target as any).value;
 			if (val === "") val = null;
-			main.setPropTextValue(prop(this), this.doc, val);
-			this.$emit("changed", prop(this), this.value);
+			main.setPropTextValue(this.meta, this.doc, val);
+			this.$emit("changed", this.meta, this.value);
 		}
 
 		get readonly() {
-			return prop(this).formula;
+			return this.meta.formula;
 		}
 
 		get value() {
-			return main.getPropTextValue(prop(this), this.doc);
+			return main.getPropTextValue(this.meta, this.doc);
 		}
 
 		get placeholder() {
-			if (!this.doc || prop(this).formula)
+			if (!this.doc || this.meta.formula)
 				return null;
 
-			let val = this.doc[prop(this).name];
+			let val = this.doc[this.meta.name];
 			if (_.isObject(val)) {
 				let locale = main.getQs('e') || "en";
 				if (!val[locale])
-					return val["en"] || val[_.keys(val)[0]];
+					return val["en"] || val[Object.Keys(val)[0]];
 			}
 			return null;
 		}

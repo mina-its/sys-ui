@@ -24,8 +24,13 @@
 </template>
 
 <script lang="ts">
+	declare let DeepDiff, $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
+	import {st, glob, prepareServerUrl, $t, flat2recursive} from "@/main";
+	import {Keys, WebMethod, LogType} from '../../../sys/src/types';
+	import {Modify, DiffKind} from '@/types';
+
+	const main = require("./main");
 
 	@Component
 	export default class Toolbar extends Vue {
@@ -45,7 +50,7 @@
 		}
 
 		findDiffOnEdit(itemRef: string, item: any, ref: string, data: any, diff: any, path: any[]) {
-			let modify: Modify = _.find(glob.md, {ref: itemRef});
+			let modify: Modify = glob.md.find(m => m.ref == itemRef);
 			if (!modify) {
 				modify = {type: WebMethod.patch, ref: itemRef, data: {_id: item._id}, item: item, rootRef: ref} as Modify;
 				glob.md.push(modify);
@@ -69,7 +74,7 @@
 				if (path.length != 1)
 					throw "findDiffOnInsert, Invalid diff path length!";
 
-				let modify: Modify = _.find(glob.md, {ref: itemRef});
+				let modify: Modify = glob.md.find(md => md.ref == itemRef);
 				if (!modify) {
 					modify = {type: WebMethod.patch, ref: itemRef, data: {_id: item._id}, item: data, rootRef: ref} as Modify;
 					glob.md.push(modify);
@@ -79,7 +84,7 @@
 			}
 
 			let newItem = {};
-			_.map(diff.item.rhs, (value, key) => {
+			diff.item.rhs.map((value, key) => {
 				if (value !== null) {
 					newItem[key] = value;
 				}
@@ -114,7 +119,7 @@
 				if (Array.isArray(data) && path && path.length > 0) {
 					item = data[path[0]];
 					path.shift();
-					itemRef = `${ref}/${sys.getBsonId(item)}`;
+					itemRef = `${ref}/${main.getBsonId(item)}`;
 				} else {
 					item = data;
 					itemRef = ref;
@@ -140,7 +145,7 @@
 		apply(cn?, done?) {
 			st.notify = null;
 			if (!done) done = () => {
-				sys.log('Apply done!');
+				main.log('Apply done!');
 			};
 			if (!main.validate()) return done();
 
@@ -168,14 +173,14 @@
 
 		commitModify(done?) {
 			if (glob.md.length == 0) {
-				sys.notify($t('saved'), LogType.Debug);
+				main.notify($t('saved'), LogType.Debug);
 				st.dirty = false;
 				return done();
 			}
 
 			let modify = glob.md.pop();
-			//sys.log(modify.type, modify.ref, modify.data);
-			sys.ajax(prepareServerUrl(modify.ref), modify.data, {method: modify.type}, (res) => {
+			//main.log(modify.type, modify.ref, modify.data);
+			main.ajax(prepareServerUrl(modify.ref), modify.data, {method: modify.type}, (res) => {
 				let od = glob.od[modify.rootRef];
 				res.data = flat2recursive(res.data);
 
@@ -184,9 +189,9 @@
 					if (modify.type === WebMethod.post) {
 						od.push(JSON.parse(JSON.stringify(modify.item)));
 					} else if (modify.rootRef) { // 'modify.rootRef' is empty when we already update the old data, such as document change
-						let oldItem = Array.isArray(od) ? _.find(od, {_id: modify.data._id}) : od;
+						let oldItem = Array.isArray(od) ? od.find(o => o._id == modify.data._id) : od;
 						let data = st.data[modify.rootRef];
-						let item = Array.isArray(od) ? _.find(od, {_id: modify.data._id}) : od;
+						let item = Array.isArray(od) ? od.find(o => o._id == modify.data._id) : od;
 						if (!oldItem)
 							throw `oldItem not found, ref: '${modify.ref}'`;
 						_.assignIn(oldItem, res.data);
@@ -200,7 +205,7 @@
 					this.commitModify(done);
 			}, (err) => {
 				done(err);
-				sys.notify(err);
+				main.notify(err);
 			});
 		}
 
@@ -228,13 +233,13 @@
 		// 		files.push(mod.file);
 		// 	}
 		// 	glob.md = glob.md.filter(mod => mod.ref != modify.ref);
-		// 	sys.ajax(setQs('m', RequestMode.partial, false, "/" + modify.ref), modify.data, {files}, (res) => {
+		// 	main.ajax(setQs('m', RequestMode.partial, false, "/" + modify.ref), modify.data, {files}, (res) => {
 		// 		let propName = modify.ref.replace(/^.+\/(\w+)$/, "$1");
 		// 		glob.od[modify.rootRef][propName] = st.data[modify.rootRef][propName] = flat2recursive(res.data);
 		// 		this.commitModify(done);
 		// 	}, (err) => {
 		// 		done(err);
-		// 		sys.notify(err);
+		// 		main.notify(err);
 		// 	});
 		// }
 	}

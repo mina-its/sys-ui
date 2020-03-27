@@ -47,13 +47,13 @@
 		functionTest(x, y) {
 			let data = st.data["functionTest"];
 			this.message = "Running ...";
-			sys.ajax("/functionTest", data, null, (res) => {
+			main.ajax("/functionTest", data, null, (res) => {
 				if (res.message)
 					this.message = res.message;
 				else
 					this.message = "Done!";
 			}, (err) => {
-				sys.notify(err);
+				main.notify(err);
 			});
 		}
 	}

@@ -44,11 +44,11 @@
 				for (let prop of requiredProps) {
 					if (data[prop.name] === null || data[prop.name] === "") {
 						error = error || `value is required for property '${prop.title}'`;
-						sys.setPropertyEmbeddedError(data, prop.name, `* mandatory`);
+						main.setPropertyEmbeddedError(data, prop.name, `* mandatory`);
 					}
 				}
 				if (error) {
-					sys.notify(error, LogType.Error);
+					main.notify(error, LogType.Error);
 					return false;
 				}
 			}
@@ -73,13 +73,13 @@
 				let data = _.extend({_data: st.data}, st.data[functionName]);
 				if (!this.validate(data))
 					return;
-				sys.log(`calling '${this.name}' ...`, data);
-				sys.ajax("/" + this.name, data, null, (res) => {
+				main.log(`calling '${this.name}' ...`, data);
+				main.ajax("/" + this.name, data, null, (res) => {
 					this.showProgress = false;
 					if (meta.interactive && res.code == StatusCode.Accepted)
 						return;
 					else if (res.code != StatusCode.Ok)
-						sys.notify(res.message, LogType.Error);
+						main.notify(res.message, LogType.Error);
 					else {
 						$(".my-modal").modal('hide');
 						setTimeout(() => {
@@ -89,7 +89,7 @@
 					}
 				}, (err) => {
 					this.showProgress = false;
-					sys.notify(err);
+					main.notify(err);
 				});
 			}
 		}

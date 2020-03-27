@@ -69,7 +69,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
+	const main = require("./main");
 
 	@Component
 	export default class ApiDoc extends Vue {

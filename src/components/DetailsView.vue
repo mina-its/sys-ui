@@ -92,8 +92,8 @@
 
 		execLink(cn: Context) {
 			let data = {data: this.item};
-			sys.ajax("/" + cn.name, data, null, main.handleResponse, (err) => {
-					sys.notify(err);
+			main.ajax("/" + cn.name, data, null, main.handleResponse, (err) => {
+					main.notify(err);
 				}
 			);
 		}

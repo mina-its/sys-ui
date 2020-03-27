@@ -5,11 +5,12 @@
 </template>
 
 <script lang="ts">
+	declare let Chart: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
+	import {ChartColors} from '@/types';
 
 	@Component
-	export default class Chart extends Vue {
+	export default class AppChart extends Vue {
 		@Prop() private data: any;
 
 		mounted() {
@@ -24,7 +25,7 @@
 			});
 			chartData.datasets.push(dataSet);
 
-			let ctx = this.$refs.canvas.getContext("2d");
+			let ctx = (this.$refs.canvas as any).getContext("2d");
 			new Chart(ctx, {
 				type: 'bar', data: chartData, options: {
 					legend: {

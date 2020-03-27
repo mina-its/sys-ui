@@ -3,8 +3,10 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {FunctionMeta} from "../../../web/src/types";
-	import {Elem, ElemType, ObjectViewType} from "../../../sys/src/types";
+	import {Elem, ElemType, ObjectViewType, FunctionMeta} from "../../../sys/src/types";
+	import {st} from "@/main";
+
+	const main = require("./main");
 
 	@Component
 	export default class FormElem extends Vue {

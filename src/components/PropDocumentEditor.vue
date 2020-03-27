@@ -7,7 +7,11 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property, WebMethod} from "../../../sys/src/types";
+    import {glob, st} from "@/main";
+    import { Modify } from '@/types';
+
+	const main = require("./main");
 
 	@Component
 	export default class PropDocumentEditor extends Vue {
@@ -24,15 +28,15 @@
 			try {
 				let val = (e.target as any).value ? JSON.parse((e.target as any).value) : null;
 				this.invalidData = false;
-				this.doc[prop(this).name] = val;
+				this.doc[this.meta.name] = val;
 
-				let ref = prop(this)._.ref.replace(new RegExp(`/${prop(this).name}$`), "");
+				let ref = this.meta._.ref.replace(new RegExp(`/${this.meta.name}$`), "");
 				let data = {};
-				data[prop(this).name] = val;
+				data[this.meta.name] = val;
 				glob.md.push({type: WebMethod.patch, ref, data} as Modify);
-				glob.od[ref][prop(this).name] = JSON.parse(JSON.stringify(val));
+				glob.od[ref][this.meta.name] = JSON.parse(JSON.stringify(val));
 
-				this.$emit("changed", prop(this), val);
+				this.$emit("changed", this.meta, val);
 			} catch (ex) {
 				//this.doc._error = `Property '${prop(this).title}' invalid data.`;
 				this.invalidData = true;
@@ -44,7 +48,7 @@
 			if (this.invalidData) {
 				return this.$el.value;
 			} else {
-				let val = this.doc[prop(this).name];
+				let val = this.doc[this.meta.name];
 				return val ? JSON.stringify(val) : "";
 			}
 		}

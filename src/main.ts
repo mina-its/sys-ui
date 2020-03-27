@@ -1,9 +1,7 @@
-declare let WeakSet, moment, $, io: any;
+declare let WeakSet, axios, $, io: any;
 import Vue from 'vue';
 import App from './App.vue';
-import {Constants, MenuItem, State, StateCmenu, StateGeoMap} from "@/types";
-import _ = require('lodash/core');
-import sys = require("../../sys/client/main");
+import _ from 'lodash/core';
 import {Global, MenuItem, State, StateCmenu, StateGeoMap, Constants} from "@/types";
 import {
 	DirFile,
@@ -11,14 +9,20 @@ import {
 	Drive,
 	Form,
 	Keys,
-	LogType,
 	Property,
 	RequestMode,
-	WebResponse
+	WebResponse,
+	LogType,
+	NotificationInfo,
+	GetOptions,
+	ComponentParams,
+	AjaxConfig,
+	StatusCode,
+	IError,
+	Pair,
+	WebMethod,
+	EmbeddedInfo
 } from "../../sys/src/types";
-import {NotificationInfo} from "../../sys/client/types";
-import {AjaxConfig, ComponentParams, ItemMeta, ItemState, NotificationInfo} from "./types";
-import {EmbeddedInfo, GetOptions, IError, LogType, Pair, StatusCode, WebMethod, WebResponse} from "../src/types";
 
 Vue.config.productionTip = false;
 
@@ -26,8 +30,13 @@ new Vue({
 	render: (h) => h(App),
 }).$mount('#app');
 
-export function $t(key: string): string {
-	return sys.getText('sys', key);
+export function $t(text: string): string {
+	return typeof (text) == "object" ? text[st.config.locale] || _.values(text)[0] : text;
+
+	// if (text[pack + "." + key]) return text[pack + "." + key];
+	//
+	// console.warn(`Warning: text '${pack}.${key}' not found`);
+	// return key.replace(/-/g, " ");
 }
 
 function validateTemplate(): boolean {
@@ -44,7 +53,7 @@ export function start() {
 	startVue();
 	handleWindowEvents();
 	console.log(
-		`%c sys.main started. %c version: 5.2.4 %c`,
+		`%c main started. %c version: 5.2.4 %c`,
 		'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
 		'background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
 		'background:transparent'
@@ -86,7 +95,7 @@ function startVue() {
 		geoMap: {show: false} as StateGeoMap
 	} as State;
 
-	Vue.st = Vue.prototype.st = st;
+	Vue["st"] = Vue.prototype.st = st;
 
 	let mainState = $("#main-state").html();
 	let res: WebResponse = mainState ? parse(mainState) : {};
@@ -96,7 +105,7 @@ function startVue() {
 	getNavmenu(res);
 
 	if (res.message) {
-		sys.notify(res);
+		notify(res);
 	} else
 		initState(res);
 
@@ -204,7 +213,7 @@ function handleWindowEvents() {
 					if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
 					e.preventDefault();
 					if (st.dirty) {
-						sys.notify($t('save-before'), LogType.Warning);
+						notify($t('save-before'), LogType.Warning);
 						return;
 					} // dirty page
 					if (/\bf=\d/.test(href)) { // function link
@@ -253,7 +262,7 @@ function setUndefinedToNull(item, prop: Property) {
 		item[prop.name] = null;
 
 	if (prop.required)
-		sys.setPropertyEmbeddedError(item, prop.name, null); // to check later
+		setPropertyEmbeddedError(item, prop.name, null); // to check later
 }
 
 export function vueResetProperties(data: any, name: string, resetStatus: boolean) {
@@ -285,7 +294,7 @@ function validateData(data, ref: string): boolean {
 	let requiredProps = _.filter(meta.properties, {required: true});
 	for (let prop of requiredProps) {
 		if (_.isNull(data[prop.name])) {
-			sys.notify(`Property '${prop.name}' is required.`, LogType.Warning);
+			notify(`Property '${prop.name}' is required.`, LogType.Warning);
 			// if (!Array.isArray(st.data[ref]))
 			// 	data._error = `Property '${prop.name}' is required.`;
 			return false;
@@ -316,7 +325,7 @@ export function commitNewItem() {
 	let objectName = location.pathname.replace(/\//, '');
 	let data = st.data[objectName];
 	if (data._id != -1) {
-		sys.notify('Invalid state, please refresh and check if the item already has been added!', LogType.Error);
+		notify('Invalid state, please refresh and check if the item already has been added!', LogType.Error);
 		return;
 	}
 	for (let ref in st.data) {
@@ -325,11 +334,11 @@ export function commitNewItem() {
 		}
 	}
 
-	sys.ajax(prepareServerUrl(objectName), data, null, (res) => {
+	ajax(prepareServerUrl(objectName), data, null, (res) => {
 		st.dirty = false;
 		location.href = `/${objectName}/${res.data._id.$oid}`;
 	}, (err) => {
-		sys.notify(err);
+		notify(err);
 	});
 }
 
@@ -351,12 +360,12 @@ function resetToolbar() {
 
 export function load(href) {
 	if (st.dirty) {
-		sys.notify($t('save-before'), LogType.Warning);
+		notify($t('save-before'), LogType.Warning);
 		return;
 	}
 
-	sys.ajax(setQs('m', RequestMode.partial, false, href), null, null, handleResponse, (err) => {
-		sys.notify(err);
+	ajax(setQs('m', RequestMode.partial, false, href), null, null, handleResponse, (err) => {
+		notify(err);
 	});
 }
 
@@ -365,7 +374,7 @@ export function handleResponse(res: WebResponse) {
 	if (res.redirect)
 		handleResponseRedirect(res);
 	else if (res.message) {
-		sys.notify(res.message, LogType.Info);
+		notify(res.message, LogType.Info);
 		// resetToolbar();
 		// history.pushState(null, null, "/");
 	} else
@@ -566,10 +575,10 @@ export function checkPropDependencyOnChange(meta, prop, instance: any) {
 		if (prop._items) {
 			prop._items = null;
 			let data = {prop, instance};
-			sys.ajax("/getPropertyReferenceValues", data, null, (res) => {
+			ajax("/getPropertyReferenceValues", data, null, (res) => {
 				prop._items = res.data;
 			}, (err) => {
-				sys.notify(err);
+				notify(err);
 			});
 		}
 	}
@@ -628,10 +637,6 @@ export function refreshFileGallery(file?: string, done?) {
 	openFileGallery(st.fileGallery.drive, file, st.fileGallery.path, st.fileGallery.fixedPath, st.fileGallery.fileSelectCallback, done);
 }
 
-export function getText(text) {
-	return typeof (text) == "object" ? text[st.config.locale] || _.values(text)[0] : text;
-}
-
 export function prop(component): Property {
 	return component.meta as Property;
 }
@@ -647,7 +652,7 @@ export function openFileGallery(drive: Drive, file: string, path: string, fixedP
 	$("#file-gallery").modal("show");
 	st.fileGallery.loading = true;
 	st.fileGallery.list = [];
-	sys.ajax('/getFileGallery?m=1', {drive: drive._id, path}, {}, (res) => {
+	ajax('/getFileGallery?m=1', {drive: drive._id, path}, {}, (res) => {
 		st.fileGallery.loading = false;
 		st.fileGallery.uri = res.data.uri;
 		st.fileGallery.list = res.data.list;
@@ -668,19 +673,8 @@ export function log(...message) {
 	console.log(message);
 }
 
-export function isRtl() {
-	return false;
-}
-
 export function invoke(pack: string, name: string, args: any[]) {
 	return false;
-}
-
-export function getText(pack, key) {
-	if (text[pack + "." + key]) return text[pack + "." + key];
-
-	console.warn(`Warning: text '${pack}.${key}' not found`);
-	return key.replace(/-/g, " ");
 }
 
 export function toFriendlyFileSizeString(size: number): string {
@@ -840,8 +834,6 @@ export module appState {
 	}
 
 	export function initItem(item: any) {
-		let meta: ItemMeta = item._;
-		meta.state = ItemState.Normal;
 
 	}
 

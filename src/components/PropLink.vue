@@ -30,7 +30,7 @@
 		get ref() {
 			if (!this.doc._id)
 				return "/";
-			return "/" + prop(this)._.ref.replace(new RegExp(`\/${prop(this).name}$`), "") + "/" + sys.getBsonId(this.doc);
+			return "/" + prop(this)._.ref.replace(new RegExp(`\/${prop(this).name}$`), "") + "/" + main.getBsonId(this.doc);
 		}
 	}
 </script>

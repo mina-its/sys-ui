@@ -5,7 +5,11 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property, Keys} from "../../../sys/src/types";
+	import {st} from "@/main";
+		import { MenuItem } from '@/types';
+
+	const main = require("./main");
 
 	@Component
 	export default class PropReference extends Vue {
@@ -23,9 +27,7 @@
 
 		update() {
 			let val = (event.target as any).value;
-			let items = val == "" ? prop(this)._.items : _.filter(prop(this)._.items, (item: Pair) => {
-				return item.title.toLowerCase().indexOf(val.toLowerCase()) > -1;
-			});
+			let items = val == "" ? this.meta._.items : this.meta._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
 			items.forEach((item) => {
 				item.hover = false;
 			});
@@ -33,28 +35,28 @@
 		}
 
 		refreshText() {
-			let val = this.doc[prop(this).name];
-			this.doc[prop(this).name] = null;
-			this.doc[prop(this).name] = val;
+			let val = this.doc[this.meta.name];
+			this.doc[this.meta.name] = null;
+			this.doc[this.meta.name] = val;
 		}
 
 		showDropDown(items) {
-			if (!prop(this).required && items && items.length)
+			if (!this.meta.required && items && items.length)
 				items = [{ref: null, title: "", hover: false}].concat(items);
 
-			main.showCmenu(prop(this), items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
+			main.showCmenu(this.meta, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
 				if (item == null) { // Esc
 					this.refreshText();
 					return;
 				}
-				this.doc[prop(this).name] = null;
-				this.doc[prop(this).name] = item.ref;
-				this.$emit("changed", prop(this), this.value);
+				this.doc[this.meta.name] = null;
+				this.doc[this.meta.name] = item.ref;
+				this.$emit("changed", this.meta, this.value);
 			});
 		}
 
 		get value() {
-			return main.getPropReferenceValue(prop(this), this.doc);
+			return main.getPropReferenceValue(this.meta, this.doc);
 		}
 	}
 </script>

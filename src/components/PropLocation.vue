@@ -5,7 +5,10 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property} from "../../../sys/src/types";
+	import {st} from "@/main";
+
+	const main = require("./main");
 
 	@Component
 	export default class PropLocation extends Vue {
@@ -13,7 +16,7 @@
 		@Prop() private doc: any;
 
 		changed() {
-			this.$emit("changed", prop(this), this.value);
+			this.$emit("changed", this.meta, this.value);
 		}
 
 		changing() {
@@ -23,7 +26,7 @@
 				show: true,
 				val: this.value,
 				select: function (value) {
-					doc[prop(this).name] = value;
+					doc[this.meta.name] = value;
 					console.log(doc);
 					changed();
 				}
@@ -31,7 +34,7 @@
 		}
 
 		get value() {
-			return this.doc[prop(this).name];
+			return this.doc[this.meta.name];
 		}
 	}
 </script>

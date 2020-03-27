@@ -15,7 +15,7 @@
 			let e = this.elem as Elem;
 			//console.log("object-view:" + e.obj.ref);
 			if (!e.obj) {
-				sys.notify("Element 'object-view' needs obj property.", LogType.Error);
+				main.notify("Element 'object-view' needs obj property.", LogType.Error);
 				return;
 			}
 

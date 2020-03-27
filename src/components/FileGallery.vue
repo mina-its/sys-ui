@@ -70,13 +70,13 @@
 				switch (item.ref) {
 					case "upload":
 						main.browseFile((files) => {
-							sys.ajax('/uploadToFileGallery?m=1', {
+							main.ajax('/uploadToFileGallery?m=1', {
 									_files: files,
 									drive: st.fileGallery.drive._id,
 									path: st.fileGallery.path
 								}, null, (res) => {
 									main.refreshFileGallery();
-									sys.notify('upload done!', LogType.Debug);
+									main.notify('upload done!', LogType.Debug);
 								}
 							)
 							;
@@ -106,7 +106,7 @@
 			main.showCmenu(item, items, e, (state, menu: MenuItem) => {
 					switch (menu.ref) {
 						case "remove":
-							sys.question(null, `### Delete Confirm\n\nAre you sure you want to delete the file '${item.name}'`, [{
+							main.question(null, `### Delete Confirm\n\nAre you sure you want to delete the file '${item.name}'`, [{
 								title: "YES",
 								ref: YesNo.Yes
 							}, {
@@ -114,7 +114,7 @@
 								ref: YesNo.No
 							}], (option: Pair) => {
 								if (!option || option.ref == YesNo.No) return;
-								sys.ajax("/deleteFromFileGallery?m=1", {
+								main.ajax("/deleteFromFileGallery?m=1", {
 									drive: st.fileGallery.drive._id,
 									pth: st.fileGallery.path,
 									name: item.name
@@ -125,7 +125,7 @@
 							break;
 						case "preview":
 						case "download":
-							window.open(sys.joinUri(st.fileGallery.uri, item.name), '_blank');
+							window.open(main.joinUri(st.fileGallery.uri, item.name), '_blank');
 							break;
 
 						case "refresh":
@@ -160,7 +160,7 @@
 		}
 
 		size(item: DirFile) {
-			return item.size ? "(" + sys.toFriendlyFileSizeString(item.size) + ")" : "";
+			return item.size ? "(" + main.toFriendlyFileSizeString(item.size) + ")" : "";
 		}
 
 		icon(item: DirFile) {
@@ -175,7 +175,7 @@
 				case "gif":
 				case "tiff":
 				case "ico":
-					return sys.joinUri(st.fileGallery.uri, item.name);
+					return main.joinUri(st.fileGallery.uri, item.name);
 
 				case "doc":
 				case "docx":
@@ -212,14 +212,14 @@
 				st.fileGallery.path = ref;
 				main.refreshFileGallery();
 			} else
-				sys.notify("Current directory Can not be changed!", LogType.Debug);
+				main.notify("Current directory Can not be changed!", LogType.Debug);
 		}
 
 		select(cn, done, item: DirFile) {
 			if (item)
 				st.fileGallery.selected = item;
 			if (st.fileGallery.selected && st.fileGallery.selected.type == DirFileType.Folder) {
-				st.fileGallery.path = sys.joinUri(st.fileGallery.path, st.fileGallery.selected.name);
+				st.fileGallery.path = main.joinUri(st.fileGallery.path, st.fileGallery.selected.name);
 				main.refreshFileGallery(null, done);
 			} else {
 				$("#file-gallery").modal('hide');

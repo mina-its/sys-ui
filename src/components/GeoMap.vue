@@ -10,8 +10,11 @@
 </template>
 
 <script lang="ts">
+	declare let google: any;
 	import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
+	import {st} from "@/main";
+
+	const main = require("./main");
 
 	@Component
 	export default class GeoMap extends Vue {

@@ -4,8 +4,11 @@
 </template>
 
 <script lang="ts">
+	declare let moment: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property, LogType} from "../../../sys/src/types";
+
+	const main = require("./main");
 
 	@Component
 	export default class PropTime extends Vue {
@@ -16,16 +19,16 @@
 		update() {
 			let val = new Date((event.target as any).value);
 			if (val.getTime()) {
-				this.doc[prop(this).name] = val;
+				this.doc[this.meta.name] = val;
 			} else {
-				sys.notify('invalid-date', LogType.Error);
-				this.doc[prop(this).name] = null;
+				main.notify('invalid-date', LogType.Error);
+				this.doc[this.meta.name] = null;
 			}
-			this.$emit("changed", prop(this), this.value);
+			this.$emit("changed", this.meta, this.value);
 		}
 
 		get value() {
-			let val = this.doc[prop(this).name];
+			let val = this.doc[this.meta.name];
 			return val ? moment(val).format("YYYY/MM/DD") : "";
 		}
 	}

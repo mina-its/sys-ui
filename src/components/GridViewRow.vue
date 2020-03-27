@@ -10,8 +10,10 @@
 </template>
 
 <script lang="ts">
+	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property} from "../../../sys/src/types";
+	import {RowStatus} from '@/types';
 
 	@Component
 	export default class GridViewRow extends Vue {
@@ -19,28 +21,34 @@
 		@Prop() private selectable: boolean;
 		@Prop() private meta: Property;
 
-			focused (e, prop) {
-				$(".prop-focused").removeClass("prop-focused");
-				$(e.target).closest("td").addClass("prop-focused");
-			}
-			changed (meta, val) {
-				this.$emit('changed', meta, val);
-			}
-			updateStatus() {
-				this.item._status = (event.target as any).checked ? RowStatus.Selected : "";
-			}
-			headerClick(item, $event) {
-				this.$emit('headerClick', item, $event);
-			}
-			click() {
-				this.$emit('selected', this.item);
-			}
-			keydown(e, prop) {
-				this.$emit('keydown', e, this.item, prop);
-			}
-			get status() {
-							return this.item._status;
-						}
+		focused(e, prop) {
+			$(".prop-focused").removeClass("prop-focused");
+			$(e.target).closest("td").addClass("prop-focused");
+		}
+
+		changed(meta, val) {
+			this.$emit('changed', meta, val);
+		}
+
+		updateStatus() {
+			this.item._status = (event.target as any).checked ? RowStatus.Selected : "";
+		}
+
+		headerClick(item, $event) {
+			this.$emit('headerClick', item, $event);
+		}
+
+		click() {
+			this.$emit('selected', this.item);
+		}
+
+		keydown(e, prop) {
+			this.$emit('keydown', e, this.item, prop);
+		}
+
+		get status() {
+			return this.item._status;
+		}
 	}
 </script>
 

@@ -9,7 +9,6 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
 
 	@Component
 	export default class MessageCard extends Vue {

@@ -5,7 +5,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property} from "../../../sys/src/types";
 
 	@Component
 	export default class PropTextMultiline extends Vue {
@@ -15,12 +15,12 @@
 		update() {
 			let val = (event.target as any).value;
 			if (val === "") val = null;
-			this.doc[prop(this).name] = val;
-			this.$emit("changed", prop(this), this.value);
+			this.doc[this.meta.name] = val;
+			this.$emit("changed", this.meta, this.value);
 		}
 
 		get value() {
-			return this.doc[prop(this).name];
+			return this.doc[this.meta.name];
 		}
 	}
 </script>

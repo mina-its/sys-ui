@@ -3,8 +3,12 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
+	declare let io: any;
+	import {Component, Vue} from 'vue-property-decorator';
+	import {glob, st} from "@/main";
+	import {ClientCommand, LogType, Pair} from '../../../sys/src/types';
+
+	const main = require("./main");
 
 	@Component
 	export default class WebSocket extends Vue {
@@ -28,11 +32,11 @@
 					break;
 
 				case ClientCommand.Notification:
-					sys.notify(args[0], args[1]);
+					main.notify(args[0], args[1]);
 					break;
 
 				case ClientCommand.Question:
-					sys.question(args[0] /*questionid*/, args[1] /*message*/, args[2] /*options*/, (item: Pair) => {
+					main.question(args[0] /*questionid*/, args[1] /*message*/, args[2] /*options*/, (item: Pair) => {
 						glob.io.emit('cmd', ClientCommand.Answer, args[0], item ? item.ref : null);
 					});
 					break;
