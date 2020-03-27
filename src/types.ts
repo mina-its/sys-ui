@@ -80,7 +80,7 @@ export class State {
 export class HeadFunc {
 	title: string;
 	name: string;
-	exec: () => void;
+	exec: (...args: any) => void;
 }
 
 export class MenuItem {

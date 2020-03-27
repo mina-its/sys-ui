@@ -4,7 +4,9 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property} from "../../../sys/src/types";
+
+	const main = require("./main");
 
 	@Component
 	export default class PropLink extends Vue {
@@ -16,11 +18,11 @@
 		}
 
 		get value() {
-			if (prop(this).formula)
-				return main.evalExpression(this.doc, prop(this).formula);
+			if (this.meta.formula)
+				return main.evalExpression(this.doc, this.meta.formula);
 
-			let val = this.doc[prop(this).name];
-			if (_.isObject(val)) {
+			let val = this.doc[this.meta.name];
+			if (typeof val == "object") {
 				let locale = main.getQs('e') || "en";
 				return val[locale];
 			} else
@@ -30,7 +32,7 @@
 		get ref() {
 			if (!this.doc._id)
 				return "/";
-			return "/" + prop(this)._.ref.replace(new RegExp(`\/${prop(this).name}$`), "") + "/" + main.getBsonId(this.doc);
+			return "/" + this.meta._.ref.replace(new RegExp(`\/${this.meta.name}$`), "") + "/" + main.getBsonId(this.doc);
 		}
 	}
 </script>

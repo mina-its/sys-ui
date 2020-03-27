@@ -12,8 +12,6 @@
                             <li class="breadcrumb-item active" aria-current="page">{{current}}</li>
                         </ol>
                     </nav>
-                    </ol>
-                    </nav>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -49,8 +47,13 @@
 </template>
 
 <script lang="ts">
+	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
+	import {st, $t} from '@/main';
+	import {DirFile, LogType, DirFileType, YesNo, Pair} from '../../../sys/src/types';
+	import {MenuItem} from '@/types';
+
+	const main = require("./main");
 
 	@Component
 	export default class FileGallery extends Vue {

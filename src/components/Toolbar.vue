@@ -185,7 +185,7 @@
 				res.data = flat2recursive(res.data);
 
 				if (modify.type === WebMethod.post || modify.type == WebMethod.patch) {
-					_.assignIn(modify.item, res.data);
+					Object.assign(modify.item, res.data);
 					if (modify.type === WebMethod.post) {
 						od.push(JSON.parse(JSON.stringify(modify.item)));
 					} else if (modify.rootRef) { // 'modify.rootRef' is empty when we already update the old data, such as document change
@@ -194,7 +194,7 @@
 						let item = Array.isArray(od) ? od.find(o => o._id == modify.data._id) : od;
 						if (!oldItem)
 							throw `oldItem not found, ref: '${modify.ref}'`;
-						_.assignIn(oldItem, res.data);
+						Object.assign(oldItem, res.data);
 						this.fixOldItemUpdate(oldItem);
 					}
 				}

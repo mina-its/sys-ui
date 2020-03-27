@@ -28,7 +28,7 @@
 		update() {
 			let val = (event.target as any).value;
 			let items = val == "" ? this.meta._.items : this.meta._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
-			items.forEach(item => item.hover = false);
+			items.forEach(item => (item as MenuItem).hover = false);
 			this.showDropDown(items);
 		}
 

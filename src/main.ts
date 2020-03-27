@@ -637,10 +637,6 @@ export function refreshFileGallery(file?: string, done?) {
 	openFileGallery(st.fileGallery.drive, file, st.fileGallery.path, st.fileGallery.fixedPath, st.fileGallery.fileSelectCallback, done);
 }
 
-export function prop(component): Property {
-	return component.meta as Property;
-}
-
 export function openFileGallery(drive: Drive, file: string, path: string, fixedPath: boolean, fileSelectCallback: (path: string, item: DirFile) => void, done?) {
 	st.fileGallery.drive = drive;
 	st.fileGallery.file = file;

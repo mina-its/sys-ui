@@ -4,8 +4,10 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
-	import {FunctionMeta} from '../../../web/src/types';
+	import {ObjectViewType, ElemType, FunctionMeta} from "../../../sys/src/types";
+		import { st } from '@/main';
+
+	const main = require("./main");
 
 	@Component
 	export default class FunctionTesting extends Vue {

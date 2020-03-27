@@ -8,8 +8,8 @@
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {Property, WebMethod} from "../../../sys/src/types";
-    import {glob, st} from "@/main";
-    import { Modify } from '@/types';
+	import {glob, st} from "@/main";
+	import {Modify} from '@/types';
 
 	const main = require("./main");
 
@@ -19,6 +19,8 @@
 		@Prop() private meta: Property;
 		@Prop() private styles: string;
 		@Prop() private invalidData: any;
+
+		$el: any;
 
 		keydown(e) {
 			this.$emit('keydown', e);
@@ -38,7 +40,7 @@
 
 				this.$emit("changed", this.meta, val);
 			} catch (ex) {
-				//this.doc._error = `Property '${prop(this).title}' invalid data.`;
+				//this.doc._error = `Property '${this.meta.title}' invalid data.`;
 				this.invalidData = true;
 				st.dirty = true;
 			}

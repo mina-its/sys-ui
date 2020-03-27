@@ -4,7 +4,10 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Elem} from "../../../sys/src/types";
+	import {Elem, LogType, ObjectViewType} from "../../../sys/src/types";
+	import {st} from '@/main';
+
+	const main = require("./main");
 
 	@Component
 	export default class ObjectView extends Vue {

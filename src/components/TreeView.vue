@@ -13,14 +13,20 @@
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {Property, Keys, GlobalType} from "../../../sys/src/types";
 	import {st} from "@/main";
-		import { TreeViewNode, TreeViewLine, TreeViewAttribute } from '@/types';
+	import {TreeViewNode, TreeViewLine, TreeViewAttribute} from '@/types';
 
 	const main = require("./main");
 
 	@Component
 	export default class TreeView extends Vue {
 		@Prop() private uri: string;
-		private nodes = [];
+		@Prop() private data: any;
+
+		nodes = [];
+		$refs: {
+			textInput: HTMLFormElement
+			blinkingCursor: HTMLFormElement
+		};
 
 		mounted() {
 			let data = st.data[this.uri];
@@ -51,7 +57,7 @@
 		}
 
 		checkToken(text) {
-			if (this.language.types[text]) {
+			if (this.data.language.types[text]) {
 				$(".current-token").addClass("line-key").removeClass("current-token").click(this.lineKeyClick);
 				return true;
 			} else

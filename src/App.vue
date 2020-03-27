@@ -29,6 +29,7 @@
 <script lang="ts">
 	import {Vue} from 'vue-property-decorator';
 	import {st} from "@/main";
+
 	const main = require("./main");
 
 	export default class App extends Vue {
@@ -44,6 +45,9 @@
 </script>
 
 <style lang="scss">
+    $left: left;
+    $right: right;
+
     $theme-colors: (
             "primary": #0072C6,
             "danger": #ff4136,
@@ -61,7 +65,7 @@
             "side-nav": #2f353c,
             "breadcrumb-separator": #aaa,
     );
-    @import "../../node_modules/bootstrap/scss/bootstrap";
+    @import "bootstrap";
 
     @function color($key: "blue") {
         @return map-get($colors, $key);

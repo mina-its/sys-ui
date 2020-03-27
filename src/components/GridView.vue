@@ -43,9 +43,23 @@
 </template>
 
 <script lang="ts">
+	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, GridRowHeaderStyle} from "../../../sys/src/types";
-	import {ObjectMeta} from '../../../web/src/types';
+	import {
+		ObjectViewType,
+		GridRowHeaderStyle,
+		NewItemMode,
+		LogType,
+		ReqParams,
+		WebMethod,
+		Pair,
+		Keys,
+		ObjectMeta
+	} from "../../../sys/src/types";
+	import {st, glob, $t, changeLocale} from "@/main";
+	import {Modify, RowStatus, MenuItem} from '@/types';
+
+	const main = require("./main");
 
 	@Component
 	export default class GridView extends Vue {
@@ -67,8 +81,8 @@
 			});
 			for (let prop of dependents) {
 				item[prop.name] = null;
-				if (prop._items) {
-					prop._items = null;
+				if (prop._.items) {
+					prop._.items = null;
 					//prop.type
 				}
 			}
@@ -133,7 +147,7 @@
 						break;
 
 					case "filter":
-						this.meta.filter.items.push({title: state.title, id: Math.random()});
+						// this.meta.filter.items.push({title: state.title, id: Math.random()});
 						break;
 				}
 			});
@@ -273,8 +287,7 @@
 		}
 
 		rowMove(up: boolean) {
-			let query = {_status: RowStatus.Selected};
-			let item = _.find(this.items, query);
+			let item = this.items.find(i => i._status == RowStatus.Selected);
 			let index = this.items.indexOf(item);
 			if ((up && index == 0) || (!up && index == this.items.length - 1)) return;
 			st.dirty = true;
@@ -313,11 +326,11 @@
 			this.items.splice(siblingIndex, 0, item);
 			// reorder items in old data
 			let od = glob.od[this.uri][index];
-			keydown: function (e, item, prop) {
-				glob.od[this.uri].splice(index, 1);
-				glob.od[this.uri].splice(siblingIndex, 0, od);
-			}
-		,
+			glob.od[this.uri].splice(index, 1);
+			glob.od[this.uri].splice(siblingIndex, 0, od);
+		}
+
+		keydown(e, item, prop) {
 			switch (e.which) {
 				case Keys.esc:
 					break;

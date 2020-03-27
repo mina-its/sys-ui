@@ -6,7 +6,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, Property} from "../../../sys/src/types";
+	import {Property} from "../../../sys/src/types";
 
 	@Component
 	export default class FilterItem extends Vue {
@@ -14,9 +14,9 @@
 		@Prop() private meta: Property;
 
 		close() {
-			this.meta.filter.items = _.filter(this.meta.filter.items, (item) => {
-				return item.id !== this.item.id;
-			});
+			// this.meta.filter.items = _.filter(this.meta.filter.items, (item) => {
+			// 	return item.id !== this.item.id;
+			// });
 		}
 	}
 </script>

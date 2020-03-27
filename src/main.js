@@ -572,9 +572,6 @@ export function browseFile(fileBrowsed) {
 export function refreshFileGallery(file, done) {
     openFileGallery(st.fileGallery.drive, file, st.fileGallery.path, st.fileGallery.fixedPath, st.fileGallery.fileSelectCallback, done);
 }
-export function prop(component) {
-    return component.meta;
-}
 export function openFileGallery(drive, file, path, fixedPath, fileSelectCallback, done) {
     st.fileGallery.drive = drive;
     st.fileGallery.file = file;

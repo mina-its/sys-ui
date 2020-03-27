@@ -43,10 +43,10 @@
 				return null;
 
 			let val = this.doc[this.meta.name];
-			if (_.isObject(val)) {
+			if (typeof val == "object") {
 				let locale = main.getQs('e') || "en";
 				if (!val[locale])
-					return val["en"] || val[Object.Keys(val)[0]];
+					return val["en"] || val[Object.keys(val)[0]];
 			}
 			return null;
 		}

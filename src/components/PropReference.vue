@@ -7,7 +7,7 @@
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {Property, Keys} from "../../../sys/src/types";
 	import {st} from "@/main";
-		import { MenuItem } from '@/types';
+	import {MenuItem} from '@/types';
 
 	const main = require("./main");
 
@@ -28,9 +28,7 @@
 		update() {
 			let val = (event.target as any).value;
 			let items = val == "" ? this.meta._.items : this.meta._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
-			items.forEach((item) => {
-				item.hover = false;
-			});
+			items.forEach(item => (item as MenuItem).hover = false);
 			this.showDropDown(items);
 		}
 

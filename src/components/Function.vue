@@ -3,8 +3,12 @@
 </template>
 
 <script lang="ts">
+	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
+	import {FunctionMeta, LogType, Context, StatusCode} from "../../../sys/src/types";
+	import {st} from '@/main';
+
+	const main = require("./main");
 
 	@Component
 	export default class Function extends Vue {
@@ -58,7 +62,7 @@
 		click(e) {
 			this.showProgress = true;
 			if (this.$listeners && this.$listeners.exec) {
-				let cn: Context = {event: e, name: this.name, data: st.data};
+				let cn: Context = {event: e, name: this.name, data: st.data} as Context;
 				try {
 					this.$emit('exec', cn, () => {
 						this.showProgress = false;
@@ -70,7 +74,7 @@
 			} else {
 				let functionName = this.name;
 				let meta: FunctionMeta = st.meta[functionName];
-				let data = _.extend({_data: st.data}, st.data[functionName]);
+				let data = {_data: st.data, ...st.data[functionName]};
 				if (!this.validate(data))
 					return;
 				main.log(`calling '${this.name}' ...`, data);

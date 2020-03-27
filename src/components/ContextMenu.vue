@@ -9,8 +9,11 @@
 </template>
 
 <script lang="ts">
+	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
+	import {st} from '@/main';
+
+	const main = require("./main");
 
 	@Component
 	export default class ContextMenu extends Vue {

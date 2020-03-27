@@ -4,7 +4,6 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
 
 	@Component
 	export default class DocumentEditor extends Vue {
@@ -17,7 +16,7 @@
 		updateHTML(e) {
 			try {
 				let val = JSON.parse(e.target.innerHTML);
-				this.value = _.extend(this.value, val);
+				Object.assign(this.value, val);
 			} catch (ex) {
 			}
 			this.$emit('input', e.target.innerHTML);

@@ -26,9 +26,12 @@
 </template>
 
 <script lang="ts">
+	declare let $: any;
 	import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-	import {ObjectViewType, ObjectDetailsViewType} from "../../../sys/src/types";
-	import {ObjectMeta} from '../../../web/src/types';
+	import {ObjectViewType, ObjectDetailsViewType, ObjectMeta, Context} from "../../../sys/src/types";
+	import {st} from '@/main';
+
+	const main = require("./main");
 
 	@Component
 	export default class DetailsView extends Vue {
@@ -61,9 +64,7 @@
 				let $dv = $(".details-view");
 				$dv.animate({
 						scrollTop: $(item.ref).offset().top + $dv.scrollTop() - $dv.offset().top
-					}
-					,
-					0
+					}, 0
 				);
 			}
 		}
@@ -104,7 +105,7 @@
 		}
 
 		getProps(group: string) {
-			return _.filter(this.meta.properties, (prop) => {
+			return this.meta.properties.filter(prop => {
 				if (prop.properties)
 					return group == prop.title;
 				else
