@@ -1,0 +1,41 @@
+<template>
+    <div :class="'prop-location text-center ' + (value ? 'has-data': '')" @click="changing"><i
+            class="fa fa-map-marker-alt"></i></div>
+</template>
+
+<script lang="ts">
+	import {Component, Prop, Vue} from 'vue-property-decorator';
+	import {ObjectViewType, Property} from "../../../sys/src/types";
+
+	@Component
+	export default class PropLocation extends Vue {
+		@Prop() private meta: Property;
+		@Prop() private doc: any;
+
+		changed() {
+			this.$emit("changed", prop(this), this.value);
+		}
+
+		changing() {
+			let doc = this.doc;
+			let changed = this.changed;
+			st.geoMap = {
+				show: true,
+				val: this.value,
+				select: function (value) {
+					doc[prop(this).name] = value;
+					console.log(doc);
+					changed();
+				}
+			};
+		}
+
+		get value() {
+			return this.doc[prop(this).name];
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+
+</style>

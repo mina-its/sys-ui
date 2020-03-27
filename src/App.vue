@@ -1,29 +1,274 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-  </div>
+    <div class="d-flex h-100 flex-column">
+        <header>
+            <nav-bar></nav-bar>
+        </header>
+        <main class="d-flex align-items-stretch overflow-auto">
+            <side-nav></side-nav>
+            <div class="d-flex flex-column flex-fill overflow-auto">
+                <toolbar></toolbar>
+                <div class="main-body h-100 overflow-auto w-100 d-flex" @scroll="onScroll()">
+                    <elem v-for="elem in st.form.elems" :elem="elem"></elem>
+                </div>
+            </div>
+        </main>
+        <section class="helpers-section">
+            <file-gallery></file-gallery>
+            <div id="snackbar"></div>
+            <input id="file-browse" type="file" class="d-none" @change="fileBrowsed" style="width: 0;height: 0;"
+                   multiple="true">
+            <notify-box></notify-box>
+            <web-socket></web-socket>
+            <question-box></question-box>
+            <context-menu></context-menu>
+            <!--  <geo-map></geo-map>-->
+        </section>
+    </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
+	import {Vue} from 'vue-property-decorator';
 
-@Component({
-  components: {
-    HelloWorld,
-  },
-})
-export default class App extends Vue {}
+	export default class App extends Vue {
+		onScroll() {
+			main.hideCmenu();
+		}
+
+      fileBrowsed(e) {
+        console.log("fileBrowsed!");
+        st.fileGallery.fileBrowsed(e.target.files);
+      }
+	}
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+    $theme-colors: (
+            "primary": #0072C6,
+            "danger": #ff4136,
+            "dark": #24292e,
+            "warning": #ff7700,
+        //my custom colors
+            "grid-head" : #f6f8fa,
+            "grid-border": #d7d9dc,
+            "panel-separator-line" : #dee2e6,
+            "grid-row-hover" : #f0f8ff,
+            "grid-row-selected": #FFC,
+            "grid-row-header-selected": #FFE,
+            "form-label": #666,
+            "layout-border": #ddd,
+            "side-nav": #2f353c,
+            "breadcrumb-separator": #aaa,
+    );
+    @import "../../node_modules/bootstrap/scss/bootstrap";
+
+    @function color($key: "blue") {
+        @return map-get($colors, $key);
+    }
+
+    @function theme-color($key: "primary") {
+        @return map-get($theme-colors, $key);
+    }
+
+    @function gray($key: "100") {
+        @return map-get($grays, $key);
+    }
+
+    html {
+        height: 100%;
+    }
+
+    body {
+        height: 100%;
+        overflow: hidden;
+        text-align: $left;
+        font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+        font-size: 15px;
+    }
+
+    main {
+        flex: 1 1 auto;
+        scroll-behavior: smooth;
+    }
+
+    input {
+        &[type=date],
+        &[type=time],
+        &[type=datetime-local],
+        &[type=month] {
+            -webkit-appearance: normal;
+        }
+    }
+
+    header {
+        flex: 0 1 auto;
+
+        .btn-toolbar {
+            border-color: theme-color("layout-border");
+        }
+    }
+
+    a {
+        color: #0366d6;
+
+        &:hover {
+            color: #0366d6;
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    td {
+        .prop-focused {
+            outline: 1px solid theme-color("primary");
+        }
+    }
+
+    /* Animations to fade the snackbar in and out */
+    @-webkit-keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @-webkit-keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+    .separator-line {
+        border-color: theme-color("panel-separator-line") !important;
+    }
+
+    .dropdown-menu {
+        text-align: $left;
+        z-index: 10000;
+        #{$left}: 0;
+        #{$right}: inherit;
+    }
+
+    .breadcrumb-item {
+        font-weight: 500;
+
+        + .breadcrumb-item {
+            padding-#{$left}: 0.5rem;
+
+            &::before {
+                padding-#{$right}: 0.5rem;
+                padding-#{$left}: 0;
+                content: "";
+            }
+        }
+
+        i {
+            color: theme-color("breadcrumb-separator");
+        }
+    }
+
+    #snackbar {
+      visibility: hidden; /* Hidden by default. Visible on click */
+      min-width: 250px; /* Set a default minimum width */
+      margin-#{$left}: -125px; /* Divide value of min-width by 2 */
+      background-color: #333; /* Black background color */
+      color: #fff; /* White text color */
+      text-align: center; /* Centered text */
+      border-radius: 2px; /* Rounded borders */
+      padding: 16px; /* Padding */
+      position: fixed; /* Sit on top of the screen */
+      z-index: 1; /* Add a z-index if needed */
+      left: 50%; /* Center the snackbar */
+      bottom: 30px; /* 30px from the bottom */
+
+      .visible {
+        visibility: visible; /* Show the snackbar */
+        /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+        However, delay the fade out process for 2.5 seconds */
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+      }
+    }
+
+    .fa-chevron- {
+        &left:before {
+            @if $left == left {
+                content: "\f053" !important;
+            } @else {
+                content: "\f054" !important;
+            }
+        }
+
+        &right:before {
+            @if $right == right {
+                content: "\f054" !important;
+            } @else {
+                content: "\f053" !important;
+            }
+        }
+    }
+
+    .token {
+        white-space: pre;
+    }
+
+    .fade- {
+        &enter-active {
+            transition: opacity .1s;
+        }
+
+        &leave-active {
+            transition: opacity .8s;
+        }
+
+        &enter, &leave-to {
+            opacity: 0;
+        }
+    }
+
+    .aside {
+        position: sticky;
+        top: 0;
+    }
+
+    .modal {
+        .prop-comment {
+            //background-color: inherit;
+            //border: none;
+            //padding: 0 !important;
+            //color: gray;
+        }
+    }
 </style>
