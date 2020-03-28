@@ -25,7 +25,6 @@ export class Global {
 	od: any;
 	md: Modify[] = [];
 	counter = 1;
-	onReady: () => void;
 	io: any;
 }
 

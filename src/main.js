@@ -1,14 +1,10 @@
 import Vue from 'vue';
 import App from './App.vue';
-import _ from 'lodash/core';
+import store from './store';
 import { Global, Constants } from "@/types";
 import { Keys, RequestMode, LogType, StatusCode, WebMethod } from "../../sys/src/types";
-Vue.config.productionTip = false;
-new Vue({
-    render: (h) => h(App),
-}).$mount('#app');
 export function $t(text) {
-    return typeof (text) == "object" ? text[st.config.locale] || _.values(text)[0] : text;
+    return typeof (text) == "object" ? text[st.config.locale] || Object.values(text)[0] : text;
     // if (text[pack + "." + key]) return text[pack + "." + key];
     //
     // console.warn(`Warning: text '${pack}.${key}' not found`);
@@ -61,7 +57,6 @@ function startVue() {
         cmenu: { show: false, items: [], handler: null, left: 0, top: 0 },
         geoMap: { show: false }
     };
-    Vue["st"] = Vue.prototype.st = st;
     let mainState = $("#main-state").html();
     let res = mainState ? parse(mainState) : {};
     st.config = res.config || {};
@@ -78,20 +73,12 @@ function startVue() {
             if (binding.value)
                 el.focus();
         }
-        // , update: function (el, binding) {
-        // 	if (binding.value) {
-        // 		Vue.nextTick(function () {
-        // 			el.focus();
-        // 		});
-        // 	}
-        // }
     });
+    Vue.config.productionTip = false;
     new Vue({
-        el: "#root", data: st, mounted: () => {
-            if (glob.onReady)
-                glob.onReady();
-        }
-    });
+        store,
+        render: (h) => h(App),
+    }).$mount('#root');
 }
 export function getNavmenu(res) {
     let _navmenu = localStorage.getItem('_navmenu');
@@ -251,9 +238,9 @@ export function vueResetProperties(data, name, resetStatus) {
 }
 function validateData(data, ref) {
     let meta = st.meta[ref];
-    let requiredProps = _.filter(meta.properties, { required: true });
+    let requiredProps = meta.properties.filter(p => p.required);
     for (let prop of requiredProps) {
-        if (_.isNull(data[prop.name])) {
+        if (data[prop.name] == null) {
             notify(`Property '${prop.name}' is required.`, LogType.Warning);
             // if (!Array.isArray(st.data[ref]))
             // 	data._error = `Property '${prop.name}' is required.`;
@@ -343,7 +330,7 @@ export function setPropTextValue(meta, data, val) {
             data[meta.name][locale] = val;
         }
         else {
-            if (_.isObject(oldValue))
+            if (typeof oldValue == "object")
                 data[meta.name]["en"] = val;
             else
                 data[meta.name] = val;
@@ -358,7 +345,7 @@ export function getPropTextValue(meta, data) {
     if (!data)
         throw "prop-text doc is null!";
     let val = data[meta.name];
-    if (_.isObject(val)) {
+    if (typeof val == "object") {
         let locale = getQs('e') || "en";
         return val[locale];
     }
@@ -376,7 +363,7 @@ export function getPropReferenceValue(meta, data) {
             val = [val];
         let values = [];
         for (let valItem of val) {
-            let item = _.find(meta._.items, { ref: valItem });
+            let item = meta._.items.find(i => i.ref == valItem);
             if (!item)
                 values.push("...");
             else
@@ -385,7 +372,7 @@ export function getPropReferenceValue(meta, data) {
         return values.join(", ");
     }
     else {
-        let item = _.find(meta._.items, { ref: val });
+        let item = meta._.items.find(i => i.ref == val);
         if (!item)
             return "...";
         return item.title;
@@ -424,7 +411,7 @@ export function showCmenu(state, items, event, handler) {
     for (let item of items) {
         item.hover = item.hover || false;
     }
-    if (!_.some(items, { hover: true })) {
+    if (!items.find(i => i.hover)) {
         if (!items[0].title) {
             items[0].hover = false;
             items[1].hover = true;
@@ -445,7 +432,7 @@ function handleCmenuKeys(e) {
             hideCmenu();
             break;
         case Keys.enter: {
-            let item = _.find(st.cmenu.items, { hover: true });
+            let item = st.cmenu.items.find(i => i.hover);
             if (item) {
                 st.cmenu.handler(st.cmenu.state, item);
                 hideCmenu();
@@ -453,7 +440,7 @@ function handleCmenuKeys(e) {
             break;
         }
         case Keys.down: {
-            let item = _.find(st.cmenu.items, { hover: true });
+            let item = st.cmenu.items.find(i => i.hover);
             if (!item)
                 st.cmenu.items[0].hover = true;
             else {
@@ -466,7 +453,7 @@ function handleCmenuKeys(e) {
             break;
         }
         case Keys.up: {
-            let item = _.find(st.cmenu.items, { hover: true });
+            let item = st.cmenu.items.find(i => i.hover);
             if (!item)
                 st.cmenu.items[st.cmenu.items.length - 1].hover = true;
             else {

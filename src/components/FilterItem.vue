@@ -14,7 +14,7 @@
 		@Prop() private meta: Property;
 
 		close() {
-			// this.meta.filter.items = _.filter(this.meta.filter.items, (item) => {
+			// this.meta.filter.items = this.meta.filter.items.filter(item => {
 			// 	return item.id !== this.item.id;
 			// });
 		}

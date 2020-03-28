@@ -228,7 +228,7 @@
 
 		// submitFile(modify: Modify, done) {
 		// 	let files = [modify.file];
-		// 	let modifies = _.filter(glob.md, {ref: modify.ref});
+		// 	let modifies = glob.md.filter(md => md.ref == modify.ref);
 		// 	for (let mod of modifies) {
 		// 		files.push(mod.file);
 		// 	}
