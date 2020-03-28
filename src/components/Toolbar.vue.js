@@ -1,8 +1,7 @@
 import { __decorate } from "tslib";
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { st, glob, prepareServerUrl, $t, flat2recursive } from "@/main";
+import { prepareServerUrl, $t, flat2recursive } from "@/main";
 import { Keys, WebMethod, LogType } from '../../../sys/src/types';
-import { DiffKind } from '@/types';
 const main = require("./main");
 let Toolbar = class Toolbar extends Vue {
     mounted() {
@@ -16,90 +15,99 @@ let Toolbar = class Toolbar extends Vue {
     del() {
     }
     findDiffOnEdit(itemRef, item, ref, data, diff, path) {
-        let modify = glob.md.find(m => m.ref == itemRef);
-        if (!modify) {
-            modify = { type: WebMethod.patch, ref: itemRef, data: { _id: item._id }, item: item, rootRef: ref };
-            glob.md.push(modify);
-        }
-        let val = diff.rhs;
-        if (path[path.length - 1] == "$oid") {
-            path.pop();
-            val = { "$oid": val };
-        }
-        if (path.length > 1 && typeof path[path.length - 1] == "number") {
-            // case: remove first sub role, the second sub role is substituted.
-            path.pop();
-            modify.data[path.join('.')] = item[path.join('.')];
-        }
-        else
-            modify.data[path.join('.')] = val;
+        // todo
+        // let modify: Modify = glob.md.find(m => m.ref == itemRef);
+        // if (!modify) {
+        // 	modify = {type: WebMethod.patch, ref: itemRef, data: {_id: item._id}, item: item, rootRef: ref} as Modify;
+        // 	glob.md.push(modify);
+        // }
+        //
+        // let val = diff.rhs;
+        // if (path[path.length - 1] == "$oid") {
+        // 	path.pop();
+        // 	val = {"$oid": val};
+        // }
+        // if (path.length > 1 && typeof path[path.length - 1] == "number") {
+        // 	// case: remove first sub role, the second sub role is substituted.
+        // 	path.pop();
+        // 	modify.data[path.join('.')] = item[path.join('.')];
+        // } else
+        // 	modify.data[path.join('.')] = val;
     }
     findDiffOnInsert(itemRef, item, ref, data, diff, path) {
-        if (path && path.length) { // Add to multiple value property
-            if (path.length != 1)
-                throw "findDiffOnInsert, Invalid diff path length!";
-            let modify = glob.md.find(md => md.ref == itemRef);
-            if (!modify) {
-                modify = { type: WebMethod.patch, ref: itemRef, data: { _id: item._id }, item: data, rootRef: ref };
-                glob.md.push(modify);
-            }
-            modify.data[path.join('.')] = item[path.join('.')];
-            return;
-        }
-        let newItem = {};
-        diff.item.rhs.map((value, key) => {
-            if (value !== null) {
-                newItem[key] = value;
-            }
-        });
-        glob.md.push({
-            type: WebMethod.post,
-            ref: itemRef,
-            data: newItem,
-            item: diff.item.rhs,
-            rootRef: ref
-        });
+        // todo
+        // if (path && path.length) { // Add to multiple value property
+        // 	if (path.length != 1)
+        // 		throw "findDiffOnInsert, Invalid diff path length!";
+        //
+        // 	let modify: Modify = glob.md.find(md => md.ref == itemRef);
+        // 	if (!modify) {
+        // 		modify = {type: WebMethod.patch, ref: itemRef, data: {_id: item._id}, item: data, rootRef: ref} as Modify;
+        // 		glob.md.push(modify);
+        // 	}
+        // 	modify.data[path.join('.')] = item[path.join('.')];
+        // 	return;
+        // }
+        //
+        // let newItem = {};
+        // diff.item.rhs.map((value, key) => {
+        // 	if (value !== null) {
+        // 		newItem[key] = value;
+        // 	}
+        // });
+        //
+        // glob.md.push({
+        // 	type: WebMethod.post,
+        // 	ref: itemRef,
+        // 	data: newItem,
+        // 	item: diff.item.rhs,
+        // 	rootRef: ref
+        // } as Modify);
     }
-    findDiff(ref) {
-        let data = st.data[ref];
-        let od = glob.od[ref];
-        if (Array.isArray(data)) {
-            for (let item of data) {
-                item._status = null;
-            }
-            for (let item of od) {
-                item._status = null;
-            }
-        }
-        let diffs = DeepDiff(od, data) || [];
-        for (let diff of diffs) {
-            let item, itemRef;
-            let path = diff.path ? JSON.parse(JSON.stringify(diff.path)) : null; // case: when we delete two sub roles, path is shared between different diffs
-            if (Array.isArray(data) && path && path.length > 0) {
-                item = data[path[0]];
-                path.shift();
-                itemRef = `${ref}/${main.getBsonId(item)}`;
-            }
-            else {
-                item = data;
-                itemRef = ref;
-            }
-            switch (diff.kind) {
-                case DiffKind.newlyAdded:
-                case DiffKind.edited:
-                    this.findDiffOnEdit(itemRef, item, ref, data, diff, path);
-                    break;
-                case DiffKind.deleted:
-                    break;
-                case DiffKind.arrayChange: {
-                    this.findDiffOnInsert(itemRef, item, ref, data, diff, path);
-                    break;
-                }
-            }
-        }
-    }
+    // findDiff(ref: string) {
+    // 	let data = st.data[ref];
+    // 	let od = glob.od[ref];
+    //
+    // 	if (Array.isArray(data)) {
+    // 		for (let item of data) {
+    // 			item._status = null;
+    // 		}
+    // 		for (let item of od) {
+    // 			item._status = null;
+    // 		}
+    // 	}
+    //
+    // 	let diffs = DeepDiff(od, data) || [];
+    // 	for (let diff of diffs) {
+    // 		let item, itemRef;
+    // 		let path = diff.path ? JSON.parse(JSON.stringify(diff.path)) : null; // case: when we delete two sub roles, path is shared between different diffs
+    // 		if (Array.isArray(data) && path && path.length > 0) {
+    // 			item = data[path[0]];
+    // 			path.shift();
+    // 			itemRef = `${ref}/${main.getBsonId(item)}`;
+    // 		} else {
+    // 			item = data;
+    // 			itemRef = ref;
+    // 		}
+    //
+    // 		switch (diff.kind) {
+    // 			case DiffKind.newlyAdded:
+    // 			case DiffKind.edited:
+    // 				this.findDiffOnEdit(itemRef, item, ref, data, diff, path);
+    // 				break;
+    //
+    // 			case DiffKind.deleted:
+    // 				break;
+    //
+    // 			case DiffKind.arrayChange: {
+    // 				this.findDiffOnInsert(itemRef, item, ref, data, diff, path);
+    // 				break;
+    // 			}
+    // 		}
+    // 	}
+    // }
     apply(cn, done) {
-        st.notify = null;
+        main.updateStateRoot({ notify: null });
         if (!done)
             done = () => {
                 main.log('Apply done!');
@@ -173,6 +181,18 @@ let Toolbar = class Toolbar extends Vue {
                 parent[parts[parts.length - 1]] = val;
             }
         }
+    }
+    get toolbar() {
+        return this.$store.state.toolbar;
+    }
+    get currentForm() {
+        return this.$store.state.form;
+    }
+    get isDirty() {
+        return this.$store.state.isDirty;
+    }
+    get headFuncs() {
+        return this.$store.state.headFuncs;
     }
 };
 __decorate([

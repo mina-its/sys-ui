@@ -1,34 +1,36 @@
 <template>
     <div class="d-flex h-100 flex-column">
         <header>
-            <nav-bar></nav-bar>
+            <NavBar></NavBar>
         </header>
         <main class="d-flex align-items-stretch overflow-auto">
-            <side-nav></side-nav>
+            <SideNav></SideNav>
             <div class="d-flex flex-column flex-fill overflow-auto">
-                <toolbar></toolbar>
+                <Toolbar></Toolbar>
                 <div class="main-body h-100 overflow-auto w-100 d-flex" @scroll="onScroll()">
-                    <elem v-for="elem in st.form.elems" :elem="elem"></elem>
+                    <FormElem v-for="elem in form.elems" :elem="elem"></FormElem>
                 </div>
             </div>
         </main>
         <section class="helpers-section">
-            <file-gallery></file-gallery>
+            <FileGallery></FileGallery>
             <div id="snackbar"></div>
             <input id="file-browse" type="file" class="d-none" @change="fileBrowsed" style="width: 0;height: 0;"
                    multiple="true">
-            <notify-box></notify-box>
-            <web-socket></web-socket>
-            <question-box></question-box>
-            <context-menu></context-menu>
+            <NotifyBox></NotifyBox>
+            <WebSocket></WebSocket>
+            <QuestionBox></QuestionBox>
+            <ContextMenu></ContextMenu>
             <!--  <geo-map></geo-map>-->
         </section>
     </div>
 </template>
 
 <script lang="ts">
+	declare let $: any;
 	import {Vue} from 'vue-property-decorator';
-	import {st} from "@/main";
+	import {$t, hideCmenu, load, notify} from "@/main";
+	import {LogType, NotificationInfo, Form} from '../../sys/src/types';
 
 	const main = require("./main");
 
@@ -39,7 +41,83 @@
 
 		fileBrowsed(e) {
 			console.log("fileBrowsed!");
-			st.fileGallery.fileBrowsed(e.target.files);
+			this.$store.state.fileGallery.fileBrowsed(e.target.files);
+		}
+
+		handleWindowEvents() {
+			$(window)
+				.on('notify', function (e: any) {
+					let notify = e.detail as NotificationInfo;
+					if (notify.type == LogType.Debug) {
+						$("#snackbar").addClass("visible").text(notify.message);
+						setTimeout(function () {
+							$("#snackbar").removeClass("visible");
+						}, 3000);
+					} else
+						main.updateRoot({notify});
+				})
+				.on('question', function (e: any) {
+					main.updateRoot({question: e.detail});
+				})
+				.on("popstate", (e) => {
+					load(location.href);
+				})
+				.on("beforeunload", (e) => {
+					if (this.$store.state.dirty) {
+						e = e || window.event;
+						if (e)
+							e.returnValue = $t('save-before');
+						return $t('save-before');
+					}
+				})
+				.on("resize", (e) => {
+					hideCmenu();
+				})
+				.on("keydown", (e) => {
+					if (this.$store.state.cmenu.show)
+						main.handleCmenuKeys(e);
+					main.updateRoot({notify: null});
+				})
+				.on("click", (e) => {
+					if (e.target.tagName == "A") {
+						if (e.target.getAttribute('target')) return; // especially _blank
+						let href = e.target.getAttribute('href');
+						if (href) {
+							if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
+							e.preventDefault();
+							if (this.$store.state.dirty) {
+								notify($t('save-before'), LogType.Warning);
+								return;
+							} // dirty page
+							if (/\bf=\d/.test(href)) { // function link
+
+							} else
+								history.pushState(null, null, href);
+							load(href);
+						}
+					}
+				})
+				.on("mouseup", (e) => {
+					if (this.$store.state.cmenu.show &&
+						!$('.dropdown-item').is(e.target)
+						&& $('.dropdown-item').has(e.target).length === 0
+						&& $('.dropdown-menu.show').has(e.target).length === 0
+					) hideCmenu();
+				});
+		}
+
+		mounted() {
+			this.handleWindowEvents();
+			console.log(
+				`%c main started. %c version: ${this.$store.state.config.version} %c`,
+				'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+				'background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
+				'background:transparent'
+			);
+		}
+
+		get form(): Form {
+			return this.$store.state.form;
 		}
 	}
 </script>

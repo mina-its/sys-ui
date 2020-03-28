@@ -1,30 +1,32 @@
 <template>
-    <div></div>
 </template>
 
 <script lang="ts">
-	declare let io: any;
+	import {AppStateLog} from "@/types";
 	import {Component, Vue} from 'vue-property-decorator';
-	import {glob, st} from "@/main";
 	import {ClientCommand, LogType, Pair} from '../../../sys/src/types';
 
+	declare let io: any;
 	const main = require("./main");
 
 	@Component
 	export default class WebSocket extends Vue {
+		private socket = io();
+
+		public emit(command: string, ...args) {
+			this.socket.emit(command, ...args);
+		}
 
 		mounted() {
 			// console.log("web-socket initing ...");
-			if (st.config.interactive) {
-				glob.io = io();
-				glob.io.on('cmd', this.handleCommand);
-			}
+			if (this.$store.state.config.interactive)
+				this.socket.on('cmd', this.handleCommand);
 		}
 
 		handleCommand(command: ClientCommand, ...args: any[]) {
 			switch (command) {
 				case ClientCommand.Log:
-					st.logs.push({message: args[0], type: args[1], ref: args[2]});
+					this.pushLog({message: args[0], type: args[1], ref: args[2]});
 					break;
 
 				case ClientCommand.PingAck:
@@ -37,13 +39,13 @@
 
 				case ClientCommand.Question:
 					main.question(args[0] /*questionid*/, args[1] /*message*/, args[2] /*options*/, (item: Pair) => {
-						glob.io.emit('cmd', ClientCommand.Answer, args[0], item ? item.ref : null);
+						this.socket.emit('cmd', ClientCommand.Answer, args[0], item ? item.ref : null);
 					});
 					break;
 
 				case ClientCommand.FunctionDone:
-					st.logs.push({message: "done!", type: LogType.Info});
-					st.logs.push(null);
+					this.pushLog({message: "done!", type: LogType.Info});
+					this.pushLog(null);
 					break;
 
 				case ClientCommand.Download:
@@ -51,14 +53,14 @@
 					break;
 
 				case ClientCommand.FunctionFailed:
-					st.logs.push({message: args[0], type: LogType.Error});
-					st.logs.push(null);
+					this.pushLog({message: args[0], type: LogType.Error});
+					this.pushLog(null);
 					break;
 			}
 		}
+
+		pushLog(log: AppStateLog) {
+			this.$store.commit("pushLog", log);
+		}
 	}
 </script>
-
-<style scoped lang="scss">
-
-</style>

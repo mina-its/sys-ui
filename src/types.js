@@ -1,98 +1,105 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChartColors = [
+import { AppStateConfig } from "../../sys/src/types";
+export const Constants = {
+    redirectBack: "_back",
+    redirectSelf: "_self",
+};
+export const ChartColors = [
     'rgba(54, 162, 235, 0.8)',
     'rgba(255, 99, 132, 0.8)',
     'rgba(75, 192, 192, 0.8)',
     'rgba(255, 159, 64, 0.8)',
     'rgba(255, 205, 86, 0.8)',
     'rgba(153, 102, 255, 0.8)',
-    'rgba(231,233,237, 0.8)'
+    'rgba(231,233,237, 0.8)' //grey:
 ];
-class Global {
+export class HeadFunc {
+}
+export class MenuItem {
+}
+export class Modify {
+}
+export class AppStateGeoMap {
     constructor() {
-        this.md = [];
-        this.counter = 1;
+        this.show = false;
     }
 }
-exports.Global = Global;
-class State {
-}
-exports.State = State;
-class HeadFunc {
-}
-exports.HeadFunc = HeadFunc;
-class MenuItem {
-}
-exports.MenuItem = MenuItem;
-class Modify {
-}
-exports.Modify = Modify;
-class StateGeoMap {
-}
-exports.StateGeoMap = StateGeoMap;
-var RowStatus;
+export var RowStatus;
 (function (RowStatus) {
     RowStatus[RowStatus["Selected"] = 1] = "Selected";
-})(RowStatus = exports.RowStatus || (exports.RowStatus = {}));
-class StateCmenu {
+})(RowStatus || (RowStatus = {}));
+export class AppStateCmenu {
+    constructor() {
+        this.show = false;
+        this.items = [];
+        this.left = 0;
+        this.top = 0;
+    }
 }
-exports.StateCmenu = StateCmenu;
-exports.Constants = {
-    redirectBack: "_back",
-    redirectSelf: "_self",
-};
-var Gmode;
-(function (Gmode) {
-    Gmode[Gmode["noGrouping"] = 0] = "noGrouping";
-    Gmode[Gmode["grouped"] = 1] = "grouped";
-    Gmode[Gmode["sideMenu"] = 2] = "sideMenu";
-})(Gmode = exports.Gmode || (exports.Gmode = {}));
-var PropertyLabelMode;
+export var PropertyLabelMode;
 (function (PropertyLabelMode) {
     PropertyLabelMode[PropertyLabelMode["Hidden"] = 1] = "Hidden";
     PropertyLabelMode[PropertyLabelMode["Visible"] = 2] = "Visible";
-})(PropertyLabelMode = exports.PropertyLabelMode || (exports.PropertyLabelMode = {}));
-var DiffKind;
+})(PropertyLabelMode || (PropertyLabelMode = {}));
+export var DiffKind;
 (function (DiffKind) {
     DiffKind["newlyAdded"] = "N";
     DiffKind["edited"] = "E";
     DiffKind["deleted"] = "D";
     DiffKind["arrayChange"] = "A";
-})(DiffKind = exports.DiffKind || (exports.DiffKind = {}));
-class TreeViewNode {
+})(DiffKind || (DiffKind = {}));
+export class TreeViewNode {
 }
-exports.TreeViewNode = TreeViewNode;
-class TreeViewLine {
+export class TreeViewLine {
 }
-exports.TreeViewLine = TreeViewLine;
-class TreeViewAttribute {
+export class TreeViewAttribute {
 }
-exports.TreeViewAttribute = TreeViewAttribute;
-class ApiDocParameter {
+export class ApiDocParameter {
 }
-exports.ApiDocParameter = ApiDocParameter;
-class ApiDocOperation {
+export class ApiDocOperation {
 }
-exports.ApiDocOperation = ApiDocOperation;
-class ApiDocBlock {
+export class ApiDocBlock {
     constructor() {
         this.operations = [];
     }
 }
-exports.ApiDocBlock = ApiDocBlock;
-class ApiDocSchema {
+export class ApiDocSchema {
 }
-exports.ApiDocSchema = ApiDocSchema;
-class ApiDocEnum {
+export class ApiDocEnum {
 }
-exports.ApiDocEnum = ApiDocEnum;
-class ApiDoc {
+export class ApiDoc {
     constructor() {
         this.blocks = [];
         this.schemas = [];
         this.enums = [];
     }
 }
-exports.ApiDoc = ApiDoc;
+export class Global {
+    constructor() {
+        this.fileGallery = new AppStateFileGallery();
+        this.question = new AppStateQuestion();
+        this.modal = false;
+        this.headFuncs = [];
+        this.config = new AppStateConfig();
+        this.cmenu = new AppStateCmenu();
+        this.geoMap = new AppStateGeoMap();
+        this.modifies = [];
+    }
+}
+export class AppStateFileGallery {
+    constructor() {
+        this.path = "";
+        this.list = [];
+        this.file = '';
+        this.loading = false;
+        this.fixedPath = false;
+        this.uri = '';
+    }
+}
+export class AppStateQuestion {
+    constructor() {
+        this.options = [];
+    }
+}
+export class AppStateLog {
+}
 //# sourceMappingURL=types.js.map

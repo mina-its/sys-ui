@@ -1,28 +1,28 @@
-declare let WeakSet, axios, $, io: any;
+declare let WeakSet, $, axios: any;
 import Vue from 'vue';
 import App from './App.vue';
 import store from './store';
-import {Global, MenuItem, State, StateCmenu, StateGeoMap, Constants} from "@/types";
+import {MenuItem, Constants, AppState} from "@/types";
 import {
 	DirFile,
-	DirFileType,
 	Drive,
-	Form,
 	Keys,
 	Property,
-	RequestMode,
 	WebResponse,
 	LogType,
 	NotificationInfo,
 	GetOptions,
 	ComponentParams,
-	AjaxConfig,
 	StatusCode,
 	IError,
 	Pair,
-	WebMethod,
-	EmbeddedInfo
+	EmbeddedInfo,
+	RequestMode,
+	AjaxConfig,
+	WebMethod
 } from "../../sys/src/types";
+
+const st = store.state;
 
 export function $t(text: string): string {
 	return typeof (text) == "object" ? text[st.config.locale] || Object.values(text)[0] as string : text;
@@ -33,112 +33,35 @@ export function $t(text: string): string {
 	// return key.replace(/-/g, " ");
 }
 
-function validateTemplate(): boolean {
-	if (!$("#root").length) {
-		console.error("Html element like <div id=\"root\"> is expected!");
-		return false;
-	}
-
-	return true;
+export function updateStateRoot(state: AppState) {
+	store.commit('updateRoot', state);
 }
 
-export function start() {
-	if (!validateTemplate()) return;
-	startVue();
-	handleWindowEvents();
-	console.log(
-		`%c main started. %c version: 5.2.4 %c`,
-		'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
-		'background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
-		'background:transparent'
-	);
-}
-
-function startVue() {
-	Vue.config.devtools = true;
-
-	st = {
-		form: {} as Form,
-		menu: [],
-		navmenu: [],
-		data: {},
-		fileGallery: {
-			drive: null,
-			path: "",
-			list: [],
-			file: null,
-			selectable: null,
-		},
-		question: {
-			message: null,
-			options: []
-		},
-		modal: false,
-		toolbar: false,
-		config: {
-			appTitle: "",
-			brandingLogo: "",
-			locale: "",
-			appLocales: [],
-			loginRef: "",
-			loginTitle: ""
-		},
-		dirty: false,
-		notify: null,
-		cmenu: {show: false, items: [], handler: null, left: 0, top: 0} as StateCmenu,
-		geoMap: {show: false} as StateGeoMap
-	} as State;
-
-	let mainState = $("#main-state").html();
-	let res: WebResponse = mainState ? parse(mainState) : {};
-	st.config = res.config || {} as any;
-	st.logs = [];
-	st.menu = res.menu;
-	getNavmenu(res);
-
-	if (res.message) {
-		notify(res);
-	} else
-		initState(res);
-
-	Vue.directive("focus", {
-		inserted: function (el, binding) {
-			if (binding.value)
-				el.focus();
-		}
-	});
-	Vue.config.productionTip = false;
-	new Vue({
-		store,
-		render: (h) => h(App),
-	}).$mount('#root');
-}
-
-export function getNavmenu(res: WebResponse) {
-	let _navmenu = localStorage.getItem('_navmenu');
-	// if (_navmenu)
-	// 	st.navmenu = JSON.parse(_navmenu);
-	// else
-	st.navmenu = res.navmenu;
-}
-
-export function setNavmenu() {
-	let ref = location.pathname;
-	let title = document.title;
-	// if (st.form.breadcrumb && st.form.breadcrumb.length > 0) {
-	// 	let rootref = st.form.breadcrumb[0].ref;
-	// 	let rootItem = st.navmenu.filter(item => item.ref == rootref).pop();
-	// 	if (!rootItem)
-	// 		rootItem = {ref: rootref, title: st.form.breadcrumb[0].title};
-	//
-	// 	st.navmenu = st.navmenu.filter(item => item.ref != rootItem).slice(0, 3);
-	// 	st.navmenu.unshift(rootItem);
-	// } else {
-	//st.navmenu = st.navmenu.filter(item => item.ref != ref).slice(0, 8);
-	//st.navmenu.unshift({title, ref});
-	//}
-	localStorage.setItem('_navmenu', JSON.stringify(st.navmenu));
-}
+// export function getNavmenu(res: WebResponse) {
+// 	let _navmenu = localStorage.getItem('_navmenu');
+// 	// if (_navmenu)
+// 	// 	dispatchState({navmenu : JSON.parse(_navmenu)});
+// 	// else
+// 	return res.navmenu;
+// }
+//
+// export function setNavmenu() {
+// 	let ref = location.pathname;
+// 	let title = document.title;
+// 	// if (st.form.breadcrumb && st.form.breadcrumb.length > 0) {
+// 	// 	let rootref = st.form.breadcrumb[0].ref;
+// 	// 	let rootItem = st.navmenu.filter(item => item.ref == rootref).pop();
+// 	// 	if (!rootItem)
+// 	// 		rootItem = {ref: rootref, title: st.form.breadcrumb[0].title};
+// 	//
+// 	// 	dispatchState({navmenu : st.navmenu.filter(item => item.ref != rootItem).slice(0, 3);
+// 	// 	st.navmenu.unshift(rootItem);
+// 	// } else {
+// 	//st.navmenu = st.navmenu.filter(item => item.ref != ref).slice(0, 8);
+// 	//st.navmenu.unshift({title, ref});
+// 	//}
+// 	localStorage.setItem('_navmenu', JSON.stringify(st.config.navmenu));
+// }
 
 export function evalExpression($this: any, expression: string): any {
 	try {
@@ -149,93 +72,24 @@ export function evalExpression($this: any, expression: string): any {
 	}
 }
 
-function handleWindowEvents() {
-	$(window)
-		.on('notify', function (e: any) {
-			let notify: NotificationInfo = e.detail;
-
-			switch (notify.type) {
-				case LogType.Debug:
-					$("#snackbar").addClass("visible").text(notify.message);
-					setTimeout(function () {
-						$("#snackbar").removeClass("visible");
-					}, 3000);
-					break;
-
-				default:
-					st.notify = notify;
-					break;
-			}
-		})
-		.on('question', function (e: any) {
-			st.question = e.detail;
-		})
-		.on("popstate", (e) => {
-			load(location.href);
-		})
-		.on("beforeunload", (e) => {
-			if (st.dirty) {
-				e = e || window.event;
-				if (e)
-					e.returnValue = $t('save-before');
-				return $t('save-before');
-			}
-		})
-		.on("resize", (e) => {
-			hideCmenu();
-		})
-		.on("keydown", (e) => {
-			if (st.cmenu.show)
-				handleCmenuKeys(e);
-			st.notify = null;
-		})
-		.on("click", (e) => {
-			if (e.target.tagName == "A") {
-				if (e.target.getAttribute('target')) return; // especially _blank
-				let href = e.target.getAttribute('href');
-				if (href) {
-					if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
-					e.preventDefault();
-					if (st.dirty) {
-						notify($t('save-before'), LogType.Warning);
-						return;
-					} // dirty page
-					if (/\bf=\d/.test(href)) { // function link
-
-					} else
-						history.pushState(null, null, href);
-					load(href);
-				}
-			}
-		})
-		.on("mouseup", (e) => {
-			if (st.cmenu.show &&
-				!$('.dropdown-item').is(e.target)
-				&& $('.dropdown-item').has(e.target).length === 0
-				&& $('.dropdown-menu.show').has(e.target).length === 0
-			) hideCmenu();
-		});
-}
-
 export function initState(res: WebResponse) {
 	//log("load res: ", res.data);
 	let title = "";
 	if (res.form) {
-		st.form = res.form;
+		updateStateRoot({form: res.form});
 		title = st.form.title as string;
 	}
 	document.title = title;
-	st.headFuncs = [];
-	st.toolbar = false;
-	st.meta = res.meta || {};
-	if (res.config) st.config = res.config as any;
+	updateStateRoot({headFuncs: []});
+	updateStateRoot({toolbar: false});
+	updateStateRoot({meta: res.meta || {}});
+	if (res.config) updateStateRoot({config: res.config});
 	let data = res.data || {};
 	for (let prop in data) {
 		vueResetProperties(data[prop], prop, true);
 	}
 
-	glob.od = JSON.parse(JSON.stringify(data));
-	st.data = data;
+	updateStateRoot({data});
 	$(".details-view").scrollTop(0);
 	setNavmenu();
 }
@@ -250,53 +104,56 @@ function setUndefinedToNull(item, prop: Property) {
 }
 
 export function vueResetProperties(data: any, name: string, resetStatus: boolean) {
-	let meta = st.meta[name];
-	if (Array.isArray(data)) {
-		if (resetStatus)
-			data.forEach((item) => {
-				item._status = null;
-			});
-	} else {
-		if (data._id < 0) // new item
-			st.dirty = true;
-	}
-
-	if (!meta || !meta.properties) return;
-	for (let prop of meta.properties) {
-		if (Array.isArray(data)) {
-			data.forEach((item) => {
-				setUndefinedToNull(item, prop);
-			});
-		} else {
-			setUndefinedToNull(data, prop);
-		}
-	}
+	// todo
+	// let meta = st.meta[name];
+	// if (Array.isArray(data)) {
+	// 	if (resetStatus)
+	// 		data.forEach((item) => {
+	// 			item._status = null;
+	// 		});
+	// } else {
+	// 	if (data._id < 0) // new item
+	// 		commitStateRoot({dirty: true});
+	// }
+	//
+	// if (!meta || !meta.properties) return;
+	// for (let prop of meta.properties) {
+	// 	if (Array.isArray(data)) {
+	// 		data.forEach((item) => {
+	// 			setUndefinedToNull(item, prop);
+	// 		});
+	// 	} else {
+	// 		setUndefinedToNull(data, prop);
+	// 	}
+	// }
 }
 
 function validateData(data, ref: string): boolean {
-	let meta = st.meta[ref];
-	let requiredProps = meta.properties.filter(p => p.required);
-	for (let prop of requiredProps) {
-		if (data[prop.name] == null) {
-			notify(`Property '${prop.name}' is required.`, LogType.Warning);
-			// if (!Array.isArray(st.data[ref]))
-			// 	data._error = `Property '${prop.name}' is required.`;
-			return false;
-		}
-	}
+	// todo
+	// let meta = st.meta[ref];
+	// let requiredProps = meta.properties.filter(p => p.required);
+	// for (let prop of requiredProps) {
+	// 	if (data[prop.name] == null) {
+	// 		notify(`Property '${prop.name}' is required.`, LogType.Warning);
+	// 		// if (!Array.isArray(st.data[ref]))
+	// 		// 	data._error = `Property '${prop.name}' is required.`;
+	// 		return false;
+	// 	}
+	// }
 	return true;
 }
 
 export function validate(): boolean {
-	for (let ref in st.data) {
-		if (Array.isArray(st.data[ref])) {
-			for (let item of st.data[ref]) {
-				if (!validateData(item, ref))
-					return false;
-			}
-		} else if (!validateData(st.data[ref], ref))
-			return false;
-	}
+	// todo
+	// for (let ref in st.data) {
+	// 	if (Array.isArray(st.data[ref])) {
+	// 		for (let item of st.data[ref]) {
+	// 			if (!validateData(item, ref))
+	// 				return false;
+	// 		}
+	// 	} else if (!validateData(st.data[ref], ref))
+	// 		return false;
+	// }
 
 	return true;
 }
@@ -306,24 +163,25 @@ export function someProps(prop): boolean {
 }
 
 export function commitNewItem() {
-	let objectName = location.pathname.replace(/\//, '');
-	let data = st.data[objectName];
-	if (data._id != -1) {
-		notify('Invalid state, please refresh and check if the item already has been added!', LogType.Error);
-		return;
-	}
-	for (let ref in st.data) {
-		if (ref.indexOf(objectName + "/") == 0) {
-			data[ref.substr(objectName.length + 1)] = st.data[ref];
-		}
-	}
-
-	ajax(prepareServerUrl(objectName), data, null, (res) => {
-		st.dirty = false;
-		location.href = `/${objectName}/${res.data._id.$oid}`;
-	}, (err) => {
-		notify(err);
-	});
+	// todo
+	// let objectName = location.pathname.replace(/\//, '');
+	// let data = st.data[objectName];
+	// if (data._id != -1) {
+	// 	notify('Invalid state, please refresh and check if the item already has been added!', LogType.Error);
+	// 	return;
+	// }
+	// for (let ref in st.data) {
+	// 	if (ref.indexOf(objectName + "/") == 0) {
+	// 		data[ref.substr(objectName.length + 1)] = st.data[ref];
+	// 	}
+	// }
+	//
+	// ajax(prepareServerUrl(objectName), data, null, (res) => {
+	// 	commitStateRoot({dirty: false});
+	// 	location.href = `/${objectName}/${res.data._id.$oid}`;
+	// }, (err) => {
+	// 	notify(err);
+	// });
 }
 
 export function prepareServerUrl(ref: string): string {
@@ -336,21 +194,6 @@ export function prepareServerUrl(ref: string): string {
 
 export function onlyUnique(value, index, self) {
 	return self.indexOf(value) === index;
-}
-
-function resetToolbar() {
-	st.toolbar = false;
-}
-
-export function load(href) {
-	if (st.dirty) {
-		notify($t('save-before'), LogType.Warning);
-		return;
-	}
-
-	ajax(setQs('m', RequestMode.partial, false, href), null, null, handleResponse, (err) => {
-		notify(err);
-	});
 }
 
 export function handleResponse(res: WebResponse) {
@@ -426,7 +269,7 @@ export function getPropReferenceValue(meta: Property, data): string {
 }
 
 function refresh() {
-	st.dirty = false;
+	updateStateRoot({dirty: false});
 	location.reload();
 }
 
@@ -466,11 +309,11 @@ export function showCmenu(state, items: MenuItem[], event, handler: (state, item
 			items[0].hover = true;
 	}
 
-	st.cmenu = {show: true, items, handler, state, top: 0, left: 0, right: 0, bottom: 0, event};
+	updateStateRoot({cmenu: {show: true, items, handler, state, top: 0, left: 0, right: 0, bottom: 0, event}});
 }
 
 export function hideCmenu() {
-	st.cmenu.show = false;
+	store.commit('updateCMenu', {show: false});
 }
 
 function handleCmenuKeys(e) {
@@ -492,13 +335,13 @@ function handleCmenuKeys(e) {
 
 		case Keys.down: {
 			let item = st.cmenu.items.find(i => i.hover);
-			if (!item)
-				st.cmenu.items[0].hover = true;
-			else {
-				let i = st.cmenu.items.indexOf(item);
-				if (i < st.cmenu.items.length - 1) {
-					item.hover = false;
-					st.cmenu.items[i + 1].hover = true;
+			if (!item) {
+				store.commit('updateCMenuItem', {index: 0, update: {hover: true}});
+			} else {
+				let index = st.cmenu.items.indexOf(item);
+				if (index < st.cmenu.items.length - 1) {
+					store.commit('updateCMenuItem', {index: index, update: {hover: false}});
+					store.commit('updateCMenuItem', {index: index + 1, update: {hover: true}});
 				}
 			}
 			break;
@@ -507,12 +350,12 @@ function handleCmenuKeys(e) {
 		case Keys.up: {
 			let item = st.cmenu.items.find(i => i.hover);
 			if (!item)
-				st.cmenu.items[st.cmenu.items.length - 1].hover = true;
+				store.commit('updateCMenuItem', {index: st.cmenu.items.length - 1, update: {hover: true}});
 			else {
-				let i = st.cmenu.items.indexOf(item);
-				if (i > 0) {
-					item.hover = false;
-					st.cmenu.items[i - 1].hover = true;
+				let index = st.cmenu.items.indexOf(item);
+				if (index > 0) {
+					store.commit('updateCMenuItem', {index: index, update: {hover: false}});
+					store.commit('updateCMenuItem', {index: index - 1, update: {hover: true}});
 				}
 			}
 			break;
@@ -613,7 +456,7 @@ export function flat2recursive(flatJson: any): any {
 }
 
 export function browseFile(fileBrowsed?: (files: any[]) => void) {
-	st.fileGallery.fileBrowsed = fileBrowsed;
+	store.commit('updateFileGallery', {fileBrowsed});
 	$("#file-browse").val("").click();
 }
 
@@ -622,21 +465,27 @@ export function refreshFileGallery(file?: string, done?) {
 }
 
 export function openFileGallery(drive: Drive, file: string, path: string, fixedPath: boolean, fileSelectCallback: (path: string, item: DirFile) => void, done?) {
-	st.fileGallery.drive = drive;
-	st.fileGallery.file = file;
-	st.fileGallery.path = path || "";
-	st.fileGallery.fixedPath = fixedPath;
-	st.fileGallery.selectable = true;
-	st.fileGallery.fileSelectCallback = fileSelectCallback;
+	updateStateRoot({
+		fileGallery: {
+			list: [],
+			loading: true,
+			drive,
+			file,
+			path: path || "",
+			fixedPath,
+			selectable: true,
+			fileSelectCallback: fileSelectCallback
+		}
+	});
 
 	$("#file-gallery").modal("show");
-	st.fileGallery.loading = true;
-	st.fileGallery.list = [];
 	ajax('/getFileGallery?m=1', {drive: drive._id, path}, {}, (res) => {
-		st.fileGallery.loading = false;
-		st.fileGallery.uri = res.data.uri;
-		st.fileGallery.list = res.data.list;
-		st.fileGallery.selected = st.fileGallery.list.find(l => l.name == st.fileGallery.file);
+		store.commit('updateFileGallery', {
+			loading: false,
+			uri: res.data.uri,
+			list: res.data.list,
+			selected: st.fileGallery.list.find(l => l.name == st.fileGallery.file)
+		});
 		if (done) done();
 	});
 }
@@ -674,47 +523,6 @@ export function joinUri(...parts: string[]): string {
 		uri += "/" + (part || "").replace(/^\//, '').replace(/\/$/, '');
 	}
 	return uri.substr(1);
-}
-
-export function ajax(url: string, data: any, config: AjaxConfig, done: (res: WebResponse) => void, fail?: (err: { code: StatusCode, message: string }) => void) {
-	let params: any = {url, data};
-
-	if (config && config.method)
-		params.method = config.method;
-	else
-		params.method = data ? WebMethod.post : WebMethod.get;
-
-	if (data && data._files) {
-		params.data = new FormData();
-		for (let file of data._files) {
-			params.data.append('files[]', file, file['name']);
-		}
-		params.data.append('data', JSON.stringify(data));
-		params.headers = {'Content-Type': 'multipart/form-data'};
-	}
-
-	fail = fail || notify;
-	axios(params).then((res) => {
-		if (res.code && res.code != StatusCode.Ok)
-			fail({code: res.code, message: res.message});
-		else {
-			try {
-				done(res.data);
-			} catch (ex) {
-				notify(`error on handling ajax response: ${ex.message}`);
-				console.error(res, ex);
-			}
-		}
-	}).catch((err) => {
-		console.error(`error on ajax '${url}'`, err);
-
-		if (err.response && err.response.data && err.response.data.message)
-			fail({message: err.response.data.message, code: err.response.data.code});
-		else if (err.response && err.response.data)
-			fail({message: err.response.data, code: err.response.status});
-		else
-			fail({message: err.toString(), code: StatusCode.UnknownError});
-	});
 }
 
 export function notify(content: string | IError, type?: LogType, params?: NotificationInfo) {
@@ -808,6 +616,76 @@ export function setPropertyEmbeddedError(doc: any, propName: string, error: stri
 	(doc._[propName] as EmbeddedInfo).err = error;
 }
 
-$(document).ready(start);
-export let glob = new Global();
-export let st: State;
+export function load(href) {
+	if (this.state.dirty) {
+		notify($t('save-before'), LogType.Warning);
+		return;
+	}
+
+	this.ajax(setQs('m', RequestMode.partial, false, href), null, null, handleResponse, (err) => {
+		notify(err);
+	});
+}
+
+export function ajax(url: string, data: any, config: AjaxConfig, done: (res: WebResponse) => void, fail?: (err: { code: StatusCode, message: string }) => void) {
+	let params: any = {url, data};
+
+	if (config && config.method)
+		params.method = config.method;
+	else
+		params.method = data ? WebMethod.post : WebMethod.get;
+
+	if (data && data._files) {
+		params.data = new FormData();
+		for (let file of data._files) {
+			params.data.append('files[]', file, file['name']);
+		}
+		params.data.append('data', JSON.stringify(data));
+		params.headers = {'Content-Type': 'multipart/form-data'};
+	}
+
+	fail = fail || notify;
+	axios(params).then((res) => {
+		if (res.code && res.code != StatusCode.Ok)
+			fail({code: res.code, message: res.message});
+		else {
+			try {
+				done(res.data);
+			} catch (ex) {
+				notify(`error on handling ajax response: ${ex.message}`);
+				console.error(res, ex);
+			}
+		}
+	}).catch((err) => {
+		console.error(`error on ajax '${url}'`, err);
+
+		if (err.response && err.response.data && err.response.data.message)
+			fail({message: err.response.data.message, code: err.response.data.code});
+		else if (err.response && err.response.data)
+			fail({message: err.response.data, code: err.response.status});
+		else
+			fail({message: err.toString(), code: StatusCode.UnknownError});
+	});
+}
+
+(function start() {
+	let mainState = $("#main-state").html();
+	let res: WebResponse = mainState ? parse(mainState) : {};
+	updateStateRoot({config: res.config || {}});
+
+	if (res.message) {
+		notify(res);
+	} else
+		initState(res);
+
+	Object.assign(Vue.config, {productionTip: false, devtools: true});
+	Vue.directive("focus", {
+		inserted(el, binding) {
+			if (binding.value) el.focus();
+		}
+	});
+	new Vue({
+		store,
+		render: (h) => h(App),
+	}).$mount('#root');
+})();

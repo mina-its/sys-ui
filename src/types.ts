@@ -1,15 +1,9 @@
-import {
-	Pair,
-	Property,
-	Form,
-	WebMethod,
-	DirFile,
-	Drive,
-	LogType,
-	NotificationInfo,
-	ObjectMeta,
-	FunctionMeta
-} from "../../sys/src/types";
+import {Property, WebMethod, Form, Drive, DirFile, Pair, LogType, NotificationInfo, AppStateConfig} from "../../sys/src/types";
+
+export const Constants = {
+	redirectBack: "_back",
+	redirectSelf: "_self",
+};
 
 export const ChartColors = [
 	'rgba(54, 162, 235, 0.8)',//blue:
@@ -20,61 +14,6 @@ export const ChartColors = [
 	'rgba(153, 102, 255, 0.8)',//purple:
 	'rgba(231,233,237, 0.8)'//grey:
 ];
-
-export class Global {
-	od: any;
-	md: Modify[] = [];
-	counter = 1;
-	io: any;
-}
-
-export class State {
-	form: Form;
-	data: any;
-	meta: ObjectMeta | FunctionMeta;
-	toolbar: boolean;
-	dirty: boolean;
-	notify: NotificationInfo;
-	logs: {
-		message?: string;
-		ref?: string;
-		type?: LogType;
-	}[];
-	cmenu: StateCmenu;
-	question: {
-		questionId: string;
-		message: string;
-		options: Pair[];
-		select: (item: Pair) => void;
-	};
-	menu: any[];
-	modal: boolean;
-	navmenu: any[];
-	config: {
-		locale: string;
-		interactive: boolean;
-		appLocales: Pair[];
-		brandingLogo: string;
-		appTitle: string;
-		loginRef: string;
-		loginTitle: string;
-	};
-	fileGallery: {
-		drive: Drive;
-		file: string;
-		path: string;
-		loading: boolean;
-		fixedPath: boolean;
-		selectable: boolean;
-		selected: DirFile;
-		uri: string;
-		list: DirFile[];
-		fileSelectCallback?: (path: string, item: DirFile) => void;
-		fileBrowsed?: (files: any[]) => void;
-	};
-	geoMap: StateGeoMap;
-	headFuncs: HeadFunc[];
-}
 
 export class HeadFunc {
 	title: string;
@@ -91,14 +30,16 @@ export class MenuItem {
 
 export class Modify {
 	data: any;
-	item: any;
 	type: WebMethod;
-	rootRef: string;
 	ref: string;
 }
 
-export class StateGeoMap {
-	marker?: any;
+export class AppStateGeoMap {
+	constructor() {
+		this.show = false;
+	}
+
+	marker: any;
 	show: boolean;
 	val: { x: number, y: number, z: number };
 	select: (val) => void;
@@ -108,7 +49,14 @@ export enum RowStatus {
 	Selected = 1,
 }
 
-export class StateCmenu {
+export class AppStateCmenu {
+	constructor() {
+		this.show = false;
+		this.items = [];
+		this.left = 0;
+		this.top = 0;
+	}
+
 	state: any;
 	show: boolean;
 	items: MenuItem[];
@@ -118,17 +66,6 @@ export class StateCmenu {
 	right: number;
 	event: any;
 	handler: (state, item) => void;
-}
-
-export const Constants = {
-	redirectBack: "_back",
-	redirectSelf: "_self",
-};
-
-export enum Gmode {
-	noGrouping = 0,
-	grouped = 1,
-	sideMenu = 2,
 }
 
 export enum PropertyLabelMode {
@@ -206,3 +143,69 @@ export class ApiDoc {
 	schemas: ApiDocSchema[] = [];
 	enums: ApiDocEnum[] = [];
 }
+
+export class Global {
+	constructor() {
+		this.fileGallery = new AppStateFileGallery();
+		this.question = new AppStateQuestion();
+		this.modal = false;
+		this.headFuncs = [];
+		this.config = new AppStateConfig();
+		this.cmenu = new AppStateCmenu();
+		this.geoMap = new AppStateGeoMap();
+		this.modifies = [];
+	}
+
+	form: Form;
+	question: AppStateQuestion;
+	fileGallery: AppStateFileGallery;
+	logs: AppStateLog[];
+	modal: boolean;
+	headFuncs: HeadFunc[];
+	config: AppStateConfig;
+	notify?: NotificationInfo;
+	cmenu: AppStateCmenu;
+	geoMap: AppStateGeoMap;
+	modifies: Modify[];
+}
+
+export class AppStateFileGallery {
+	constructor() {
+		this.path = "";
+		this.list = [];
+		this.file = '';
+		this.loading = false;
+		this.fixedPath = false;
+		this.uri = '';
+	}
+
+	drive: Drive;
+	path: string;
+	list: DirFile[];
+	file: string;
+	selectable: boolean;
+	loading: boolean;
+	fixedPath: boolean;
+	selected: DirFile;
+	uri: string;
+	fileSelectCallback: (path: string, item: DirFile) => void;
+	fileBrowsed: (files: any[]) => void;
+}
+
+export class AppStateQuestion {
+	constructor() {
+		this.options = [];
+	}
+
+	message: string;
+	options: [];
+	questionId: string;
+	select: (item: Pair) => void;
+}
+
+export class AppStateLog {
+	message?: string;
+	ref?: string;
+	type?: LogType;
+}
+

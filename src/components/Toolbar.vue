@@ -1,22 +1,22 @@
 <template>
-    <div v-if="alwaysVisible || st.toolbar" class="d-flex p-2 pl-4 btn-toolbar border-bottom separator-line"
+    <div v-if="alwaysVisible || toolbar" class="d-flex p-2 pl-4 btn-toolbar border-bottom separator-line"
          role="toolbar" aria-label="Toolbar with button groups">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb pt-2 p-0 m-0 bg-transparent">
-                <li v-for="item in st.form.breadcrumb" class="breadcrumb-item">
+                <li v-for="item in currentForm.breadcrumb" class="breadcrumb-item">
                     <a :href="item.ref">{{item.title}}</a>
                     <i class="fa fa-chevron-right ml-1"></i>
                 </li>
-                <li class="breadcrumb-item active" aria-current="page">{{st.form.title}}</li>
+                <li class="breadcrumb-item active" aria-current="page">{{currentForm.title}}</li>
             </ol>
         </nav>
-        <div v-if="st.dirty" class="mx-2" role="group">
-            <function styles="btn-primary" @exec="apply" name="apply" title="${$t('apply')}"></function>
-            <function styles="btn-link" @exec="cancel" name="cancel" title="${$t('cancel')}"></function>
+        <div v-if="isDirty" class="mx-2" role="group">
+            <function styles="btn-primary" @exec="apply" name="apply" :title="$t('apply')"></function>
+            <function styles="btn-link" @exec="cancel" name="cancel" :title="$t('cancel')"></function>
         </div>
         <div class="mr-auto"></div>
         <div class="mx-2" role="group">
-            <function v-for="func in st.headFuncs" :key="func._id" styles="btn-primary" :name="func.name"
+            <function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name"
                       @exec="func.exec" :title="func.title"></function>
         </div>
         <function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></function>
@@ -24,11 +24,10 @@
 </template>
 
 <script lang="ts">
-	declare let DeepDiff, $: any;
+	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {st, glob, prepareServerUrl, $t, flat2recursive} from "@/main";
+	import {prepareServerUrl, $t, flat2recursive} from "@/main";
 	import {Keys, WebMethod, LogType} from '../../../sys/src/types';
-	import {Modify, DiffKind} from '@/types';
 
 	const main = require("./main");
 
@@ -50,100 +49,102 @@
 		}
 
 		findDiffOnEdit(itemRef: string, item: any, ref: string, data: any, diff: any, path: any[]) {
-			let modify: Modify = glob.md.find(m => m.ref == itemRef);
-			if (!modify) {
-				modify = {type: WebMethod.patch, ref: itemRef, data: {_id: item._id}, item: item, rootRef: ref} as Modify;
-				glob.md.push(modify);
-			}
-
-			let val = diff.rhs;
-			if (path[path.length - 1] == "$oid") {
-				path.pop();
-				val = {"$oid": val};
-			}
-			if (path.length > 1 && typeof path[path.length - 1] == "number") {
-				// case: remove first sub role, the second sub role is substituted.
-				path.pop();
-				modify.data[path.join('.')] = item[path.join('.')];
-			} else
-				modify.data[path.join('.')] = val;
+			// todo
+			// let modify: Modify = glob.md.find(m => m.ref == itemRef);
+			// if (!modify) {
+			// 	modify = {type: WebMethod.patch, ref: itemRef, data: {_id: item._id}, item: item, rootRef: ref} as Modify;
+			// 	glob.md.push(modify);
+			// }
+			//
+			// let val = diff.rhs;
+			// if (path[path.length - 1] == "$oid") {
+			// 	path.pop();
+			// 	val = {"$oid": val};
+			// }
+			// if (path.length > 1 && typeof path[path.length - 1] == "number") {
+			// 	// case: remove first sub role, the second sub role is substituted.
+			// 	path.pop();
+			// 	modify.data[path.join('.')] = item[path.join('.')];
+			// } else
+			// 	modify.data[path.join('.')] = val;
 		}
 
 		findDiffOnInsert(itemRef: string, item: any, ref: string, data: any, diff: any, path: any[]) {
-			if (path && path.length) { // Add to multiple value property
-				if (path.length != 1)
-					throw "findDiffOnInsert, Invalid diff path length!";
-
-				let modify: Modify = glob.md.find(md => md.ref == itemRef);
-				if (!modify) {
-					modify = {type: WebMethod.patch, ref: itemRef, data: {_id: item._id}, item: data, rootRef: ref} as Modify;
-					glob.md.push(modify);
-				}
-				modify.data[path.join('.')] = item[path.join('.')];
-				return;
-			}
-
-			let newItem = {};
-			diff.item.rhs.map((value, key) => {
-				if (value !== null) {
-					newItem[key] = value;
-				}
-			});
-
-			glob.md.push({
-				type: WebMethod.post,
-				ref: itemRef,
-				data: newItem,
-				item: diff.item.rhs,
-				rootRef: ref
-			} as Modify);
+			// todo
+			// if (path && path.length) { // Add to multiple value property
+			// 	if (path.length != 1)
+			// 		throw "findDiffOnInsert, Invalid diff path length!";
+			//
+			// 	let modify: Modify = glob.md.find(md => md.ref == itemRef);
+			// 	if (!modify) {
+			// 		modify = {type: WebMethod.patch, ref: itemRef, data: {_id: item._id}, item: data, rootRef: ref} as Modify;
+			// 		glob.md.push(modify);
+			// 	}
+			// 	modify.data[path.join('.')] = item[path.join('.')];
+			// 	return;
+			// }
+			//
+			// let newItem = {};
+			// diff.item.rhs.map((value, key) => {
+			// 	if (value !== null) {
+			// 		newItem[key] = value;
+			// 	}
+			// });
+			//
+			// glob.md.push({
+			// 	type: WebMethod.post,
+			// 	ref: itemRef,
+			// 	data: newItem,
+			// 	item: diff.item.rhs,
+			// 	rootRef: ref
+			// } as Modify);
 		}
 
-		findDiff(ref: string) {
-			let data = st.data[ref];
-			let od = glob.od[ref];
-
-			if (Array.isArray(data)) {
-				for (let item of data) {
-					item._status = null;
-				}
-				for (let item of od) {
-					item._status = null;
-				}
-			}
-
-			let diffs = DeepDiff(od, data) || [];
-			for (let diff of diffs) {
-				let item, itemRef;
-				let path = diff.path ? JSON.parse(JSON.stringify(diff.path)) : null; // case: when we delete two sub roles, path is shared between different diffs
-				if (Array.isArray(data) && path && path.length > 0) {
-					item = data[path[0]];
-					path.shift();
-					itemRef = `${ref}/${main.getBsonId(item)}`;
-				} else {
-					item = data;
-					itemRef = ref;
-				}
-
-				switch (diff.kind) {
-					case DiffKind.newlyAdded:
-					case DiffKind.edited:
-						this.findDiffOnEdit(itemRef, item, ref, data, diff, path);
-						break;
-
-					case DiffKind.deleted:
-						break;
-
-					case DiffKind.arrayChange: {
-						this.findDiffOnInsert(itemRef, item, ref, data, diff, path);
-						break;
-					}
-				}
-			}
-		}
+		// findDiff(ref: string) {
+		// 	let data = st.data[ref];
+		// 	let od = glob.od[ref];
+		//
+		// 	if (Array.isArray(data)) {
+		// 		for (let item of data) {
+		// 			item._status = null;
+		// 		}
+		// 		for (let item of od) {
+		// 			item._status = null;
+		// 		}
+		// 	}
+		//
+		// 	let diffs = DeepDiff(od, data) || [];
+		// 	for (let diff of diffs) {
+		// 		let item, itemRef;
+		// 		let path = diff.path ? JSON.parse(JSON.stringify(diff.path)) : null; // case: when we delete two sub roles, path is shared between different diffs
+		// 		if (Array.isArray(data) && path && path.length > 0) {
+		// 			item = data[path[0]];
+		// 			path.shift();
+		// 			itemRef = `${ref}/${main.getBsonId(item)}`;
+		// 		} else {
+		// 			item = data;
+		// 			itemRef = ref;
+		// 		}
+		//
+		// 		switch (diff.kind) {
+		// 			case DiffKind.newlyAdded:
+		// 			case DiffKind.edited:
+		// 				this.findDiffOnEdit(itemRef, item, ref, data, diff, path);
+		// 				break;
+		//
+		// 			case DiffKind.deleted:
+		// 				break;
+		//
+		// 			case DiffKind.arrayChange: {
+		// 				this.findDiffOnInsert(itemRef, item, ref, data, diff, path);
+		// 				break;
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		apply(cn?, done?) {
-			st.notify = null;
+			main.updateStateRoot({notify: null});
 			if (!done) done = () => {
 				main.log('Apply done!');
 			};
@@ -224,6 +225,22 @@
 					parent[parts[parts.length - 1]] = val;
 				}
 			}
+		}
+
+		get toolbar() {
+			return this.$store.state.toolbar;
+		}
+
+		get currentForm() {
+			return this.$store.state.form;
+		}
+
+		get isDirty() {
+			return this.$store.state.isDirty;
+		}
+
+		get headFuncs() {
+			return this.$store.state.headFuncs;
 		}
 
 		// submitFile(modify: Modify, done) {

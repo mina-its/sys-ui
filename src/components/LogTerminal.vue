@@ -8,8 +8,9 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {st, glob, $t} from "@/main";
+	import {$t} from "@/main";
 	import {ClientCommand, MenuItem} from '../../../sys/src/types';
+	import WebSocket from "@/components/WebSocket.vue";
 
 	const main = require("./main");
 
@@ -18,8 +19,7 @@
 		@Prop() private prop!: string;
 
 		mounted() {
-			if (glob.io)
-				glob.io.emit('cmd', ClientCommand.Ping);
+			WebSocket.call("emit", 'cmd', ClientCommand.Ping);
 		}
 
 		openMenu(e) {
@@ -27,7 +27,7 @@
 			main.showCmenu(null, items, e, (state, item: MenuItem) => {
 				switch (item.ref) {
 					case "clear":
-						st.logs = [];
+						this.$store.commit("clearLogs");
 						break;
 				}
 			});
@@ -35,13 +35,7 @@
 		}
 
 		get logs() {
-			return st.logs.map(log => log || {type: 0});
-		}
-
-		bind() {
-			// Vue.nextTick(() => {
-			// 	this.el.focus();
-			// })
+			return this.$store.state.logs.map(log => log || {type: 0});
 		}
 	}
 </script>
