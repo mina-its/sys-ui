@@ -15,9 +15,7 @@
 
 		mounted() {
 			let chartData = {labels: [], datasets: []};
-			chartData.labels = this.data.series.map((s) => {
-				return s.x
-			});
+			chartData.labels = this.data.series.map(s => s.x);
 
 			let dataSet = {backgroundColor: ChartColors[0], data: [], label: this.data.title, type: this.data.type};
 			this.data.series.forEach(function (s) {

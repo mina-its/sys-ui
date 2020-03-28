@@ -1,4 +1,14 @@
-import {Property, WebMethod, Form, Drive, DirFile, Pair, LogType, NotificationInfo, AppStateConfig} from "../../sys/src/types";
+import {
+	Property,
+	WebMethod,
+	Form,
+	Drive,
+	DirFile,
+	Pair,
+	LogType,
+	NotificationInfo,
+	AppStateConfig
+} from "../../sys/src/types";
 
 export const Constants = {
 	redirectBack: "_back",
@@ -154,15 +164,18 @@ export class Global {
 		this.cmenu = new AppStateCmenu();
 		this.geoMap = new AppStateGeoMap();
 		this.modifies = [];
+		this.dirty = false;
 	}
 
 	form: Form;
+	data: any;
 	question: AppStateQuestion;
 	fileGallery: AppStateFileGallery;
 	logs: AppStateLog[];
 	modal: boolean;
 	headFuncs: HeadFunc[];
 	config: AppStateConfig;
+	dirty: boolean;
 	notify?: NotificationInfo;
 	cmenu: AppStateCmenu;
 	geoMap: AppStateGeoMap;
@@ -186,10 +199,10 @@ export class AppStateFileGallery {
 	selectable: boolean;
 	loading: boolean;
 	fixedPath: boolean;
-	selected: DirFile;
-	uri: string;
+	selected?: DirFile;
+	uri?: string;
 	fileSelectCallback: (path: string, item: DirFile) => void;
-	fileBrowsed: (files: any[]) => void;
+	fileBrowsed?: (files: any[]) => void;
 }
 
 export class AppStateQuestion {

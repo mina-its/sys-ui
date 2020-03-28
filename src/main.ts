@@ -1,8 +1,9 @@
+import Function from "@/components/Function.vue";
+
 declare let WeakSet, $, axios: any;
 import Vue from 'vue';
 import App from './App.vue';
-import store from './store';
-import {MenuItem, Constants, AppState} from "@/types";
+import {MenuItem, Constants, Global} from "@/types";
 import {
 	DirFile,
 	Drive,
@@ -19,22 +20,21 @@ import {
 	EmbeddedInfo,
 	RequestMode,
 	AjaxConfig,
-	WebMethod
+	WebMethod,
+	ObjectDeclare,
+	FunctionDeclare,
+	ItemMeta
 } from "../../sys/src/types";
 
-const st = store.state;
+let glob = new Global();
 
 export function $t(text: string): string {
-	return typeof (text) == "object" ? text[st.config.locale] || Object.values(text)[0] as string : text;
+	return typeof (text) == "object" ? text[glob.config.locale] || Object.values(text)[0] as string : text;
 
 	// if (text[pack + "." + key]) return text[pack + "." + key];
 	//
 	// console.warn(`Warning: text '${pack}.${key}' not found`);
 	// return key.replace(/-/g, " ");
-}
-
-export function updateStateRoot(state: AppState) {
-	store.commit('updateRoot', state);
 }
 
 // export function getNavmenu(res: WebResponse) {
@@ -48,19 +48,19 @@ export function updateStateRoot(state: AppState) {
 // export function setNavmenu() {
 // 	let ref = location.pathname;
 // 	let title = document.title;
-// 	// if (st.form.breadcrumb && st.form.breadcrumb.length > 0) {
-// 	// 	let rootref = st.form.breadcrumb[0].ref;
-// 	// 	let rootItem = st.navmenu.filter(item => item.ref == rootref).pop();
+// 	// if (glob.form.breadcrumb && glob.form.breadcrumb.length > 0) {
+// 	// 	let rootref = glob.form.breadcrumb[0].ref;
+// 	// 	let rootItem = glob.navmenu.filter(item => item.ref == rootref).pop();
 // 	// 	if (!rootItem)
-// 	// 		rootItem = {ref: rootref, title: st.form.breadcrumb[0].title};
+// 	// 		rootItem = {ref: rootref, title: glob.form.breadcrumb[0].title};
 // 	//
-// 	// 	dispatchState({navmenu : st.navmenu.filter(item => item.ref != rootItem).slice(0, 3);
-// 	// 	st.navmenu.unshift(rootItem);
+// 	// 	dispatchState({navmenu : glob.navmenu.filter(item => item.ref != rootItem).slice(0, 3);
+// 	// 	glob.navmenu.unshift(rootItem);
 // 	// } else {
-// 	//st.navmenu = st.navmenu.filter(item => item.ref != ref).slice(0, 8);
-// 	//st.navmenu.unshift({title, ref});
+// 	//glob.navmenu = glob.navmenu.filter(item => item.ref != ref).slice(0, 8);
+// 	//glob.navmenu.unshift({title, ref});
 // 	//}
-// 	localStorage.setItem('_navmenu', JSON.stringify(st.config.navmenu));
+// 	localStorage.setItem('_navmenu', JSON.stringify(glob.config.navmenu));
 // }
 
 export function evalExpression($this: any, expression: string): any {
@@ -76,22 +76,20 @@ export function initState(res: WebResponse) {
 	//log("load res: ", res.data);
 	let title = "";
 	if (res.form) {
-		updateStateRoot({form: res.form});
-		title = st.form.title as string;
+		glob.form = res.form;
+		title = glob.form.title as string;
 	}
 	document.title = title;
-	updateStateRoot({headFuncs: []});
-	updateStateRoot({toolbar: false});
-	updateStateRoot({meta: res.meta || {}});
-	if (res.config) updateStateRoot({config: res.config});
+	glob.headFuncs = [];
+	// glob.form.toolbar = false;
+	// if (glob.config) glob.config = res.config;
 	let data = res.data || {};
 	for (let prop in data) {
 		vueResetProperties(data[prop], prop, true);
 	}
 
-	updateStateRoot({data});
+	glob.data = data;
 	$(".details-view").scrollTop(0);
-	setNavmenu();
 }
 
 function setUndefinedToNull(item, prop: Property) {
@@ -104,57 +102,48 @@ function setUndefinedToNull(item, prop: Property) {
 }
 
 export function vueResetProperties(data: any, name: string, resetStatus: boolean) {
-	// todo
-	// let meta = st.meta[name];
-	// if (Array.isArray(data)) {
-	// 	if (resetStatus)
-	// 		data.forEach((item) => {
-	// 			item._status = null;
-	// 		});
-	// } else {
-	// 	if (data._id < 0) // new item
-	// 		commitStateRoot({dirty: true});
-	// }
-	//
-	// if (!meta || !meta.properties) return;
-	// for (let prop of meta.properties) {
-	// 	if (Array.isArray(data)) {
-	// 		data.forEach((item) => {
-	// 			setUndefinedToNull(item, prop);
-	// 		});
-	// 	} else {
-	// 		setUndefinedToNull(data, prop);
-	// 	}
-	// }
+	let meta = data._ as ItemMeta;
+	if (Array.isArray(data)) {
+		if (resetStatus)
+			data.forEach(item => item._status = null);
+	} else {
+		if (data._id < 0) // new item
+			glob.dirty = true;
+	}
+
+	if (!meta || !meta.dec || !meta.dec.properties) return;
+	for (let prop of meta.dec.properties) {
+		if (Array.isArray(data))
+			data.forEach(item => setUndefinedToNull(item, prop));
+		else
+			setUndefinedToNull(data, prop);
+	}
 }
 
 function validateData(data, ref: string): boolean {
-	// todo
-	// let meta = st.meta[ref];
-	// let requiredProps = meta.properties.filter(p => p.required);
-	// for (let prop of requiredProps) {
-	// 	if (data[prop.name] == null) {
-	// 		notify(`Property '${prop.name}' is required.`, LogType.Warning);
-	// 		// if (!Array.isArray(st.data[ref]))
-	// 		// 	data._error = `Property '${prop.name}' is required.`;
-	// 		return false;
-	// 	}
-	// }
+	let meta = data._ as ItemMeta;
+	let requiredProps = meta.dec.properties.filter(p => p.required);
+	for (let prop of requiredProps) {
+		if (data[prop.name] == null) {
+			notify(`Property '${prop.name}' is required.`, LogType.Warning);
+			// if (!Array.isArray(glob.data[ref]))
+			// 	data._error = `Property '${prop.name}' is required.`;
+			return false;
+		}
+	}
 	return true;
 }
 
 export function validate(): boolean {
-	// todo
-	// for (let ref in st.data) {
-	// 	if (Array.isArray(st.data[ref])) {
-	// 		for (let item of st.data[ref]) {
-	// 			if (!validateData(item, ref))
-	// 				return false;
-	// 		}
-	// 	} else if (!validateData(st.data[ref], ref))
-	// 		return false;
-	// }
-
+	for (let ref in glob.data) {
+		if (Array.isArray(glob.data[ref])) {
+			for (let item of glob.data[ref]) {
+				if (!validateData(item, ref))
+					return false;
+			}
+		} else if (!validateData(glob.data[ref], ref))
+			return false;
+	}
 	return true;
 }
 
@@ -165,14 +154,14 @@ export function someProps(prop): boolean {
 export function commitNewItem() {
 	// todo
 	// let objectName = location.pathname.replace(/\//, '');
-	// let data = st.data[objectName];
+	// let data = glob.data[objectName];
 	// if (data._id != -1) {
 	// 	notify('Invalid state, please refresh and check if the item already has been added!', LogType.Error);
 	// 	return;
 	// }
-	// for (let ref in st.data) {
+	// for (let ref in glob.data) {
 	// 	if (ref.indexOf(objectName + "/") == 0) {
-	// 		data[ref.substr(objectName.length + 1)] = st.data[ref];
+	// 		data[ref.substr(objectName.length + 1)] = glob.data[ref];
 	// 	}
 	// }
 	//
@@ -269,7 +258,7 @@ export function getPropReferenceValue(meta: Property, data): string {
 }
 
 function refresh() {
-	updateStateRoot({dirty: false});
+	glob.dirty = false;
 	location.reload();
 }
 
@@ -309,53 +298,53 @@ export function showCmenu(state, items: MenuItem[], event, handler: (state, item
 			items[0].hover = true;
 	}
 
-	updateStateRoot({cmenu: {show: true, items, handler, state, top: 0, left: 0, right: 0, bottom: 0, event}});
+	glob.cmenu = {show: true, items, handler, state, top: 0, left: 0, right: 0, bottom: 0, event};
 }
 
 export function hideCmenu() {
-	store.commit('updateCMenu', {show: false});
+	glob.cmenu.show = false;
 }
 
 function handleCmenuKeys(e) {
 	switch (e.which) {
 		case Keys.tab:
 		case Keys.esc:
-			st.cmenu.handler(st.cmenu.state, null);
+			glob.cmenu.handler(glob.cmenu.state, null);
 			hideCmenu();
 			break;
 
 		case Keys.enter: {
-			let item = st.cmenu.items.find(i => i.hover);
+			let item = glob.cmenu.items.find(i => i.hover);
 			if (item) {
-				st.cmenu.handler(st.cmenu.state, item);
+				glob.cmenu.handler(glob.cmenu.state, item);
 				hideCmenu();
 			}
 			break;
 		}
 
 		case Keys.down: {
-			let item = st.cmenu.items.find(i => i.hover);
+			let item = glob.cmenu.items.find(i => i.hover);
 			if (!item) {
-				store.commit('updateCMenuItem', {index: 0, update: {hover: true}});
+				glob.cmenu.items[0].hover = true;
 			} else {
-				let index = st.cmenu.items.indexOf(item);
-				if (index < st.cmenu.items.length - 1) {
-					store.commit('updateCMenuItem', {index: index, update: {hover: false}});
-					store.commit('updateCMenuItem', {index: index + 1, update: {hover: true}});
+				let index = glob.cmenu.items.indexOf(item);
+				if (index < glob.cmenu.items.length - 1) {
+					glob.cmenu.items[index].hover = false;
+					glob.cmenu.items[index + 1].hover = true;
 				}
 			}
 			break;
 		}
 
 		case Keys.up: {
-			let item = st.cmenu.items.find(i => i.hover);
+			let item = glob.cmenu.items.find(i => i.hover);
 			if (!item)
-				store.commit('updateCMenuItem', {index: st.cmenu.items.length - 1, update: {hover: true}});
+				glob.cmenu.items[glob.cmenu.items.length - 1].hover = true;
 			else {
-				let index = st.cmenu.items.indexOf(item);
+				let index = glob.cmenu.items.indexOf(item);
 				if (index > 0) {
-					store.commit('updateCMenuItem', {index: index, update: {hover: false}});
-					store.commit('updateCMenuItem', {index: index - 1, update: {hover: true}});
+					glob.cmenu.items[index].hover = false;
+					glob.cmenu.items[index - 1].hover = true;
 				}
 			}
 			break;
@@ -393,20 +382,14 @@ export function setQs(key: string, value: any, fullPath: boolean, href?: string)
 		return fullPath ? (location.pathname + "?" + query) : query.toString();
 }
 
-export function checkPropDependencyOnChange(meta, prop, instance: any) {
-	let dependents = meta.properties.filter((p) => {
-		return p.dependsOn == prop.name
-	});
+export function checkPropDependencyOnChange(dec: ObjectDeclare | FunctionDeclare, prop, instance: any) {
+	let dependents = dec.properties.filter(p => p.dependsOn == prop.name);
 	for (let prop of dependents) {
 		instance[prop.name] = null;
-		if (prop._items) {
-			prop._items = null;
+		if (prop._.items) {
+			prop._.items = null;
 			let data = {prop, instance};
-			ajax("/getPropertyReferenceValues", data, null, (res) => {
-				prop._items = res.data;
-			}, (err) => {
-				notify(err);
-			});
+			ajax("/getPropertyReferenceValues", data, null, res => prop._.items = res.data, err => notify(err));
 		}
 	}
 }
@@ -418,7 +401,7 @@ function parse(str: string): any {
 
 export function flat2recursive(flatJson: any): any {
 	let keys = {};
-	const findKeys = (obj) => {
+	const findKeys = obj => {
 		if (obj && obj._0) {
 			keys[obj._0] = obj;
 			delete obj._0;
@@ -431,7 +414,7 @@ export function flat2recursive(flatJson: any): any {
 	};
 
 	const seen = new WeakSet();
-	const replaceRef = (obj) => {
+	const replaceRef = obj => {
 		if (seen.has(obj)) return;
 		seen.add(obj);
 
@@ -456,36 +439,32 @@ export function flat2recursive(flatJson: any): any {
 }
 
 export function browseFile(fileBrowsed?: (files: any[]) => void) {
-	store.commit('updateFileGallery', {fileBrowsed});
+	glob.fileGallery.fileBrowsed = fileBrowsed;
 	$("#file-browse").val("").click();
 }
 
 export function refreshFileGallery(file?: string, done?) {
-	openFileGallery(st.fileGallery.drive, file, st.fileGallery.path, st.fileGallery.fixedPath, st.fileGallery.fileSelectCallback, done);
+	openFileGallery(glob.fileGallery.drive, file, glob.fileGallery.path, glob.fileGallery.fixedPath, glob.fileGallery.fileSelectCallback, done);
 }
 
 export function openFileGallery(drive: Drive, file: string, path: string, fixedPath: boolean, fileSelectCallback: (path: string, item: DirFile) => void, done?) {
-	updateStateRoot({
-		fileGallery: {
-			list: [],
-			loading: true,
-			drive,
-			file,
-			path: path || "",
-			fixedPath,
-			selectable: true,
-			fileSelectCallback: fileSelectCallback
-		}
-	});
+	glob.fileGallery = {
+		list: [],
+		loading: true,
+		drive,
+		file,
+		path: path || "",
+		fixedPath,
+		selectable: true,
+		fileSelectCallback: fileSelectCallback
+	};
 
 	$("#file-gallery").modal("show");
-	ajax('/getFileGallery?m=1', {drive: drive._id, path}, {}, (res) => {
-		store.commit('updateFileGallery', {
-			loading: false,
-			uri: res.data.uri,
-			list: res.data.list,
-			selected: st.fileGallery.list.find(l => l.name == st.fileGallery.file)
-		});
+	ajax('/getFileGallery?m=1', {drive: drive._id, path}, {}, res => {
+		glob.fileGallery.loading = false;
+		glob.fileGallery.uri = res.data.uri;
+		glob.fileGallery.list = res.data.list;
+		glob.fileGallery.selected = glob.fileGallery.list.find(l => l.name == glob.fileGallery.file);
 		if (done) done();
 	});
 }
@@ -622,9 +601,7 @@ export function load(href) {
 		return;
 	}
 
-	this.ajax(setQs('m', RequestMode.partial, false, href), null, null, handleResponse, (err) => {
-		notify(err);
-	});
+	this.ajax(setQs('m', RequestMode.partial, false, href), null, null, handleResponse, err => notify(err));
 }
 
 export function ajax(url: string, data: any, config: AjaxConfig, done: (res: WebResponse) => void, fail?: (err: { code: StatusCode, message: string }) => void) {
@@ -645,7 +622,7 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
 	}
 
 	fail = fail || notify;
-	axios(params).then((res) => {
+	axios(params).then(res => {
 		if (res.code && res.code != StatusCode.Ok)
 			fail({code: res.code, message: res.message});
 		else {
@@ -656,7 +633,7 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
 				console.error(res, ex);
 			}
 		}
-	}).catch((err) => {
+	}).catch(err => {
 		console.error(`error on ajax '${url}'`, err);
 
 		if (err.response && err.response.data && err.response.data.message)
@@ -671,7 +648,8 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
 (function start() {
 	let mainState = $("#main-state").html();
 	let res: WebResponse = mainState ? parse(mainState) : {};
-	updateStateRoot({config: res.config || {}});
+	console.assert(res.config, 'config must be ready in initial state.');
+	glob.config = res.config;
 
 	if (res.message) {
 		notify(res);
@@ -684,8 +662,7 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
 			if (binding.value) el.focus();
 		}
 	});
-	new Vue({
-		store,
-		render: (h) => h(App),
-	}).$mount('#root');
+
+	Vue["glob"] = Vue.prototype.glob = glob;
+	new Vue({el: "#root", data: glob});
 })();
