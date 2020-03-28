@@ -1,37 +1,38 @@
 <template>
-    <div v-if="alwaysVisible || toolbar" class="d-flex p-2 pl-4 btn-toolbar border-bottom separator-line"
+    <div v-if="alwaysVisible || glob.form._.toolbar" class="d-flex p-2 pl-4 btn-toolbar border-bottom separator-line"
          role="toolbar" aria-label="Toolbar with button groups">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb pt-2 p-0 m-0 bg-transparent">
-                <li v-for="item in currentForm.breadcrumb" class="breadcrumb-item">
+                <li v-for="item in glob.form.breadcrumb" class="breadcrumb-item">
                     <a :href="item.ref">{{item.title}}</a>
                     <i class="fa fa-chevron-right ml-1"></i>
                 </li>
-                <li class="breadcrumb-item active" aria-current="page">{{currentForm.title}}</li>
+                <li class="breadcrumb-item active" aria-current="page">{{glob.form.title}}</li>
             </ol>
         </nav>
-        <div v-if="isDirty" class="mx-2" role="group">
-            <function styles="btn-primary" @exec="apply" name="apply" :title="$t('apply')"></function>
-            <function styles="btn-link" @exec="cancel" name="cancel" :title="$t('cancel')"></function>
+        <div v-if="glob.dirty" class="mx-2" role="group">
+            <Function styles="btn-primary" @exec="apply" name="apply" :title="$t('apply')"></Function>
+            <Function styles="btn-link" @exec="cancel" name="cancel" :title="$t('cancel')"></Function>
         </div>
         <div class="mr-auto"></div>
         <div class="mx-2" role="group">
-            <function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name"
-                      @exec="func.exec" :title="func.title"></function>
+            <Function v-for="func in glob.headFuncs" :key="func._id" styles="btn-primary" :name="func.name"
+                      @exec="func.exec" :title="func.title"></Function>
         </div>
-        <function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></function>
+        <Function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></Function>
     </div>
 </template>
 
 <script lang="ts">
 	declare let $: any;
+	import Function from "@/components/Function.vue";
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {prepareServerUrl, $t, flat2recursive} from "@/main";
+	import {prepareServerUrl, $t, flat2recursive, glob} from "@/main";
 	import {Keys, WebMethod, LogType} from '../../../sys/src/types';
 
 	const main = require("./main");
 
-	@Component
+	@Component({components: {Function}})
 	export default class Toolbar extends Vue {
 		@Prop() private alwaysVisible: boolean;
 
@@ -101,7 +102,7 @@
 		}
 
 		// findDiff(ref: string) {
-		// 	let data = st.data[ref];
+		// 	let data = glob.data[ref];
 		// 	let od = glob.od[ref];
 		//
 		// 	if (Array.isArray(data)) {
@@ -152,16 +153,16 @@
 
 			if (main.getQs("n") == "true")
 				return main.commitNewItem();
-			else
-				for (let ref in st.data) {
-					this.findDiff(ref);
-				}
+			// else
+			// 	for (let ref in glob.data) {
+			// 		this.findDiff(ref);
+			// 	}
 
 			this.commitModify(done);
 		}
 
 		cancel() {
-			st.dirty = false;
+			glob.dirty = false;
 			if (main.getQs("n") == "true")
 				location.href = location.pathname;
 			else
@@ -173,34 +174,21 @@
 		}
 
 		commitModify(done?) {
-			if (glob.md.length == 0) {
+			if (glob.modifies.length == 0) {
 				main.notify($t('saved'), LogType.Debug);
-				st.dirty = false;
+				glob.dirty = false;
 				return done();
 			}
 
-			let modify = glob.md.pop();
+			let modify = glob.modifies.pop();
 			//main.log(modify.type, modify.ref, modify.data);
 			main.ajax(prepareServerUrl(modify.ref), modify.data, {method: modify.type}, (res) => {
-				let od = glob.od[modify.rootRef];
 				res.data = flat2recursive(res.data);
 
-				if (modify.type === WebMethod.post || modify.type == WebMethod.patch) {
-					Object.assign(modify.item, res.data);
-					if (modify.type === WebMethod.post) {
-						od.push(JSON.parse(JSON.stringify(modify.item)));
-					} else if (modify.rootRef) { // 'modify.rootRef' is empty when we already update the old data, such as document change
-						let oldItem = Array.isArray(od) ? od.find(o => o._id == modify.data._id) : od;
-						let data = st.data[modify.rootRef];
-						let item = Array.isArray(od) ? od.find(o => o._id == modify.data._id) : od;
-						if (!oldItem)
-							throw `oldItem not found, ref: '${modify.ref}'`;
-						Object.assign(oldItem, res.data);
-						this.fixOldItemUpdate(oldItem);
-					}
-				}
+				if (modify.type === WebMethod.post || modify.type == WebMethod.patch)
+					Object.assign(modify.data, res.data);
 
-				if (res.redirect && glob.md.length == 0)
+				if (res.redirect && glob.modifies.length == 0)
 					return main.handleResponseRedirect(res);
 				else
 					this.commitModify(done);
@@ -208,39 +196,6 @@
 				done(err);
 				main.notify(err);
 			});
-		}
-
-		fixOldItemUpdate(target: any) {
-			for (let key in target) {
-				if (key.indexOf('.') > -1) {
-					let val = target[key];
-					delete target[key];
-
-					let parts = key.split('.');
-					let parent = target;
-					for (let i = 0; i < parts.length - 1; i++) {
-						let part = parts[i];
-						parent = parent[part];
-					}
-					parent[parts[parts.length - 1]] = val;
-				}
-			}
-		}
-
-		get toolbar() {
-			return this.$store.state.toolbar;
-		}
-
-		get currentForm() {
-			return this.$store.state.form;
-		}
-
-		get isDirty() {
-			return this.$store.state.isDirty;
-		}
-
-		get headFuncs() {
-			return this.$store.state.headFuncs;
 		}
 
 		// submitFile(modify: Modify, done) {
@@ -252,7 +207,7 @@
 		// 	glob.md = glob.md.filter(mod => mod.ref != modify.ref);
 		// 	main.ajax(setQs('m', RequestMode.partial, false, "/" + modify.ref), modify.data, {files}, (res) => {
 		// 		let propName = modify.ref.replace(/^.+\/(\w+)$/, "$1");
-		// 		glob.od[modify.rootRef][propName] = st.data[modify.rootRef][propName] = flat2recursive(res.data);
+		// 		glob.od[modify.rootRef][propName] = glob.data[modify.rootRef][propName] = flat2recursive(res.data);
 		// 		this.commitModify(done);
 		// 	}, (err) => {
 		// 		done(err);

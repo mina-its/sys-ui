@@ -22,8 +22,8 @@
 				return;
 			}
 
-			let data = st.data[e.obj.ref];
-			st.toolbar = true;
+			let data = glob.data[e.obj.ref];
+			glob.toolbar = true;
 			let rt = this.root == null ? true : this.root;
 			if (e.obj && e.obj.type == ObjectViewType.TreeView)
 				return ce('tree-view', {props: {uri: e.obj.ref}});

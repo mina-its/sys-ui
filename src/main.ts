@@ -26,7 +26,7 @@ import {
 	ItemMeta
 } from "../../sys/src/types";
 
-let glob = new Global();
+export let glob = new Global();
 
 export function $t(text: string): string {
 	return typeof (text) == "object" ? text[glob.config.locale] || Object.values(text)[0] as string : text;

@@ -180,6 +180,7 @@ export class Global {
 	cmenu: AppStateCmenu;
 	geoMap: AppStateGeoMap;
 	modifies: Modify[];
+	socket: any;
 }
 
 export class AppStateFileGallery {

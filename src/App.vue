@@ -8,7 +8,7 @@
             <div class="d-flex flex-column flex-fill overflow-auto">
                 <Toolbar></Toolbar>
                 <div class="main-body h-100 overflow-auto w-100 d-flex" @scroll="onScroll()">
-                    <FormElem v-for="elem in form.elems" :elem="elem"></FormElem>
+                    <FormElem v-for="elem in glob.form.elems" :elem="elem"></FormElem>
                 </div>
             </div>
         </main>
@@ -29,8 +29,8 @@
 <script lang="ts">
 	declare let $: any;
 	import {Vue} from 'vue-property-decorator';
-	import {$t, hideCmenu, load, notify} from "@/main";
-	import {LogType, NotificationInfo, Form} from '../../sys/src/types';
+	import {$t, hideCmenu, load, notify, glob} from "@/main";
+	import {LogType, NotificationInfo} from '../../sys/src/types';
 
 	const main = require("./main");
 
@@ -41,7 +41,7 @@
 
 		fileBrowsed(e) {
 			console.log("fileBrowsed!");
-			this.$store.state.fileGallery.fileBrowsed(e.target.files);
+			glob.fileGallery.fileBrowsed(e.target.files);
 		}
 
 		handleWindowEvents() {
@@ -63,7 +63,7 @@
 					load(location.href);
 				})
 				.on("beforeunload", (e) => {
-					if (this.$store.state.dirty) {
+					if (glob.dirty) {
 						e = e || window.event;
 						if (e)
 							e.returnValue = $t('save-before');
@@ -74,7 +74,7 @@
 					hideCmenu();
 				})
 				.on("keydown", (e) => {
-					if (this.$store.state.cmenu.show)
+					if (glob.cmenu.show)
 						main.handleCmenuKeys(e);
 					main.updateRoot({notify: null});
 				})
@@ -85,7 +85,7 @@
 						if (href) {
 							if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
 							e.preventDefault();
-							if (this.$store.state.dirty) {
+							if (glob.dirty) {
 								notify($t('save-before'), LogType.Warning);
 								return;
 							} // dirty page
@@ -98,7 +98,7 @@
 					}
 				})
 				.on("mouseup", (e) => {
-					if (this.$store.state.cmenu.show &&
+					if (glob.cmenu.show &&
 						!$('.dropdown-item').is(e.target)
 						&& $('.dropdown-item').has(e.target).length === 0
 						&& $('.dropdown-menu.show').has(e.target).length === 0
@@ -109,15 +109,11 @@
 		mounted() {
 			this.handleWindowEvents();
 			console.log(
-				`%c main started. %c version: ${this.$store.state.config.version} %c`,
+				`%c main started. %c version: ${glob.config.version} %c`,
 				'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
 				'background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
 				'background:transparent'
 			);
-		}
-
-		get form(): Form {
-			return this.$store.state.form;
 		}
 	}
 </script>

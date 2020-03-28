@@ -13,8 +13,8 @@
                         <elem v-for="elem in bodyElems" :elem="elem"></elem>
                     </form>
                 </div>
-                <div v-if="st.notify" class="text-light bg-danger modal-body">
-                    <span>{{st.notify.message}}</span>
+                <div v-if="glob.notify" class="text-light bg-danger modal-body">
+                    <span>{{glob.notify.message}}</span>
                 </div>
                 <div class="modal-footer">
                     <elem v-for="elem in footerElems" :elem="elem"></elem>
@@ -43,9 +43,9 @@
 		}
 
 		mounted() {
-			st.modal = true;
+			glob.modal = true;
 			$(".my-modal").modal().on('hidden.bs.modal', function () {
-				st.modal = false;
+				glob.modal = false;
 				main.load(location.href);
 			});
 		}

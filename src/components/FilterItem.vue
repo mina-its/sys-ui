@@ -1,7 +1,7 @@
 <template>
-<span class="filter-item py-2 badge badge-pill badge-info">{{item.title}}
-   <i @click="close" class="fas fa-times ml-2"></i>
- </span>
+    <span class="filter-item py-2 badge badge-pill badge-info">{{item.title}}
+        <i @click="close" class="fas fa-times ml-2"></i>
+    </span>
 </template>
 
 <script lang="ts">

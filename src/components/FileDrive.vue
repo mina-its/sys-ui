@@ -1,22 +1,18 @@
 <template>
     <panel class="file-drive">
         <div>
-            <file-drive-item :file="item" v-for="item in files"></file-drive-item>
+            <FileDriveItem :file="item" v-for="item in files"></FileDriveItem>
         </div>
     </panel>
 </template>
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType} from "../../../sys/src/types";
+	import FileDriveItem from "@/components/FileDriveItem.vue";
 
-	@Component
+	@Component({components: {FileDriveItem}})
 	export default class FileDrive extends Vue {
 		@Prop() private path: string;
 		@Prop() private files: any[];
 	}
 </script>
-
-<style scoped lang="scss">
-
-</style>

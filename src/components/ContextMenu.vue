@@ -1,6 +1,6 @@
 <template>
-    <div v-if="st.cmenu.show" :style="style" class="dropdown-menu show overflow-auto context-menu">
-        <template v-for="item in st.cmenu.items">
+    <div v-if="glob.cmenu.show" :style="style" class="dropdown-menu show overflow-auto context-menu">
+        <template v-for="item in glob.cmenu.items">
             <div v-if="item.title=='-'" class="dropdown-divider"></div>
             <a v-else :class="'dropdown-item' + (item.hover ? ' active' : '') " @click="click(item)"
                href="javascript:;">{{item.title || '&nbsp;'}}</a>
@@ -10,31 +10,31 @@
 
 <script lang="ts">
 	declare let $: any;
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {st} from '@/main';
+	import {Component, Vue} from 'vue-property-decorator';
+	import {glob} from '@/main';
 
 	const main = require("./main");
 
 	@Component
 	export default class ContextMenu extends Vue {
 		click(item) {
-			st.cmenu.show = false;
-			st.cmenu.handler(st.cmenu.state, item);
+			glob.cmenu.show = false;
+			glob.cmenu.handler(glob.cmenu.state, item);
 		}
 
 		calcMenuPosition() {
 			let left, top, right, bottom, width = 0, height = 0;
 			let h = $(window).height();
 			let w = $(window).width();
-			if (st.cmenu.event.ctrl) {
-				let $c = $(st.cmenu.event.ctrl);
+			if (glob.cmenu.event.ctrl) {
+				let $c = $(glob.cmenu.event.ctrl);
 				left = right = $c.offset().left;
 				top = bottom = $c.offset().top;
 				width = $c.outerWidth();
 				height = $c.outerHeight();
 			} else {
-				left = right = st.cmenu.event.pageX;
-				top = bottom = st.cmenu.event.pageY;
+				left = right = glob.cmenu.event.pageX;
+				top = bottom = glob.cmenu.event.pageY;
 			}
 
 			if (h - bottom < 300)
@@ -49,27 +49,27 @@
 			else
 				right = 0;
 
-			st.cmenu.left = left;
-			st.cmenu.right = right;
-			st.cmenu.top = top;
-			st.cmenu.bottom = bottom;
+			glob.cmenu.left = left;
+			glob.cmenu.right = right;
+			glob.cmenu.top = top;
+			glob.cmenu.bottom = bottom;
 		}
 
 		get style() {
 			this.calcMenuPosition();
 			let val: any = {};
 
-			if (st.cmenu.right) {
-				val.right = st.cmenu.right + 'px';
+			if (glob.cmenu.right) {
+				val.right = glob.cmenu.right + 'px';
 				val.left = 'auto';
 			} else
-				val.left = st.cmenu.left + 'px';
+				val.left = glob.cmenu.left + 'px';
 
-			if (st.cmenu.bottom) {
-				val.bottom = st.cmenu.bottom + 'px';
+			if (glob.cmenu.bottom) {
+				val.bottom = glob.cmenu.bottom + 'px';
 				val.top = 'auto';
 			} else
-				val.top = st.cmenu.top + 'px';
+				val.top = glob.cmenu.top + 'px';
 			return val;
 		}
 	}

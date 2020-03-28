@@ -21,7 +21,7 @@
 			if (e.which === Keys.up || e.which === Keys.down) {
 				e.preventDefault();
 			}
-			if (!st.cmenu.show)
+			if (!glob.cmenu.show)
 				this.$emit('keydown', e);
 		}
 

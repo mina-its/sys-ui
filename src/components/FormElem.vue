@@ -3,8 +3,8 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Elem, ElemType, ObjectViewType, FunctionMeta} from "../../../sys/src/types";
-	import {st} from "@/main";
+	import {Elem, ElemType, ObjectViewType, FunctionDeclare, ItemMeta} from "../../../sys/src/types";
+	import {glob} from "@/main";
 
 	const main = require("./main");
 
@@ -18,31 +18,22 @@
 					return ce('object-view', {props: {"elem": this.elem}});
 
 				case ElemType.Function: {
-					if (!this.elem.func.ref) {
-						console.error(`ref is expected for the function:`, this.elem.func);
-						return;
-					}
+					console.assert(this.elem.func.ref, `ref is expected for the function:`, this.elem.func);
 					let ref = this.elem.func.ref as any;
-					let meta: FunctionMeta = st.meta[ref];
-					if (!meta) {
-						console.error(`meta not found for func ref '${ref}'`, "meta:", JSON.stringify(st.meta));
-						return;
-					}
+					let data = glob.data[ref];
+					let dec = (data._ as ItemMeta).dec as FunctionDeclare;
+					console.assert(dec, `meta not found for func ref '${ref}'`);
 
-					let data = st.data[meta.name];
 					let exec = this.elem.func.exec;
-					if (!exec && meta.clientSide) {
-						exec = eval(`${meta.pack}.${meta.name}`);
-						if (!exec) {
-							console.error(`client side function ${meta.name} in package ${meta.pack} not found!`);
-							return null;
-						}
+					if (!exec && dec.clientSide) {
+						exec = eval(`${dec.pack}.${dec.name}`);
+						console.assert(exec, `client side function ${dec.name} in package ${dec.pack} not found!`);
 					}
 
 					return ce('function', {
 						props: {
-							"title": meta.title,
-							"name": meta.name,
+							"title": dec.title,
+							"name": dec.name,
 							"styles": this.elem.styles,
 							"exec": exec
 						}
@@ -50,17 +41,11 @@
 				}
 
 				case ElemType.Property: {
-					let meta = st.meta[this.elem.property.entityRef];
-					if (meta == null) {
-						console.error(`property elem: meta not found for ref '${this.elem.property.entityRef}'`);
-						return;
-					}
-					let item = st.data[meta.name];
-					let pMeta = meta.properties.find(prop => prop.name == this.elem.property.name);
-					if (pMeta == null) {
-						console.error(`error rendering property elem. property '${this.elem.property.name}' meta not found! parent meta:`, meta);
-						return null;
-					}
+					let item = glob.data[this.elem.property.entityRef];
+					let dec = (item._ as ItemMeta).dec;
+					console.assert(dec, `property elem: meta not found for ref '${this.elem.property.entityRef}'`);
+					let pMeta = dec.properties.find(prop => prop.name == this.elem.property.name);
+					console.assert(pMeta, `error rendering property elem. property '${this.elem.property.name}' meta not found! parent meta:`);
 					return ce('prop', {
 						props: {
 							viewType: this.elem.property.detailsView ? ObjectViewType.DetailsView : ObjectViewType.GridView,
@@ -71,10 +56,7 @@
 				}
 
 				case ElemType.Text:
-					if (!this.elem.text) {
-						console.error('incomplete text elem: ', this.elem);
-						return ce('span', {}, "...");
-					}
+					console.assert(this.elem.text, 'incomplete text elem: ', this.elem);
 
 					if (this.elem.text.markdown)
 						return ce('markdown', {props: {"content": this.elem.text.content, "styles": this.elem.styles}});
@@ -96,11 +78,11 @@
 				case ElemType.Component:
 					let data, props = this.elem.component.props;
 					if (this.elem.component._ref)
-						data = st.data[this.elem.component._ref];
+						data = glob.data[this.elem.component._ref];
 					return ce(this.elem.component.name, {props: {data, ...props}});
 
 				case ElemType.Chart:
-					return ce('chart', {props: {data: st.data['tests']}});
+					return ce('chart', {props: {data: glob.data['tests']}});
 			}
 		}
 	}

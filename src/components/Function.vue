@@ -5,8 +5,8 @@
 <script lang="ts">
 	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {FunctionMeta, LogType, Context, StatusCode} from "../../../sys/src/types";
-	import {st} from '@/main';
+	import {FunctionDeclare, LogType, Context, StatusCode, ItemMeta} from "../../../sys/src/types";
+	import {glob} from '@/main';
 
 	const main = require("./main");
 
@@ -41,9 +41,9 @@
 		}
 
 		validate(data) {
-			let meta: FunctionMeta = st.meta[this.name];
-			if (meta && meta.properties) {
-				let requiredProps = meta.properties.filter(p => p.required);
+			let dec = (data._ as ItemMeta).dec as FunctionDeclare;
+			if (dec && dec.properties) {
+				let requiredProps = dec.properties.filter(p => p.required);
 				let error = "";
 				for (let prop of requiredProps) {
 					if (data[prop.name] === null || data[prop.name] === "") {
@@ -62,7 +62,7 @@
 		click(e) {
 			this.showProgress = true;
 			if (this.$listeners && this.$listeners.exec) {
-				let cn: Context = {event: e, name: this.name, data: st.data} as Context;
+				let cn: Context = {event: e, name: this.name, data: glob.data} as Context;
 				try {
 					this.$emit('exec', cn, () => {
 						this.showProgress = false;
@@ -73,14 +73,14 @@
 				}
 			} else {
 				let functionName = this.name;
-				let meta: FunctionMeta = st.meta[functionName];
-				let data = {_data: st.data, ...st.data[functionName]};
+				let data = {_data: glob.data, ...glob.data[functionName]};
+				let dec = (data._ as ItemMeta).dec as FunctionDeclare;
 				if (!this.validate(data))
 					return;
 				main.log(`calling '${this.name}' ...`, data);
 				main.ajax("/" + this.name, data, null, (res) => {
 					this.showProgress = false;
-					if (meta.interactive && res.code == StatusCode.Accepted)
+					if (dec.interactive && res.code == StatusCode.Accepted)
 						return;
 					else if (res.code != StatusCode.Ok)
 						main.notify(res.message, LogType.Error);
@@ -89,7 +89,7 @@
 						setTimeout(() => {
 							main.handleResponse(res);
 						}, 100);
-						//_.extend(st.data, res.data);
+						//_.extend(glob.data, res.data);
 					}
 				}, (err) => {
 					this.showProgress = false;

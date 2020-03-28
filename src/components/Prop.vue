@@ -5,8 +5,8 @@
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {ObjectViewType, Property, GlobalType, EmbeddedInfo} from "../../../sys/src/types";
-		import { PropertyLabelMode } from '@/types';
-		import { st } from '@/main';
+	import {PropertyLabelMode} from '@/types';
+	import {glob} from '@/main';
 
 	const main = require("./main");
 
@@ -19,10 +19,7 @@
 		@Prop() private indexInGrid: any;
 
 		render(ce) {
-			if (!this.meta) {
-				console.error("error rendering 'prop' component. meta is empty! item:", this.item);
-				return null;
-			}
+			console.assert(this.meta, "error rendering 'prop' component. meta is empty! item:", this.item);
 
 			if (this.meta.condition != null && !main.evalExpression(this.item, this.meta.condition)) {
 				this.item[this.meta.name] = null;
@@ -58,7 +55,7 @@
 		renderDetailsView(ce) {
 			let valueClass = `prop-value border mx-2`;
 			if (this.meta._.gtype == GlobalType.object && !this.meta.documentView) {
-				let oData = st.data[this.meta._.ref] || [];
+				let oData = glob.data[this.meta._.ref] || [];
 				main.vueResetProperties(oData, this.meta._.ref, false);
 				return ce('object-view', {
 					props: {root: false, elem: {obj: {ref: this.meta._.ref, root: false}}},

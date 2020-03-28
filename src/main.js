@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Constants, Global } from "@/types";
 import { Keys, LogType, StatusCode, RequestMode, WebMethod } from "../../sys/src/types";
-let glob = new Global();
+export let glob = new Global();
 export function $t(text) {
     return typeof (text) == "object" ? text[glob.config.locale] || Object.values(text)[0] : text;
     // if (text[pack + "." + key]) return text[pack + "." + key];

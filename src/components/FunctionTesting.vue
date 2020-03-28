@@ -33,8 +33,8 @@
 			// bodyElems.push({type: ElemType.Document, document: {value: data}});
 
 			main.vueResetProperties(data, this.meta.name, false);
-			st.data[this.meta.name] = data;
-			st.data["functionTest"] = {functionId: this.meta._id, sampleIndex: 0, input: data};
+			glob.data[this.meta.name] = data;
+			glob.data["functionTest"] = {functionId: this.meta._id, sampleIndex: 0, input: data};
 			let footerElems = [{type: ElemType.Function, func: {ref: "functionTest", exec: this.functionTest}}];
 			return ce('modal', {
 				props: {
@@ -47,7 +47,7 @@
 		}
 
 		functionTest(x, y) {
-			let data = st.data["functionTest"];
+			let data = glob.data["functionTest"];
 			this.message = "Running ...";
 			main.ajax("/functionTest", data, null, (res) => {
 				if (res.message)

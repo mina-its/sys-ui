@@ -42,7 +42,7 @@
 			} catch (ex) {
 				//this.doc._error = `Property '${this.meta.title}' invalid data.`;
 				this.invalidData = true;
-				st.dirty = true;
+				glob.dirty = true;
 			}
 		}
 

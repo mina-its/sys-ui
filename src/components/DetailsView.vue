@@ -42,11 +42,11 @@
 		mounted() {
 			if (this.root) {
 				this.currentGroup = this.groups[0];
-				let meta = st.meta[this.uri];
-				st.headFuncs = [];
+				let meta = glob.meta[this.uri];
+				glob.headFuncs = [];
 				if (meta.links)
 					for (let link of meta.links) {
-						st.headFuncs.push({title: link.title, name: link.address.$oid, exec: this.execLink});
+						glob.headFuncs.push({title: link.title, name: link.address.$oid, exec: this.execLink});
 					}
 			}
 		}
@@ -100,7 +100,7 @@
 		}
 
 		changed(prop, instance, val) {
-			st.dirty = true;
+			glob.dirty = true;
 			main.checkPropDependencyOnChange(this.meta, prop, instance);
 		}
 
@@ -128,11 +128,11 @@
 		}
 
 		get meta() {
-			return st.meta[this.uri];
+			return glob.meta[this.uri];
 		}
 
 		get item() {
-			return st.data[this.uri];
+			return glob.data[this.uri];
 		}
 
 		get groups() {

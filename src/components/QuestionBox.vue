@@ -10,8 +10,8 @@
                     <div class="flex-grow-1 mx-2" v-html="message"></div>
                 </div>
                 <div class="modal-footer">
-                    <function styles="btn-primary" :title="option.title" @exec="select(option)" :key="option.ref"
-                              v-for="option in st.question.options"></function>
+                    <Function styles="btn-primary" :title="option.title" @exec="select(option)" :key="option.ref"
+                              v-for="option in glob.question.options"></Function>
                 </div>
             </div>
         </div>
@@ -20,32 +20,31 @@
 
 <script lang="ts">
 	declare let $, marked: any;
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {st} from "@/main";
+	import Function from "@/components/Function.vue";
+	import {Component, Vue} from 'vue-property-decorator';
+	import {glob} from "@/main";
 	import {Pair} from '../../../sys/src/types';
 
 	const main = require("./main");
 
-	@Component
+	@Component({components: {Function}})
 	export default class QuestionBox extends Vue {
-		@Prop() private prop!: string;
-
 		mounted() {
 			$("#question-box").on('hidden.bs.modal', function () {
-				if (st.question.options.length)
-					st.question.select(null);
+				if (glob.question.options.length)
+					glob.question.select(null);
 			});
 		}
 
 		select(option: Pair) {
-			st.question.select(option);
-			st.question.options = []; // to not send again null
+			glob.question.select(option);
+			glob.question.options = []; // to not send again null
 			$("#question-box").modal('hide');
 		}
 
 		get message() {
-			if (st.question.message)
-				return marked(st.question.message);
+			if (glob.question.message)
+				return marked(glob.question.message);
 			else
 				return "";
 		}

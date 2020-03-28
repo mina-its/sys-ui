@@ -22,7 +22,7 @@
 		changing() {
 			let doc = this.doc;
 			let changed = this.changed;
-			st.geoMap = {
+			glob.geoMap = {
 				show: true,
 				val: this.value,
 				select: function (value) {

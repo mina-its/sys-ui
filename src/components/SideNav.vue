@@ -3,13 +3,13 @@
         <div class="input-group mb-3">
             <input type="text" class="form-control border-right-0" placeholder="Search">
             <span class="input-group-append bg-white rounded border-left-0">
-     	<span class="input-group-text bg-transparent">
-       <span class="fa fa-search text-muted"></span>
- 			</span>
-     </span>
+     	        <span class="input-group-text bg-transparent">
+                    <span class="fa fa-search text-muted"></span>
+		        </span>
+            </span>
         </div>
         <ul class="pl-0 list-unstyled">
-            <li v-for="item of st.navmenu" class="mr-2 nav-item">
+            <li v-for="item of glob.config.navmenu" class="mr-2 nav-item">
                 <a v-if="item.title=='-'" class="d-block my-2 border-bottom border-secondary"></a>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold">{{item.title}}</a>
                 <a v-else :href="item.ref" :class="getStyle(item)">{{item.title}}</a>
@@ -25,12 +25,10 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
+	import {glob} from "@/main";
 
 	@Component
 	export default class SideNav extends Vue {
-		mounted() {
-		}
-
 		getStyle(item) {
 			let style = "text-nowrap nav-link";
 			if (location.hostname == item.ref)

@@ -72,7 +72,7 @@
 			else
 				val = newItem;
 			this.doc[this.meta.name] = val;
-			st.dirty = true;
+			glob.dirty = true;
 		}
 
 		browseFile(cn, done) {
@@ -111,7 +111,7 @@
 					}
 					item[this.meta.name] = val;
 
-					if (st.toolbar) {
+					if (glob.toolbar) {
 						let rootRef = this.meta._.ref.replace(/\/\w+$/, "");
 						glob.md.push({ref: this.meta._.ref, data: val, rootRef} as Modify);
 
@@ -119,7 +119,7 @@
 						if (rootRef)
 							glob.od[rootRef][this.meta.name] = val;
 
-						st.dirty = true;
+						glob.dirty = true;
 					}
 				});
 			}
@@ -140,7 +140,7 @@
 			} else
 				val = null;
 			this.doc[this.meta.name] = val;
-			st.dirty = true;
+			glob.dirty = true;
 			console.log(1);
 			e.stopPropagation();
 		}

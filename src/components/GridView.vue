@@ -71,11 +71,11 @@
 		private mainCheckState = null;
 
 		mounted() {
-			st.data[this.meta._ref] = this.items;
+			glob.data[this.meta._ref] = this.items;
 		}
 
 		changed(meta, item, val) {
-			st.dirty = true;
+			glob.dirty = true;
 			let dependents = this.meta.properties.filter((prop) => {
 				return prop.dependsOn == meta.name
 			});
@@ -106,7 +106,7 @@
 						})) || 0) + 1;
 					}
 					this.items.push(newItem);
-					st.dirty = true;
+					glob.dirty = true;
 					break;
 
 				case NewItemMode.modal:
@@ -173,7 +173,7 @@
 				}
 			}
 			this.rowHeaderStyle = GridRowHeaderStyle.empty;
-			st.dirty = true;
+			glob.dirty = true;
 		}
 
 		onScroll() {
@@ -290,7 +290,7 @@
 			let item = this.items.find(i => i._status == RowStatus.Selected);
 			let index = this.items.indexOf(item);
 			if ((up && index == 0) || (!up && index == this.items.length - 1)) return;
-			st.dirty = true;
+			glob.dirty = true;
 
 			let emptyZs = this.items.filter((item) => {
 				return !item._z;
@@ -366,11 +366,11 @@
 		}
 
 		get items() {
-			return st.data[this.uri];
+			return glob.data[this.uri];
 		}
 
 		get meta(): ObjectMeta {
-			return st.meta[this.uri];
+			return glob.meta[this.uri];
 		}
 	}
 </script>

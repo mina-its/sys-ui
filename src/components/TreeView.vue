@@ -29,8 +29,8 @@
 		};
 
 		mounted() {
-			let data = st.data[this.uri];
-			let meta = st.meta[this.uri];
+			let data = glob.data[this.uri];
+			let meta = glob.meta[this.uri];
 			let props = meta.properties as Property[];
 			let node = this.createNode(data, props);
 			this.nodes = [node];
