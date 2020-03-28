@@ -1,80 +1,98 @@
-export const ChartColors = [
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChartColors = [
     'rgba(54, 162, 235, 0.8)',
     'rgba(255, 99, 132, 0.8)',
     'rgba(75, 192, 192, 0.8)',
     'rgba(255, 159, 64, 0.8)',
     'rgba(255, 205, 86, 0.8)',
     'rgba(153, 102, 255, 0.8)',
-    'rgba(231,233,237, 0.8)' //grey:
+    'rgba(231,233,237, 0.8)'
 ];
-export class Global {
+class Global {
     constructor() {
         this.md = [];
         this.counter = 1;
     }
 }
-export class State {
+exports.Global = Global;
+class State {
 }
-export class HeadFunc {
+exports.State = State;
+class HeadFunc {
 }
-export class MenuItem {
+exports.HeadFunc = HeadFunc;
+class MenuItem {
 }
-export class Modify {
+exports.MenuItem = MenuItem;
+class Modify {
 }
-export class StateGeoMap {
+exports.Modify = Modify;
+class StateGeoMap {
 }
-export var RowStatus;
+exports.StateGeoMap = StateGeoMap;
+var RowStatus;
 (function (RowStatus) {
     RowStatus[RowStatus["Selected"] = 1] = "Selected";
-})(RowStatus || (RowStatus = {}));
-export class StateCmenu {
+})(RowStatus = exports.RowStatus || (exports.RowStatus = {}));
+class StateCmenu {
 }
-export const Constants = {
+exports.StateCmenu = StateCmenu;
+exports.Constants = {
     redirectBack: "_back",
     redirectSelf: "_self",
 };
-export var Gmode;
+var Gmode;
 (function (Gmode) {
     Gmode[Gmode["noGrouping"] = 0] = "noGrouping";
     Gmode[Gmode["grouped"] = 1] = "grouped";
     Gmode[Gmode["sideMenu"] = 2] = "sideMenu";
-})(Gmode || (Gmode = {}));
-export var PropertyLabelMode;
+})(Gmode = exports.Gmode || (exports.Gmode = {}));
+var PropertyLabelMode;
 (function (PropertyLabelMode) {
     PropertyLabelMode[PropertyLabelMode["Hidden"] = 1] = "Hidden";
     PropertyLabelMode[PropertyLabelMode["Visible"] = 2] = "Visible";
-})(PropertyLabelMode || (PropertyLabelMode = {}));
-export var DiffKind;
+})(PropertyLabelMode = exports.PropertyLabelMode || (exports.PropertyLabelMode = {}));
+var DiffKind;
 (function (DiffKind) {
     DiffKind["newlyAdded"] = "N";
     DiffKind["edited"] = "E";
     DiffKind["deleted"] = "D";
     DiffKind["arrayChange"] = "A";
-})(DiffKind || (DiffKind = {}));
-export class TreeViewNode {
+})(DiffKind = exports.DiffKind || (exports.DiffKind = {}));
+class TreeViewNode {
 }
-export class TreeViewLine {
+exports.TreeViewNode = TreeViewNode;
+class TreeViewLine {
 }
-export class TreeViewAttribute {
+exports.TreeViewLine = TreeViewLine;
+class TreeViewAttribute {
 }
-export class ApiDocParameter {
+exports.TreeViewAttribute = TreeViewAttribute;
+class ApiDocParameter {
 }
-export class ApiDocOperation {
+exports.ApiDocParameter = ApiDocParameter;
+class ApiDocOperation {
 }
-export class ApiDocBlock {
+exports.ApiDocOperation = ApiDocOperation;
+class ApiDocBlock {
     constructor() {
         this.operations = [];
     }
 }
-export class ApiDocSchema {
+exports.ApiDocBlock = ApiDocBlock;
+class ApiDocSchema {
 }
-export class ApiDocEnum {
+exports.ApiDocSchema = ApiDocSchema;
+class ApiDocEnum {
 }
-export class ApiDoc {
+exports.ApiDocEnum = ApiDocEnum;
+class ApiDoc {
     constructor() {
         this.blocks = [];
         this.schemas = [];
         this.enums = [];
     }
 }
+exports.ApiDoc = ApiDoc;
 //# sourceMappingURL=types.js.map

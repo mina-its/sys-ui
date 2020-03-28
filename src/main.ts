@@ -824,32 +824,6 @@ export function setPropertyEmbeddedError(doc: any, propName: string, error: stri
 	(doc._[propName] as EmbeddedInfo).err = error;
 }
 
-export module appState {
-	export function reset() {
-
-	}
-
-	export function initItem(item: any) {
-
-	}
-
-	export function propChanged(ref: string, oldValue: any, newValue: any) {
-
-	}
-
-	export function commit(data: any, done: (res: WebResponse) => void) {
-
-	}
-
-	export function commitAll(done: (res: WebResponse) => void) {
-
-	}
-
-	export function isDirty(data?: any): boolean {
-		return false;
-	}
-}
-
 $(document).ready(start);
 export let glob = new Global();
 export let st: State;

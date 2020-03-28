@@ -739,28 +739,6 @@ export function setPropertyEmbeddedError(doc, propName, error) {
     doc._[propName] = doc._[propName] || {};
     doc._[propName].err = error;
 }
-export var appState;
-(function (appState) {
-    function reset() {
-    }
-    appState.reset = reset;
-    function initItem(item) {
-    }
-    appState.initItem = initItem;
-    function propChanged(ref, oldValue, newValue) {
-    }
-    appState.propChanged = propChanged;
-    function commit(data, done) {
-    }
-    appState.commit = commit;
-    function commitAll(done) {
-    }
-    appState.commitAll = commitAll;
-    function isDirty(data) {
-        return false;
-    }
-    appState.isDirty = isDirty;
-})(appState || (appState = {}));
 $(document).ready(start);
 export let glob = new Global();
 export let st;
