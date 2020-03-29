@@ -30,11 +30,14 @@
 	import {prepareServerUrl, $t, flat2recursive, glob} from "@/main";
 	import {Keys, WebMethod, LogType} from '../../../sys/src/types';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component({components: {Function}})
 	export default class Toolbar extends Vue {
 		@Prop() private alwaysVisible: boolean;
+        get glob() {
+            return glob;
+        }
 
 		mounted() {
 			$(window).on("keydown", (e) => {

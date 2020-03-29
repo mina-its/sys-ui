@@ -7,7 +7,7 @@
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {Property, Keys} from "../../../sys/src/types";
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class PropText extends Vue {

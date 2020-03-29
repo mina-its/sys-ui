@@ -8,7 +8,7 @@
 	import {FunctionDeclare, LogType, Context, StatusCode, ItemMeta} from "../../../sys/src/types";
 	import {glob} from '@/main';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class Function extends Vue {
@@ -17,6 +17,10 @@
 		@Prop() private styles: string;
 		private showProgress = false;
 		private spinnerTimer = null;
+
+        get glob() {
+            return glob;
+        }
 
 		render(ce) {
 			if (this.styles && this.styles.indexOf('fa-') > -1)

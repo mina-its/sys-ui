@@ -11,7 +11,7 @@
 	import {glob} from "@/main";
 	import {Modify} from '@/types';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class PropDocumentEditor extends Vue {

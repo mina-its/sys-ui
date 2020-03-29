@@ -25,7 +25,7 @@
 	import {glob} from "@/main";
 	import {Pair} from '../../../sys/src/types';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component({components: {Function}})
 	export default class QuestionBox extends Vue {

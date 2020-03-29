@@ -28,7 +28,7 @@ import {WebMethod} from "../../../sys/src/types";
 	import {MenuItem, Modify} from '@/types';
 	import {$t, glob} from '@/main';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class PropFile extends Vue {

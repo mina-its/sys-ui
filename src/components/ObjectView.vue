@@ -7,7 +7,7 @@
 	import {Elem, LogType, ObjectViewType} from "../../../sys/src/types";
 	import {glob} from '@/main';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class ObjectView extends Vue {

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import App from './App.vue';
-import { Constants, Global } from '@/types';
+import { Constants, Global, AppStateLog } from './types';
 import { Keys, LogType, StatusCode, RequestMode, WebMethod } from '../../sys/src/types';
 export let glob = new Global();
 export function $t(text) {
@@ -576,11 +576,11 @@ export function setPropertyEmbeddedError(doc, propName, error) {
     doc._[propName].err = error;
 }
 export function load(href) {
-    if (this.state.dirty) {
+    if (glob.dirty) {
         notify($t('save-before'), LogType.Warning);
         return;
     }
-    this.ajax(setQs('m', RequestMode.partial, false, href), null, null, handleResponse, err => notify(err));
+    ajax(setQs('m', RequestMode.partial, false, href), null, null, handleResponse, err => notify(err));
 }
 export function getItemDec(item) {
     if (!item || !item._) {
@@ -589,6 +589,8 @@ export function getItemDec(item) {
     return item._.dec;
 }
 export function ajax(url, data, config, done, fail) {
+    if (glob.config.host)
+        url = joinUri(glob.config.host, url);
     const params = { url, data };
     if (config && config.method) {
         params.method = config.method;
@@ -631,10 +633,12 @@ export function ajax(url, data, config, done, fail) {
         }
     });
 }
-(function start() {
+export function start() {
+    console.log('starting ...');
     const mainState = $('#main-state').html();
     const res = mainState ? parse(mainState) : {};
     console.assert(res.config, 'config must be ready in initial state.');
+    let x = new AppStateLog();
     glob.config = res.config;
     if (res.message) {
         notify(res);
@@ -650,7 +654,10 @@ export function ajax(url, data, config, done, fail) {
             }
         }
     });
+    Vue.component('Function', require("@/components/Function.vue").default);
     Vue['glob'] = Vue.prototype.glob = glob;
     new Vue({ render: h => h(App) }).$mount('#app');
-})();
+}
+;
+start();
 //# sourceMappingURL=main.js.map

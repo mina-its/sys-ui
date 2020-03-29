@@ -27,131 +27,145 @@
 </template>
 
 <script lang="ts">
-	declare let $: any;
-	import {Vue} from 'vue-property-decorator';
-	import {$t, hideCmenu, load, notify, glob} from "@/main";
-	import {LogType, NotificationInfo} from '../../sys/src/types';
+    declare let $: any;
+    import {Component, Vue} from 'vue-property-decorator';
+    import {$t, hideCmenu, load, notify, glob, start} from "@/main";
+    import {LogType, NotificationInfo} from '../../sys/src/types';
+    import SideNav from "@/components/SideNav.vue";
+    import NavBar from './components/NavBar.vue';
+    import FormElem from "@/components/FormElem.vue";
+    import FileGallery from "@/components/FileGallery.vue";
+    import NotifyBox from "@/components/NotifyBox.vue";
+    import WebSocket from "@/components/WebSocket.vue";
+    import QuestionBox from "@/components/QuestionBox.vue";
+    import ContextMenu from "@/components/ContextMenu.vue";
+    import Toolbar from "@/components/Toolbar.vue";
 
-	const main = require("./main");
+    const main = require("@/main");
 
-	export default class App extends Vue {
-		onScroll() {
-			main.hideCmenu();
-		}
+    @Component({
+        components: {
+            ContextMenu,
+            QuestionBox,
+            WebSocket,
+            NotifyBox,
+            FileGallery,
+            FormElem,
+            Toolbar,
+            SideNav,
+            NavBar
+        }
+    })
+    export default class App extends Vue {
+        get glob() {
+            return glob;
+        }
 
-		fileBrowsed(e) {
-			console.log("fileBrowsed!");
-			glob.fileGallery.fileBrowsed(e.target.files);
-		}
+        onScroll() {
+            main.hideCmenu();
+        }
 
-		handleWindowEvents() {
-			$(window)
-				.on('notify', function (e: any) {
-					let notify = e.detail as NotificationInfo;
-					if (notify.type == LogType.Debug) {
-						$("#snackbar").addClass("visible").text(notify.message);
-						setTimeout(function () {
-							$("#snackbar").removeClass("visible");
-						}, 3000);
-					} else
-						main.updateRoot({notify});
-				})
-				.on('question', function (e: any) {
-					main.updateRoot({question: e.detail});
-				})
-				.on("popstate", (e) => {
-					load(location.href);
-				})
-				.on("beforeunload", (e) => {
-					if (glob.dirty) {
-						e = e || window.event;
-						if (e)
-							e.returnValue = $t('save-before');
-						return $t('save-before');
-					}
-				})
-				.on("resize", (e) => {
-					hideCmenu();
-				})
-				.on("keydown", (e) => {
-					if (glob.cmenu.show)
-						main.handleCmenuKeys(e);
-					main.updateRoot({notify: null});
-				})
-				.on("click", (e) => {
-					if (e.target.tagName == "A") {
-						if (e.target.getAttribute('target')) return; // especially _blank
-						let href = e.target.getAttribute('href');
-						if (href) {
-							if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
-							e.preventDefault();
-							if (glob.dirty) {
-								notify($t('save-before'), LogType.Warning);
-								return;
-							} // dirty page
-							if (/\bf=\d/.test(href)) { // function link
+        fileBrowsed(e) {
+            console.log("fileBrowsed!");
+            glob.fileGallery.fileBrowsed(e.target.files);
+        }
 
-							} else
-								history.pushState(null, null, href);
-							load(href);
-						}
-					}
-				})
-				.on("mouseup", (e) => {
-					if (glob.cmenu.show &&
-						!$('.dropdown-item').is(e.target)
-						&& $('.dropdown-item').has(e.target).length === 0
-						&& $('.dropdown-menu.show').has(e.target).length === 0
-					) hideCmenu();
-				});
-		}
+        handleWindowEvents() {
+            $(window)
+                .on('notify', function (e: any) {
+                    let notify = e.detail as NotificationInfo;
+                    if (notify.type == LogType.Debug) {
+                        $("#snackbar").addClass("visible").text(notify.message);
+                        setTimeout(function () {
+                            $("#snackbar").removeClass("visible");
+                        }, 3000);
+                    } else
+                        glob.notify = notify;
+                })
+                .on('question', function (e: any) {
+                    glob.question = e.detail;
+                })
+                .on("popstate", (e) => {
+                    load(location.href);
+                })
+                .on("beforeunload", (e) => {
+                    if (glob.dirty) {
+                        e = e || window.event;
+                        if (e)
+                            e.returnValue = $t('save-before');
+                        return $t('save-before');
+                    }
+                })
+                .on("resize", (e) => {
+                    hideCmenu();
+                })
+                .on("keydown", (e) => {
+                    if (glob.cmenu.show)
+                        main.handleCmenuKeys(e);
+                    glob.notify = null;
+                })
+                .on("click", (e) => {
+                    if (e.target.tagName == "A") {
+                        if (e.target.getAttribute('target')) return; // especially _blank
+                        let href = e.target.getAttribute('href');
+                        if (href) {
+                            if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
+                            e.preventDefault();
+                            if (glob.dirty) {
+                                notify($t('save-before'), LogType.Warning);
+                                return;
+                            } // dirty page
+                            if (/\bf=\d/.test(href)) { // function link
 
-		mounted() {
-			this.handleWindowEvents();
-			console.log(
-				`%c main started. %c version: ${glob.config.version} %c`,
-				'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
-				'background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
-				'background:transparent'
-			);
-		}
-	}
+                            } else
+                                history.pushState(null, null, href);
+                            load(href);
+                        }
+                    }
+                })
+                .on("mouseup", (e) => {
+                    if (glob.cmenu.show &&
+                        !$('.dropdown-item').is(e.target)
+                        && $('.dropdown-item').has(e.target).length === 0
+                        && $('.dropdown-menu.show').has(e.target).length === 0
+                    ) hideCmenu();
+                });
+        }
+
+        mounted() {
+            this.handleWindowEvents();
+            console.log(
+                `%c main started. %c version: ${glob.config.version} %c`,
+                'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+                'background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
+                'background:transparent'
+            );
+        }
+    }
 </script>
 
 <style lang="scss">
     $left: left;
     $right: right;
 
-    $theme-colors: (
-            "primary": #0072C6,
-            "danger": #ff4136,
-            "dark": #24292e,
-            "warning": #ff7700,
-        //my custom colors
-            "grid-head" : #f6f8fa,
-            "grid-border": #d7d9dc,
-            "panel-separator-line" : #dee2e6,
-            "grid-row-hover" : #f0f8ff,
-            "grid-row-selected": #FFC,
-            "grid-row-header-selected": #FFE,
-            "form-label": #666,
-            "layout-border": #ddd,
-            "side-nav": #2f353c,
-            "breadcrumb-separator": #aaa,
-    );
+    :root {
+        --primary: #0072C6;
+        --danger: #ff4136;
+        --dark: #24292e;
+        --warning: #ff7700;
+        --grid-head: #f6f8fa;
+        --grid-border: #d7d9dc;
+        --panel-separator-line: #dee2e6;
+        --grid-row-hover: #f0f8ff;
+        --grid-row-selected: #FFC;
+        --grid-row-header-selected: #FFE;
+        --form-label: #666;
+        --layout-border: #ddd;
+        --side-nav: #2f353c;
+        --breadcrumb-separator: #aaa;
+    }
+
     @import "bootstrap";
-
-    @function color($key: "blue") {
-        @return map-get($colors, $key);
-    }
-
-    @function theme-color($key: "primary") {
-        @return map-get($theme-colors, $key);
-    }
-
-    @function gray($key: "100") {
-        @return map-get($grays, $key);
-    }
 
     html {
         height: 100%;
@@ -183,7 +197,7 @@
         flex: 0 1 auto;
 
         .btn-toolbar {
-            border-color: theme-color("layout-border");
+            border-color: var(--layout-border);
         }
     }
 
@@ -201,7 +215,7 @@
 
     td {
         .prop-focused {
-            outline: 1px solid theme-color("primary");
+            outline: 1px solid var(--primary);
         }
     }
 
@@ -251,7 +265,7 @@
     }
 
     .separator-line {
-        border-color: theme-color("panel-separator-line") !important;
+        border-color: var(--panel-separator-line) !important;
     }
 
     .dropdown-menu {
@@ -275,7 +289,7 @@
         }
 
         i {
-            color: theme-color("breadcrumb-separator");
+            color: var(--breadcrumb-separator);
         }
     }
 

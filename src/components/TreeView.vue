@@ -15,7 +15,7 @@
 	import {glob} from "@/main";
 	import {TreeViewNode, TreeViewLine, TreeViewAttribute} from '@/types';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class TreeView extends Vue {

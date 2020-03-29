@@ -6,7 +6,7 @@
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {Property} from "../../../sys/src/types";
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class PropLink extends Vue {

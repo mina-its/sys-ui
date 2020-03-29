@@ -14,7 +14,7 @@
 	import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 	import {glob} from "@/main";
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class GeoMap extends Vue {

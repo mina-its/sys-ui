@@ -16,7 +16,7 @@
 	import {Property, Pair} from "../../../sys/src/types";
 	import {MenuItem} from '@/types';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class PropReferenceMultiple extends Vue {

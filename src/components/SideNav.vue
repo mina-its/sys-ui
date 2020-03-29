@@ -24,28 +24,31 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {glob} from "@/main";
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {glob} from "@/main";
 
-	@Component
-	export default class SideNav extends Vue {
-		getStyle(item) {
-			let style = "text-nowrap nav-link";
-			if (location.hostname == item.ref)
-				style += " active";
-			if (item.items)
-				style += " has-child";
-			return style;
-		}
-	}
+    @Component
+    export default class SideNav extends Vue {
+        get glob() {
+            return glob;
+        }
+
+        getStyle(item) {
+            let style = "text-nowrap nav-link";
+            if (location.hostname == item.ref)
+                style += " active";
+            if (item.items)
+                style += " has-child";
+            return style;
+        }
+    }
 </script>
 
 <style lang="scss">
     .side-nav {
-        min-width: 220px;
         overflow-y: scroll;
         -ms-overflow-style: none;
-        background-color: theme-color("side-nav");
+        background-color: var(--side-nav);
         min-width: 280px;
 
         a {

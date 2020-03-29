@@ -12,7 +12,7 @@
 	import {ClientCommand, MenuItem} from '../../../sys/src/types';
 	import WebSocket from "@/components/WebSocket.vue";
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class LogTerminal extends Vue {

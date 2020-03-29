@@ -8,7 +8,7 @@
 	import {PropertyLabelMode} from '@/types';
 	import {glob} from '@/main';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class ElemProp extends Vue {

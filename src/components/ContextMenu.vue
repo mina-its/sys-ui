@@ -13,7 +13,7 @@
 	import {Component, Vue} from 'vue-property-decorator';
 	import {glob} from '@/main';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class ContextMenu extends Vue {

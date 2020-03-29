@@ -31,7 +31,7 @@
 	import {ObjectViewType, ObjectDetailsViewType, ObjectDeclare, Context} from "../../../sys/src/types";
 	import {glob} from '@/main';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class DetailsView extends Vue {

@@ -7,7 +7,7 @@
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 
-	const main = require("./main");
+	const main = require("@/main");
 
 	@Component
 	export default class TreeViewAttribute extends Vue {

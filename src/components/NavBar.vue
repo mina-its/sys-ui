@@ -30,24 +30,27 @@
 </template>
 
 <script lang="ts">
-	import {Component, Vue} from 'vue-property-decorator';
-	import AppLocaleMenu from "@/components/AppLocaleMenu.vue";
-	import {glob} from "@/main";
+    import {Component, Vue} from 'vue-property-decorator';
+    import AppLocaleMenu from "@/components/AppLocaleMenu.vue";
+    import {glob} from "@/main";
 
-	@Component({components: {AppLocaleMenu}})
-	export default class NavBar extends Vue {
-		getStyle(item) {
-			let style = "nav-item";
-			if (location.hostname == item.ref)
-				style += " active";
-			if (item.items)
-				style += " dropdown";
-			return style;
-		}
-	}
+    @Component({components: {AppLocaleMenu}})
+    export default class NavBar extends Vue {
+        getStyle(item) {
+            let style = "nav-item";
+            if (location.hostname == item.ref)
+                style += " active";
+            if (item.items)
+                style += " dropdown";
+            return style;
+        }
+    }
 </script>
 
 <style lang="scss">
+    $left: left;
+    $right: right;
+
     .navbar-nav {
         margin-#{$right}: auto !important;
     }

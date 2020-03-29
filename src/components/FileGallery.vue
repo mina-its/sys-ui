@@ -47,231 +47,233 @@
 </template>
 
 <script lang="ts">
-	import Function from "@/components/Function.vue";
+    declare let $: any;
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {glob, $t} from '@/main';
+    import {DirFile, LogType, DirFileType, YesNo, Pair} from '../../../sys/src/types';
+    import {MenuItem} from '@/types';
 
-	declare let $: any;
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {glob, $t} from '@/main';
-	import {DirFile, LogType, DirFileType, YesNo, Pair} from '../../../sys/src/types';
-	import {MenuItem} from '@/types';
+    const main = require("@/main");
+    @Component({components: {}})
+    export default class FileGallery extends Vue {
+        get glob() {
+            return glob;
+        }
 
-	const main = require("./main");
-	@Component({components: {Function}})
-	export default class FileGallery extends Vue {
-		isSelected(item: DirFile) {
-			return glob.fileGallery.selected == item;
-		}
+        isSelected(item: DirFile) {
+            return glob.fileGallery.selected == item;
+        }
 
-		openRootMenu(e) {
-			let items: MenuItem[] = [
-				{ref: "upload", title: $t('upload')},
-				{title: "-"},
-				{ref: "refresh", title: $t('refresh')}
-			];
-			main.showCmenu(null, items, e, (state, item: MenuItem) => {
-				switch (item.ref) {
-					case "upload":
-						main.browseFile((files) => {
-							main.ajax('/uploadToFileGallery?m=1', {
-									_files: files,
-									drive: glob.fileGallery.drive._id,
-									path: glob.fileGallery.path
-								}, null, res => {
-									main.refreshFileGallery();
-									main.notify('upload done!', LogType.Debug);
-								}
-							)
-							;
-						});
-						break;
+        openRootMenu(e) {
+            let items: MenuItem[] = [
+                {ref: "upload", title: $t('upload')},
+                {title: "-"},
+                {ref: "refresh", title: $t('refresh')}
+            ];
+            main.showCmenu(null, items, e, (state, item: MenuItem) => {
+                switch (item.ref) {
+                    case "upload":
+                        main.browseFile((files) => {
+                            main.ajax('/uploadToFileGallery?m=1', {
+                                    _files: files,
+                                    drive: glob.fileGallery.drive._id,
+                                    path: glob.fileGallery.path
+                                }, null, res => {
+                                    main.refreshFileGallery();
+                                    main.notify('upload done!', LogType.Debug);
+                                }
+                            )
+                            ;
+                        });
+                        break;
 
-					case "refresh":
-						main.refreshFileGallery();
-						break;
-				}
-			});
-			e.preventDefault();
-		}
+                    case "refresh":
+                        main.refreshFileGallery();
+                        break;
+                }
+            });
+            e.preventDefault();
+        }
 
-		openMenu(e, item: DirFile) {
-			if (item.type == DirFileType.Folder) return;
+        openMenu(e, item: DirFile) {
+            if (item.type == DirFileType.Folder) return;
 
-			let items: MenuItem[] = [
-				{ref: "preview", title: $t('preview')},
-				{ref: "download", title: $t('download')},
-				// {ref: "rename", title: $t('rename')},
-				{title: "-"},
-				{ref: "remove", title: $t('remove')},
-				{title: "-"},
-				{ref: "refresh", title: $t('refresh')}
-			];
-			main.showCmenu(item, items, e, (state, menu: MenuItem) => {
-					switch (menu.ref) {
-						case "remove":
-							main.question(null, `### Delete Confirm\n\nAre you sure you want to delete the file '${item.name}'`, [{
-								title: "YES",
-								ref: YesNo.Yes
-							}, {
-								title: "NO",
-								ref: YesNo.No
-							}], (option: Pair) => {
-								if (!option || option.ref == YesNo.No) return;
-								main.ajax("/deleteFromFileGallery?m=1", {
-									drive: glob.fileGallery.drive._id,
-									pth: glob.fileGallery.path,
-									name: item.name
-								}, null, () => {
-									main.refreshFileGallery();
-								});
-							});
-							break;
-						case "preview":
-						case "download":
-							window.open(main.joinUri(glob.fileGallery.uri, item.name), '_blank');
-							break;
+            let items: MenuItem[] = [
+                {ref: "preview", title: $t('preview')},
+                {ref: "download", title: $t('download')},
+                // {ref: "rename", title: $t('rename')},
+                {title: "-"},
+                {ref: "remove", title: $t('remove')},
+                {title: "-"},
+                {ref: "refresh", title: $t('refresh')}
+            ];
+            main.showCmenu(item, items, e, (state, menu: MenuItem) => {
+                    switch (menu.ref) {
+                        case "remove":
+                            main.question(null, `### Delete Confirm\n\nAre you sure you want to delete the file '${item.name}'`, [{
+                                title: "YES",
+                                ref: YesNo.Yes
+                            }, {
+                                title: "NO",
+                                ref: YesNo.No
+                            }], (option: Pair) => {
+                                if (!option || option.ref == YesNo.No) return;
+                                main.ajax("/deleteFromFileGallery?m=1", {
+                                    drive: glob.fileGallery.drive._id,
+                                    pth: glob.fileGallery.path,
+                                    name: item.name
+                                }, null, () => {
+                                    main.refreshFileGallery();
+                                });
+                            });
+                            break;
+                        case "preview":
+                        case "download":
+                            window.open(main.joinUri(glob.fileGallery.uri, item.name), '_blank');
+                            break;
 
-						case "refresh":
-							main.refreshFileGallery();
-							break;
+                        case "refresh":
+                            main.refreshFileGallery();
+                            break;
 
-						case "rename":
-							item["editing"] = true;
-							console.log(item);
-							break;
-					}
-				}
-			)
-			;
-			e.stopPropagation();
-			e.preventDefault();
-		}
+                        case "rename":
+                            item["editing"] = true;
+                            console.log(item);
+                            break;
+                    }
+                }
+            )
+            ;
+            e.stopPropagation();
+            e.preventDefault();
+        }
 
-		imageStyle(item: DirFile) {
-			let ext = item.name.split('.').pop().toLowerCase();
-			switch (ext) {
-				case "png":
-				case "jpg":
-				case "jpeg":
-				case "gif":
-				case "tiff":
-				case "ico":
-					return "file-gallery-image-src";
-				default:
-					return null;
-			}
-		}
+        imageStyle(item: DirFile) {
+            let ext = item.name.split('.').pop().toLowerCase();
+            switch (ext) {
+                case "png":
+                case "jpg":
+                case "jpeg":
+                case "gif":
+                case "tiff":
+                case "ico":
+                    return "file-gallery-image-src";
+                default:
+                    return null;
+            }
+        }
 
-		size(item: DirFile) {
-			return item.size ? "(" + main.toFriendlyFileSizeString(item.size) + ")" : "";
-		}
+        size(item: DirFile) {
+            return item.size ? "(" + main.toFriendlyFileSizeString(item.size) + ")" : "";
+        }
 
-		icon(item: DirFile) {
-			if (item.type == DirFileType.Folder)
-				return '/images/gallery/folder2.png';
+        icon(item: DirFile) {
+            if (item.type == DirFileType.Folder)
+                return '/images/gallery/folder2.png';
 
-			let ext = item.name.split('.').pop().toLowerCase();
-			switch (ext) {
-				case "png":
-				case "jpg":
-				case "jpeg":
-				case "gif":
-				case "tiff":
-				case "ico":
-					return main.joinUri(glob.fileGallery.uri, item.name);
+            let ext = item.name.split('.').pop().toLowerCase();
+            switch (ext) {
+                case "png":
+                case "jpg":
+                case "jpeg":
+                case "gif":
+                case "tiff":
+                case "ico":
+                    return main.joinUri(glob.fileGallery.uri, item.name);
 
-				case "doc":
-				case "docx":
-					return '/images/gallery/doc.png';
+                case "doc":
+                case "docx":
+                    return '/images/gallery/doc.png';
 
-				case "exe":
-					return '/images/gallery/exe.png';
+                case "exe":
+                    return '/images/gallery/exe.png';
 
-				case "mp3":
-				case "wav":
-					return '/images/gallery/music.png';
+                case "mp3":
+                case "wav":
+                    return '/images/gallery/music.png';
 
-				case "pdf":
-					return '/images/gallery/pdf.png';
+                case "pdf":
+                    return '/images/gallery/pdf.png';
 
-				case "avi":
-				case "mp4":
-				case "mov":
-					return '/images/gallery/play.png';
+                case "avi":
+                case "mp4":
+                case "mov":
+                    return '/images/gallery/play.png';
 
-				case "zip":
-					return '/images/gallery/zip.png';
+                case "zip":
+                    return '/images/gallery/zip.png';
 
-				case "xml":
-					return '/images/gallery/xml.png';
+                case "xml":
+                    return '/images/gallery/xml.png';
 
-				default:
-					return '/images/gallery/file.png';
-			}
-		}
+                default:
+                    return '/images/gallery/file.png';
+            }
+        }
 
-		browse(ref: string) {
-			if (!glob.fileGallery.fixedPath) {
-				glob.fileGallery.path = ref;
-				main.refreshFileGallery();
-			} else
-				main.notify("Current directory Can not be changed!", LogType.Debug);
-		}
+        browse(ref: string) {
+            if (!glob.fileGallery.fixedPath) {
+                glob.fileGallery.path = ref;
+                main.refreshFileGallery();
+            } else
+                main.notify("Current directory Can not be changed!", LogType.Debug);
+        }
 
-		select(cn, done, item: DirFile) {
-			if (item)
-				glob.fileGallery.selected = item;
-			if (glob.fileGallery.selected && glob.fileGallery.selected.type == DirFileType.Folder) {
-				glob.fileGallery.path = main.joinUri(glob.fileGallery.path, glob.fileGallery.selected.name);
-				main.refreshFileGallery(null, done);
-			} else {
-				$("#file-gallery").modal('hide');
-				glob.fileGallery.fileSelectCallback(glob.fileGallery.path, glob.fileGallery.selected);
-				if (done) done();
-			}
-		}
+        select(cn, done, item: DirFile) {
+            if (item)
+                glob.fileGallery.selected = item;
+            if (glob.fileGallery.selected && glob.fileGallery.selected.type == DirFileType.Folder) {
+                glob.fileGallery.path = main.joinUri(glob.fileGallery.path, glob.fileGallery.selected.name);
+                main.refreshFileGallery(null, done);
+            } else {
+                $("#file-gallery").modal('hide');
+                glob.fileGallery.fileSelectCallback(glob.fileGallery.path, glob.fileGallery.selected);
+                if (done) done();
+            }
+        }
 
-		close(cn, done) {
-			$("#file-gallery").modal('hide');
-			done();
-		}
+        close(cn, done) {
+            $("#file-gallery").modal('hide');
+            done();
+        }
 
-		focus(item: DirFile) {
-			glob.fileGallery.selected = item;
-		}
+        focus(item: DirFile) {
+            glob.fileGallery.selected = item;
+        }
 
-		get breadcrumb() {
-			if (glob.fileGallery.fixedPath)
-				return [];
-			let parts = glob.fileGallery.path.split("/").filter(el => el);
-			let result: Pair[] = [];
-			parts.forEach((part, i) => {
-				result.push({title: part, ref: ""});
-			});
+        get breadcrumb() {
+            if (glob.fileGallery.fixedPath)
+                return [];
+            let parts = glob.fileGallery.path.split("/").filter(el => el);
+            let result: Pair[] = [];
+            parts.forEach((part, i) => {
+                result.push({title: part, ref: ""});
+            });
 
-			if (result.length > 0)
-				result.unshift({title: main.getText(glob.fileGallery.drive.title), ref: ""});
-			result.pop();
-			return result;
-		}
+            if (result.length > 0)
+                result.unshift({title: main.getText(glob.fileGallery.drive.title), ref: ""});
+            result.pop();
+            return result;
+        }
 
-		get files() {
-			if (glob.fileGallery.fixedPath)
-				glob.fileGallery.list = glob.fileGallery.list.filter(f => f.type == DirFileType.File);
-			glob.fileGallery.list.sort((a, b) => b.type - a.type);
-			glob.fileGallery.list.forEach(i => i["editing"] = false);
-			return glob.fileGallery.list;
-		}
+        get files() {
+            if (glob.fileGallery.fixedPath)
+                glob.fileGallery.list = glob.fileGallery.list.filter(f => f.type == DirFileType.File);
+            glob.fileGallery.list.sort((a, b) => b.type - a.type);
+            glob.fileGallery.list.forEach(i => i["editing"] = false);
+            return glob.fileGallery.list;
+        }
 
-		get current() {
-			if (glob.fileGallery.fixedPath) {
-				return main.getText(glob.fileGallery.drive.title) + ` (${glob.fileGallery.path})`;
-			} else {
-				let parts = glob.fileGallery.path.split("/").filter(el => el);
-				if (parts.length == 0) return main.getText(glob.fileGallery.drive.title);
-				return parts.pop();
-			}
-		}
-	}
+        get current() {
+            if (glob.fileGallery.fixedPath) {
+                return main.getText(glob.fileGallery.drive.title) + ` (${glob.fileGallery.path})`;
+            } else {
+                let parts = glob.fileGallery.path.split("/").filter(el => el);
+                if (parts.length == 0) return main.getText(glob.fileGallery.drive.title);
+                return parts.pop();
+            }
+        }
+    }
 </script>
 
 <style lang="scss">
