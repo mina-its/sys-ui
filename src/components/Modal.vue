@@ -27,7 +27,7 @@
 <script lang="ts">
 	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {st} from "@/main";
+	import {glob} from "@/main";
 
 	const main = require("./main");
 

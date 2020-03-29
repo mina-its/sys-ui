@@ -1,3 +1,4 @@
+import {WebMethod} from "../../../sys/src/types";
 <template>
     <div :class="'p-0 border-0 ' + styles">
         <div v-if="viewType==2" class="prop-file-box">
@@ -23,9 +24,9 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property, RequestMode, DirFile, LogType, DriveMode, File} from "../../../sys/src/types";
-		import {MenuItem, Modify} from '@/types';
-		import { $t, st, glob } from '@/main';
+	import {DirFile, DriveMode, File, LogType, Property, RequestMode, WebMethod} from "../../../sys/src/types";
+	import {MenuItem, Modify} from '@/types';
+	import {$t, glob} from '@/main';
 
 	const main = require("./main");
 
@@ -86,7 +87,7 @@
 					done();
 					if (!files.length) return;
 					item._files = item._files || [];
-					for (let file of files) {
+					for (const file of files) {
 						item._files.push(file);
 					}
 					if (this.meta.file && this.meta.file.sizeLimit) {
@@ -102,7 +103,7 @@
 						else if (!Array.isArray(val)) val = [val]; // in case of set property to multiple which already has data
 					}
 
-					for (let file of files) {
+					for (const file of files) {
 						let newItem = {_id: -Math.random(), name: file.name, size: file.size};
 						if (Array.isArray(val))
 							val.push(newItem);
@@ -111,14 +112,8 @@
 					}
 					item[this.meta.name] = val;
 
-					if (glob.toolbar) {
-						let rootRef = this.meta._.ref.replace(/\/\w+$/, "");
-						glob.md.push({ref: this.meta._.ref, data: val, rootRef} as Modify);
-
-						// replace od to prevent parallel modify detection
-						if (rootRef)
-							glob.od[rootRef][this.meta.name] = val;
-
+					if (glob.form._.toolbar) {
+						glob.modifies.push({ref: this.meta._.ref, data: val, type: WebMethod.patch} as Modify);
 						glob.dirty = true;
 					}
 				});
@@ -126,10 +121,7 @@
 		}
 
 		remove(file, e) {
-			glob.md = glob.md.filter((mod) => {
-				return mod.data._id != file._id
-			});
-
+			glob.modifies = glob.modifies.filter(mod => mod.data._id != file._id);
 			let val = this.doc[this.meta.name];
 			if (Array.isArray(val)) {
 				val = val.filter((item) => {

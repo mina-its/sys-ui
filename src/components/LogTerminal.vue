@@ -1,6 +1,6 @@
 <template>
     <div class="p-2 log-terminal w-100 bg-dark" @contextmenu="openMenu">
-        <div v-focus="true" tabindex="1" :class="'log-terminal-item type-'+log.type" v-for="log in logs">
+        <div v-focus="true" tabindex="1" :class="'log-terminal-item type-'+log.type" v-for="log in glob.logs">
             {{log.message}}
         </div>
     </div>
@@ -8,7 +8,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {$t} from "@/main";
+	import {$t, glob} from "@/main";
 	import {ClientCommand, MenuItem} from '../../../sys/src/types';
 	import WebSocket from "@/components/WebSocket.vue";
 
@@ -27,15 +27,11 @@
 			main.showCmenu(null, items, e, (state, item: MenuItem) => {
 				switch (item.ref) {
 					case "clear":
-						this.$store.commit("clearLogs");
+						glob.logs = [];
 						break;
 				}
 			});
 			e.preventDefault();
-		}
-
-		get logs() {
-			return this.$store.state.logs.map(log => log || {type: 0});
 		}
 	}
 </script>

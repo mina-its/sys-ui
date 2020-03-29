@@ -45,7 +45,7 @@
 			if (dec && dec.properties) {
 				let requiredProps = dec.properties.filter(p => p.required);
 				let error = "";
-				for (let prop of requiredProps) {
+				for (const prop of requiredProps) {
 					if (data[prop.name] === null || data[prop.name] === "") {
 						error = error || `value is required for property '${prop.title}'`;
 						main.setPropertyEmbeddedError(data, prop.name, `* mandatory`);

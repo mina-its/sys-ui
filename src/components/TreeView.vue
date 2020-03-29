@@ -12,7 +12,7 @@
 	declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {Property, Keys, GlobalType} from "../../../sys/src/types";
-	import {st} from "@/main";
+	import {glob} from "@/main";
 	import {TreeViewNode, TreeViewLine, TreeViewAttribute} from '@/types';
 
 	const main = require("./main");
@@ -30,8 +30,8 @@
 
 		mounted() {
 			let data = glob.data[this.uri];
-			let meta = glob.meta[this.uri];
-			let props = meta.properties as Property[];
+			let dec = main.getItemDec(data);
+			let props = dec.properties as Property[];
 			let node = this.createNode(data, props);
 			this.nodes = [node];
 		}
@@ -121,7 +121,7 @@
 				} as TreeViewLine;
 
 				if (Array.isArray(data)) {
-					for (let item of data) {
+					for (const item of data) {
 						let child = this.createNode(item, props, null);
 						node.nodes.push(child);
 					}
@@ -133,7 +133,7 @@
 					return p._.gtype == GlobalType.object;
 				});
 
-				for (let prop of objectProps) {
+				for (const prop of objectProps) {
 					if (data[prop.name]) {
 						let child = this.createNode(data[prop.name], prop.properties, prop);
 						node.nodes.push(child);
@@ -151,7 +151,7 @@
 			let subjectProp = parent ? {name: "__name", _: {gtype: GlobalType.string}} : attributeProps.shift();
 			if (item) {
 				if (parent) item.__name = parent.name;
-				for (let prop of attributeProps) {
+				for (const prop of attributeProps) {
 					if (prop.text && prop.text.password)
 						continue;
 					attrs.push({prop, item} as TreeViewAttribute);

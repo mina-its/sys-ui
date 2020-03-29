@@ -12,7 +12,7 @@
 <script lang="ts">
 	declare let google: any;
 	import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-	import {st} from "@/main";
+	import {glob} from "@/main";
 
 	const main = require("./main");
 

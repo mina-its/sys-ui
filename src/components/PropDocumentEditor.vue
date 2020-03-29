@@ -8,7 +8,7 @@
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {Property, WebMethod} from "../../../sys/src/types";
-	import {glob, st} from "@/main";
+	import {glob} from "@/main";
 	import {Modify} from '@/types';
 
 	const main = require("./main");
@@ -35,8 +35,8 @@
 				let ref = this.meta._.ref.replace(new RegExp(`/${this.meta.name}$`), "");
 				let data = {};
 				data[this.meta.name] = val;
-				glob.md.push({type: WebMethod.patch, ref, data} as Modify);
-				glob.od[ref][this.meta.name] = JSON.parse(JSON.stringify(val));
+				glob.modifies.push({type: WebMethod.patch, ref, data} as Modify);
+				glob.modifies[ref][this.meta.name] = JSON.parse(JSON.stringify(val));
 
 				this.$emit("changed", this.meta, val);
 			} catch (ex) {

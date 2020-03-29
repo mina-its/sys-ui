@@ -43,336 +43,341 @@
 </template>
 
 <script lang="ts">
-	declare let $: any;
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {
-		ObjectViewType,
-		GridRowHeaderStyle,
-		NewItemMode,
-		LogType,
-		ReqParams,
-		WebMethod,
-		Pair,
-		Keys,
-		ObjectMeta
-	} from "../../../sys/src/types";
-	import {st, glob, $t, changeLocale} from "@/main";
-	import {Modify, RowStatus, MenuItem} from '@/types';
+  declare let $: any;
+  import {Component, Prop, Vue} from 'vue-property-decorator';
+  import {
+    ObjectViewType,
+    GridRowHeaderStyle,
+    NewItemMode,
+    LogType,
+    ReqParams,
+    WebMethod,
+    Pair,
+    Keys,
+    ObjectDeclare
+  } from '../../../sys/src/types';
+  import {glob, $t} from '@/main';
+  import {Modify, RowStatus, MenuItem} from '@/types';
 
-	const main = require("./main");
+  const main = require('./main');
 
-	@Component
-	export default class GridView extends Vue {
-		@Prop() private uri: string;
-		@Prop() private root: boolean;
+  @Component
+  export default class GridView extends Vue {
+    @Prop() private uri: string;
+    @Prop() private root: boolean;
+    @Prop() private meta: ObjectDeclare;
 
-		private ni = -1;
-		private rowHeaderStyle = GridRowHeaderStyle.empty;
-		private mainCheckState = null;
+    private ni = -1;
+    private rowHeaderStyle = GridRowHeaderStyle.empty;
+    private mainCheckState = null;
 
-		mounted() {
-			glob.data[this.meta._ref] = this.items;
-		}
+    mounted() {
+      glob.data[this.meta._ref] = this.items;
+    }
 
-		changed(meta, item, val) {
-			glob.dirty = true;
-			let dependents = this.meta.properties.filter((prop) => {
-				return prop.dependsOn == meta.name
-			});
-			for (let prop of dependents) {
-				item[prop.name] = null;
-				if (prop._.items) {
-					prop._.items = null;
-					//prop.type
-				}
-			}
-		}
+    changed(meta, item, val) {
+      glob.dirty = true;
+      let dependents = this.meta.properties.filter((prop) => {
+        return prop.dependsOn == meta.name;
+      });
+      for (const prop of dependents) {
+        item[prop.name] = null;
+        if (prop._.items) {
+          prop._.items = null;
+          //prop.type
+        }
+      }
+    }
 
-		newItem() {
-			switch (this.meta.newItemMode) {
-				case NewItemMode.newPage:
-					history.pushState(null, null, location.pathname + "?n=true");
-					main.load(location.pathname + "?n=true");
-					break;
+    newItem() {
+      switch (this.meta.newItemMode) {
+        case NewItemMode.newPage:
+          history.pushState(null, null, location.pathname + '?n=true');
+          main.load(location.pathname + '?n=true');
+          break;
 
-				default:
-					let newItem = {_id: this.ni--, _status: null};
-					this.meta.properties.forEach((prop) => {
-						newItem[prop.name] = null;
-					});
-					if (this.meta.reorderable) {
-						newItem["_z"] = (Math.max(...this.items.map((i) => {
-							return i._z;
-						})) || 0) + 1;
-					}
-					this.items.push(newItem);
-					glob.dirty = true;
-					break;
+        default:
+          let newItem = {_id: this.ni--, _status: null};
+          this.meta.properties.forEach((prop) => {
+            newItem[prop.name] = null;
+          });
+          if (this.meta.reorderable) {
+            newItem['_z'] = (Math.max(...this.items.map((i) => {
+              return i._z;
+            })) || 0) + 1;
+          }
+          this.items.push(newItem);
+          glob.dirty = true;
+          break;
 
-				case NewItemMode.modal:
-					main.notify('not supported!', LogType.Error);
-					break;
-			}
-		}
+        case NewItemMode.modal:
+          main.notify('not supported!', LogType.Error);
+          break;
+      }
+    }
 
-		goBack() {
-			if (this.meta.page > 1) {
-				let href = main.setQs(ReqParams.page, this.meta.page - 1, true);
-				main.load(href);
-			}
-		}
+    goBack() {
+      if (this.meta.page > 1) {
+        let href = main.setQs(ReqParams.page, this.meta.page - 1, true);
+        main.load(href);
+      }
+    }
 
-		goForward() {
-			if (this.meta.page < this.meta.pages) {
-				let href = main.setQs(ReqParams.page, this.meta.page + 1, true);
-				main.load(href);
-			}
-		}
+    goForward() {
+      if (this.meta.page < this.meta.pages) {
+        let href = main.setQs(ReqParams.page, this.meta.page + 1, true);
+        main.load(href);
+      }
+    }
 
-		showColumnMenu(prop, e) {
-			let items: MenuItem[] = [
-				{ref: "sort", title: $t('sort')},
-				// {ref: "filter", title: $t('filter')},
-			];
-			main.showCmenu(prop, items, e, (state, item) => {
-				main.hideCmenu();
-				if (!item) return;
-				switch (item.ref) {
-					case "sort":
-						let prevSort = main.getQs(ReqParams.sort);
-						let sort = (prevSort && prevSort.indexOf("-") == -1 ? "-" : "") + state.name;
-						let href = main.setQs(ReqParams.sort, sort, true);
-						history.pushState(null, null, href);
-						main.load(href);
-						break;
+    showColumnMenu(prop, e) {
+      let items: MenuItem[] = [
+        {ref: 'sort', title: $t('sort')},
+        // {ref: "filter", title: $t('filter')},
+      ];
+      main.showCmenu(prop, items, e, (state, item) => {
+        main.hideCmenu();
+        if (!item) {
+          return;
+        }
+        switch (item.ref) {
+          case 'sort':
+            let prevSort = main.getQs(ReqParams.sort);
+            let sort = (prevSort && prevSort.indexOf('-') == -1 ? '-' : '') + state.name;
+            let href = main.setQs(ReqParams.sort, sort, true);
+            history.pushState(null, null, href);
+            main.load(href);
+            break;
 
-					case "filter":
-						// this.meta.filter.items.push({title: state.title, id: Math.random()});
-						break;
-				}
-			});
-		}
+          case 'filter':
+            // this.meta.filter.items.push({title: state.title, id: Math.random()});
+            break;
+        }
+      });
+    }
 
-		deleteItems() {
-			for (let i = this.items.length - 1; i >= 0; i--) {
-				let item = this.items[i];
-				if (item._status) {
-					this.items.splice(i, 1);
+    deleteItems() {
+      for (let i = this.items.length - 1; i >= 0; i--) {
+        let item = this.items[i];
+        if (item._status) {
+          this.items.splice(i, 1);
 
-					if (!(item._id < 0)) { // not newly added item
-						let url = `${this.meta._ref}/${main.getBsonId(item)}`;
-						glob.md.push({type: WebMethod.del, ref: url} as Modify);
+          if (!(item._id < 0)) { // not newly added item
+            let url = `${this.meta._ref}/${main.getBsonId(item)}`;
+            glob.modifies.push({type: WebMethod.del, ref: url} as Modify);
+            throw 'todo';
+            // glob.modifies[this.meta._ref].forEach((oitem, oi) => {
+            // 		if (main.getBsonId(oitem) == main.getBsonId(item)) {
+            // 			glob.modifies[this.meta._ref].splice(oi, 1);
+            // 		}
+            // 	}
+            // );
+          }
+        }
+      }
+      this.rowHeaderStyle = GridRowHeaderStyle.empty;
+      glob.dirty = true;
+    }
 
-						glob.od[this.meta._ref].forEach((oitem, oi) => {
-								if (main.getBsonId(oitem) == main.getBsonId(item)) {
-									glob.od[this.meta._ref].splice(oi, 1);
-								}
-							}
-						);
-					}
-				}
-			}
-			this.rowHeaderStyle = GridRowHeaderStyle.empty;
-			glob.dirty = true;
-		}
+    onScroll() {
+      main.hideCmenu();
+    }
 
-		onScroll() {
-			main.hideCmenu();
-		}
+    mainSelect(e) {
+      if (this.mainCheckState) {
+        this.selectAll();
+      } else {
+        this.rowHeaderStyle = GridRowHeaderStyle.empty;
+        this.deselectAll();
+      }
+    }
 
-		mainSelect(e) {
-			if (this.mainCheckState)
-				this.selectAll();
-			else {
-				this.rowHeaderStyle = GridRowHeaderStyle.empty;
-				this.deselectAll();
-			}
-		}
+    selectAll() {
+      this.rowHeaderStyle = GridRowHeaderStyle.select;
+      this.items.forEach((item) => {
+        item._status = RowStatus.Selected;
+      });
+    }
 
-		selectAll() {
-			this.rowHeaderStyle = GridRowHeaderStyle.select;
-			this.items.forEach((item) => {
-				item._status = RowStatus.Selected;
-			});
-		}
+    deselectAll(but?) {
+      this.items.forEach((item) => {
+        item._status = null;
+      });
+      if (but) {
+        but._status = RowStatus.Selected;
+      }
+    }
 
-		deselectAll(but?) {
-			this.items.forEach((item) => {
-				item._status = null;
-			});
-			if (but)
-				but._status = RowStatus.Selected;
-		}
+    rowSelected(item) {
+      this.mainCheckState = false;
+      if (this.rowHeaderStyle == GridRowHeaderStyle.select) {
+        item._status = item._status == RowStatus.Selected ? null : RowStatus.Selected;
+      } else {
+        item._status = RowStatus.Selected;
+        this.deselectAll(item);
+      }
+    }
 
-		rowSelected(item) {
-			this.mainCheckState = false;
-			if (this.rowHeaderStyle == GridRowHeaderStyle.select) {
-				item._status = item._status == RowStatus.Selected ? null : RowStatus.Selected;
-			} else {
-				item._status = RowStatus.Selected;
-				this.deselectAll(item);
-			}
-		}
+    showRowMenu(item, e) {
+      let items: Pair[] = [
+        {ref: 'select', title: $t('select')},
+        {ref: 'select-all', title: $t('select-all')},
+        {ref: null, title: '-'},
+        {ref: 'delete', title: $t('delete')},
+      ];
 
-		showRowMenu(item, e) {
-			let items: Pair[] = [
-				{ref: "select", title: $t('select')},
-				{ref: "select-all", title: $t('select-all')},
-				{ref: null, title: '-'},
-				{ref: "delete", title: $t('delete')},
-			];
+      if (item._id && main.getBsonId(item)) {
+        if (this.root) {
+          items.unshift({ref: 'tree', title: $t('tree-view')});
+        }
+        items.unshift({ref: 'details', title: $t('details')});
+      }
 
-			if (item._id && main.getBsonId(item)) {
-				if (this.root)
-					items.unshift({ref: "tree", title: $t('tree-view')});
-				items.unshift({ref: "details", title: $t('details')});
-			}
+      if (this.meta.reorderable) {
+        items.push({ref: null, title: '-'});
+        items.push({ref: 'move-up', title: $t('row-move-up')});
+        items.push({ref: 'move-down', title: $t('row-move-down')});
+      }
 
-			if (this.meta.reorderable) {
-				items.push({ref: null, title: "-"});
-				items.push({ref: "move-up", title: $t('row-move-up')});
-				items.push({ref: "move-down", title: $t('row-move-down')});
-			}
+      main.showCmenu(item, items, e, (state, item) => {
+        main.hideCmenu();
+        if (!item) {
+          return;
+        }
+        switch (item.ref) {
+          case 'delete':
+            this.deleteItems();
+            break;
 
-			main.showCmenu(item, items, e, (state, item) => {
-				main.hideCmenu();
-				if (!item) return;
-				switch (item.ref) {
-					case "delete":
-						this.deleteItems();
-						break;
+          case 'details': {
+            if (!state._id) {
+              main.notify('ID is expected, please check the item data!', LogType.Error);
+              console.error(state);
+              return;
+            }
+            let href = main.prepareServerUrl(`${this.meta._ref}/${main.getBsonId(state)}`);
+            history.pushState(null, null, href);
+            main.load(href);
+            break;
+          }
 
-					case "details": {
-						if (!state._id) {
-							main.notify("ID is expected, please check the item data!", LogType.Error);
-							console.error(state);
-							return;
-						}
-						let href = main.prepareServerUrl(`${this.meta._ref}/${main.getBsonId(state)}`);
-						history.pushState(null, null, href);
-						main.load(href);
-						break;
-					}
+          case 'tree': {
+            if (!state._id) {
+              main.notify('ID is expected, please check the item data!', LogType.Error);
+              console.error(state);
+              return;
+            }
+            let href = main.prepareServerUrl(`${this.meta._ref}/${main.getBsonId(state)}?t=${ObjectViewType.TreeView}`);
+            history.pushState(null, null, href);
+            main.load(href);
+            break;
+          }
 
-					case "tree": {
-						if (!state._id) {
-							main.notify("ID is expected, please check the item data!", LogType.Error);
-							console.error(state);
-							return;
-						}
-						let href = main.prepareServerUrl(`${this.meta._ref}/${main.getBsonId(state)}?t=${ObjectViewType.TreeView}`);
-						history.pushState(null, null, href);
-						main.load(href);
-						break;
-					}
+          case 'select':
+            this.rowHeaderStyle = GridRowHeaderStyle.select;
+            break;
 
-					case "select":
-						this.rowHeaderStyle = GridRowHeaderStyle.select;
-						break;
+          case 'select-all':
+            this.selectAll();
+            break;
 
-					case "select-all":
-						this.selectAll();
-						break;
+          case 'move-up':
+            this.rowMove(true);
+            break;
 
-					case "move-up":
-						this.rowMove(true);
-						break;
+          case 'move-down':
+            this.rowMove(false);
+            break;
+        }
+      });
+      this.deselectAll(item);
+    }
 
-					case "move-down":
-						this.rowMove(false);
-						break;
-				}
-			});
-			this.deselectAll(item);
-		}
+    rowMove(up: boolean) {
+      let item = this.items.find(i => i._status == RowStatus.Selected);
+      let index = this.items.indexOf(item);
+      if ((up && index == 0) || (!up && index == this.items.length - 1)) {
+        return;
+      }
+      glob.dirty = true;
 
-		rowMove(up: boolean) {
-			let item = this.items.find(i => i._status == RowStatus.Selected);
-			let index = this.items.indexOf(item);
-			if ((up && index == 0) || (!up && index == this.items.length - 1)) return;
-			glob.dirty = true;
+      let emptyZs = this.items.filter((item) => {
+        return !item._z;
+      });
 
-			let emptyZs = this.items.filter((item) => {
-				return !item._z;
-			});
+      if (emptyZs.length) {
+        let min = Math.min(...this.items.map((i) => {
+          return i._z;
+        })) || 0;
+        for (const item of this.items) {
+          item._z = ++min;
+        }
+      }
 
-			if (emptyZs.length) {
-				let min = Math.min(...this.items.map((i) => {
-					return i._z;
-				})) || 0;
-				for (let item of this.items) {
-					item._z = ++min;
-				}
-			}
+      let siblingIndex = up ? index - 1 : index + 1;
+      let sibling = this.items[siblingIndex];
 
-			let siblingIndex = up ? index - 1 : index + 1;
-			let sibling = this.items[siblingIndex];
+      // check if _z are same (happens in some situations)
+      if (item._z == sibling._z) {
+        let min = Math.min(...this.items.map((i) => {
+          return i._z;
+        }));
+        for (const item of this.items) {
+          item._z = min++;
+        }
+      }
+      // replace items _z
+      let _z = item._z;
+      item._z = sibling._z;
+      sibling._z = _z;
+      // reorder items index for UI effect
+      this.items.splice(index, 1);
+      this.items.splice(siblingIndex, 0, item);
+    }
 
-			// check if _z are same (happens in some situations)
-			if (item._z == sibling._z) {
-				let min = Math.min(...this.items.map((i) => {
-					return i._z;
-				}));
-				for (let item of this.items) {
-					item._z = min++;
-				}
-			}
-			// replace items _z
-			let _z = item._z;
-			item._z = sibling._z;
-			sibling._z = _z;
-			// reorder items index for UI effect
-			this.items.splice(index, 1);
-			this.items.splice(siblingIndex, 0, item);
-			// reorder items in old data
-			let od = glob.od[this.uri][index];
-			glob.od[this.uri].splice(index, 1);
-			glob.od[this.uri].splice(siblingIndex, 0, od);
-		}
+    keydown(e, item, prop) {
+      switch (e.which) {
+        case Keys.esc:
+          break;
 
-		keydown(e, item, prop) {
-			switch (e.which) {
-				case Keys.esc:
-					break;
+        case Keys.up:
+        case Keys.down:
+        case Keys.enter:
+          let $t = $(e.target);
+          let ci = $t.closest('td')[0].cellIndex;
+          let ri = $t.closest('tr')[0].rowIndex + (e.which == Keys.up ? -1 : 1);
+          let table = $t.closest('table');
+          if (e.which == Keys.enter && ri == table[0].rows.length - 1) {
+            this.newItem();
+          } else if (ri <= 0 || ri >= table[0].rows.length - 1) {
+            return;
+          }
 
-				case Keys.up:
-				case Keys.down:
-				case Keys.enter:
-					let $t = $(e.target);
-					let ci = $t.closest("td")[0].cellIndex;
-					let ri = $t.closest("tr")[0].rowIndex + (e.which == Keys.up ? -1 : 1);
-					let table = $t.closest("table");
-					if (e.which == Keys.enter && ri == table[0].rows.length - 1) {
-						this.newItem();
-					} else if (ri <= 0 || ri >= table[0].rows.length - 1) return;
+          setTimeout(() => {
+            let row = table[0].rows[ri];
+            let cell = row.cells[ci].firstChild;
+            row.click();
+            cell.focus();
+          }, 0);
 
-					setTimeout(() => {
-						let row = table[0].rows[ri];
-						let cell = row.cells[ci].firstChild;
-						row.click();
-						cell.focus();
-					}, 0);
+          if (e.ctrlKey) {
+            if (e.which == Keys.up) {
+              this.rowMove(true);
+            }
 
-					if (e.ctrlKey) {
-						if (e.which == Keys.up)
-							this.rowMove(true);
+            if (e.which == Keys.down) {
+              this.rowMove(false);
+            }
+          }
 
-						if (e.which == Keys.down)
-							this.rowMove(false);
-					}
+          break;
+      }
+    }
 
-					break;
-			}
-		}
-
-		get items() {
-			return glob.data[this.uri];
-		}
-
-		get meta(): ObjectMeta {
-			return glob.meta[this.uri];
-		}
-	}
+    get items() {
+      return glob.data[this.uri];
+    }
+  }
 </script>
 
 <style lang="scss">

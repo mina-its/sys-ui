@@ -4,21 +4,21 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ObjectViewType, ElemType, FunctionMeta} from "../../../sys/src/types";
-		import { st } from '@/main';
+	import {ObjectViewType, ElemType, FunctionDeclare} from "../../../sys/src/types";
+	import {glob} from '@/main';
 
 	const main = require("./main");
 
 	@Component
 	export default class FunctionTesting extends Vue {
-		@Prop() private meta: FunctionMeta;
+		@Prop() private meta: FunctionDeclare;
 		message = "";
 
 		render(ce) {
 			let sample = this.meta.test.samples[0];
 			let bodyElems = [];
 			if (this.meta.properties)
-				for (let para of this.meta.properties) {
+				for (const para of this.meta.properties) {
 					bodyElems.push({
 						type: ElemType.Property, property: {
 							name: para.name,

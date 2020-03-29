@@ -28,8 +28,8 @@
 <script lang="ts">
 	declare let $: any;
 	import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-	import {ObjectViewType, ObjectDetailsViewType, ObjectMeta, Context} from "../../../sys/src/types";
-	import {st} from '@/main';
+	import {ObjectViewType, ObjectDetailsViewType, ObjectDeclare, Context} from "../../../sys/src/types";
+	import {glob} from '@/main';
 
 	const main = require("./main");
 
@@ -37,16 +37,16 @@
 	export default class DetailsView extends Vue {
 		@Prop() private uri: string;
 		@Prop() private root: boolean;
+		@Prop() private meta: ObjectDeclare;
 		currentGroup: string;
 
 		mounted() {
 			if (this.root) {
 				this.currentGroup = this.groups[0];
-				let meta = glob.meta[this.uri];
 				glob.headFuncs = [];
-				if (meta.links)
-					for (let link of meta.links) {
-						glob.headFuncs.push({title: link.title, name: link.address.$oid, exec: this.execLink});
+				if (this.meta.links)
+					for (const link of this.meta.links) {
+						glob.headFuncs.push({title: link.title as string, name: link.address["$oid"], exec: this.execLink});
 					}
 			}
 		}
@@ -58,9 +58,8 @@
 
 		selectGroup(item) {
 			this.currentGroup = item.title;
-			let meta = this.meta as ObjectMeta;
 			history.pushState(null, null, item.ref);
-			if (meta.detailsViewType == ObjectDetailsViewType.Tabular) {
+			if (this.meta.detailsViewType == ObjectDetailsViewType.Tabular) {
 				let $dv = $(".details-view");
 				$dv.animate({
 						scrollTop: $(item.ref).offset().top + $dv.scrollTop() - $dv.offset().top
@@ -75,16 +74,14 @@
 
 		groupVisible(group) {
 			if (this.groups.length <= 1) return false;
-			let meta = this.meta as ObjectMeta;
 			if (this.root)
-				return meta.detailsViewType == ObjectDetailsViewType.Tabular || this.currentGroup == group;
+				return this.meta.detailsViewType == ObjectDetailsViewType.Tabular || this.currentGroup == group;
 			else
 				return true;
 		}
 
 		groupHeadVisible(group) {
-			let meta = this.meta as ObjectMeta;
-			return this.root && meta.detailsViewType == ObjectDetailsViewType.Tabular;
+			return this.root && this.meta.detailsViewType == ObjectDetailsViewType.Tabular;
 		}
 
 		onScroll() {
@@ -114,21 +111,16 @@
 		}
 
 		get sideMenuVisible() {
-			let meta = this.meta as ObjectMeta;
-			return this.sideMenu && this.root && (!meta.detailsViewType || meta.detailsViewType == ObjectDetailsViewType.Grouped || meta.detailsViewType == ObjectDetailsViewType.Tabular);
+			return this.sideMenu && this.root && (!this.meta.detailsViewType || this.meta.detailsViewType == ObjectDetailsViewType.Grouped || this.meta.detailsViewType == ObjectDetailsViewType.Tabular);
 		}
 
 		get sideMenu() {
 			let menus = [];
-			for (let grp of this.groups) {
+			for (const grp of this.groups) {
 				menus.push({ref: "#gp-" + grp.replace(/\s/g, "-"), title: grp});
 			}
 			if (menus.length <= 1) menus = null;
 			return menus;
-		}
-
-		get meta() {
-			return glob.meta[this.uri];
 		}
 
 		get item() {

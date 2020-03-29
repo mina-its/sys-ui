@@ -106,16 +106,16 @@
 		// 	let od = glob.od[ref];
 		//
 		// 	if (Array.isArray(data)) {
-		// 		for (let item of data) {
+		// 		for (const item of data) {
 		// 			item._status = null;
 		// 		}
-		// 		for (let item of od) {
+		// 		for (const item of od) {
 		// 			item._status = null;
 		// 		}
 		// 	}
 		//
 		// 	let diffs = DeepDiff(od, data) || [];
-		// 	for (let diff of diffs) {
+		// 	for (const diff of diffs) {
 		// 		let item, itemRef;
 		// 		let path = diff.path ? JSON.parse(JSON.stringify(diff.path)) : null; // case: when we delete two sub roles, path is shared between different diffs
 		// 		if (Array.isArray(data) && path && path.length > 0) {
@@ -154,7 +154,7 @@
 			if (main.getQs("n") == "true")
 				return main.commitNewItem();
 			// else
-			// 	for (let ref in glob.data) {
+			// 	for (const ref in glob.data) {
 			// 		this.findDiff(ref);
 			// 	}
 
@@ -201,7 +201,7 @@
 		// submitFile(modify: Modify, done) {
 		// 	let files = [modify.file];
 		// 	let modifies = glob.md.filter(md => md.ref == modify.ref);
-		// 	for (let mod of modifies) {
+		// 	for (const mod of modifies) {
 		// 		files.push(mod.file);
 		// 	}
 		// 	glob.md = glob.md.filter(mod => mod.ref != modify.ref);

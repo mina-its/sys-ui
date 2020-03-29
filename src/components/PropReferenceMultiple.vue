@@ -73,7 +73,7 @@
 
 		get items() {
 			let items: Pair[] = [];
-			for (let v of this.value) {
+			for (const v of this.value) {
 				let item = this.meta._.items.find(i => i.ref == v);
 				if (item)
 					items.push(item);

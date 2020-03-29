@@ -5,7 +5,7 @@
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {Elem, LogType, ObjectViewType} from "../../../sys/src/types";
-	import {st} from '@/main';
+	import {glob} from '@/main';
 
 	const main = require("./main");
 
@@ -23,7 +23,7 @@
 			}
 
 			let data = glob.data[e.obj.ref];
-			glob.toolbar = true;
+			glob.form._.toolbar = true;
 			let rt = this.root == null ? true : this.root;
 			if (e.obj && e.obj.type == ObjectViewType.TreeView)
 				return ce('tree-view', {props: {uri: e.obj.ref}});

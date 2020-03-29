@@ -6,7 +6,7 @@
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {Property, Keys} from "../../../sys/src/types";
-	import {st} from "@/main";
+	import {glob} from "@/main";
 	import {MenuItem} from '@/types';
 
 	const main = require("./main");
