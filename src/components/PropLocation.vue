@@ -12,11 +12,11 @@
 
 	@Component
 	export default class PropLocation extends Vue {
-		@Prop() private meta: Property;
+		@Prop() private prop: Property;
 		@Prop() private doc: any;
 
 		changed() {
-			this.$emit("changed", this.meta, this.value);
+			this.$emit("changed", this.prop, this.value);
 		}
 
 		changing() {
@@ -26,7 +26,7 @@
 				show: true,
 				val: this.value,
 				select: function (value) {
-					doc[this.meta.name] = value;
+					doc[this.prop.name] = value;
 					console.log(doc);
 					changed();
 				}
@@ -34,7 +34,7 @@
 		}
 
 		get value() {
-			return this.doc[this.meta.name];
+			return this.doc[this.prop.name];
 		}
 	}
 </script>

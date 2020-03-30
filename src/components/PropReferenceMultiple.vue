@@ -22,26 +22,26 @@
 	export default class PropReferenceMultiple extends Vue {
 		@Prop() private type: string;
 		@Prop() private doc: any;
-		@Prop() private meta: Property;
+		@Prop() private prop: Property;
 		@Prop() private styles: string;
 
 		update() {
 			let val = (event.target as any).value;
-			let items = val == "" ? this.meta._.items : this.meta._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
+			let items = val == "" ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
 			items.forEach(item => (item as MenuItem).hover = false);
 			this.showDropDown(items);
 		}
 
 		refreshText() {
-			let val = this.doc[this.meta.name];
-			this.doc[this.meta.name] = null;
-			this.doc[this.meta.name] = val;
+			let val = this.doc[this.prop.name];
+			this.doc[this.prop.name] = null;
+			this.doc[this.prop.name] = val;
 		}
 
 		remove(item) {
-			let val = this.doc[this.meta.name];
-			this.doc[this.meta.name] = val.filter(v => JSON.stringify(v) != JSON.stringify(item.ref));
-			this.$emit("changed", this.meta, val);
+			let val = this.doc[this.prop.name];
+			this.doc[this.prop.name] = val.filter(v => JSON.stringify(v) != JSON.stringify(item.ref));
+			this.$emit("changed", this.prop, val);
 		}
 
 		showDropDown(items) {
@@ -49,23 +49,23 @@
 				return JSON.stringify(v);
 			});
 			items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
-			main.showCmenu(this.meta, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
+			main.showCmenu(this.prop, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
 				if (item == null) { // Esc
 					this.refreshText();
 					return;
 				}
-				let val = this.doc[this.meta.name];
+				let val = this.doc[this.prop.name];
 				if (!val)
-					this.doc[this.meta.name] = val = [];
+					this.doc[this.prop.name] = val = [];
 				val.push(item.ref);
-				this.$emit("changed", this.meta, val);
+				this.$emit("changed", this.prop, val);
 			});
 		}
 
 		get value() {
-			let val = this.doc[this.meta.name];
+			let val = this.doc[this.prop.name];
 			if (!val)
-				this.doc[this.meta.name] = val = [];
+				this.doc[this.prop.name] = val = [];
 			else if (!Array.isArray(val))
 				val = [val];
 			return val;
@@ -74,7 +74,7 @@
 		get items() {
 			let items: Pair[] = [];
 			for (const v of this.value) {
-				let item = this.meta._.items.find(i => i.ref == v);
+				let item = this.prop._.items.find(i => i.ref == v);
 				if (item)
 					items.push(item);
 				else

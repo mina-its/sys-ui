@@ -10,14 +10,14 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <elem v-for="elem in bodyElems" :elem="elem"></elem>
+                        <FormElem v-for="elem in bodyElems" :elem="elem"></FormElem>
                     </form>
                 </div>
                 <div v-if="glob.notify" class="text-light bg-danger modal-body">
                     <span>{{glob.notify.message}}</span>
                 </div>
                 <div class="modal-footer">
-                    <elem v-for="elem in footerElems" :elem="elem"></elem>
+                    <FormElem v-for="elem in footerElems" :elem="elem"></FormElem>
                 </div>
             </div>
         </div>
@@ -25,13 +25,15 @@
 </template>
 
 <script lang="ts">
-	declare let $: any;
+	import FormElem from "@/components/FormElem.vue";
+    declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {glob} from "@/main";
 
 	const main = require("@/main");
-
-	@Component
+    @Component({
+        components: {FormElem}
+    })
 	export default class Modal extends Vue {
 		@Prop() private title: string;
 		@Prop() private footerElems: any[];

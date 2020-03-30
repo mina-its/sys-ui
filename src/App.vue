@@ -29,8 +29,7 @@
 <script lang="ts">
     declare let $: any;
     import {Component, Vue} from 'vue-property-decorator';
-    import {$t, hideCmenu, load, notify, glob, start} from "@/main";
-    import {LogType, NotificationInfo} from '../../sys/src/types';
+    import {$t, hideCmenu, load, notify, glob} from "@/main";
     import SideNav from "@/components/SideNav.vue";
     import NavBar from './components/NavBar.vue';
     import FormElem from "@/components/FormElem.vue";
@@ -40,6 +39,7 @@
     import QuestionBox from "@/components/QuestionBox.vue";
     import ContextMenu from "@/components/ContextMenu.vue";
     import Toolbar from "@/components/Toolbar.vue";
+    import {LogType, NotificationInfo} from '../../sys/src/types';
 
     const main = require("@/main");
 
@@ -57,10 +57,6 @@
         }
     })
     export default class App extends Vue {
-        get glob() {
-            return glob;
-        }
-
         onScroll() {
             main.hideCmenu();
         }
@@ -163,6 +159,9 @@
         --layout-border: #ddd;
         --side-nav: #2f353c;
         --breadcrumb-separator: #aaa;
+
+        --font-size-base: 15px;
+        --badge-padding-x: 0.25rem;
     }
 
     @import "bootstrap";

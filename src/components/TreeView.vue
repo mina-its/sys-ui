@@ -1,6 +1,6 @@
 <template>
     <div class="tree-view p-2 h-100 ml-2" @click="click">
-        <tree-view-node v-for="node in nodes" :node="node"></tree-view-node>
+        <TreeViewNode v-for="node in nodes" :node="node"></TreeViewNode>
         <span class="token current-token"></span>
         <textarea ref="textInput" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                   class="text-input" @keydown="keydown"></textarea>
@@ -9,157 +9,158 @@
 </template>
 
 <script lang="ts">
-	declare let $: any;
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property, Keys, GlobalType} from "../../../sys/src/types";
-	import {glob} from "@/main";
-	import {TreeViewNode, TreeViewLine, TreeViewAttribute} from '@/types';
+    import TreeViewNode from "@/components/TreeViewNode.vue";
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Property, Keys, GlobalType, EntityMeta} from "../../../sys/src/types";
+    import {glob} from "@/main";
+    import {TreeViewNode as Node, TreeViewLine, TreeViewAttribute} from '@/types';
 
-	const main = require("@/main");
+    declare let $: any;
+    const main = require("@/main");
 
-	@Component
-	export default class TreeView extends Vue {
-		@Prop() private uri: string;
-		@Prop() private data: any;
+    @Component({components: {TreeViewNode}})
+    export default class TreeView extends Vue {
+        @Prop() private uri: string;
+        @Prop() private data: any;
 
-		nodes = [];
-		$refs: {
-			textInput: HTMLFormElement
-			blinkingCursor: HTMLFormElement
-		};
+        nodes = [];
+        $refs: {
+            textInput: HTMLFormElement
+            blinkingCursor: HTMLFormElement
+        };
 
-		mounted() {
-			let data = glob.data[this.uri];
-			let dec = main.getItemDec(data);
-			let props = dec.properties as Property[];
-			let node = this.createNode(data, props);
-			this.nodes = [node];
-		}
+        mounted() {
+            let data = glob.data[this.uri];
+            let dec = (data._ as EntityMeta).dec;
+            let props = dec.properties as Property[];
+            let node = this.createNode(data, props);
+            this.nodes = [node];
+        }
 
-		click(e) {
-			this.$refs.textInput.focus();
-			this.locateCursor();
-		}
+        click(e) {
+            this.$refs.textInput.focus();
+            this.locateCursor();
+        }
 
-		locateCursor() {
-			let $tk = $(".current-token");
+        locateCursor() {
+            let $tk = $(".current-token");
 
-			let x = $tk.offset().x + $tk.width();
-			let y = $tk.offset().y;
+            let x = $tk.offset().x + $tk.width();
+            let y = $tk.offset().y;
 
-			let blinkingCursor = this.$refs.blinkingCursor;
-			blinkingCursor.style.left = x + "px";
-			blinkingCursor.style.top = y + "px";
-		}
+            let blinkingCursor = this.$refs.blinkingCursor;
+            blinkingCursor.style.left = x + "px";
+            blinkingCursor.style.top = y + "px";
+        }
 
-		lineKeyClick() {
-			console.log("lineKeyClick");
-		}
+        lineKeyClick() {
+            console.log("lineKeyClick");
+        }
 
-		checkToken(text) {
-			if (this.data.language.types[text]) {
-				$(".current-token").addClass("line-key").removeClass("current-token").click(this.lineKeyClick);
-				return true;
-			} else
-				return false;
-		}
+        checkToken(text) {
+            if (this.data.language.types[text]) {
+                $(".current-token").addClass("line-key").removeClass("current-token").click(this.lineKeyClick);
+                return true;
+            } else
+                return false;
+        }
 
-		keydown(e) {
-			let $tk = $(".current-token");
-			let keycode = e.keyCode;
+        keydown(e) {
+            let $tk = $(".current-token");
+            let keycode = e.keyCode;
 
-			if (e.ctrlKey || e.altKey)
-				return;
+            if (e.ctrlKey || e.altKey)
+                return;
 
-			let printable =
-				(keycode > 47 && keycode < 58) || // number keys
-				keycode == 13 || // spacebar & return key(s) (if you want to allow carriage returns)
-				(keycode > 64 && keycode < 91) || // letter keys
-				(keycode > 95 && keycode < 112) || // numpad keys
-				(keycode > 185 && keycode < 193) || // ;=,-./` (in order)
-				(keycode > 218 && keycode < 223);   // [\]' (in order)
+            let printable =
+                (keycode > 47 && keycode < 58) || // number keys
+                keycode == 13 || // spacebar & return key(s) (if you want to allow carriage returns)
+                (keycode > 64 && keycode < 91) || // letter keys
+                (keycode > 95 && keycode < 112) || // numpad keys
+                (keycode > 185 && keycode < 193) || // ;=,-./` (in order)
+                (keycode > 218 && keycode < 223);   // [\]' (in order)
 
-			if (printable) {
-				$tk.text($tk.text() + e.key);
-				return;
-			}
+            if (printable) {
+                $tk.text($tk.text() + e.key);
+                return;
+            }
 
-			let lang = this.data.language;
+            let lang = this.data.language;
 
-			switch (keycode) {
-				case Keys.backspace:
-					$tk.text($tk.text().substr(0, $tk.text().length - 1));
-					break;
+            switch (keycode) {
+                case Keys.backspace:
+                    $tk.text($tk.text().substr(0, $tk.text().length - 1));
+                    break;
 
-				case Keys.space:
-					if (this.checkToken($tk.text())) {
-						return;
-					}
-					$tk.text($tk.text() + e.key);
-					break;
+                case Keys.space:
+                    if (this.checkToken($tk.text())) {
+                        return;
+                    }
+                    $tk.text($tk.text() + e.key);
+                    break;
 
-				case Keys.tab:
-					this.checkToken($tk.text());
-					break;
+                case Keys.tab:
+                    this.checkToken($tk.text());
+                    break;
 
-				default:
-					console.log(e);
-					break;
-			}
-		}
+                default:
+                    console.log(e);
+                    break;
+            }
+        }
 
-		createNode(data, props: Property[], parent?: Property): TreeViewNode {
-			let node = new TreeViewNode();
-			node.nodes = [];
+        createNode(data, props: Property[], parent?: Property): Node {
+            let node = new Node();
+            node.nodes = [];
 
-			if (parent && parent.isList) {
-				node.line = {
-					head: "..",
-					subject: {name: "name", _: {gtype: GlobalType.string}},
-					item: {name: parent.name},
-					attrs: []
-				} as TreeViewLine;
+            if (parent && parent.isList) {
+                node.line = {
+                    head: "..",
+                    subject: {name: "name", _: {gtype: GlobalType.string}},
+                    item: {name: parent.name},
+                    attrs: []
+                } as TreeViewLine;
 
-				if (Array.isArray(data)) {
-					for (const item of data) {
-						let child = this.createNode(item, props, null);
-						node.nodes.push(child);
-					}
-				}
-			} else {
-				node.line = this.createLine(data, props, parent);
+                if (Array.isArray(data)) {
+                    for (const item of data) {
+                        let child = this.createNode(item, props, null);
+                        node.nodes.push(child);
+                    }
+                }
+            } else {
+                node.line = this.createLine(data, props, parent);
 
-				let objectProps = props.filter((p) => {
-					return p._.gtype == GlobalType.object;
-				});
+                let objectProps = props.filter((p) => {
+                    return p._.gtype == GlobalType.object;
+                });
 
-				for (const prop of objectProps) {
-					if (data[prop.name]) {
-						let child = this.createNode(data[prop.name], prop.properties, prop);
-						node.nodes.push(child);
-					}
-				}
-			}
-			return node;
-		}
+                for (const prop of objectProps) {
+                    if (data[prop.name]) {
+                        let child = this.createNode(data[prop.name], prop.properties, prop);
+                        node.nodes.push(child);
+                    }
+                }
+            }
+            return node;
+        }
 
-		createLine(item, props: Property[], parent: Property): TreeViewLine {
-			let attrs = [];
-			let attributeProps = props.filter((p) => {
-				return p._.gtype != GlobalType.object;
-			});
-			let subjectProp = parent ? {name: "__name", _: {gtype: GlobalType.string}} : attributeProps.shift();
-			if (item) {
-				if (parent) item.__name = parent.name;
-				for (const prop of attributeProps) {
-					if (prop.text && prop.text.password)
-						continue;
-					attrs.push({prop, item} as TreeViewAttribute);
-				}
-			}
-			return {head: "..", subject: subjectProp, item, attrs} as TreeViewLine;
-		}
-	}
+        createLine(item, props: Property[], parent: Property): TreeViewLine {
+            let attrs = [];
+            let attributeProps = props.filter((p) => {
+                return p._.gtype != GlobalType.object;
+            });
+            let subjectProp = parent ? {name: "__name", _: {gtype: GlobalType.string}} : attributeProps.shift();
+            if (item) {
+                if (parent) item.__name = parent.name;
+                for (const prop of attributeProps) {
+                    if (prop.text && prop.text.password)
+                        continue;
+                    attrs.push({prop, item} as TreeViewAttribute);
+                }
+            }
+            return {head: "..", subject: subjectProp, item, attrs} as TreeViewLine;
+        }
+    }
 </script>
 
 <style lang="scss">

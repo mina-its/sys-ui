@@ -15,7 +15,7 @@
 	export default class PropReference extends Vue {
 		@Prop() private type: string;
 		@Prop() private doc: any;
-		@Prop() private meta: Property;
+		@Prop() private prop: Property;
 
 		keydown(e) {
 			if (e.which === Keys.up || e.which === Keys.down) {
@@ -27,34 +27,34 @@
 
 		update() {
 			let val = (event.target as any).value;
-			let items = val == "" ? this.meta._.items : this.meta._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
+			let items = val == "" ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
 			items.forEach(item => (item as MenuItem).hover = false);
 			this.showDropDown(items);
 		}
 
 		refreshText() {
-			let val = this.doc[this.meta.name];
-			this.doc[this.meta.name] = null;
-			this.doc[this.meta.name] = val;
+			let val = this.doc[this.prop.name];
+			this.doc[this.prop.name] = null;
+			this.doc[this.prop.name] = val;
 		}
 
 		showDropDown(items) {
-			if (!this.meta.required && items && items.length)
+			if (!this.prop.required && items && items.length)
 				items = [{ref: null, title: "", hover: false}].concat(items);
 
-			main.showCmenu(this.meta, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
+			main.showCmenu(this.prop, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
 				if (item == null) { // Esc
 					this.refreshText();
 					return;
 				}
-				this.doc[this.meta.name] = null;
-				this.doc[this.meta.name] = item.ref;
-				this.$emit("changed", this.meta, this.value);
+				this.doc[this.prop.name] = null;
+				this.doc[this.prop.name] = item.ref;
+				this.$emit("changed", this.prop, this.value);
 			});
 		}
 
 		get value() {
-			return main.getPropReferenceValue(this.meta, this.doc);
+			return main.getPropReferenceValue(this.prop, this.doc);
 		}
 	}
 </script>

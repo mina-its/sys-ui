@@ -1,5 +1,5 @@
 <template>
-    <div v-if="alwaysVisible || glob.form._.toolbar" class="d-flex p-2 pl-4 btn-toolbar border-bottom separator-line"
+    <div v-if="alwaysVisible || glob.form.toolbar" class="d-flex p-2 pl-4 btn-toolbar border-bottom separator-line"
          role="toolbar" aria-label="Toolbar with button groups">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb pt-2 p-0 m-0 bg-transparent">
@@ -35,9 +35,6 @@
 	@Component({components: {Function}})
 	export default class Toolbar extends Vue {
 		@Prop() private alwaysVisible: boolean;
-        get glob() {
-            return glob;
-        }
 
 		mounted() {
 			$(window).on("keydown", (e) => {

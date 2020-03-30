@@ -23,7 +23,7 @@
 			}
 
 			let data = glob.data[e.obj.ref];
-			glob.form._.toolbar = true;
+			glob.form.toolbar = true;
 			let rt = this.root == null ? true : this.root;
 			if (e.obj && e.obj.type == ObjectViewType.TreeView)
 				return ce('tree-view', {props: {uri: e.obj.ref}});

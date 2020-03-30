@@ -1,5 +1,5 @@
 <template>
-    <input @focus="$emit('focus', $event)" type="text" :value="value" :name="viewType != 1 ? meta.name : null"
+    <input @focus="$emit('focus', $event)" type="text" :value="value" :name="viewType !== 1 ? prop.name : null"
            @blur="update" class="form-control">
 </template>
 
@@ -13,22 +13,22 @@
 	@Component
 	export default class PropTime extends Vue {
 		@Prop() private doc: any;
-		@Prop() private meta: Property;
+		@Prop() private prop: Property;
 		@Prop() private viewType: string;
 
 		update() {
 			let val = new Date((event.target as any).value);
 			if (val.getTime()) {
-				this.doc[this.meta.name] = val;
+				this.doc[this.prop.name] = val;
 			} else {
 				main.notify('invalid-date', LogType.Error);
-				this.doc[this.meta.name] = null;
+				this.doc[this.prop.name] = null;
 			}
-			this.$emit("changed", this.meta, this.value);
+			this.$emit("changed", this.prop, this.value);
 		}
 
 		get value() {
-			let val = this.doc[this.meta.name];
+			let val = this.doc[this.prop.name];
 			return val ? moment(val).format("YYYY/MM/DD") : "";
 		}
 	}

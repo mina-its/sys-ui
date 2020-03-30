@@ -6,12 +6,12 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property} from "../../../sys/src/types";
+	import { ObjectDec} from "../../../sys/src/types";
 
 	@Component
 	export default class FilterItem extends Vue {
 		@Prop() private item: any;
-		@Prop() private meta: Property;
+		@Prop() private dec: ObjectDec;
 
 		close() {
 			// this.meta.filter.items = this.meta.filter.items.filter(item => {

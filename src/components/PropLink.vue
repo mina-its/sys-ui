@@ -11,17 +11,17 @@
 	@Component
 	export default class PropLink extends Vue {
 		@Prop() private doc: any;
-		@Prop() private meta: Property;
+		@Prop() private prop: Property;
 
 		keydown(e) {
 			this.$emit('keydown', e);
 		}
 
 		get value() {
-			if (this.meta.formula)
-				return main.evalExpression(this.doc, this.meta.formula);
+			if (this.prop.formula)
+				return main.evalExpression(this.doc, this.prop.formula);
 
-			let val = this.doc[this.meta.name];
+			let val = this.doc[this.prop.name];
 			if (typeof val == "object") {
 				let locale = main.getQs('e') || "en";
 				return val[locale];
@@ -32,7 +32,7 @@
 		get ref() {
 			if (!this.doc._id)
 				return "/";
-			return "/" + this.meta._.ref.replace(new RegExp(`\/${this.meta.name}$`), "") + "/" + main.getBsonId(this.doc);
+			return "/" + this.prop._.ref.replace(new RegExp(`\/${this.prop.name}$`), "") + "/" + main.getBsonId(this.doc);
 		}
 	}
 </script>

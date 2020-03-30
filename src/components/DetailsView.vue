@@ -4,22 +4,22 @@
             <ul class="nav flex-column tree pr-5" id="menus">
                 <li v-for="item in sideMenu" class="nav-item">
                     <a @click="selectGroup(item)"
-                       :class="{'text-nowrap text-secondary nav-link': true, 'active': currentGroup==item.title}"
+                       :class="{'text-nowrap text-secondary nav-link': true, 'active': currentGroup===item.title}"
                        href="#">{{item.title}}</a>
                 </li>
             </ul>
         </aside>
-        <div :class="{'p-4':root, 'border rounded': !root && meta.detailsViewType==2}">
-            <div v-if="groupVisible(group)" :class="{'py-4':meta.detailsViewType==2}" v-for="group in groups"
+        <div :class="{'p-4':root, 'border rounded': !root && dec.detailsViewType===2}">
+            <div v-if="groupVisible(group)" :class="{'py-4':dec.detailsViewType===2}" v-for="group in groups"
                  :id="'gp-' + group.replace(/\s/g, '-')">
                 <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
                 <div class="group">
-                    <prop v-for="prop in getProps(group)" :key="prop.name" :item="item" :meta="prop" @changed="changed"
-                          :viewType="2"></prop>
+                    <Prop v-for="prop in getProps(group)" :key="prop.name" :item="item" :prop="prop" @changed="changed"
+                          :viewType="2"></Prop>
                 </div>
             </div>
-            <prop v-if="nonGroupVisible()" v-for="prop in meta.properties" :key="prop.name" :item="item" :meta="prop"
-                  @changed="changed" :viewType="2"></prop>
+            <Prop v-if="nonGroupVisible()" v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
+                  @changed="changed" :viewType="2"></Prop>
             <div v-if="root" class="h-25"></div>
         </div>
     </div>
@@ -28,8 +28,8 @@
 <script lang="ts">
 	declare let $: any;
 	import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-	import {ObjectViewType, ObjectDetailsViewType, ObjectDeclare, Context} from "../../../sys/src/types";
-	import {glob} from '@/main';
+	import {ObjectViewType, ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
+    import {component, glob} from '@/main';
 
 	const main = require("@/main");
 
@@ -37,15 +37,15 @@
 	export default class DetailsView extends Vue {
 		@Prop() private uri: string;
 		@Prop() private root: boolean;
-		@Prop() private meta: ObjectDeclare;
+		@Prop() private dec: ObjectDec;
 		currentGroup: string;
 
 		mounted() {
 			if (this.root) {
 				this.currentGroup = this.groups[0];
 				glob.headFuncs = [];
-				if (this.meta.links)
-					for (const link of this.meta.links) {
+				if (this.dec.links)
+					for (const link of this.dec.links) {
 						glob.headFuncs.push({title: link.title as string, name: link.address["$oid"], exec: this.execLink});
 					}
 			}
@@ -59,7 +59,7 @@
 		selectGroup(item) {
 			this.currentGroup = item.title;
 			history.pushState(null, null, item.ref);
-			if (this.meta.detailsViewType == ObjectDetailsViewType.Tabular) {
+			if (this.dec.detailsViewType == ObjectDetailsViewType.Tabular) {
 				let $dv = $(".details-view");
 				$dv.animate({
 						scrollTop: $(item.ref).offset().top + $dv.scrollTop() - $dv.offset().top
@@ -75,13 +75,13 @@
 		groupVisible(group) {
 			if (this.groups.length <= 1) return false;
 			if (this.root)
-				return this.meta.detailsViewType == ObjectDetailsViewType.Tabular || this.currentGroup == group;
+				return this.dec.detailsViewType == ObjectDetailsViewType.Tabular || this.currentGroup == group;
 			else
 				return true;
 		}
 
 		groupHeadVisible(group) {
-			return this.root && this.meta.detailsViewType == ObjectDetailsViewType.Tabular;
+			return this.root && this.dec.detailsViewType == ObjectDetailsViewType.Tabular;
 		}
 
 		onScroll() {
@@ -98,11 +98,11 @@
 
 		changed(prop, instance, val) {
 			glob.dirty = true;
-			main.checkPropDependencyOnChange(this.meta, prop, instance);
+			main.checkPropDependencyOnChange(this.dec, prop, instance);
 		}
 
 		getProps(group: string) {
-			return this.meta.properties.filter(prop => {
+			return this.dec.properties.filter(prop => {
 				if (prop.properties)
 					return group == prop.title;
 				else
@@ -111,7 +111,7 @@
 		}
 
 		get sideMenuVisible() {
-			return this.sideMenu && this.root && (!this.meta.detailsViewType || this.meta.detailsViewType == ObjectDetailsViewType.Grouped || this.meta.detailsViewType == ObjectDetailsViewType.Tabular);
+			return this.sideMenu && this.root && (!this.dec.detailsViewType || this.dec.detailsViewType == ObjectDetailsViewType.Grouped || this.dec.detailsViewType == ObjectDetailsViewType.Tabular);
 		}
 
 		get sideMenu() {
@@ -128,7 +128,7 @@
 		}
 
 		get groups() {
-			let props = this.meta.properties.filter((p) => {
+			let props = this.dec.properties.filter((p) => {
 				return p.condition == null || main.evalExpression(this.item, p.condition);
 			});
 			return props.map((p) => {

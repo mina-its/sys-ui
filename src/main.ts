@@ -18,9 +18,11 @@ import {
     RequestMode,
     AjaxConfig,
     WebMethod,
-    ObjectDeclare,
-    FunctionDeclare,
-    ItemMeta
+    ObjectDec,
+    FunctionDec,
+    EntityMeta,
+    Form,
+    FormDto
 } from '../../sys/src/types';
 
 export let glob = new Global();
@@ -71,24 +73,30 @@ export function evalExpression($this: any, expression: string): any {
     }
 }
 
-export function initState(res: WebResponse) {
-    //log("load res: ", res.data);
-    let title = '';
-    if (res.form) {
-        glob.form = res.form;
-        title = glob.form.title as string;
-    }
-    document.title = title;
-    glob.headFuncs = [];
-    // glob.form.toolbar = false;
-    // if (glob.config) glob.config = res.config;
-    let data = res.data || {};
-    for (const prop in data) {
-        vueResetProperties(data[prop], prop, true);
-    }
+function vueResetFormData(form: FormDto) {
+    if (!form.dataset || !form.declarations) return;
 
-    glob.data = data;
-    $('.details-view').scrollTop(0);
+    for (let ref in form.dataset) {
+        let data = form.dataset[ref];
+        let dec = form.declarations[ref];
+        if (!data || !dec)
+            continue;
+
+        data._ = data._ || {};
+        let meta = data._ as EntityMeta;
+        meta.dec = dec;
+
+        if (Array.isArray(data))
+            data.forEach(data => meta.marked = null);
+
+        for (const prop of dec.properties) {
+            if (Array.isArray(data)) {
+                data.forEach(item => setUndefinedToNull(item, prop));
+            } else {
+                setUndefinedToNull(data, prop);
+            }
+        }
+    }
 }
 
 function setUndefinedToNull(item, prop: Property) {
@@ -104,33 +112,17 @@ function setUndefinedToNull(item, prop: Property) {
     } // to check later
 }
 
-export function vueResetProperties(data: any, name: string, resetStatus: boolean) {
-    let meta = data._ as ItemMeta;
-    if (Array.isArray(data)) {
-        if (resetStatus) {
-            data.forEach(item => item._status = null);
-        }
-    } else {
-        if (data._id < 0) // new item
-        {
-            glob.dirty = true;
-        }
-    }
-
-    if (!meta || !meta.dec || !meta.dec.properties) {
-        return;
-    }
-    for (const prop of meta.dec.properties) {
-        if (Array.isArray(data)) {
-            data.forEach(item => setUndefinedToNull(item, prop));
-        } else {
-            setUndefinedToNull(data, prop);
-        }
-    }
-}
+// export function vueResetProperties(data: any, dec: ObjectDeclare | FunctionDeclare) {
+//     data._ = data._ || {};
+//     let meta = data._ as EntityMeta;
+//     meta.dec = dec;
+//     for (const prop of meta.dec.properties) {
+//         setUndefinedToNull(data, prop);
+//     }
+// }
 
 function validateData(data, ref: string): boolean {
-    let meta = data._ as ItemMeta;
+    let meta = data._ as EntityMeta;
     let requiredProps = meta.dec.properties.filter(p => p.required);
     for (const prop of requiredProps) {
         if (data[prop.name] == null) {
@@ -199,88 +191,77 @@ export function onlyUnique(value, index, self) {
 
 export function handleResponse(res: WebResponse) {
     res = flat2recursive(res);
-    if (res.redirect) {
+    if (res.redirect)
         handleResponseRedirect(res);
-    } else if (res.message) {
+    else if (res.message)
         notify(res.message, LogType.Info);
-        // resetToolbar();
-        // history.pushState(null, null, "/");
+    else if (res.form) {
+        glob.form = res.form;
+        document.title = glob.form.title as string;
+        glob.headFuncs = [];
+        vueResetFormData(glob.form);
+        $('.details-view').scrollTop(0);
     } else {
-        initState(res);
+        notify("WHAT should I do now?", LogType.Warning);
+        console.log(res);
     }
 }
 
-export function setPropTextValue(meta, data, val): void {
+export function setPropTextValue(prop: Property, data, val): void {
     let locale = getQs('e') || 'en';
-    let oldValue = data[meta.name];
+    let oldValue = data[prop.name];
 
-    if (meta.text && meta.text.multiLanguage) {
+    if (prop.text && prop.text.multiLanguage) {
         if (locale) {
-            if (typeof oldValue == 'string') {
-                data[meta.name] = {'en': oldValue};
-            } else {
-                data[meta.name] = data[meta.name] || {};
-            }
+            if (typeof oldValue == 'string')
+                data[prop.name] = {'en': oldValue};
+            else
+                data[prop.name] = data[prop.name] || {};
 
-            data[meta.name][locale] = val;
+            data[prop.name][locale] = val;
         } else {
-            if (typeof oldValue == 'object') {
-                data[meta.name]['en'] = val;
-            } else {
-                data[meta.name] = val;
-            }
+            if (oldValue && typeof oldValue == 'object')
+                data[prop.name]['en'] = val;
+            else
+                data[prop.name] = val;
         }
-    } else {
-        data[meta.name] = val;
-    }
+    } else
+        data[prop.name] = val;
 }
 
 export function getPropTextValue(meta: Property, data): any {
-    if (meta.formula) {
-        return evalExpression(this.doc, meta.formula);
-    }
+    if (meta.formula) return evalExpression(this.doc, meta.formula);
+    if (!data) throw 'prop-text doc is null!';
 
-    if (!data) {
-        throw 'prop-text doc is null!';
-    }
     let val = data[meta.name];
-    if (typeof val == 'object') {
+    if (val && typeof val == 'object') {
         let locale = getQs('e') || 'en';
         return val[locale];
-    } else {
+    } else
         return val;
-    }
 }
 
 export function getPropReferenceValue(meta: Property, data): string {
-    if (!data) {
-        return '';
-    }
+    if (!data) return '';
     let val = data[meta.name];
-    if (!val) {
-        return '';
-    }
+    if (!val) return '';
 
     if (meta.isList) {
-        if (!Array.isArray(val)) {
+        if (!Array.isArray(val))
             val = [val];
-        }
 
         let values = [];
         for (const valItem of val) {
             let item = meta._.items.find(i => i.ref == valItem);
-            if (!item) {
+            if (!item)
                 values.push('...');
-            } else {
+            else
                 values.push(item.title);
-            }
         }
         return values.join(', ');
     } else {
         let item = meta._.items.find(i => i.ref == val);
-        if (!item) {
-            return '...';
-        }
+        if (!item) return '...';
         return item.title;
     }
 }
@@ -414,7 +395,7 @@ export function setQs(key: string, value: any, fullPath: boolean, href?: string)
     }
 }
 
-export function checkPropDependencyOnChange(dec: ObjectDeclare | FunctionDeclare, prop, instance: any) {
+export function checkPropDependencyOnChange(dec: ObjectDec | FunctionDec, prop, instance: any) {
     let dependents = dec.properties.filter(p => p.dependsOn == prop.name);
     for (const prop of dependents) {
         instance[prop.name] = null;
@@ -643,14 +624,7 @@ export function load(href) {
         return;
     }
 
-    ajax(setQs('m', RequestMode.partial, false, href), null, null, handleResponse, err => notify(err));
-}
-
-export function getItemDec(item: any): FunctionDeclare | ObjectDeclare {
-    if (!item || !item._) {
-        return null;
-    }
-    return (item._ as ItemMeta).dec;
+    ajax(setQs('m', RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
 
 export function ajax(url: string, data: any, config: AjaxConfig, done: (res: WebResponse) => void,
@@ -703,34 +677,34 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
     });
 }
 
-export function start() {
+function registerComponents() {
+    Vue.component('Function', require("@/components/Function.vue").default);
+    Vue.component('Panel', require("@/components/Panel.vue").default);
+    Vue.component('Modal', require("@/components/Modal.vue").default);
+    Vue.component('Prop', require("@/components/Prop.vue").default);
+}
+
+function start() {
     console.log('starting ...');
     const mainState = $('#main-state').html();
     const res: WebResponse = mainState ? parse(mainState) : {};
     console.assert(res.config, 'config must be ready in initial state.');
 
-    let x = new AppStateLog();
+    handleResponse(res);
     glob.config = res.config;
-
-    if (res.message) {
-        notify(res);
-    } else {
-        initState(res);
-    }
 
     Object.assign(Vue.config, {productionTip: false, devtools: true});
     Vue.directive('focus', {
         inserted(el, binding) {
-            if (binding.value) {
-                el.focus();
-            }
+            if (binding.value) el.focus();
         }
     });
 
-    Vue.component('Function', require("@/components/Function.vue").default);
+    registerComponents();
 
     Vue['glob'] = Vue.prototype.glob = glob;
-    new Vue({render: h => h(App)}).$mount('#app');
+    window['glob'] = glob;
+    new Vue({data: glob, render: h => h(App)}).$mount('#app');
 };
 
 start();

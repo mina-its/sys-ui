@@ -7,7 +7,8 @@ import {
   Pair,
   LogType,
   NotificationInfo,
-  AppStateConfig
+  AppStateConfig,
+  FormDto
 } from '../../sys/src/types';
 
 export const Constants = {
@@ -155,7 +156,7 @@ export class ApiDoc {
 }
 
 export class Global {
-  form: Form;
+  form: FormDto;
   data: any;
   question: AppStateQuestion;
   fileGallery: AppStateFileGallery;

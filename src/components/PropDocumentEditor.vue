@@ -16,7 +16,7 @@
 	@Component
 	export default class PropDocumentEditor extends Vue {
 		@Prop() private doc: any;
-		@Prop() private meta: Property;
+		@Prop() private prop: Property;
 		@Prop() private styles: string;
 		@Prop() private invalidData: any;
 
@@ -30,17 +30,17 @@
 			try {
 				let val = (e.target as any).value ? JSON.parse((e.target as any).value) : null;
 				this.invalidData = false;
-				this.doc[this.meta.name] = val;
+				this.doc[this.prop.name] = val;
 
-				let ref = this.meta._.ref.replace(new RegExp(`/${this.meta.name}$`), "");
+				let ref = this.prop._.ref.replace(new RegExp(`/${this.prop.name}$`), "");
 				let data = {};
-				data[this.meta.name] = val;
+				data[this.prop.name] = val;
 				glob.modifies.push({type: WebMethod.patch, ref, data} as Modify);
-				glob.modifies[ref][this.meta.name] = JSON.parse(JSON.stringify(val));
+				glob.modifies[ref][this.prop.name] = JSON.parse(JSON.stringify(val));
 
-				this.$emit("changed", this.meta, val);
+				this.$emit("changed", this.prop, val);
 			} catch (ex) {
-				//this.doc._error = `Property '${this.meta.title}' invalid data.`;
+				//this.doc._error = `Property '${this.prop.title}' invalid data.`;
 				this.invalidData = true;
 				glob.dirty = true;
 			}
@@ -50,7 +50,7 @@
 			if (this.invalidData) {
 				return this.$el.value;
 			} else {
-				let val = this.doc[this.meta.name];
+				let val = this.doc[this.prop.name];
 				return val ? JSON.stringify(val) : "";
 			}
 		}

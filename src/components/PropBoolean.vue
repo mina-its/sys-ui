@@ -1,6 +1,6 @@
 <template>
-    <input @focus="$emit('focus', $event)" type="checkbox" :id="meta.name" class="form-check-input" v-model="value"
-           :name="meta.name" @keydown="keydown" @change="update">
+    <input @focus="$emit('focus', $event)" type="checkbox" :id="prop.name" class="form-check-input" v-model="value"
+           :name="prop.name" @keydown="keydown" @change="update">
 </template>
 
 <script lang="ts">
@@ -9,7 +9,7 @@
 
 	@Component
 	export default class PropBoolean extends Vue {
-		@Prop() private meta: Property;
+		@Prop() private prop: Property;
 		@Prop() private doc: any;
 
 		keydown(e) {
@@ -17,12 +17,12 @@
 		}
 
 		update() {
-			this.doc[this.meta.name] = (event.target as any).checked;
-			this.$emit("changed", this.meta, this.value);
+			this.doc[this.prop.name] = (event.target as any).checked;
+			this.$emit("changed", this.prop, this.value);
 		}
 
 		get value() {
-			return this.doc[this.meta.name];
+			return this.doc[this.prop.name];
 		}
 	}
 </script>

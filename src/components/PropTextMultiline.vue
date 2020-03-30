@@ -10,17 +10,17 @@
 	@Component
 	export default class PropTextMultiline extends Vue {
 		@Prop() private doc: any;
-		@Prop() private meta: Property;
+		@Prop() private prop: Property;
 
 		update() {
 			let val = (event.target as any).value;
 			if (val === "") val = null;
-			this.doc[this.meta.name] = val;
-			this.$emit("changed", this.meta, this.value);
+			this.doc[this.prop.name] = val;
+			this.$emit("changed", this.prop, this.value);
 		}
 
 		get value() {
-			return this.doc[this.meta.name];
+			return this.doc[this.prop.name];
 		}
 	}
 </script>
