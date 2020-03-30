@@ -589,9 +589,12 @@ export function getItemDec(item) {
     return item._.dec;
 }
 export function ajax(url, data, config, done, fail) {
-    if (glob.config.host)
+    let headers = {};
+    if (glob.config.host) {
         url = joinUri(glob.config.host, url);
-    const params = { url, data };
+        headers['Access-Control-Allow-Origin'] = '*';
+    }
+    let params = { url, data, headers };
     if (config && config.method) {
         params.method = config.method;
     }
@@ -604,7 +607,7 @@ export function ajax(url, data, config, done, fail) {
             params.data.append('files[]', file, file['name']);
         }
         params.data.append('data', JSON.stringify(data));
-        params.headers = { 'Content-Type': 'multipart/form-data' };
+        params.headers['Content-Type'] = 'multipart/form-data';
     }
     fail = fail || notify;
     axios(params).then(res => {

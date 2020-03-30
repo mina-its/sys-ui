@@ -656,9 +656,12 @@ export function getItemDec(item: any): FunctionDeclare | ObjectDeclare {
 export function ajax(url: string, data: any, config: AjaxConfig, done: (res: WebResponse) => void,
                      fail?: (err: { code: StatusCode, message: string }) => void) {
 
-    if (glob.config.host)
+    let headers = {};
+    if (glob.config.host) {
         url = joinUri(glob.config.host, url);
-    const params: any = {url, data};
+        headers['Access-Control-Allow-Origin'] = '*';
+    }
+    let params: any = {url, data, headers};
 
     if (config && config.method) {
         params.method = config.method;
@@ -672,7 +675,7 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
             params.data.append('files[]', file, file['name']);
         }
         params.data.append('data', JSON.stringify(data));
-        params.headers = {'Content-Type': 'multipart/form-data'};
+        params.headers['Content-Type'] = 'multipart/form-data';
     }
 
     fail = fail || notify;
