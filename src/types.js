@@ -1,35 +1,41 @@
-import { AppStateConfig } from '../../sys/src/types';
-export const Constants = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const types_1 = require("../../sys/src/types");
+exports.Constants = {
     redirectBack: '_back',
     redirectSelf: '_self',
     notifyEvent: 'notify',
     questionEvent: 'question',
 };
-export const ChartColors = [
+exports.ChartColors = [
     'rgba(54, 162, 235, 0.8)',
     'rgba(255, 99, 132, 0.8)',
     'rgba(75, 192, 192, 0.8)',
     'rgba(255, 159, 64, 0.8)',
     'rgba(255, 205, 86, 0.8)',
     'rgba(153, 102, 255, 0.8)',
-    'rgba(231,233,237, 0.8)' // grey:
+    'rgba(231,233,237, 0.8)'
 ];
-export class HeadFunc {
+class HeadFunc {
 }
-export class MenuItem {
+exports.HeadFunc = HeadFunc;
+class MenuItem {
 }
-export class Modify {
+exports.MenuItem = MenuItem;
+class Modify {
 }
-export class AppStateGeoMap {
+exports.Modify = Modify;
+class AppStateGeoMap {
     constructor() {
         this.show = false;
     }
 }
-export var RowStatus;
+exports.AppStateGeoMap = AppStateGeoMap;
+var RowStatus;
 (function (RowStatus) {
     RowStatus[RowStatus["Selected"] = 1] = "Selected";
-})(RowStatus || (RowStatus = {}));
-export class AppStateCmenu {
+})(RowStatus = exports.RowStatus || (exports.RowStatus = {}));
+class AppStateCmenu {
     constructor() {
         this.show = false;
         this.items = [];
@@ -37,51 +43,61 @@ export class AppStateCmenu {
         this.top = 0;
     }
 }
-export var PropertyLabelMode;
+exports.AppStateCmenu = AppStateCmenu;
+var PropertyLabelMode;
 (function (PropertyLabelMode) {
     PropertyLabelMode[PropertyLabelMode["Hidden"] = 1] = "Hidden";
     PropertyLabelMode[PropertyLabelMode["Visible"] = 2] = "Visible";
-})(PropertyLabelMode || (PropertyLabelMode = {}));
-export var DiffKind;
+})(PropertyLabelMode = exports.PropertyLabelMode || (exports.PropertyLabelMode = {}));
+var DiffKind;
 (function (DiffKind) {
     DiffKind["newlyAdded"] = "N";
     DiffKind["edited"] = "E";
     DiffKind["deleted"] = "D";
     DiffKind["arrayChange"] = "A";
-})(DiffKind || (DiffKind = {}));
-export class TreeViewNode {
+})(DiffKind = exports.DiffKind || (exports.DiffKind = {}));
+class TreeViewNode {
 }
-export class TreeViewLine {
+exports.TreeViewNode = TreeViewNode;
+class TreeViewLine {
 }
-export class TreeViewAttribute {
+exports.TreeViewLine = TreeViewLine;
+class TreeViewAttribute {
 }
-export class ApiDocParameter {
+exports.TreeViewAttribute = TreeViewAttribute;
+class ApiDocParameter {
 }
-export class ApiDocOperation {
+exports.ApiDocParameter = ApiDocParameter;
+class ApiDocOperation {
 }
-export class ApiDocBlock {
+exports.ApiDocOperation = ApiDocOperation;
+class ApiDocBlock {
     constructor() {
         this.operations = [];
     }
 }
-export class ApiDocSchema {
+exports.ApiDocBlock = ApiDocBlock;
+class ApiDocSchema {
 }
-export class ApiDocEnum {
+exports.ApiDocSchema = ApiDocSchema;
+class ApiDocEnum {
 }
-export class ApiDoc {
+exports.ApiDocEnum = ApiDocEnum;
+class ApiDoc {
     constructor() {
         this.blocks = [];
         this.schemas = [];
         this.enums = [];
     }
 }
-export class Global {
+exports.ApiDoc = ApiDoc;
+class Global {
     constructor() {
         this.fileGallery = new AppStateFileGallery();
         this.question = new AppStateQuestion();
         this.modal = false;
         this.headFuncs = [];
-        this.config = new AppStateConfig();
+        this.config = new types_1.AppStateConfig();
         this.cmenu = new AppStateCmenu();
         this.geoMap = new AppStateGeoMap();
         this.notify = null;
@@ -89,7 +105,8 @@ export class Global {
         this.dirty = false;
     }
 }
-export class AppStateFileGallery {
+exports.Global = Global;
+class AppStateFileGallery {
     constructor() {
         this.path = '';
         this.list = [];
@@ -99,11 +116,14 @@ export class AppStateFileGallery {
         this.uri = '';
     }
 }
-export class AppStateQuestion {
+exports.AppStateFileGallery = AppStateFileGallery;
+class AppStateQuestion {
     constructor() {
         this.options = [];
     }
 }
-export class AppStateLog {
+exports.AppStateQuestion = AppStateQuestion;
+class AppStateLog {
 }
+exports.AppStateLog = AppStateLog;
 //# sourceMappingURL=types.js.map
