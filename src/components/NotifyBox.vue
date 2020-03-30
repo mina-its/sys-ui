@@ -3,9 +3,9 @@
         <div v-if="glob.notify && !glob.modal" ref="notifyBox" id="notify-box"
              :class="'text-left w-100 navbar notify-type-'+glob.notify.type" role="alert" @click="glob.notify=null">
 	    <span>
-	    	<i v-if="glob.notify.type==3" class="m-1 fa fa-exclamation-circle fa-2x"></i>
-	    	<i v-if="glob.notify.type==4" class="m-1 fa fa-exclamation-triangle fa-2x"></i>
-	    	<i v-if="glob.notify.type==6" class="m-1 fa fa-info-circle fa-2x"></i>
+	    	<i v-if="glob.notify.type===3" class="m-1 fa fa-exclamation-circle fa-2x"></i>
+	    	<i v-if="glob.notify.type===4" class="m-1 fa fa-exclamation-triangle fa-2x"></i>
+	    	<i v-if="glob.notify.type===6" class="m-1 fa fa-info-circle fa-2x"></i>
 	    </span>
             <span class="mx-3 flex-grow-1 notify-message">{{glob.notify.message}}</span>
         </div>
@@ -13,13 +13,12 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {glob} from "@/main";
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {glob} from "@/main";
 
-	@Component
-	export default class NotifyBox extends Vue {
-		@Prop() private prop!: string;
-	}
+    @Component
+    export default class NotifyBox extends Vue {
+    }
 </script>
 
 <style lang="scss">
@@ -32,15 +31,15 @@
         color: white;
 
         &.notify-type-4 {
-            background-color: theme-color("warning");
+            background-color: var(--warning);
         }
 
         &.notify-type-3 {
-            background-color: theme-color("danger");
+            background-color: var(--danger);
         }
 
         &.notify-type-6 {
-            background-color: theme-color("primary");
+            background-color: var(--primary);
         }
     }
 </style>

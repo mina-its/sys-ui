@@ -94,7 +94,7 @@ function validateData(data, ref) {
     for (const prop of requiredProps) {
         if (data[prop.name] == null) {
             notify(`Property '${prop.name}' is required.`, LogType.Warning);
-            // if (!Array.isArray(glob.data[ref]))
+            // if (!Array.isArray(glob.glob.form.dataset[ref]))
             // 	data._error = `Property '${prop.name}' is required.`;
             return false;
         }
@@ -102,15 +102,15 @@ function validateData(data, ref) {
     return true;
 }
 export function validate() {
-    for (const ref in glob.data) {
-        if (Array.isArray(glob.data[ref])) {
-            for (const item of glob.data[ref]) {
+    for (const ref in glob.form.dataset) {
+        if (Array.isArray(glob.form.dataset[ref])) {
+            for (const item of glob.form.dataset[ref]) {
                 if (!validateData(item, ref)) {
                     return false;
                 }
             }
         }
-        else if (!validateData(glob.data[ref], ref)) {
+        else if (!validateData(glob.form.dataset[ref], ref)) {
             return false;
         }
     }
@@ -478,10 +478,10 @@ export function notify(content, type, params) {
             type = LogType.Info;
         }
     }
-    window.dispatchEvent(new CustomEvent('notify', { detail: { message, type } }));
+    window.dispatchEvent(new CustomEvent(Constants.notifyEvent, { detail: { message, type } }));
 }
 export function question(questionId, message, options, select) {
-    window.dispatchEvent(new CustomEvent('question', { detail: { questionId, message, options, select } }));
+    window.dispatchEvent(new CustomEvent(Constants.questionEvent, { detail: { questionId, message, options, select } }));
     $('#question-box').modal('show');
 }
 export function getBsonId(item) {

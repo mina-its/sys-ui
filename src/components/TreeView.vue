@@ -30,7 +30,7 @@
         };
 
         mounted() {
-            let data = glob.data[this.uri];
+            let data = glob.form.dataset[this.uri];
             let dec = (data._ as EntityMeta).dec;
             let props = dec.properties as Property[];
             let node = this.createNode(data, props);

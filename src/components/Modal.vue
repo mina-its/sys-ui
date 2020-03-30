@@ -39,11 +39,6 @@
 		@Prop() private footerElems: any[];
 		@Prop() private bodyElems: any[];
 
-		created() {
-			// console.log("footerElems:", this.footerElems);
-			// console.log(this.bodyElems);
-		}
-
 		mounted() {
 			glob.modal = true;
 			$(".my-modal").modal().on('hidden.bs.modal', function () {

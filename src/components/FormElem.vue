@@ -22,7 +22,7 @@
                 case ElemType.Function: {
                     console.assert(this.elem.func.ref, `ref is expected for the function:`, this.elem.func);
                     let ref = this.elem.func.ref as any;
-                    let data = glob.data[ref];
+                    let data = glob.form.dataset[ref];
                     let dec = (data._ as EntityMeta).dec as FunctionDec;
                     console.assert(dec, `meta not found for func ref '${ref}'`);
 
@@ -78,11 +78,11 @@
                 case ElemType.Component:
                     let data, props = this.elem.component.props;
                     if (this.elem.component._ref)
-                        data = glob.data[this.elem.component._ref];
+                        data = glob.form.dataset[this.elem.component._ref];
                     return ce(this.elem.component.name, {props: {data, ...props}});
 
                 case ElemType.Chart:
-                    return ce('chart', {props: {data: glob.data['tests']}});
+                    return ce('chart', {props: {data: glob.form.dataset['tests']}});
             }
         }
     }

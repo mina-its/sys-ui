@@ -69,8 +69,6 @@
         renderDetailsView(ce) {
             let valueClass = `prop-value border mx-2`;
             if (this.prop._.gtype == GlobalType.object && !this.prop.documentView) {
-                let oData = glob.data[this.prop._.ref] || [];
-                // main.vueResetProperties(oData, this.meta._.ref, false);
                 return ce('object-view', {
                     props: {root: false, elem: {obj: {ref: this.prop._.ref, root: false}}},
                 });

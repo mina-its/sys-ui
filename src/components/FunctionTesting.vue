@@ -33,8 +33,8 @@
 		// 	// bodyElems.push({type: ElemType.Document, document: {value: data}});
         //
 		// 	main.vueResetProperties(data, false);
-		// 	glob.data[this.meta.name] = data;
-		// 	glob.data["functionTest"] = {functionId: this.meta._id, sampleIndex: 0, input: data};
+		// 	glob.form.dataset[this.meta.name] = data;
+		// 	glob.form.dataset["functionTest"] = {functionId: this.meta._id, sampleIndex: 0, input: data};
 		// 	let footerElems = [{type: ElemType.Function, func: {ref: "functionTest", exec: this.functionTest}}];
 		// 	return ce('modal', {
 		// 		props: {
@@ -47,7 +47,7 @@
 		// }
 
 		functionTest(x, y) {
-			let data = glob.data["functionTest"];
+			let data = glob.form.dataset["functionTest"];
 			this.message = "Running ...";
 			main.ajax("/functionTest", data, null, (res) => {
 				if (res.message)

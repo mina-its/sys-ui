@@ -124,7 +124,7 @@
 		}
 
 		get item() {
-			return glob.data[this.uri];
+			return glob.form.dataset[this.uri];
 		}
 
 		get groups() {

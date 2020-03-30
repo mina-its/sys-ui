@@ -22,7 +22,7 @@
 				return;
 			}
 
-			let data = glob.data[e.obj.ref];
+			let data = glob.form.dataset[e.obj.ref];
 			glob.form.toolbar = true;
 			let rt = this.root == null ? true : this.root;
 			if (e.obj && e.obj.type == ObjectViewType.TreeView)

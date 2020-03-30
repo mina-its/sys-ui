@@ -27,6 +27,8 @@
 </template>
 
 <script lang="ts">
+    import {Constants} from "@/types";
+
     declare let $: any;
     import {Component, Vue} from 'vue-property-decorator';
     import {$t, hideCmenu, load, notify, glob} from "@/main";
@@ -68,7 +70,7 @@
 
         handleWindowEvents() {
             $(window)
-                .on('notify', function (e: any) {
+                .on(Constants.notifyEvent, function (e: any) {
                     let notify = e.detail as NotificationInfo;
                     if (notify.type == LogType.Debug) {
                         $("#snackbar").addClass("visible").text(notify.message);
@@ -78,7 +80,7 @@
                     } else
                         glob.notify = notify;
                 })
-                .on('question', function (e: any) {
+                .on(Constants.questionEvent, function (e: any) {
                     glob.question = e.detail;
                 })
                 .on("popstate", (e) => {
@@ -131,9 +133,9 @@
         mounted() {
             this.handleWindowEvents();
             console.log(
-                `%c main started. %c version: ${glob.config.version} %c`,
-                'background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
-                'background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
+                `%c mina framework started. %c version: ${glob.config.version} %c`,
+                'background:#05B ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',
+                'background:#0072C6 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
                 'background:transparent'
             );
         }
