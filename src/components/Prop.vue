@@ -12,11 +12,13 @@
     import PropTextMultiline from "@/components/PropTextMultiline.vue";
     import PropTime from "@/components/PropTime.vue";
     import {glob} from '@/main';
+    import PropReferenceMultiple from "@/components/PropReferenceMultiple.vue";
 
     const main = require("@/main");
 
     @Component({
         components: {
+            PropReferenceMultiple,
             PropTime,
             PropTextMultiline,
             PropText, PropReference, PropMessage, PropLocation, PropLink, PropFile, PropBoolean

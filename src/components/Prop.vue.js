@@ -11,6 +11,7 @@ import PropReference from "@/components/PropReference.vue";
 import PropText from "@/components/PropText.vue";
 import PropTextMultiline from "@/components/PropTextMultiline.vue";
 import PropTime from "@/components/PropTime.vue";
+import PropReferenceMultiple from "@/components/PropReferenceMultiple.vue";
 const main = require("@/main");
 let ElemProp = class ElemProp extends Vue {
     render(ce) {
@@ -53,7 +54,7 @@ let ElemProp = class ElemProp extends Vue {
             });
         }
         let vl = this.renderValue(ce, valueClass);
-        let embed = this.item._ && this.item._[this.prop.name];
+        let embed = this.item && this.item._ && this.item._[this.prop.name];
         let msg = null;
         if (embed)
             msg = ce('prop-message', { props: { "message": embed.err } });
@@ -201,6 +202,7 @@ __decorate([
 ElemProp = __decorate([
     Component({
         components: {
+            PropReferenceMultiple,
             PropTime,
             PropTextMultiline,
             PropText, PropReference, PropMessage, PropLocation, PropLink, PropFile, PropBoolean

@@ -652,7 +652,7 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
     }
 
     fail = fail || notify;
-    console.log(params);
+    // console.log(params);
     axios(params).then(res => {
         if (res.code && res.code !== StatusCode.Ok) {
             fail({code: res.code, message: res.message});
