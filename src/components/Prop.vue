@@ -81,7 +81,7 @@
             }
 
             let vl = this.renderValue(ce, valueClass);
-            let embed: EmbeddedInfo = this.item._ && this.item._[this.prop.name];
+            let embed: EmbeddedInfo = this.item && this.item._ && this.item._[this.prop.name];
             let msg = null;
             if (embed)
                 msg = ce('prop-message', {props: {"message": embed.err}});

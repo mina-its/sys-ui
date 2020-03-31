@@ -6,8 +6,8 @@
     const main = require("@/main");
     @Component
     export default class ObjectView extends Vue {
-        @Prop() private elem!: Elem;
-        @Prop() private root!: boolean;
+        @Prop() private elem: Elem;
+        @Prop() private root: boolean;
 
         render(ce) {
             let e = this.elem as Elem;
@@ -17,7 +17,10 @@
                 return;
             }
 
-            const data = glob.form.dataset[e.obj.ref];
+            let data = glob.form.dataset[e.obj.ref];
+            if (!data) {
+                data = glob.form.dataset[e.obj.ref] = {};
+            }
             const dec = glob.form.declarations[e.obj.ref];
             glob.form.toolbar = true;
             let rt = this.root == null ? true : this.root;
