@@ -707,9 +707,9 @@ function start() {
 
     const mainState = $('#main-state').html();
     const res: WebResponse = parse(mainState);
-    if (res)
+    if (res) {
         startVue(res);
-    else {  // load main-state async
+    } else {  // load main-state async
         let host = "http://localhost";
         let uri = host + setQs('m', RequestMode.inlineDev, true) + location.hash;
         console.log(uri);

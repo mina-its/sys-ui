@@ -636,8 +636,9 @@ function start() {
     };
     const mainState = $('#main-state').html();
     const res = parse(mainState);
-    if (res)
+    if (res) {
         startVue(res);
+    }
     else { // load main-state async
         let host = "http://localhost";
         let uri = host + setQs('m', RequestMode.inlineDev, true) + location.hash;
