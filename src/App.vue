@@ -220,6 +220,9 @@
         }
     }
 
+    // todo: disable print
+    /*#print{display:none!important;}@media print{*{display:none;}}*/
+
     /* Animations to fade the snackbar in and out */
     @-webkit-keyframes fadein {
         from {

@@ -3,5 +3,10 @@ module.exports = {
         output: {
             libraryExport: 'default'
         }
-    }
+    },
+
+    crossorigin: "",
+
+    pwa: {}
+
 }

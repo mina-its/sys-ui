@@ -1,7 +1,7 @@
-declare let WeakSet, $, axios: any;
+declare let WeakSet, $: any;
 import Vue from 'vue';
 import App from './App.vue';
-import {MenuItem, Constants, Global, AppStateLog} from './types';
+import {MenuItem, Constants, Global} from './types';
 import {
     DirFile,
     Drive,
@@ -21,10 +21,10 @@ import {
     ObjectDec,
     FunctionDec,
     EntityMeta,
-    Form,
     FormDto
 } from '../../sys/src/types';
 
+const axios = require('axios').default;
 export let glob = new Global();
 
 export function $t(text: string): string {
@@ -408,6 +408,7 @@ export function checkPropDependencyOnChange(dec: ObjectDec | FunctionDec, prop, 
 }
 
 function parse(str: string): any {
+    if (!str) return null;
     let flatJson = JSON.parse(str);
     return flat2recursive(flatJson);
 }
@@ -633,7 +634,6 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
     let headers = {};
     if (glob.config.host) {
         url = joinUri(glob.config.host, url);
-        headers['Access-Control-Allow-Origin'] = '*';
     }
     let params: any = {url, data, headers};
 
@@ -653,6 +653,7 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
     }
 
     fail = fail || notify;
+    console.log(params);
     axios(params).then(res => {
         if (res.code && res.code !== StatusCode.Ok) {
             fail({code: res.code, message: res.message});
@@ -686,25 +687,40 @@ function registerComponents() {
 
 function start() {
     console.log('starting ...');
+    const startVue = (res: WebResponse) => {
+        handleResponse(res);
+        glob.config = res.config;
+
+        Object.assign(Vue.config, {productionTip: false, devtools: true});
+        Vue.directive('focus', {
+            inserted(el, binding) {
+                if (binding.value) el.focus();
+            }
+        });
+
+        registerComponents();
+
+        Vue['glob'] = Vue.prototype.glob = glob;
+        window['glob'] = glob;
+        new Vue({data: glob, render: h => h(App)}).$mount('#app');
+    };
+
     const mainState = $('#main-state').html();
-    const res: WebResponse = mainState ? parse(mainState) : {};
-    console.assert(res.config, 'config must be ready in initial state.');
+    const res: WebResponse = parse(mainState);
+    if (res)
+        startVue(res);
+    else {  // load main-state async
+        let host = "http://localhost";
+        let uri = host + setQs('m', RequestMode.inlineDev, true) + location.hash;
+        console.log(uri);
 
-    handleResponse(res);
-    glob.config = res.config;
-
-    Object.assign(Vue.config, {productionTip: false, devtools: true});
-    Vue.directive('focus', {
-        inserted(el, binding) {
-            if (binding.value) el.focus();
-        }
-    });
-
-    registerComponents();
-
-    Vue['glob'] = Vue.prototype.glob = glob;
-    window['glob'] = glob;
-    new Vue({data: glob, render: h => h(App)}).$mount('#app');
-};
+        axios.get(uri, {withCredentials: true}).then(res => {
+            if (res.data)
+                startVue(res.data);
+            else
+                console.error(res);
+        }).catch(err => console.error(err));
+    }
+}
 
 start();

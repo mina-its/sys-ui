@@ -2,6 +2,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import { Constants, Global } from './types';
 import { Keys, LogType, StatusCode, RequestMode, WebMethod } from '../../sys/src/types';
+const axios = require('axios').default;
 export let glob = new Global();
 export function $t(text) {
     return typeof (text) == 'object' ? text[glob.config.locale] || Object.values(text)[0] : text;
@@ -365,6 +366,8 @@ export function checkPropDependencyOnChange(dec, prop, instance) {
     }
 }
 function parse(str) {
+    if (!str)
+        return null;
     let flatJson = JSON.parse(str);
     return flat2recursive(flatJson);
 }
@@ -564,7 +567,6 @@ export function ajax(url, data, config, done, fail) {
     let headers = {};
     if (glob.config.host) {
         url = joinUri(glob.config.host, url);
-        headers['Access-Control-Allow-Origin'] = '*';
     }
     let params = { url, data, headers };
     if (config && config.method) {
@@ -582,6 +584,7 @@ export function ajax(url, data, config, done, fail) {
         params.headers['Content-Type'] = 'multipart/form-data';
     }
     fail = fail || notify;
+    console.log(params);
     axios(params).then(res => {
         if (res.code && res.code !== StatusCode.Ok) {
             fail({ code: res.code, message: res.message });
@@ -616,23 +619,36 @@ function registerComponents() {
 }
 function start() {
     console.log('starting ...');
+    const startVue = (res) => {
+        handleResponse(res);
+        glob.config = res.config;
+        Object.assign(Vue.config, { productionTip: false, devtools: true });
+        Vue.directive('focus', {
+            inserted(el, binding) {
+                if (binding.value)
+                    el.focus();
+            }
+        });
+        registerComponents();
+        Vue['glob'] = Vue.prototype.glob = glob;
+        window['glob'] = glob;
+        new Vue({ data: glob, render: h => h(App) }).$mount('#app');
+    };
     const mainState = $('#main-state').html();
-    const res = mainState ? parse(mainState) : {};
-    console.assert(res.config, 'config must be ready in initial state.');
-    handleResponse(res);
-    glob.config = res.config;
-    Object.assign(Vue.config, { productionTip: false, devtools: true });
-    Vue.directive('focus', {
-        inserted(el, binding) {
-            if (binding.value)
-                el.focus();
-        }
-    });
-    registerComponents();
-    Vue['glob'] = Vue.prototype.glob = glob;
-    window['glob'] = glob;
-    new Vue({ data: glob, render: h => h(App) }).$mount('#app');
+    const res = parse(mainState);
+    if (res)
+        startVue(res);
+    else { // load main-state async
+        let host = "http://localhost";
+        let uri = host + setQs('m', RequestMode.inlineDev, true) + location.hash;
+        console.log(uri);
+        axios.get(uri, { withCredentials: true }).then(res => {
+            if (res.data)
+                startVue(res.data);
+            else
+                console.error(res);
+        }).catch(err => console.error(err));
+    }
 }
-;
 start();
 //# sourceMappingURL=main.js.map

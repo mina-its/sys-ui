@@ -7,6 +7,7 @@
     <meta name='viewport'
           content='width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0'/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="keywords" content="<%= NODE_ENV %>"/>
 
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <script src="/vendor/jquery-3.4.1.min.js"></script>
@@ -23,63 +24,5 @@
 <body>
 <noscript>Please enable your browser JavaScript.</noscript>
 <div id="app"></div>
-<script type="application/json" id="main-state">
-    {
-        "config": {
-            "version": "*.*.*",
-            "host": "http://localhost",
-            "appTitle": "Sample",
-            "brandingLogo": "",
-            "locale": "EN",
-            "appLocales": [
-                {
-                    "ref": "en",
-                    "title": "English"
-                },
-                {
-                    "ref": "ar",
-                    "title": "العربیه"
-                }
-            ],
-            "loginRef": "/login",
-            "loginTitle": "Login",
-            "interactive": false,
-            "menu": [
-                {
-                    "ref": "home",
-                    "title": "Home"
-                }
-            ],
-            "navmenu": [
-                {
-                    "ref": "home",
-                    "title": "Home"
-                },
-                {
-                    "title": "-"
-                },
-                {
-                    "ref": "login",
-                    "title": "Login"
-                }
-            ]
-        },
-        "form": {
-            "elems": [
-                {
-                    "type": 1,
-                    "styles": "p-4 text-success",
-                    "text": {
-                        "content": "# Welcome",
-                        "markdown": true
-                    }
-                }
-            ],
-            "toolbar": true,
-            "title": "Welcome Page",
-            "breadcrumb": []
-        }
-    }
-</script>
 </body>
 </html>
