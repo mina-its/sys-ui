@@ -1,7 +1,6 @@
 import {
     Property,
     WebMethod,
-    Form,
     Drive,
     DirFile,
     Pair,
@@ -56,10 +55,6 @@ export class AppStateGeoMap {
     constructor() {
         this.show = false;
     }
-}
-
-export enum RowStatus {
-    Selected = 1,
 }
 
 export class AppStateCmenu {

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {ObjectViewType, Property, GlobalType, EmbeddedInfo} from "../../../sys/types";
     import {PropertyLabelMode} from '@/types';
     import PropBoolean from "@/components/PropBoolean.vue";
@@ -53,17 +53,23 @@
             }
         }
 
-        changed(meta, val) {
-            this.$emit('changed', meta, this.item, val);
-            main.setPropertyEmbeddedError(this.item, meta.name, null);
+        @Emit()
+        changed(prop: Property, val: any) {
+            main.setPropertyEmbeddedError(this.item, prop.name, null);
+            return {prop, item: this.item, val};
+            //this.$emit('changed', prop, this.item, val);
         }
 
+        @Emit()
         focused(e) {
-            this.$emit('focus', e, this.prop);
+            //this.$emit('focus', e, this.prop);
+            return {e, prop: this.prop};
         }
 
+        @Emit()
         keydown(e) {
-            this.$emit('keydown', e, this.prop);
+            //this.$emit('keydown', e, this.prop);
+            return {e, prop: this.prop};
         }
 
         renderDetailsView(ce) {
@@ -256,7 +262,7 @@
         }
 
         &file {
-            @extend .prop-value-wide;
+            width: 500px;
             overflow: hidden;
             word-break: break-all;
             margin-left: 0 !important;
@@ -301,7 +307,7 @@
         }
 
         &text-multiline {
-            @extend .prop-value-wide;
+            width: 500px;
             min-height: 150px;
             resize: both;
         }

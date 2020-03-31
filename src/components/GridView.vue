@@ -9,14 +9,14 @@
                 <th v-if="rowHeaderStyle===2" class="text-center"><input type="checkbox" v-model="mainCheckState"
                                                                          @change="mainSelect"></th>
                 <th v-else></th>
-                <th class="text-nowrap" @click="showColumnMenu(prop, $event)" v-for="prop in meta.properties">
+                <th class="text-nowrap" @click="showColumnMenu(prop, $event)" v-for="prop in dec.properties">
                     {{prop.title || prop.name}}
                 </th>
             </tr>
             </thead>
             <tbody>
             <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown"
-                         @headerClick="showRowMenu" v-for="item in items" :item="item" :meta="meta"
+                         @headerClick="showRowMenu" v-for="item in items" :item="item" :dec="dec"
                          @changed="changed"></GridViewRow>
             </tbody>
             <tfoot>
@@ -56,13 +56,15 @@
         WebMethod,
         Pair,
         Keys,
-        ObjectDec
+        ObjectDec,
+        EntityMeta,
+        Property
     } from '../../../sys/types';
     import {glob, $t} from '@/main';
-    import {Modify, RowStatus, MenuItem} from '@/types';
+    import {Modify, MenuItem} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";
 
-    const main = require('./main');
+    const main = require('@/main');
     @Component({
         components: {GridViewRow, FilterItem}
     })
@@ -76,17 +78,17 @@
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainCheckState = null;
 
-        changed(meta, item, val) {
+        $t(key) {
+            return $t(key);
+        }
+
+        changed(prop: Property, item, val) {
             glob.dirty = true;
-            let dependents = this.dec.properties.filter((prop) => {
-                return prop.dependsOn == meta.name;
-            });
+            let dependents = this.dec.properties.filter(p => p.dependsOn == prop.name);
             for (const prop of dependents) {
                 item[prop.name] = null;
-                if (prop._.items) {
+                if (prop._.items)
                     prop._.items = null;
-                    //prop.type
-                }
             }
         }
 
@@ -98,15 +100,10 @@
                     break;
 
                 default:
-                    let newItem = {_id: this.ni--, _status: null};
-                    this.dec.properties.forEach((prop) => {
-                        newItem[prop.name] = null;
-                    });
-                    if (this.dec.reorderable) {
-                        newItem['_z'] = (Math.max(...this.items.map((i) => {
-                            return i._z;
-                        })) || 0) + 1;
-                    }
+                    let newItem = {_id: this.ni--, _: {marked: false}};
+                    this.dec.properties.forEach(prop => newItem[prop.name] = null);
+                    if (this.dec.reorderable)
+                        newItem['_z'] = (Math.max(...this.items.map(item => item._z)) || 0) + 1;
                     this.items.push(newItem);
                     glob.dirty = true;
                     break;
@@ -138,9 +135,9 @@
             ];
             main.showCmenu(prop, items, e, (state, item) => {
                 main.hideCmenu();
-                if (!item) {
+                if (!item)
                     return;
-                }
+
                 switch (item.ref) {
                     case 'sort':
                         let prevSort = main.getQs(ReqParams.sort);
@@ -185,9 +182,9 @@
         }
 
         mainSelect(e) {
-            if (this.mainCheckState) {
+            if (this.mainCheckState)
                 this.selectAll();
-            } else {
+            else {
                 this.rowHeaderStyle = GridRowHeaderStyle.empty;
                 this.deselectAll();
             }
@@ -195,26 +192,22 @@
 
         selectAll() {
             this.rowHeaderStyle = GridRowHeaderStyle.select;
-            this.items.forEach((item) => {
-                item._status = RowStatus.Selected;
-            });
+            this.items.forEach(item => (item._ as EntityMeta).marked = true);
         }
 
         deselectAll(but?) {
-            this.items.forEach((item) => {
-                item._status = null;
-            });
-            if (but) {
-                but._status = RowStatus.Selected;
-            }
+            this.items.forEach(item => (item._ as EntityMeta).marked = null);
+            if (but)
+                (but._ as EntityMeta).marked = true;
         }
 
         rowSelected(item) {
             this.mainCheckState = false;
-            if (this.rowHeaderStyle == GridRowHeaderStyle.select) {
-                item._status = item._status == RowStatus.Selected ? null : RowStatus.Selected;
-            } else {
-                item._status = RowStatus.Selected;
+            let meta = item._ as EntityMeta;
+            if (this.rowHeaderStyle == GridRowHeaderStyle.select)
+                meta.marked = !meta.marked;
+            else {
+                meta.marked = true;
                 this.deselectAll(item);
             }
         }
@@ -228,9 +221,8 @@
             ];
 
             if (item._id && main.getBsonId(item)) {
-                if (this.root) {
+                if (this.root)
                     items.unshift({ref: 'tree', title: $t('tree-view')});
-                }
                 items.unshift({ref: 'details', title: $t('details')});
             }
 
@@ -242,9 +234,7 @@
 
             main.showCmenu(item, items, e, (state, item) => {
                 main.hideCmenu();
-                if (!item) {
-                    return;
-                }
+                if (!item) return;
                 switch (item.ref) {
                     case 'delete':
                         this.deleteItems();
@@ -295,24 +285,16 @@
         }
 
         rowMove(up: boolean) {
-            let item = this.items.find(i => i._status == RowStatus.Selected);
+            let item = this.items.find(item => (item._ as EntityMeta).marked = true);
             let index = this.items.indexOf(item);
-            if ((up && index == 0) || (!up && index == this.items.length - 1)) {
+            if ((up && index == 0) || (!up && index == this.items.length - 1))
                 return;
-            }
             glob.dirty = true;
 
-            let emptyZs = this.items.filter((item) => {
-                return !item._z;
-            });
-
+            let emptyZs = this.items.filter(item => !item._z);
             if (emptyZs.length) {
-                let min = Math.min(...this.items.map((i) => {
-                    return i._z;
-                })) || 0;
-                for (const item of this.items) {
-                    item._z = ++min;
-                }
+                let min = Math.min(...this.items.map(item => item._z)) || 0;
+                this.items.forEach(item => item._z = ++min);
             }
 
             let siblingIndex = up ? index - 1 : index + 1;
@@ -320,12 +302,8 @@
 
             // check if _z are same (happens in some situations)
             if (item._z == sibling._z) {
-                let min = Math.min(...this.items.map((i) => {
-                    return i._z;
-                }));
-                for (const item of this.items) {
-                    item._z = min++;
-                }
+                let min = Math.min(...this.items.map((item) => item._z));
+                this.items.forEach(item => item._z = min++);
             }
             // replace items _z
             let _z = item._z;
@@ -348,11 +326,10 @@
                     let ci = $t.closest('td')[0].cellIndex;
                     let ri = $t.closest('tr')[0].rowIndex + (e.which == Keys.up ? -1 : 1);
                     let table = $t.closest('table');
-                    if (e.which == Keys.enter && ri == table[0].rows.length - 1) {
+                    if (e.which == Keys.enter && ri == table[0].rows.length - 1)
                         this.newItem();
-                    } else if (ri <= 0 || ri >= table[0].rows.length - 1) {
+                    else if (ri <= 0 || ri >= table[0].rows.length - 1)
                         return;
-                    }
 
                     setTimeout(() => {
                         let row = table[0].rows[ri];
@@ -362,13 +339,11 @@
                     }, 0);
 
                     if (e.ctrlKey) {
-                        if (e.which == Keys.up) {
+                        if (e.which == Keys.up)
                             this.rowMove(true);
-                        }
 
-                        if (e.which == Keys.down) {
+                        if (e.which == Keys.down)
                             this.rowMove(false);
-                        }
                     }
 
                     break;
@@ -384,7 +359,7 @@
     .grid-view {
 
         th {
-            @extend .p-2;
+            padding: .5rem;
             font-weight: 500;
             border: 1px solid var(--grid-border);
 

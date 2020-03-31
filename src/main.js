@@ -616,6 +616,9 @@ function registerComponents() {
     Vue.component('Panel', require("@/components/Panel.vue").default);
     Vue.component('Modal', require("@/components/Modal.vue").default);
     Vue.component('Prop', require("@/components/Prop.vue").default);
+    Vue.component('ObjectView', require("@/components/ObjectView.vue").default);
+    Vue.component('GridView', require("@/components/GridView.vue").default);
+    Vue.component('DetailsView', require("@/components/DetailsView.vue").default);
 }
 function start() {
     console.log('starting ...');

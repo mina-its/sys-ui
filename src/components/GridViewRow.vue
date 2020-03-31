@@ -11,8 +11,8 @@
 
 <script lang="ts">
     declare let $: any;
-    import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {ObjectDec} from "../../../sys/types";
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {ObjectDec, Property, EntityMeta} from "../../../sys/types";
     import {RowStatus} from '@/types';
 
     @Component
@@ -21,17 +21,19 @@
         @Prop() private selectable: boolean;
         @Prop() private dec: ObjectDec;
 
-        focused(e, prop) {
+        focused(e, prop: Property) {
             $(".prop-focused").removeClass("prop-focused");
             $(e.target).closest("td").addClass("prop-focused");
         }
 
-        changed(meta, val) {
-            this.$emit('changed', meta, val);
+        @Emit()
+        changed(prop: Property, val) {
+            //this.$emit('changed', prop, val);
+            return {prop, val};
         }
 
         updateStatus() {
-            this.item._status = (event.target as any).checked ? RowStatus.Selected : "";
+            this.meta.marked = (event.target as any).checked;
         }
 
         headerClick(item, $event) {
@@ -46,8 +48,8 @@
             this.$emit('keydown', e, this.item, prop);
         }
 
-        get status() {
-            return this.item._status;
+        get meta(): EntityMeta {
+            return this.item._ as EntityMeta;
         }
     }
 </script>
