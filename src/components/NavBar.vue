@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand" href="/">
             <img v-if="glob.config.brandingLogo" alt="logo" class='branding-logo img-responsive'
                  :src="glob.config.brandingLogo"/>

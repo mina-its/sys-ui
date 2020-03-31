@@ -635,8 +635,7 @@ export function ajax(url: string, data: any, config: AjaxConfig, done: (res: Web
     if (glob.config.host) {
         url = joinUri(glob.config.host, url);
     }
-    let params: any = {url, data, headers};
-
+    let params: any = {url, data, headers, withCredentials: true};
     if (config && config.method) {
         params.method = config.method;
     } else {

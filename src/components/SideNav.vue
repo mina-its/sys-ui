@@ -48,14 +48,15 @@
     .side-nav {
         overflow-y: scroll;
         -ms-overflow-style: none;
-        background-color: var(--side-nav);
+        background-color: var(--side-nav-bg);
         min-width: 280px;
 
         a {
-            color: white;
+            color: var(--side-nav-color);
 
             &:hover {
                 text-decoration: underline;
+                color: var(--side-nav-color);
             }
         }
 

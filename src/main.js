@@ -568,7 +568,7 @@ export function ajax(url, data, config, done, fail) {
     if (glob.config.host) {
         url = joinUri(glob.config.host, url);
     }
-    let params = { url, data, headers };
+    let params = { url, data, headers, withCredentials: true };
     if (config && config.method) {
         params.method = config.method;
     }

@@ -150,6 +150,7 @@
         --primary: #0072C6;
         --danger: #ff4136;
         --dark: #24292e;
+        --header-bg: #24292e;
         --warning: #ff7700;
         --grid-head: #f6f8fa;
         --grid-border: #d7d9dc;
@@ -159,7 +160,8 @@
         --grid-row-header-selected: #FFE;
         --form-label: #666;
         --layout-border: #ddd;
-        --side-nav: #2f353c;
+        --side-nav-bg: #2f353c;
+        --side-nav-color: #fff;
         --breadcrumb-separator: #aaa;
 
         --font-size-base: 15px;
@@ -196,6 +198,10 @@
 
     header {
         flex: 0 1 auto;
+
+        nav{
+            background-color: var(--header-bg);
+        }
 
         .btn-toolbar {
             border-color: var(--layout-border);
