@@ -57,7 +57,7 @@
         Pair,
         Keys,
         ObjectDec
-    } from '../../../sys/src/types';
+    } from '../../../sys/types';
     import {glob, $t} from '@/main';
     import {Modify, RowStatus, MenuItem} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";

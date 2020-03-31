@@ -12,7 +12,7 @@
 <script lang="ts">
     declare let $: any;
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {ObjectDec} from "../../../sys/src/types";
+    import {ObjectDec} from "../../../sys/types";
     import {RowStatus} from '@/types';
 
     @Component

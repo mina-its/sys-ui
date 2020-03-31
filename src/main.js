@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import { Constants, Global } from './types';
-import { Keys, LogType, StatusCode, RequestMode, WebMethod } from '../../sys/src/types';
+import { Keys, LogType, StatusCode, RequestMode, WebMethod } from '../../sys/types';
 const axios = require('axios').default;
 export let glob = new Global();
 export function $t(text) {

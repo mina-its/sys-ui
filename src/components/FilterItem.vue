@@ -6,7 +6,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import { ObjectDec} from "../../../sys/src/types";
+	import { ObjectDec} from "../../../sys/types";
 
 	@Component
 	export default class FilterItem extends Vue {

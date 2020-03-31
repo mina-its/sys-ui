@@ -11,7 +11,7 @@ import WebSocket from "@/components/WebSocket.vue";
 import QuestionBox from "@/components/QuestionBox.vue";
 import ContextMenu from "@/components/ContextMenu.vue";
 import Toolbar from "@/components/Toolbar.vue";
-import { LogType } from '../../sys/src/types';
+import { LogType } from '../../sys/types';
 const main = require("@/main");
 let App = class App extends Vue {
     onScroll() {

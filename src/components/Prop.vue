@@ -1,6 +1,6 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {ObjectViewType, Property, GlobalType, EmbeddedInfo} from "../../../sys/src/types";
+    import {ObjectViewType, Property, GlobalType, EmbeddedInfo} from "../../../sys/types";
     import {PropertyLabelMode} from '@/types';
     import PropBoolean from "@/components/PropBoolean.vue";
     import PropFile from "@/components/PropFile.vue";

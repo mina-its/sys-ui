@@ -41,7 +41,7 @@
     import QuestionBox from "@/components/QuestionBox.vue";
     import ContextMenu from "@/components/ContextMenu.vue";
     import Toolbar from "@/components/Toolbar.vue";
-    import {LogType, NotificationInfo} from '../../sys/src/types';
+    import {LogType, NotificationInfo} from '../../sys/types';
 
     const main = require("@/main");
 

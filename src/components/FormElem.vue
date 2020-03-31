@@ -1,6 +1,6 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, ElemType, ObjectViewType, FunctionDec, EntityMeta} from "../../../sys/src/types";
+    import {Elem, ElemType, ObjectViewType, FunctionDec, EntityMeta} from "../../../sys/types";
     import {glob} from "@/main";
     import Markdown from "@/components/Markdown.vue";
 

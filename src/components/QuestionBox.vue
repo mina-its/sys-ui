@@ -23,7 +23,7 @@
 	import Function from "@/components/Function.vue";
 	import {Component, Vue} from 'vue-property-decorator';
 	import {glob} from "@/main";
-	import {Pair} from '../../../sys/src/types';
+	import {Pair} from '../../../sys/types';
 
 	const main = require("@/main");
 

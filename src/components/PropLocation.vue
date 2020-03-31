@@ -5,7 +5,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property} from "../../../sys/src/types";
+	import {Property} from "../../../sys/types";
 	import {glob} from "@/main";
 
 	const main = require("@/main");

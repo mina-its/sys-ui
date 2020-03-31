@@ -11,7 +11,7 @@
 <script lang="ts">
     import TreeViewNode from "@/components/TreeViewNode.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Property, Keys, GlobalType, EntityMeta} from "../../../sys/src/types";
+    import {Property, Keys, GlobalType, EntityMeta} from "../../../sys/types";
     import {glob} from "@/main";
     import {TreeViewNode as Node, TreeViewLine, TreeViewAttribute} from '@/types';
 

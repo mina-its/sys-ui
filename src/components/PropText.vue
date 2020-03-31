@@ -5,7 +5,7 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Property, Keys} from "../../../sys/src/types";
+    import {Property, Keys} from "../../../sys/types";
 
     const main = require("@/main");
 

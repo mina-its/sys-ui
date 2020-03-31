@@ -22,7 +22,7 @@ import {
     FunctionDec,
     EntityMeta,
     FormDto
-} from '../../sys/src/types';
+} from '../../sys/types';
 
 const axios = require('axios').default;
 export let glob = new Global();
