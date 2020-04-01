@@ -8,7 +8,7 @@ import {
     NotificationInfo,
     AppStateConfig,
     FormDto
-} from '../../sys/types';
+} from '../../sys/src/types';
 
 export const Constants = {
     redirectBack: '_back',

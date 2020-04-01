@@ -50,7 +50,7 @@
     declare let $: any;
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {glob, $t} from '@/main';
-    import {DirFile, LogType, DirFileType, YesNo, Pair} from '../../../sys/types';
+    import {DirFile, LogType, DirFileType, YesNo, Pair} from '../../../sys/src/types';
     import {MenuItem} from '@/types';
 
     const main = require("@/main");

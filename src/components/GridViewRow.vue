@@ -12,8 +12,7 @@
 <script lang="ts">
     declare let $: any;
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {ObjectDec, Property, EntityMeta} from "../../../sys/types";
-    import {RowStatus} from '@/types';
+    import {ObjectDec, Property, EntityMeta} from "../../../sys/src/types";
 
     @Component
     export default class GridViewRow extends Vue {

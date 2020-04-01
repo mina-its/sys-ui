@@ -7,7 +7,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property, WebMethod} from "../../../sys/types";
+	import {Property, WebMethod} from "../../../sys/src/types";
 	import {glob} from "@/main";
 	import {Modify} from '@/types';
 

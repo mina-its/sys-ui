@@ -13,7 +13,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property, Pair} from "../../../sys/types";
+	import {Property, Pair} from "../../../sys/src/types";
 	import {MenuItem} from '@/types';
 
 	const main = require("@/main");

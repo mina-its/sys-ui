@@ -4,7 +4,7 @@
 <script lang="ts">
     import {AppStateLog} from "@/types";
     import {Component, Vue} from 'vue-property-decorator';
-    import {ClientCommand, LogType, Pair} from '../../../sys/types';
+    import {ClientCommand, LogType, Pair} from '../../../sys/src/types';
     import {glob} from "@/main";
 
     declare let io: any;

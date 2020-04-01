@@ -1,6 +1,6 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, LogType, ObjectViewType, EntityMeta} from "../../../sys/types";
+    import {Elem, LogType, ObjectViewType, EntityMeta} from "../../../sys/src/types";
     import {glob} from '@/main';
 
     const main = require("@/main");

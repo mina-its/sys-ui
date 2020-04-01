@@ -59,7 +59,7 @@
         ObjectDec,
         EntityMeta,
         Property
-    } from '../../../sys/types';
+    } from '../../../sys/src/types';
     import {glob, $t} from '@/main';
     import {Modify, MenuItem} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";

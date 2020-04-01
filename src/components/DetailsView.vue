@@ -28,7 +28,7 @@
 <script lang="ts">
     declare let $: any;
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/types";
+    import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
     import {glob} from '@/main';
 
     const main = require("@/main");

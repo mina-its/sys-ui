@@ -9,7 +9,7 @@
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {$t, glob} from "@/main";
-	import {ClientCommand, MenuItem} from '../../../sys/types';
+	import {ClientCommand, MenuItem} from '../../../sys/src/types';
 	import WebSocket from "@/components/WebSocket.vue";
 
 	const main = require("@/main");

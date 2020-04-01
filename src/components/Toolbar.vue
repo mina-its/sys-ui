@@ -28,7 +28,7 @@
 	import Function from "@/components/Function.vue";
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {prepareServerUrl, $t, flat2recursive, glob} from "@/main";
-	import {Keys, WebMethod, LogType} from '../../../sys/types';
+	import {Keys, WebMethod, LogType} from '../../../sys/src/types';
 
 	const main = require("@/main");
 

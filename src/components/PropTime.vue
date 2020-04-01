@@ -6,7 +6,7 @@
 <script lang="ts">
 	declare let moment: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property, LogType} from "../../../sys/types";
+	import {Property, LogType} from "../../../sys/src/types";
 
 	const main = require("@/main");
 

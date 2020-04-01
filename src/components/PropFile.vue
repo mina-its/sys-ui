@@ -1,4 +1,4 @@
-import {WebMethod} from "../../../sys/types";
+import {WebMethod} from "../../../sys/src/types";
 <template>
     <div :class="'p-0 border-0 ' + styles">
         <div v-if="viewType==2" class="prop-file-box">
@@ -24,7 +24,7 @@ import {WebMethod} from "../../../sys/types";
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {DirFile, DriveMode, File, LogType, Property, RequestMode, WebMethod} from "../../../sys/types";
+	import {DirFile, DriveMode, File, LogType, Property, RequestMode, WebMethod} from "../../../sys/src/types";
 	import {MenuItem, Modify} from '@/types';
 	import {$t, glob} from '@/main';
 

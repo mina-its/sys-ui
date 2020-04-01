@@ -1,16 +1,19 @@
-import Vue from 'vue';
-import App from './App.vue';
-import { Constants, Global } from './types';
-import { Keys, LogType, StatusCode, RequestMode, WebMethod } from '../../sys/types';
-const axios = require('axios').default;
-export let glob = new Global();
-export function $t(text) {
-    return typeof (text) == 'object' ? text[glob.config.locale] || Object.values(text)[0] : text;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var vue_1 = require("vue");
+var App_vue_1 = require("./App.vue");
+var types_1 = require("./types");
+var types_2 = require("../../sys/src/types");
+var axios = require('axios').default;
+exports.glob = new types_1.Global();
+function $t(text) {
+    return typeof (text) == 'object' ? text[exports.glob.config.locale] || Object.values(text)[0] : text;
     // if (text[pack + "." + key]) return text[pack + "." + key];
     //
     // console.warn(`Warning: text '${pack}.${key}' not found`);
     // return key.replace(/-/g, " ");
 }
+exports.$t = $t;
 // export function getNavmenu(res: WebResponse) {
 // 	let _navmenu = localStorage.getItem('_navmenu');
 // 	// if (_navmenu)
@@ -36,7 +39,7 @@ export function $t(text) {
 // 	//}
 // 	localStorage.setItem('_navmenu', JSON.stringify(glob.config.navmenu));
 // }
-export function evalExpression($this, expression) {
+function evalExpression($this, expression) {
     try {
         if (expression == null) {
             return null;
@@ -44,30 +47,38 @@ export function evalExpression($this, expression) {
         return eval(expression.replace(/\bthis\b/g, '$this'));
     }
     catch (ex) {
-        console.error(`Evaluating '${expression}' failed! this:`, $this, 'Error:', ex.message);
+        console.error("Evaluating '" + expression + "' failed! this:", $this, 'Error:', ex.message);
     }
 }
+exports.evalExpression = evalExpression;
 function vueResetFormData(form) {
     if (!form.dataset || !form.declarations)
         return;
-    for (let ref in form.dataset) {
-        let data = form.dataset[ref];
-        let dec = form.declarations[ref];
+    var _loop_1 = function (ref) {
+        var data = form.dataset[ref];
+        var dec = form.declarations[ref];
         if (!data || !dec)
-            continue;
+            return "continue";
         data._ = data._ || {};
-        let meta = data._;
+        var meta = data._;
         meta.dec = dec;
         if (Array.isArray(data))
-            data.forEach(data => meta.marked = null);
-        for (const prop of dec.properties) {
+            data.forEach(function (data) { return meta.marked = null; });
+        var _loop_2 = function (prop) {
             if (Array.isArray(data)) {
-                data.forEach(item => setUndefinedToNull(item, prop));
+                data.forEach(function (item) { return setUndefinedToNull(item, prop); });
             }
             else {
                 setUndefinedToNull(data, prop);
             }
+        };
+        for (var _i = 0, _a = dec.properties; _i < _a.length; _i++) {
+            var prop = _a[_i];
+            _loop_2(prop);
         }
+    };
+    for (var ref in form.dataset) {
+        _loop_1(ref);
     }
 }
 function setUndefinedToNull(item, prop) {
@@ -90,11 +101,12 @@ function setUndefinedToNull(item, prop) {
 //     }
 // }
 function validateData(data, ref) {
-    let meta = data._;
-    let requiredProps = meta.dec.properties.filter(p => p.required);
-    for (const prop of requiredProps) {
+    var meta = data._;
+    var requiredProps = meta.dec.properties.filter(function (p) { return p.required; });
+    for (var _i = 0, requiredProps_1 = requiredProps; _i < requiredProps_1.length; _i++) {
+        var prop = requiredProps_1[_i];
         if (data[prop.name] == null) {
-            notify(`Property '${prop.name}' is required.`, LogType.Warning);
+            notify("Property '" + prop.name + "' is required.", types_2.LogType.Warning);
             // if (!Array.isArray(glob.glob.form.dataset[ref]))
             // 	data._error = `Property '${prop.name}' is required.`;
             return false;
@@ -102,25 +114,28 @@ function validateData(data, ref) {
     }
     return true;
 }
-export function validate() {
-    for (const ref in glob.form.dataset) {
-        if (Array.isArray(glob.form.dataset[ref])) {
-            for (const item of glob.form.dataset[ref]) {
+function validate() {
+    for (var ref in exports.glob.form.dataset) {
+        if (Array.isArray(exports.glob.form.dataset[ref])) {
+            for (var _i = 0, _a = exports.glob.form.dataset[ref]; _i < _a.length; _i++) {
+                var item = _a[_i];
                 if (!validateData(item, ref)) {
                     return false;
                 }
             }
         }
-        else if (!validateData(glob.form.dataset[ref], ref)) {
+        else if (!validateData(exports.glob.form.dataset[ref], ref)) {
             return false;
         }
     }
     return true;
 }
-export function someProps(prop) {
+exports.validate = validate;
+function someProps(prop) {
     return Array.isArray(prop.properties) && prop.properties.length;
 }
-export function commitNewItem() {
+exports.someProps = someProps;
+function commitNewItem() {
     // todo
     // let objectName = location.pathname.replace(/\//, '');
     // let data = glob.data[objectName];
@@ -141,38 +156,42 @@ export function commitNewItem() {
     // 	notify(err);
     // });
 }
-export function prepareServerUrl(ref) {
+exports.commitNewItem = commitNewItem;
+function prepareServerUrl(ref) {
     ref = '/' + ref;
-    let locale = getQs('e');
+    var locale = getQs('e');
     if (locale) {
         ref += '?e=' + locale;
     }
     return ref;
 }
-export function onlyUnique(value, index, self) {
+exports.prepareServerUrl = prepareServerUrl;
+function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
-export function handleResponse(res) {
+exports.onlyUnique = onlyUnique;
+function handleResponse(res) {
     res = flat2recursive(res);
     if (res.redirect)
         handleResponseRedirect(res);
     else if (res.message)
-        notify(res.message, LogType.Info);
+        notify(res.message, types_2.LogType.Info);
     else if (res.form) {
-        glob.form = res.form;
-        document.title = glob.form.title;
-        glob.headFuncs = [];
-        vueResetFormData(glob.form);
+        exports.glob.form = res.form;
+        document.title = exports.glob.form.title;
+        exports.glob.headFuncs = [];
+        vueResetFormData(exports.glob.form);
         $('.details-view').scrollTop(0);
     }
     else {
-        notify("WHAT should I do now?", LogType.Warning);
+        notify("WHAT should I do now?", types_2.LogType.Warning);
         console.log(res);
     }
 }
-export function setPropTextValue(prop, data, val) {
-    let locale = getQs('e') || 'en';
-    let oldValue = data[prop.name];
+exports.handleResponse = handleResponse;
+function setPropTextValue(prop, data, val) {
+    var locale = getQs('e') || 'en';
+    var oldValue = data[prop.name];
     if (prop.text && prop.text.multiLanguage) {
         if (locale) {
             if (typeof oldValue == 'string')
@@ -191,79 +210,89 @@ export function setPropTextValue(prop, data, val) {
     else
         data[prop.name] = val;
 }
-export function getPropTextValue(meta, data) {
+exports.setPropTextValue = setPropTextValue;
+function getPropTextValue(meta, data) {
     if (meta.formula)
         return evalExpression(this.doc, meta.formula);
     if (!data)
         throw 'prop-text doc is null!';
-    let val = data[meta.name];
+    var val = data[meta.name];
     if (val && typeof val == 'object') {
-        let locale = getQs('e') || 'en';
+        var locale = getQs('e') || 'en';
         return val[locale];
     }
     else
         return val;
 }
-export function getPropReferenceValue(meta, data) {
+exports.getPropTextValue = getPropTextValue;
+function getPropReferenceValue(meta, data) {
     if (!data)
         return '';
-    let val = data[meta.name];
+    var val = data[meta.name];
     if (!val)
         return '';
     if (meta.isList) {
         if (!Array.isArray(val))
             val = [val];
-        let values = [];
-        for (const valItem of val) {
-            let item = meta._.items.find(i => i.ref == valItem);
+        var values = [];
+        var _loop_3 = function (valItem) {
+            var item = meta._.items.find(function (i) { return i.ref == valItem; });
             if (!item)
                 values.push('...');
             else
                 values.push(item.title);
+        };
+        for (var _i = 0, val_1 = val; _i < val_1.length; _i++) {
+            var valItem = val_1[_i];
+            _loop_3(valItem);
         }
         return values.join(', ');
     }
     else {
-        let item = meta._.items.find(i => i.ref == val);
+        var item = meta._.items.find(function (i) { return i.ref == val; });
         if (!item)
             return '...';
         return item.title;
     }
 }
+exports.getPropReferenceValue = getPropReferenceValue;
 function refresh() {
-    glob.dirty = false;
+    exports.glob.dirty = false;
     location.reload();
 }
-export function handleResponseRedirect(res) {
-    if (res.redirect == Constants.redirectBack) {
+function handleResponseRedirect(res) {
+    if (res.redirect == types_1.Constants.redirectBack) {
         window.history.back();
     }
-    else if (res.redirect == Constants.redirectSelf) {
+    else if (res.redirect == types_1.Constants.redirectSelf) {
         refresh();
     }
     else if (!$.isEmptyObject(res.data)) {
-        let form = '';
+        var form_1 = '';
         $.each(res.data, function (key, value) {
-            form += '<input type="hidden" name="' + key + '" value="' + value + '">';
+            form_1 += '<input type="hidden" name="' + key + '" value="' + value + '">';
         });
-        $('<form action="' + res.redirect + '" method="POST">' + form + '</form>').appendTo('body').submit();
+        $('<form action="' + res.redirect + '" method="POST">' + form_1 + '</form>').appendTo('body').submit();
     }
     else {
         window.open(res.redirect, '_self'); // res.newWindow ? '_blank' : '_self'
     }
 }
-export function isRtl() {
+exports.handleResponseRedirect = handleResponseRedirect;
+function isRtl() {
     return $('body').attr('dir') == 'rtl';
 }
-export function showCmenu(state, items, event, handler) {
+exports.isRtl = isRtl;
+function showCmenu(state, items, event, handler) {
     if (!items || items.length == 0) {
         hideCmenu();
         return;
     }
-    for (const item of items) {
+    for (var _i = 0, items_1 = items; _i < items_1.length; _i++) {
+        var item = items_1[_i];
         item.hover = item.hover || false;
     }
-    if (!items.find(i => i.hover)) {
+    if (!items.find(function (i) { return i.hover; })) {
         if (!items[0].title) {
             items[0].hover = false;
             items[1].hover = true;
@@ -272,66 +301,70 @@ export function showCmenu(state, items, event, handler) {
             items[0].hover = true;
         }
     }
-    glob.cmenu = { show: true, items, handler, state, top: 0, left: 0, right: 0, bottom: 0, event };
+    exports.glob.cmenu = { show: true, items: items, handler: handler, state: state, top: 0, left: 0, right: 0, bottom: 0, event: event };
 }
-export function hideCmenu() {
-    glob.cmenu.show = false;
+exports.showCmenu = showCmenu;
+function hideCmenu() {
+    exports.glob.cmenu.show = false;
 }
+exports.hideCmenu = hideCmenu;
 function handleCmenuKeys(e) {
     switch (e.which) {
-        case Keys.tab:
-        case Keys.esc:
-            glob.cmenu.handler(glob.cmenu.state, null);
+        case types_2.Keys.tab:
+        case types_2.Keys.esc:
+            exports.glob.cmenu.handler(exports.glob.cmenu.state, null);
             hideCmenu();
             break;
-        case Keys.enter: {
-            let item = glob.cmenu.items.find(i => i.hover);
+        case types_2.Keys.enter: {
+            var item = exports.glob.cmenu.items.find(function (i) { return i.hover; });
             if (item) {
-                glob.cmenu.handler(glob.cmenu.state, item);
+                exports.glob.cmenu.handler(exports.glob.cmenu.state, item);
                 hideCmenu();
             }
             break;
         }
-        case Keys.down: {
-            let item = glob.cmenu.items.find(i => i.hover);
+        case types_2.Keys.down: {
+            var item = exports.glob.cmenu.items.find(function (i) { return i.hover; });
             if (!item) {
-                glob.cmenu.items[0].hover = true;
+                exports.glob.cmenu.items[0].hover = true;
             }
             else {
-                let index = glob.cmenu.items.indexOf(item);
-                if (index < glob.cmenu.items.length - 1) {
-                    glob.cmenu.items[index].hover = false;
-                    glob.cmenu.items[index + 1].hover = true;
+                var index = exports.glob.cmenu.items.indexOf(item);
+                if (index < exports.glob.cmenu.items.length - 1) {
+                    exports.glob.cmenu.items[index].hover = false;
+                    exports.glob.cmenu.items[index + 1].hover = true;
                 }
             }
             break;
         }
-        case Keys.up: {
-            let item = glob.cmenu.items.find(i => i.hover);
+        case types_2.Keys.up: {
+            var item = exports.glob.cmenu.items.find(function (i) { return i.hover; });
             if (!item) {
-                glob.cmenu.items[glob.cmenu.items.length - 1].hover = true;
+                exports.glob.cmenu.items[exports.glob.cmenu.items.length - 1].hover = true;
             }
             else {
-                let index = glob.cmenu.items.indexOf(item);
+                var index = exports.glob.cmenu.items.indexOf(item);
                 if (index > 0) {
-                    glob.cmenu.items[index].hover = false;
-                    glob.cmenu.items[index - 1].hover = true;
+                    exports.glob.cmenu.items[index].hover = false;
+                    exports.glob.cmenu.items[index - 1].hover = true;
                 }
             }
             break;
         }
     }
 }
-export function changeLocale(locale) {
+function changeLocale(locale) {
     location.href = setQs('e', locale, true);
 }
-export function getQs(key) {
-    let search = location.search;
-    let query = new URLSearchParams(search);
+exports.changeLocale = changeLocale;
+function getQs(key) {
+    var search = location.search;
+    var query = new URLSearchParams(search);
     return query.get(key);
 }
-export function setQs(key, value, fullPath, href) {
-    let search, el;
+exports.getQs = getQs;
+function setQs(key, value, fullPath, href) {
+    var search, el;
     if (href) {
         el = document.createElement('a');
         el.href = href;
@@ -340,7 +373,7 @@ export function setQs(key, value, fullPath, href) {
     else {
         search = location.search;
     }
-    let query = new URLSearchParams(search);
+    var query = new URLSearchParams(search);
     if (value == null) {
         query.delete(key);
     }
@@ -354,44 +387,50 @@ export function setQs(key, value, fullPath, href) {
         return fullPath ? (location.pathname + '?' + query) : query.toString();
     }
 }
-export function checkPropDependencyOnChange(dec, prop, instance) {
-    let dependents = dec.properties.filter(p => p.dependsOn == prop.name);
-    for (const prop of dependents) {
-        instance[prop.name] = null;
-        if (prop._.items) {
-            prop._.items = null;
-            let data = { prop, instance };
-            ajax('/getPropertyReferenceValues', data, null, res => prop._.items = res.data, err => notify(err));
+exports.setQs = setQs;
+function checkPropDependencyOnChange(dec, prop, instance) {
+    var dependents = dec.properties.filter(function (p) { return p.dependsOn == prop.name; });
+    var _loop_4 = function (prop_1) {
+        instance[prop_1.name] = null;
+        if (prop_1._.items) {
+            prop_1._.items = null;
+            var data = { prop: prop_1, instance: instance };
+            ajax('/getPropertyReferenceValues', data, null, function (res) { return prop_1._.items = res.data; }, function (err) { return notify(err); });
         }
+    };
+    for (var _i = 0, dependents_1 = dependents; _i < dependents_1.length; _i++) {
+        var prop_1 = dependents_1[_i];
+        _loop_4(prop_1);
     }
 }
+exports.checkPropDependencyOnChange = checkPropDependencyOnChange;
 function parse(str) {
     if (!str)
         return null;
-    let flatJson = JSON.parse(str);
+    var flatJson = JSON.parse(str);
     return flat2recursive(flatJson);
 }
-export function flat2recursive(flatJson) {
-    let keys = {};
-    const findKeys = obj => {
+function flat2recursive(flatJson) {
+    var keys = {};
+    var findKeys = function (obj) {
         if (obj && obj._0) {
             keys[obj._0] = obj;
             delete obj._0;
         }
-        for (const key in obj) {
+        for (var key in obj) {
             if (typeof obj[key] === 'object') {
                 findKeys(obj[key]);
             }
         }
     };
-    const seen = new WeakSet();
-    const replaceRef = obj => {
+    var seen = new WeakSet();
+    var replaceRef = function (obj) {
         if (seen.has(obj)) {
             return;
         }
         seen.add(obj);
-        for (const key in obj) {
-            let val = obj[key];
+        for (var key in obj) {
+            var val = obj[key];
             if (!val) {
                 continue;
             }
@@ -411,46 +450,57 @@ export function flat2recursive(flatJson) {
     replaceRef(flatJson);
     return flatJson;
 }
-export function browseFile(fileBrowsed) {
-    glob.fileGallery.fileBrowsed = fileBrowsed;
+exports.flat2recursive = flat2recursive;
+function browseFile(fileBrowsed) {
+    exports.glob.fileGallery.fileBrowsed = fileBrowsed;
     $('#file-browse').val('').click();
 }
-export function refreshFileGallery(file, done) {
-    openFileGallery(glob.fileGallery.drive, file, glob.fileGallery.path, glob.fileGallery.fixedPath, glob.fileGallery.fileSelectCallback, done);
+exports.browseFile = browseFile;
+function refreshFileGallery(file, done) {
+    openFileGallery(exports.glob.fileGallery.drive, file, exports.glob.fileGallery.path, exports.glob.fileGallery.fixedPath, exports.glob.fileGallery.fileSelectCallback, done);
 }
-export function openFileGallery(drive, file, path, fixedPath, fileSelectCallback, done) {
-    glob.fileGallery = {
+exports.refreshFileGallery = refreshFileGallery;
+function openFileGallery(drive, file, path, fixedPath, fileSelectCallback, done) {
+    exports.glob.fileGallery = {
         list: [],
         loading: true,
-        drive,
-        file,
+        drive: drive,
+        file: file,
         path: path || '',
-        fixedPath,
+        fixedPath: fixedPath,
         selectable: true,
         fileSelectCallback: fileSelectCallback
     };
     $('#file-gallery').modal('show');
-    ajax('/getFileGallery?m=1', { drive: drive._id, path }, {}, res => {
-        glob.fileGallery.loading = false;
-        glob.fileGallery.uri = res.data.uri;
-        glob.fileGallery.list = res.data.list;
-        glob.fileGallery.selected = glob.fileGallery.list.find(l => l.name === glob.fileGallery.file);
+    ajax('/getFileGallery?m=1', { drive: drive._id, path: path }, {}, function (res) {
+        exports.glob.fileGallery.loading = false;
+        exports.glob.fileGallery.uri = res.data.uri;
+        exports.glob.fileGallery.list = res.data.list;
+        exports.glob.fileGallery.selected = exports.glob.fileGallery.list.find(function (l) { return l.name === exports.glob.fileGallery.file; });
         if (done) {
             done();
         }
     });
 }
-export function component(name, props, params) {
+exports.openFileGallery = openFileGallery;
+function component(name, props, params) {
     params.props = props;
-    Vue.component(name, params);
+    vue_1.default.component(name, params);
 }
-export function log(...message) {
+exports.component = component;
+function log() {
+    var message = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        message[_i] = arguments[_i];
+    }
     console.log(message);
 }
-export function invoke(pack, name, args) {
+exports.log = log;
+function invoke(pack, name, args) {
     return false;
 }
-export function toFriendlyFileSizeString(size) {
+exports.invoke = invoke;
+function toFriendlyFileSizeString(size) {
     if (size < 1024) {
         return size + ' B';
     }
@@ -461,33 +511,42 @@ export function toFriendlyFileSizeString(size) {
         return (size / 1024 / 1024).toFixed(1) + ' MB';
     }
 }
-export function joinUri(...parts) {
-    let uri = '';
-    for (const part of parts) {
+exports.toFriendlyFileSizeString = toFriendlyFileSizeString;
+function joinUri() {
+    var parts = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        parts[_i] = arguments[_i];
+    }
+    var uri = '';
+    for (var _a = 0, parts_1 = parts; _a < parts_1.length; _a++) {
+        var part = parts_1[_a];
         uri += '/' + (part || '').replace(/^\//, '').replace(/\/$/, '');
     }
     return uri.substr(1);
 }
-export function notify(content, type, params) {
+exports.joinUri = joinUri;
+function notify(content, type, params) {
     if (!content) {
         return;
     }
-    const message = typeof content === 'string' ? content : content.message;
+    var message = typeof content === 'string' ? content : content.message;
     if (!type) {
         if (typeof content !== 'string') {
-            type = content.code && content.code !== StatusCode.Ok ? LogType.Error : LogType.Info;
+            type = content.code && content.code !== types_2.StatusCode.Ok ? types_2.LogType.Error : types_2.LogType.Info;
         }
         else {
-            type = LogType.Info;
+            type = types_2.LogType.Info;
         }
     }
-    window.dispatchEvent(new CustomEvent(Constants.notifyEvent, { detail: { message, type } }));
+    window.dispatchEvent(new CustomEvent(types_1.Constants.notifyEvent, { detail: { message: message, type: type } }));
 }
-export function question(questionId, message, options, select) {
-    window.dispatchEvent(new CustomEvent(Constants.questionEvent, { detail: { questionId, message, options, select } }));
+exports.notify = notify;
+function question(questionId, message, options, select) {
+    window.dispatchEvent(new CustomEvent(types_1.Constants.questionEvent, { detail: { questionId: questionId, message: message, options: options, select: select } }));
     $('#question-box').modal('show');
 }
-export function getBsonId(item) {
+exports.question = question;
+function getBsonId(item) {
     if (!item) {
         throw 'Item is null';
     }
@@ -500,84 +559,94 @@ export function getBsonId(item) {
         return item._id.$oid;
     }
 }
-export function head_script(src) {
+exports.getBsonId = getBsonId;
+function head_script(src) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
     }
-    const script = document.createElement('script');
+    var script = document.createElement('script');
     script.setAttribute('src', src);
     script.setAttribute('type', 'text/javascript');
     document.head.appendChild(script);
 }
-export function body_script(src) {
+exports.head_script = head_script;
+function body_script(src) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
     }
-    const script = document.createElement('script');
+    var script = document.createElement('script');
     script.setAttribute('src', src);
     script.setAttribute('type', 'text/javascript');
     document.body.appendChild(script);
 }
-export function del_script(src) {
-    const el = document.querySelector('script[src=\'' + src + '\']');
+exports.body_script = body_script;
+function del_script(src) {
+    var el = document.querySelector('script[src=\'' + src + '\']');
     if (el) {
         el.remove();
     }
 }
-export function head_link(href) {
+exports.del_script = del_script;
+function head_link(href) {
     if (document.querySelector('link[href=\'' + href + '\']')) {
         return;
     }
-    const link = document.createElement('link');
+    var link = document.createElement('link');
     link.setAttribute('href', href);
     link.setAttribute('rel', 'stylesheet');
     link.setAttribute('type', 'text/css');
     document.head.appendChild(link);
 }
-export function body_link(href) {
+exports.head_link = head_link;
+function body_link(href) {
     if (document.querySelector('link[href=\'' + href + '\']')) {
         return;
     }
-    const link = document.createElement('link');
+    var link = document.createElement('link');
     link.setAttribute('href', href);
     link.setAttribute('rel', 'stylesheet');
     link.setAttribute('type', 'text/css');
     document.body.appendChild(link);
 }
-export function del_link(href) {
-    const el = document.querySelector('link[href="' + href + '"]');
+exports.body_link = body_link;
+function del_link(href) {
+    var el = document.querySelector('link[href="' + href + '"]');
     if (el) {
         el.remove();
     }
 }
-export function setPropertyEmbeddedError(doc, propName, error) {
-    console.assert(doc, `setPropertyEmbeddedError doc is empty, prop:${propName}!`);
+exports.del_link = del_link;
+function setPropertyEmbeddedError(doc, propName, error) {
+    console.assert(doc, "setPropertyEmbeddedError doc is empty, prop:" + propName + "!");
     doc._ = doc._ || {};
     doc._[propName] = doc._[propName] || {};
     doc._[propName].err = error;
 }
-export function load(href) {
-    if (glob.dirty) {
-        notify($t('save-before'), LogType.Warning);
+exports.setPropertyEmbeddedError = setPropertyEmbeddedError;
+function load(href) {
+    if (exports.glob.dirty) {
+        notify($t('save-before'), types_2.LogType.Warning);
         return;
     }
-    ajax(setQs('m', RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
+    ajax(setQs('m', types_2.RequestMode.inline, false, href), null, null, handleResponse, function (err) { return notify(err); });
 }
-export function ajax(url, data, config, done, fail) {
-    let headers = {};
-    if (glob.config.host) {
-        url = joinUri(glob.config.host, url);
+exports.load = load;
+function ajax(url, data, config, done, fail) {
+    var headers = {};
+    if (exports.glob.config.host) {
+        url = joinUri(exports.glob.config.host, url);
     }
-    let params = { url, data, headers, withCredentials: true };
+    var params = { url: url, data: data, headers: headers, withCredentials: true };
     if (config && config.method) {
         params.method = config.method;
     }
     else {
-        params.method = data ? WebMethod.post : WebMethod.get;
+        params.method = data ? types_2.WebMethod.post : types_2.WebMethod.get;
     }
     if (data && data._files) {
         params.data = new FormData();
-        for (const file of data._files) {
+        for (var _i = 0, _a = data._files; _i < _a.length; _i++) {
+            var file = _a[_i];
             params.data.append('files[]', file, file['name']);
         }
         params.data.append('data', JSON.stringify(data));
@@ -585,8 +654,8 @@ export function ajax(url, data, config, done, fail) {
     }
     fail = fail || notify;
     // console.log(params);
-    axios(params).then(res => {
-        if (res.code && res.code !== StatusCode.Ok) {
+    axios(params).then(function (res) {
+        if (res.code && res.code !== types_2.StatusCode.Ok) {
             fail({ code: res.code, message: res.message });
         }
         else {
@@ -594,12 +663,12 @@ export function ajax(url, data, config, done, fail) {
                 done(res.data);
             }
             catch (ex) {
-                notify(`error on handling ajax response: ${ex.message}`);
+                notify("error on handling ajax response: " + ex.message);
                 console.error(res, ex);
             }
         }
-    }).catch(err => {
-        console.error(`error on ajax '${url}'`, err);
+    }).catch(function (err) {
+        console.error("error on ajax '" + url + "'", err);
         if (err.response && err.response.data && err.response.data.message) {
             fail({ message: err.response.data.message, code: err.response.data.code });
         }
@@ -607,52 +676,52 @@ export function ajax(url, data, config, done, fail) {
             fail({ message: err.response.data, code: err.response.status });
         }
         else {
-            fail({ message: err.toString(), code: StatusCode.UnknownError });
+            fail({ message: err.toString(), code: types_2.StatusCode.UnknownError });
         }
     });
 }
+exports.ajax = ajax;
 function registerComponents() {
-    Vue.component('Function', require("@/components/Function.vue").default);
-    Vue.component('Panel', require("@/components/Panel.vue").default);
-    Vue.component('Modal', require("@/components/Modal.vue").default);
-    Vue.component('Prop', require("@/components/Prop.vue").default);
-    Vue.component('ObjectView', require("@/components/ObjectView.vue").default);
-    Vue.component('GridView', require("@/components/GridView.vue").default);
-    Vue.component('DetailsView', require("@/components/DetailsView.vue").default);
+    vue_1.default.component('Function', require("@/components/Function.vue").default);
+    vue_1.default.component('Panel', require("@/components/Panel.vue").default);
+    vue_1.default.component('Modal', require("@/components/Modal.vue").default);
+    vue_1.default.component('Prop', require("@/components/Prop.vue").default);
+    vue_1.default.component('ObjectView', require("@/components/ObjectView.vue").default);
+    vue_1.default.component('GridView', require("@/components/GridView.vue").default);
+    vue_1.default.component('DetailsView', require("@/components/DetailsView.vue").default);
 }
 function start() {
     console.log('starting ...');
-    const startVue = (res) => {
+    var startVue = function (res) {
         handleResponse(res);
-        glob.config = res.config;
-        Object.assign(Vue.config, { productionTip: false, devtools: true });
-        Vue.directive('focus', {
-            inserted(el, binding) {
+        exports.glob.config = res.config;
+        Object.assign(vue_1.default.config, { productionTip: false, devtools: true });
+        vue_1.default.directive('focus', {
+            inserted: function (el, binding) {
                 if (binding.value)
                     el.focus();
             }
         });
         registerComponents();
-        Vue['glob'] = Vue.prototype.glob = glob;
-        window['glob'] = glob;
-        new Vue({ data: glob, render: h => h(App) }).$mount('#app');
+        vue_1.default['glob'] = vue_1.default.prototype.glob = exports.glob;
+        window['glob'] = exports.glob;
+        new vue_1.default({ data: exports.glob, render: function (h) { return h(App_vue_1.default); } }).$mount('#app');
     };
-    const mainState = $('#main-state').html();
-    const res = parse(mainState);
+    var mainState = $('#main-state').html();
+    var res = parse(mainState);
     if (res) {
         startVue(res);
     }
     else { // load main-state async
-        let host = "http://localhost";
-        let uri = host + setQs('m', RequestMode.inlineDev, true) + location.hash;
+        var host = "http://localhost";
+        var uri = host + setQs('m', types_2.RequestMode.inlineDev, true) + location.hash;
         console.log(uri);
-        axios.get(uri, { withCredentials: true }).then(res => {
+        axios.get(uri, { withCredentials: true }).then(function (res) {
             if (res.data)
                 startVue(res.data);
             else
                 console.error(res);
-        }).catch(err => console.error(err));
+        }).catch(function (err) { return console.error(err); });
     }
 }
 start();
-//# sourceMappingURL=main.js.map

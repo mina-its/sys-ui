@@ -1,7 +1,7 @@
 <script lang="ts">
     declare let $: any;
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {FunctionDec, LogType, Context, StatusCode, EntityMeta} from "../../../sys/types";
+    import {FunctionDec, LogType, Context, StatusCode, EntityMeta} from "../../../sys/src/types";
     import {glob} from '@/main';
 
     const main = require("@/main");
