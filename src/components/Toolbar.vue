@@ -50,7 +50,7 @@
             if (!done) done = () => {
                 main.log('Apply done!');
             };
-            if (!main.validate()) return done();
+            if (!main.validate(this.$store.state.data)) return done();
 
             if (main.getQs("n") == "true")
                 return main.commitNewItem();

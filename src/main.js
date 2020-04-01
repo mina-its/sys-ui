@@ -6,15 +6,17 @@ let index = {
     "Start Vue            ": startVue,
     // Global
     "Load                 ": load,
+    "Handle Response      ": handleResponse,
 };
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, { Store } from 'vuex';
 import $ from 'jquery';
 import App from './App.vue';
 import { Constants, Global, Modify, StateChangeType } from './types';
 import { Keys, LogType, StatusCode, RequestMode, WebMethod } from '../../sys/src/types';
 const axios = require('axios').default;
 export let glob = new Global();
+let store;
 export function $t(text) {
     return typeof (text) == 'object' ? text[glob.config.locale] || Object.values(text)[0] : text;
     // if (text[pack + "." + key]) return text[pack + "." + key];
@@ -58,8 +60,8 @@ export function evalExpression($this, expression) {
         console.error(`Evaluating '${expression}' failed! this:`, $this, 'Error:', ex.message);
     }
 }
-function vueResetFormData() {
-    if (!glob.form || !glob.form.declarations || !glob.data)
+function vueResetFormData(dataset) {
+    if (!glob.form || !glob.form.declarations || !dataset)
         return;
     const setDataMeta = (item, dec) => {
         item._ = item._ || {};
@@ -67,8 +69,8 @@ function vueResetFormData() {
         meta.dec = dec;
         return meta;
     };
-    for (let ref in glob.data) {
-        let data = glob.data[ref];
+    for (let ref in dataset) {
+        let data = dataset[ref];
         let dec = glob.form.declarations[ref];
         if (!data || !dec)
             continue;
@@ -129,15 +131,15 @@ function validateData(data, ref) {
     }
     return true;
 }
-export function validate() {
-    for (const ref in glob.data) {
-        if (Array.isArray(glob.data[ref])) {
-            for (const item of glob.data[ref]) {
+export function validate(dataset) {
+    for (const ref in dataset) {
+        if (Array.isArray(dataset[ref])) {
+            for (const item of dataset[ref]) {
                 if (!validateData(item, ref))
                     return false;
             }
         }
-        else if (!validateData(glob.data[ref], ref))
+        else if (!validateData(dataset[ref], ref))
             return false;
     }
     return true;
@@ -179,16 +181,18 @@ export function onlyUnique(value, index, self) {
 }
 export function handleResponse(res) {
     res = flat2recursive(res);
+    if (res.config)
+        glob.config = res.config;
     if (res.redirect)
         handleResponseRedirect(res);
     else if (res.message)
         notify(res.message, LogType.Info);
     else if (res.form) {
-        glob.data = res.data;
         glob.form = res.form;
+        vueResetFormData(res.data);
+        store.state.data = res.data;
         document.title = glob.form.title;
         glob.headFuncs = [];
-        vueResetFormData();
         $('.details-view').scrollTop(0);
     }
     else {
@@ -710,13 +714,9 @@ function _dispatchStoreModify(store, change) {
     commitStoreChange(store, change);
 }
 function createStore() {
-    return new Vuex.Store({
-        state: { data: glob.data },
+    return new Store({
         mutations: {
-            _commitStoreChange,
-            updateData(state, data) {
-                state.data = data;
-            }
+            _commitStoreChange
         },
         actions: {
             _dispatchStoreModify
@@ -724,8 +724,9 @@ function createStore() {
     });
 }
 function startVue(res) {
+    Vue.use(Vuex);
+    store = createStore();
     handleResponse(res);
-    glob.config = res.config;
     Object.assign(Vue.config, { productionTip: false, devtools: true });
     Vue.prototype.glob = glob;
     Vue.prototype.$t = $t;
@@ -735,9 +736,7 @@ function startVue(res) {
                 el.focus();
         }
     });
-    Vue.use(Vuex);
     registerComponents();
-    const store = createStore();
     new Vue({ data: glob, store, render: h => h(App) }).$mount('#app');
 }
 function start() {

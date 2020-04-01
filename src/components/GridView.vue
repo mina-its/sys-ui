@@ -72,11 +72,14 @@
         @Prop() private uri: string;
         @Prop() private root: boolean;
         @Prop() private dec: ObjectDec;
-        @Prop() private items: any[];
 
         private ni = -1;
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainCheckState = null;
+
+        get items() {
+            return this.$store.state.data[this.uri] || [];
+        }
 
         changed(e: ItemPropChangedEventArg) {
             main.dispatchStoreModify(this, {

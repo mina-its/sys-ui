@@ -1,7 +1,8 @@
+import {ElemType} from "../../../sys/src/types";
 <script lang="ts">
-    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {ObjectViewType, Property, GlobalType, EmbeddedInfo} from "../../../sys/src/types";
-    import {PropChangedEventArg, PropertyLabelMode, StateChangeType, ItemPropChangedEventArg} from '@/types';
+    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+    import {Elem, EmbeddedInfo, GlobalType, ObjectViewType, Property, ElemType} from "../../../sys/src/types";
+    import {ItemPropChangedEventArg, PropChangedEventArg, PropertyLabelMode} from '@/types';
     import PropBoolean from "@/components/PropBoolean.vue";
     import PropFile from "@/components/PropFile.vue";
     import PropLink from "@/components/PropLink.vue";
@@ -80,15 +81,17 @@
             let valueClass = `prop-value border mx-2`;
             if (this.prop._.gtype == GlobalType.object && !this.prop.documentView) {
                 return ce('object-view', {
-                    props: {root: false, elem: {obj: {uri: this.prop._.ref, root: false}}},
+                    props: {
+                        root: false,
+                        elem: {type: ElemType.Object, obj: {ref: this.prop._.ref}} as Elem
+                    },
                 });
             }
 
             let vl = this.renderValue(ce, valueClass);
             let embed: EmbeddedInfo = this.item && this.item._ && this.item._[this.prop.name];
             let msg = null;
-            if (embed)
-                msg = ce('prop-message', {props: {"message": embed.err}});
+            if (embed) msg = ce('prop-message', {props: {message: embed.err}});
             let cmt = this.prop.comment ? ce('div', {attrs: {"class": "prop-comment p-4 mt-3"}}, this.prop.comment) : null;
             let title = this.prop.title || this.prop.name;
             let lbl = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top"}}, title);

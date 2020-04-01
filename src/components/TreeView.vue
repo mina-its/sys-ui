@@ -30,7 +30,7 @@
         };
 
         mounted() {
-            let data = glob.data[this.uri];
+            let data = this.$store.state.data[this.uri];
             let dec = main.getDec(data);
             let props = dec.properties as Property[];
             let node = this.createNode(data, props);

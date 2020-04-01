@@ -130,7 +130,7 @@
         }
 
         get item() {
-            return glob.data[this.uri];
+            return this.$store.state.data[this.uri];
         }
 
         get groups() {

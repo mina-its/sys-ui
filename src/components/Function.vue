@@ -59,7 +59,7 @@
         click(e) {
             this.showProgress = true;
             if (this.$listeners && this.$listeners.exec) {
-                let cn: Context = {event: e, name: this.name, data: glob.data} as Context;
+                let cn: Context = {event: e, name: this.name, data: this.$store.state.data} as Context;
                 try {
                     this.$emit('exec', cn, () => {
                         this.showProgress = false;
@@ -87,7 +87,6 @@
                         setTimeout(() => {
                             main.handleResponse(res);
                         }, 100);
-                        //_.extend(glob.data, res.data);
                     }
                 }, (err) => {
                     this.showProgress = false;

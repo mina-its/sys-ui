@@ -173,7 +173,6 @@ export class ApiDoc {
 
 export class Global {
     form: FormDto;
-    data: any;
     question = new AppStateQuestion();
     fileGallery = new AppStateFileGallery();
     logs: AppStateLog[];

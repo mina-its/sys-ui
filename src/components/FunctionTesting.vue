@@ -47,16 +47,16 @@
 		// }
 
 		functionTest(x, y) {
-			const data = glob.data["functionTest"];
-			this.message = "Running ...";
-			main.ajax("/functionTest", data, null, (res) => {
-				if (res.message)
-					this.message = res.message;
-				else
-					this.message = "Done!";
-			}, (err) => {
-				main.notify(err);
-			});
+			// const data = glob.data["functionTest"];
+			// this.message = "Running ...";
+			// main.ajax("/functionTest", data, null, (res) => {
+			// 	if (res.message)
+			// 		this.message = res.message;
+			// 	else
+			// 		this.message = "Done!";
+			// }, (err) => {
+			// 	main.notify(err);
+			// });
 		}
 	}
 </script>

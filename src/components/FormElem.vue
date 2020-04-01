@@ -22,7 +22,7 @@
                 case ElemType.Function: {
                     console.assert(this.elem.func.ref, `ref is expected for the function:`, this.elem.func);
                     let ref = this.elem.func.ref as string;
-                    let data = glob.data[ref];
+                    let data = this.$store.state.data[ref];
                     let dec = main.getDec(data) as FunctionDec;
                     if (!dec) throw `meta  not found for func ref '${ref}'`;
 
@@ -39,7 +39,7 @@
                 }
 
                 case ElemType.Property: {
-                    let item = glob.data[this.elem.property.entityRef];
+                    let item = this.$store.state.data[this.elem.property.entityRef];
                     let dec = main.getDec(item);
                     if (!dec) throw `property elem: meta not found for ref '${this.elem.property.entityRef}'`;
 
@@ -78,11 +78,11 @@
                 case ElemType.Component:
                     let data, props = this.elem.component.props;
                     if (this.elem.component._ref)
-                        data = glob.data[this.elem.component._ref];
+                        data = this.$store.state.data[this.elem.component._ref];
                     return ce(this.elem.component.name, {props: {data, ...props}});
 
                 case ElemType.Chart:
-                    return ce('chart', {props: {data: glob.data['tests']}});
+                    return ce('chart', {props: {data: this.$store.state.data['tests']}});
             }
         }
     }

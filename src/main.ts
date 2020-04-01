@@ -7,11 +7,12 @@ let index = {
 
     // Global
     "Load                 ": load,
+    "Handle Response      ": handleResponse,
 };
 
 
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, {Store} from 'vuex';
 import $ from 'jquery';
 import App from './App.vue';
 import {MenuItem, Constants, Global, Modify, StateChange, StateChangeType} from './types';
@@ -39,6 +40,7 @@ import {
 
 const axios = require('axios').default;
 export let glob = new Global();
+let store: Store<{ data: any }>;
 
 export function $t(text: string): string {
     return typeof (text) == 'object' ? text[glob.config.locale] || Object.values(text)[0] as string : text;
@@ -86,8 +88,8 @@ export function evalExpression($this: any, expression: string): any {
     }
 }
 
-function vueResetFormData() {
-    if (!glob.form || !glob.form.declarations || !glob.data) return;
+function vueResetFormData(dataset) {
+    if (!glob.form || !glob.form.declarations || !dataset) return;
 
     const setDataMeta = (item, dec) => {
         item._ = item._ || {};
@@ -96,8 +98,8 @@ function vueResetFormData() {
         return meta;
     };
 
-    for (let ref in glob.data) {
-        let data = glob.data[ref];
+    for (let ref in dataset) {
+        let data = dataset[ref];
         let dec = glob.form.declarations[ref];
         if (!data || !dec)
             continue;
@@ -165,13 +167,13 @@ function validateData(data: any, ref: string): boolean {
     return true;
 }
 
-export function validate(): boolean {
-    for (const ref in glob.data) {
-        if (Array.isArray(glob.data[ref])) {
-            for (const item of glob.data[ref]) {
+export function validate(dataset: any): boolean {
+    for (const ref in dataset) {
+        if (Array.isArray(dataset[ref])) {
+            for (const item of dataset[ref]) {
                 if (!validateData(item, ref)) return false;
             }
-        } else if (!validateData(glob.data[ref], ref)) return false;
+        } else if (!validateData(dataset[ref], ref)) return false;
     }
     return true;
 }
@@ -217,16 +219,20 @@ export function onlyUnique(value, index, self) {
 
 export function handleResponse(res: WebResponse) {
     res = flat2recursive(res);
+
+    if (res.config)
+        glob.config = res.config;
+
     if (res.redirect)
         handleResponseRedirect(res);
     else if (res.message)
         notify(res.message, LogType.Info);
     else if (res.form) {
-        glob.data = res.data;
         glob.form = res.form;
+        vueResetFormData(res.data);
+        store.state.data = res.data;
         document.title = glob.form.title as string;
         glob.headFuncs = [];
-        vueResetFormData();
         $('.details-view').scrollTop(0);
     } else {
         notify("WHAT should I do now?", LogType.Warning);
@@ -786,13 +792,9 @@ function _dispatchStoreModify(store, change: StateChange) {
 }
 
 function createStore() {
-    return new Vuex.Store({
-        state: {data: glob.data},
+    return new Store({
         mutations: {
-            _commitStoreChange,
-            updateData(state, data) {
-                state.data = data;
-            }
+            _commitStoreChange
         },
         actions: {
             _dispatchStoreModify
@@ -801,8 +803,10 @@ function createStore() {
 }
 
 function startVue(res: WebResponse) {
+    Vue.use(Vuex);
+    store = createStore();
+
     handleResponse(res);
-    glob.config = res.config;
 
     Object.assign(Vue.config, {productionTip: false, devtools: true});
     Vue.prototype.glob = glob;
@@ -812,10 +816,8 @@ function startVue(res: WebResponse) {
             if (binding.value) el.focus();
         }
     });
-    Vue.use(Vuex);
 
     registerComponents();
-    const store = createStore();
     new Vue({data: glob, store, render: h => h(App)}).$mount('#app');
 }
 

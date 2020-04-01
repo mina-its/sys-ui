@@ -17,16 +17,17 @@
                 return;
             }
 
-            let data = glob.data[e.obj.ref];
-            if (!data) data = glob.data[e.obj.ref] = {};
+            let data = this.$store.state.data[e.obj.ref];
+            // if (!data) data = this.$store.state.data[e.obj.ref] = {};
             const dec = glob.form.declarations[e.obj.ref];
+            if (!dec) throw `dec is empty for ref '${e.obj.ref}'`;
             glob.form.toolbar = true;
             let rt = this.root == null ? true : this.root;
             if (e.obj && e.obj.type == ObjectViewType.TreeView)
                 return ce('tree-view', {props: {uri: e.obj.ref}});
             else
                 return Array.isArray(data) ?
-                    ce('grid-view', {props: {uri: e.obj.ref, root: rt, dec, items: data}}) :
+                    ce('grid-view', {props: {uri: e.obj.ref, root: rt, dec}}) :
                     ce('details-view', {props: {uri: e.obj.ref, root: rt, dec}});
         }
     }
