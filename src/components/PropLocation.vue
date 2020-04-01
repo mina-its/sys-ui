@@ -4,39 +4,41 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property} from "../../../sys/src/types";
-	import {glob} from "@/main";
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {Property} from "../../../sys/src/types";
+    import {glob} from "@/main";
+    import {PropChangedEventArg} from "@/types";
 
-	const main = require("@/main");
+    const main = require("@/main");
 
-	@Component
-	export default class PropLocation extends Vue {
-		@Prop() private prop: Property;
-		@Prop() private doc: any;
+    @Component
+    export default class PropLocation extends Vue {
+        @Prop() private prop: Property;
+        @Prop() private doc: any;
 
-		changed() {
-			this.$emit("changed", this.prop, this.value);
-		}
+        @Emit('changed')
+        changed(): PropChangedEventArg {
+            return {prop: this.prop, val: this.value};
+        }
 
-		changing() {
-			let doc = this.doc;
-			let changed = this.changed;
-			glob.geoMap = {
-				show: true,
-				val: this.value,
-				select: function (value) {
-					doc[this.prop.name] = value;
-					console.log(doc);
-					changed();
-				}
-			};
-		}
+        changing() {
+            let doc = this.doc;
+            let changed = this.changed;
+            glob.geoMap = {
+                show: true,
+                val: this.value,
+                select: function (value) {
+                    doc[this.prop.name] = value;
+                    console.log(doc);
+                    changed();
+                }
+            };
+        }
 
-		get value() {
-			return this.doc[this.prop.name];
-		}
-	}
+        get value() {
+            return this.doc[this.prop.name];
+        }
+    }
 </script>
 
 <style scoped lang="scss">

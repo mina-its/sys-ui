@@ -6,7 +6,7 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb pt-2 p-0 m-0 bg-transparent">
                             <li v-for="item in breadcrumb" class="breadcrumb-item">
-                                <a @click="browse(item.ref)" href="#">{{item.title}}</a>
+                                <a @click="browse(item.uri)" href="#">{{item.title}}</a>
                                 <i class="fa fa-chevron-right ml-1"></i>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">{{current}}</li>
@@ -112,10 +112,10 @@
                         case "remove":
                             main.question(null, `### Delete Confirm\n\nAre you sure you want to delete the file '${item.name}'`, [{
                                 title: "YES",
-                                ref: YesNo.Yes
+                                uri: YesNo.Yes
                             }, {
                                 title: "NO",
-                                ref: YesNo.No
+                                uri: YesNo.No
                             }], (option: Pair) => {
                                 if (!option || option.ref == YesNo.No) return;
                                 main.ajax("/deleteFromFileGallery?m=1", {
@@ -242,13 +242,10 @@
         }
 
         get breadcrumb() {
-            if (glob.fileGallery.fixedPath)
-                return [];
+            if (glob.fileGallery.fixedPath) return [];
             let parts = glob.fileGallery.path.split("/").filter(el => el);
             let result: Pair[] = [];
-            parts.forEach((part, i) => {
-                result.push({title: part, ref: ""});
-            });
+            parts.forEach((part, i) => result.push({title: part, ref: ""}));
 
             if (result.length > 0)
                 result.unshift({title: main.getText(glob.fileGallery.drive.title), ref: ""});

@@ -24,94 +24,94 @@
 </template>
 
 <script lang="ts">
-	declare let $: any;
-	import Function from "@/components/Function.vue";
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {prepareServerUrl, $t, flat2recursive, glob} from "@/main";
-	import {Keys, WebMethod, LogType} from '../../../sys/src/types';
+    import Function from "@/components/Function.vue";
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {prepareServerUrl, $t, flat2recursive, glob} from "@/main";
+    import {Keys, WebMethod, LogType} from '../../../sys/src/types';
 
-	const main = require("@/main");
+    const $ = require('jquery');
+    const main = require("@/main");
 
-	@Component({components: {Function}})
-	export default class Toolbar extends Vue {
-		@Prop() private alwaysVisible: boolean;
+    @Component({components: {Function}})
+    export default class Toolbar extends Vue {
+        @Prop() private alwaysVisible: boolean;
 
-		mounted() {
-			$(window).on("keydown", (e) => {
-				if (e.ctrlKey && e.which == Keys.s) {
-					this.apply();
-					return false;
-				}
-			});
-		}
+        mounted() {
+            $(window).on("keydown", (e) => {
+                if (e.ctrlKey && e.which == Keys.s) {
+                    this.apply();
+                    return false;
+                }
+            });
+        }
 
-		apply(cn?, done?) {
-			main.updateStateRoot({notify: null});
-			if (!done) done = () => {
-				main.log('Apply done!');
-			};
-			if (!main.validate()) return done();
+        apply(cn?, done?) {
+            main.updateStateRoot({notify: null});
+            if (!done) done = () => {
+                main.log('Apply done!');
+            };
+            if (!main.validate()) return done();
 
-			if (main.getQs("n") == "true")
-				return main.commitNewItem();
+            if (main.getQs("n") == "true")
+                return main.commitNewItem();
 
-			this.commitModify(done);
-		}
+            this.commitModify(done);
+        }
 
-		cancel() {
-			glob.dirty = false;
-			if (main.getQs("n") == "true")
-				location.href = location.pathname;
-			else
-				location.reload();
-		}
+        cancel() {
+            glob.dirty = false;
+            if (main.getQs("n") == "true")
+                location.href = location.pathname;
+            else
+                location.reload();
+        }
 
-		clickTitlePin() {
-			console.log('clickTitlePin');
-		}
+        clickTitlePin() {
+            console.log('clickTitlePin');
+        }
 
-		commitModify(done?) {
-			if (glob.modifies.length == 0) {
-				main.notify($t('saved'), LogType.Debug);
-				glob.dirty = false;
-				return done();
-			}
+        commitModify(done?) {
+            if (glob.modifies.length == 0) {
+                main.notify($t('saved'), LogType.Debug);
+                glob.dirty = false;
+                return done();
+            }
 
-			let modify = glob.modifies.pop();
-			//main.log(modify.type, modify.ref, modify.data);
-			main.ajax(prepareServerUrl(modify.ref), modify.data, {method: modify.type}, (res) => {
-				res.data = flat2recursive(res.data);
+            let modify = glob.modifies.pop();
+            //main.log(modify.type, modify.ref, modify.data);
+            main.ajax(prepareServerUrl(modify.ref), modify.data, {method: modify.type}, (res) => {
+                res.data = flat2recursive(res.data);
 
-				if (modify.type === WebMethod.post || modify.type == WebMethod.patch)
-					Object.assign(modify.data, res.data);
+                if (modify.type === WebMethod.post || modify.type == WebMethod.patch)
+                    Object.assign(modify.data, res.data);
 
-				if (res.redirect && glob.modifies.length == 0)
-					return main.handleResponseRedirect(res);
-				else
-					this.commitModify(done);
-			}, (err) => {
-				done(err);
-				main.notify(err);
-			});
-		}
+                if (res.redirect && glob.modifies.length == 0)
+                    return main.handleResponseRedirect(res);
+                else
+                    this.commitModify(done);
+            }, (err) => {
+                done(err);
+                main.notify(err);
+            });
+        }
 
-		// submitFile(modify: Modify, done) {
-		// 	let files = [modify.file];
-		// 	let modifies = glob.md.filter(md => md.ref == modify.ref);
-		// 	for (const mod of modifies) {
-		// 		files.push(mod.file);
-		// 	}
-		// 	glob.md = glob.md.filter(mod => mod.ref != modify.ref);
-		// 	main.ajax(setQs('m', RequestMode.partial, false, "/" + modify.ref), modify.data, {files}, (res) => {
-		// 		let propName = modify.ref.replace(/^.+\/(\w+)$/, "$1");
-		// 		glob.od[modify.rootRef][propName] = glob.data[modify.rootRef][propName] = flat2recursive(res.data);
-		// 		this.commitModify(done);
-		// 	}, (err) => {
-		// 		done(err);
-		// 		main.notify(err);
-		// 	});
-		// }
-	}
+        // submitFile(modify: Modify, done) {
+        // 	let files = [modify.file];
+        // 	let modifies = glob.md.filter(md => md.ref == modify.ref);
+        // 	for (const mod of modifies) {
+        // 		files.push(mod.file);
+        // 	}
+        // 	glob.md = glob.md.filter(mod => mod.ref != modify.ref);
+        // 	main.ajax(setQs('m', RequestMode.partial, false, "/" + modify.ref), modify.data, {files}, (res) => {
+        // 		let propName = modify.ref.replace(/^.+\/(\w+)$/, "$1");
+        // 		glob.od[modify.rootRef][propName] = glob.data[modify.rootRef][propName] = flat2recursive(res.data);
+        // 		this.commitModify(done);
+        // 	}, (err) => {
+        // 		done(err);
+        // 		main.notify(err);
+        // 	});
+        // }
+    }
 </script>
 
 <style scoped lang="scss">

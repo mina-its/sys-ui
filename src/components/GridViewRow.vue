@@ -1,7 +1,7 @@
 <template>
-    <tr :class="item._status?'selected':''" @click="click">
+    <tr :class="{selected: meta.marked}" @click="click">
         <td v-if="selectable" class="text-center"><input type="checkbox" v-model="status" @change="updateStatus()"></td>
-        <td v-else @click="headerClick(item, $event)" class="text-center"></td>
+        <td v-else @click="headerClick" class="text-center"></td>
         <td v-for="(pMeta, index) in dec.properties">
             <Prop @focus="focused($event)" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
                   :viewType="1" :indexInGrid="index"></Prop>
@@ -13,6 +13,7 @@
     declare let $: any;
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {ObjectDec, Property, EntityMeta} from "../../../sys/src/types";
+    import {ItemPropChangedEventArg} from '@/types';
 
     const main = require('../main');
 
@@ -27,26 +28,28 @@
             $(e.target).closest("td").addClass("prop-focused");
         }
 
-        @Emit()
-        changed(prop: Property, val) {
-            //this.$emit('changed', prop, val);
-            return {prop, val};
+        @Emit('changed')
+        changed(e: ItemPropChangedEventArg): ItemPropChangedEventArg {
+            return e;
         }
 
         updateStatus() {
             this.meta.marked = (event.target as any).checked;
         }
 
-        headerClick(item, $event) {
-            this.$emit('headerClick', item, $event);
+        @Emit('headerClick')
+        headerClick(e) {
+            return {item: this.item, e};
         }
 
+        @Emit('selected')
         click() {
-            this.$emit('selected', this.item);
+            return this.item;
         }
 
+        @Emit('keydown')
         keydown(e, prop) {
-            this.$emit('keydown', e, this.item, prop);
+            return {e, item: this.item, prop};
         }
 
         get meta(): EntityMeta {

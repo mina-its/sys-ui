@@ -21,10 +21,10 @@
 
                 case ElemType.Function: {
                     console.assert(this.elem.func.ref, `ref is expected for the function:`, this.elem.func);
-                    let ref = this.elem.func.ref as any;
+                    let ref = this.elem.func.ref as string;
                     let data = glob.data[ref];
                     let dec = main.getDec(data) as FunctionDec;
-                    if (!dec) throw `meta not found for func ref '${ref}'`;
+                    if (!dec) throw `meta  not found for func ref '${ref}'`;
 
                     let exec = this.elem.func.exec;
                     if (!exec && dec.clientSide) {

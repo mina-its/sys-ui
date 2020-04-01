@@ -16,9 +16,9 @@
                     <a v-if="item.items && item.items.length" href="#" class="nav-link dropdown-toggle"
                        id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">{{item.title}}</a>
                     <div v-if="item.items && item.items.length" class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a v-for="subitem of item.items" class="dropdown-item" :href="subitem.ref">{{subitem.title}}</a>
+                        <a v-for="subitem of item.items" class="dropdown-item" :href="subitem.uri">{{subitem.title}}</a>
                     </div>
-                    <a v-else class="nav-link" :href="item.ref">{{item.title}}</a>
+                    <a v-else class="nav-link" :href="item.uri">{{item.title}}</a>
                 </li>
             </ul>
 

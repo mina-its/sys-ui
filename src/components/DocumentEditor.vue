@@ -3,25 +3,26 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
 
-	@Component
-	export default class DocumentEditor extends Vue {
-		@Prop() private value: string;
+    @Component
+    export default class DocumentEditor extends Vue {
+        @Prop() private value: string;
 
-		mounted() {
-			this.$el.innerHTML = JSON.stringify(this.value);
-		}
+        mounted() {
+            this.$el.innerHTML = JSON.stringify(this.value);
+        }
 
-		updateHTML(e) {
-			try {
-				let val = JSON.parse(e.target.innerHTML);
-				Object.assign(this.value, val);
-			} catch (ex) {
-			}
-			this.$emit('input', e.target.innerHTML);
-		}
-	}
+        @Emit('input')
+        updateHTML(e) {
+            try {
+                let val = JSON.parse(e.target.innerHTML);
+                Object.assign(this.value, val);
+            } catch (ex) {
+            }
+            return {val: e.target.innerHTML};
+        }
+    }
 </script>
 
 <style scoped lang="scss">

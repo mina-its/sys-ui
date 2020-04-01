@@ -4,27 +4,39 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property} from "../../../sys/src/types";
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {Property} from "../../../sys/src/types";
+    import {PropChangedEventArg} from "@/types";
 
-	@Component
-	export default class PropTextMultiline extends Vue {
-		@Prop() private doc: any;
-		@Prop() private prop: Property;
+    @Component
+    export default class PropTextMultiline extends Vue {
+        @Prop() private doc: any;
+        @Prop() private prop: Property;
 
-		update() {
-			let val = (event.target as any).value;
-			if (val === "") val = null;
-			this.doc[this.prop.name] = val;
-			this.$emit("changed", this.prop, this.value);
-		}
+        @Emit('changed')
+        update(): PropChangedEventArg {
+            let val = (event.target as any).value;
+            if (val === "") val = null;
+            this.doc[this.prop.name] = val;
+            return {prop: this.prop, val: this.value};
+        }
 
-		get value() {
-			return this.doc[this.prop.name];
-		}
-	}
+        get value() {
+            return this.doc[this.prop.name];
+        }
+    }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+    .prop-text-multiline {
+        width: 500px;
+        min-height: 150px;
+        resize: both;
+    }
 
+    @media (max-width: 576px) {
+        .prop-text-multiline {
+            width: 100%;
+        }
+    }
 </style>

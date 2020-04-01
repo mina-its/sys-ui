@@ -1,7 +1,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {ObjectViewType, Property, GlobalType, EmbeddedInfo} from "../../../sys/src/types";
-    import {PropertyLabelMode} from '@/types';
+    import {PropChangedEventArg, PropertyLabelMode, StateChangeType, ItemPropChangedEventArg} from '@/types';
     import PropBoolean from "@/components/PropBoolean.vue";
     import PropFile from "@/components/PropFile.vue";
     import PropLink from "@/components/PropLink.vue";
@@ -11,7 +11,6 @@
     import PropText from "@/components/PropText.vue";
     import PropTextMultiline from "@/components/PropTextMultiline.vue";
     import PropTime from "@/components/PropTime.vue";
-    import {glob} from '@/main';
     import PropReferenceMultiple from "@/components/PropReferenceMultiple.vue";
 
     const main = require("@/main");
@@ -21,7 +20,13 @@
             PropReferenceMultiple,
             PropTime,
             PropTextMultiline,
-            PropText, PropReference, PropMessage, PropLocation, PropLink, PropFile, PropBoolean
+            PropText,
+            PropReference,
+            PropMessage,
+            PropLocation,
+            PropLink,
+            PropFile,
+            PropBoolean
         }
     })
     export default class ElemProp extends Vue {
@@ -55,22 +60,19 @@
             }
         }
 
-        @Emit()
-        changed(prop: Property, val: any) {
-            main.setPropertyEmbeddedError(this.item, prop.name, null);
-            return {prop, item: this.item, val};
-            //this.$emit('changed', prop, this.item, val);
+        @Emit("changed")
+        changed(e: PropChangedEventArg): ItemPropChangedEventArg {
+            main.setPropertyEmbeddedError(this.item, e.prop.name, null);
+            return {prop: e.prop, item: this.item, val: e.val};
         }
 
-        @Emit()
+        @Emit("focus")
         focused(e) {
-            //this.$emit('focus', e, this.prop);
             return {e, prop: this.prop};
         }
 
-        @Emit()
+        @Emit('keydown')
         keydown(e) {
-            //this.$emit('keydown', e, this.prop);
             return {e, prop: this.prop};
         }
 
@@ -78,7 +80,7 @@
             let valueClass = `prop-value border mx-2`;
             if (this.prop._.gtype == GlobalType.object && !this.prop.documentView) {
                 return ce('object-view', {
-                    props: {root: false, elem: {obj: {ref: this.prop._.ref, root: false}}},
+                    props: {root: false, elem: {obj: {uri: this.prop._.ref, root: false}}},
                 });
             }
 
@@ -307,12 +309,6 @@
             color: #4F4F4F;
             font-size: smaller;
         }
-
-        &text-multiline {
-            width: 500px;
-            min-height: 150px;
-            resize: both;
-        }
     }
 
     @media (max-width: 576px) {
@@ -327,7 +323,7 @@
             max-width: 420px;
         }
 
-        .prop-text-multiline, .prop-value.prop-file {
+        .prop-value.prop-file {
             width: 100%;
         }
     }

@@ -61,7 +61,7 @@
         Property
     } from '../../../sys/src/types';
     import {glob, $t} from '@/main';
-    import {Modify, MenuItem} from '@/types';
+    import {Modify, MenuItem, StateChangeType, StateChange, ItemPropChangedEventArg} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";
 
     const main = require('@/main');
@@ -78,15 +78,19 @@
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainCheckState = null;
 
-        $t(key) {
-            return $t(key);
-        }
+        changed(e: ItemPropChangedEventArg) {
+            main.dispatchStoreModify(this, {
+                type: StateChangeType.Patch,
+                prop: e.prop.name,
+                newValue: e.val,
+                uri: this.uri
+            } as StateChange);
+            this.$forceUpdate();
 
-        changed(prop: Property, item, val) {
             glob.dirty = true;
-            let dependents = this.dec.properties.filter(p => p.dependsOn == prop.name);
+            let dependents = this.dec.properties.filter(p => p.dependsOn == e.prop.name);
             for (const prop of dependents) {
-                item[prop.name] = null;
+                e.item[prop.name] = null;
                 if (prop._.items)
                     prop._.items = null;
             }
@@ -138,7 +142,7 @@
                 if (!item)
                     return;
 
-                switch (item.ref) {
+                switch (item.uri) {
                     case 'sort':
                         let prevSort = main.getQs(ReqParams.sort);
                         let sort = (prevSort && prevSort.indexOf('-') == -1 ? '-' : '') + state.name;
@@ -196,7 +200,7 @@
         }
 
         deselectAll(but?) {
-            this.items.forEach(item => main.getMeta(item).marked = null);
+            this.items.forEach(item => main.getMeta(item).marked = false);
             if (but)
                 main.getMeta(but).marked = true;
         }
@@ -206,10 +210,8 @@
             let meta = main.getMeta(item);
             if (this.rowHeaderStyle == GridRowHeaderStyle.select)
                 meta.marked = !meta.marked;
-            else {
-                meta.marked = true;
+            else
                 this.deselectAll(item);
-            }
         }
 
         showRowMenu(item, e) {
@@ -235,7 +237,7 @@
             main.showCmenu(item, items, e, (state, item) => {
                 main.hideCmenu();
                 if (!item) return;
-                switch (item.ref) {
+                switch (item.uri) {
                     case 'delete':
                         this.deleteItems();
                         break;

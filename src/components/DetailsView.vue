@@ -123,7 +123,7 @@
         get sideMenu() {
             let menus = [];
             for (const grp of this.groups) {
-                menus.push({ref: "#gp-" + grp.replace(/\s/g, "-"), title: grp});
+                menus.push({uri: "#gp-" + grp.replace(/\s/g, "-"), title: grp});
             }
             if (menus.length <= 1) menus = null;
             return menus;

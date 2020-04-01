@@ -4,27 +4,30 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property} from "../../../sys/src/types";
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {Property} from "../../../sys/src/types";
+    import {PropChangedEventArg} from "@/types";
 
-	@Component
-	export default class PropBoolean extends Vue {
-		@Prop() private prop: Property;
-		@Prop() private doc: any;
+    @Component
+    export default class PropBoolean extends Vue {
+        @Prop() private prop: Property;
+        @Prop() private doc: any;
 
-		keydown(e) {
-			this.$emit('keydown', e);
-		}
+        @Emit('keydown')
+        keydown(e) {
+            return {e};
+        }
 
-		update() {
-			this.doc[this.prop.name] = (event.target as any).checked;
-			this.$emit("changed", this.prop, this.value);
-		}
+        @Emit('changed')
+        update(): PropChangedEventArg {
+            this.doc[this.prop.name] = (event.target as any).checked;
+            return {prop: this.prop, val: this.value};
+        }
 
-		get value() {
-			return this.doc[this.prop.name];
-		}
-	}
+        get value() {
+            return this.doc[this.prop.name];
+        }
+    }
 </script>
 
 <style scoped lang="scss">

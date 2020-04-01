@@ -4,59 +4,63 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property, Keys} from "../../../sys/src/types";
-	import {glob} from "@/main";
-	import {MenuItem} from '@/types';
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {Property, Keys} from "../../../sys/src/types";
+    import {glob} from "@/main";
+    import {MenuItem, PropChangedEventArg} from '@/types';
 
-	const main = require("@/main");
+    const main = require("@/main");
 
-	@Component
-	export default class PropReference extends Vue {
-		@Prop() private type: string;
-		@Prop() private doc: any;
-		@Prop() private prop: Property;
+    @Component
+    export default class PropReference extends Vue {
+        @Prop() private type: string;
+        @Prop() private doc: any;
+        @Prop() private prop: Property;
 
-		keydown(e) {
-			if (e.which === Keys.up || e.which === Keys.down) {
-				e.preventDefault();
-			}
-			if (!glob.cmenu.show)
-				this.$emit('keydown', e);
-		}
+        @Emit('keydown')
+        keydown(e) {
+            if (e.which === Keys.up || e.which === Keys.down)
+                e.preventDefault();
 
-		update() {
-			let val = (event.target as any).value;
-			let items = val == "" ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
-			items.forEach(item => (item as MenuItem).hover = false);
-			this.showDropDown(items);
-		}
+            if (!glob.cmenu.show)
+                return {e};
+        }
 
-		refreshText() {
-			let val = this.doc[this.prop.name];
-			this.doc[this.prop.name] = null;
-			this.doc[this.prop.name] = val;
-		}
+        update() {
+            let val = (event.target as any).value;
+            let items = val == "" ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
+            items.forEach(item => (item as MenuItem).hover = false);
+            this.showDropDown(items);
+        }
 
-		showDropDown(items) {
-			if (!this.prop.required && items && items.length)
-				items = [{ref: null, title: "", hover: false}].concat(items);
+        refreshText() {
+            let val = this.doc[this.prop.name];
+            this.doc[this.prop.name] = null;
+            this.doc[this.prop.name] = val;
+        }
 
-			main.showCmenu(this.prop, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
-				if (item == null) { // Esc
-					this.refreshText();
-					return;
-				}
-				this.doc[this.prop.name] = null;
-				this.doc[this.prop.name] = item.ref;
-				this.$emit("changed", this.prop, this.value);
-			});
-		}
+        showDropDown(items) {
+            if (!this.prop.required && items && items.length)
+                items = [{uri: null, title: "", hover: false}].concat(items);
 
-		get value() {
-			return main.getPropReferenceValue(this.prop, this.doc);
-		}
-	}
+            main.showCmenu(this.prop, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => this.selectItem(item));
+        }
+
+        @Emit('changed')
+        selectItem(item: MenuItem): PropChangedEventArg {
+            if (item == null) { // Esc
+                this.refreshText();
+                return;
+            }
+            this.doc[this.prop.name] = null;
+            this.doc[this.prop.name] = item.ref;
+            return {prop: this.prop, val: this.value};
+        }
+
+        get value() {
+            return main.getPropReferenceValue(this.prop, this.doc);
+        }
+    }
 </script>
 
 <style scoped lang="scss">

@@ -1,11 +1,12 @@
 <template>
     <input @focus="$emit('focus', $event)" ref="ctrl" :type="type" :value="value" :placeholder="placeholder"
-           :name="viewType !== 1 ? prop.name : null" @input="update()" @keydown="keydown" :readonly="readonly">
+           :name="viewType!=1 ? prop.name : null" @input="update()" @keydown="keydown" :readonly="readonly">
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
+    import {PropChangedEventArg} from '@/types';
 
     const main = require("@/main");
 
@@ -16,18 +17,20 @@
         @Prop() private viewType: string;
         @Prop() private prop: Property;
 
+        @Emit("keydown")
         keydown(e) {
-            if (e.which === Keys.up || e.which === Keys.down) {
+            if (e.which === Keys.up || e.which === Keys.down)
                 e.preventDefault();
-            }
-            this.$emit('keydown', e);
+
+            return {e};
         }
 
-        update() {
+        @Emit("changed")
+        update(): PropChangedEventArg {
             let val = this.type == "number" ? (event.target as any).valueAsNumber : (event.target as any).value;
             if (val === "") val = null;
             main.setPropTextValue(this.prop, this.doc, val);
-            this.$emit("changed", this.prop, this.value);
+            return {prop: this.prop, val: this.value};
         }
 
         get readonly() {

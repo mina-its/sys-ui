@@ -9,6 +9,7 @@ import {
     AppStateConfig,
     FormDto
 } from '../../sys/src/types';
+import Prop from "@/components/Prop.vue";
 
 export const Constants = {
     redirectBack: '_back',
@@ -40,10 +41,17 @@ export class MenuItem {
     icon?: string;
 }
 
-export class Modify {
-    data: any;
-    type: WebMethod;
-    ref: string;
+export class StateChange {
+    type: StateChangeType;
+    prop: string;
+    newValue: any;
+    uri: string;
+}
+
+export enum StateChangeType {
+    Patch = 1,
+    Insert = 2,
+    Delete = 3,
 }
 
 export class AppStateGeoMap {
@@ -55,6 +63,17 @@ export class AppStateGeoMap {
     constructor() {
         this.show = false;
     }
+}
+
+export class PropChangedEventArg {
+    prop: Property;
+    val: any;
+}
+
+export class ItemPropChangedEventArg {
+    item: any;
+    prop: Property;
+    val: any;
 }
 
 export class AppStateCmenu {
@@ -155,31 +174,24 @@ export class ApiDoc {
 export class Global {
     form: FormDto;
     data: any;
-    question: AppStateQuestion;
-    fileGallery: AppStateFileGallery;
+    question = new AppStateQuestion();
+    fileGallery = new AppStateFileGallery();
     logs: AppStateLog[];
-    modal: boolean;
-    headFuncs: HeadFunc[];
-    config: AppStateConfig;
-    dirty: boolean;
-    notify: NotificationInfo;
-    cmenu: AppStateCmenu;
-    geoMap: AppStateGeoMap;
-    modifies: Modify[];
+    modal: boolean = false;
+    headFuncs: HeadFunc[] = [];
+    config = new AppStateConfig();
+    dirty: boolean = false;
+    notify: NotificationInfo = null;
+    cmenu = new AppStateCmenu();
+    geoMap = new AppStateGeoMap();
+    modifies: Modify[] = [];
     socket: any;
+}
 
-    constructor() {
-        this.fileGallery = new AppStateFileGallery();
-        this.question = new AppStateQuestion();
-        this.modal = false;
-        this.headFuncs = [];
-        this.config = new AppStateConfig();
-        this.cmenu = new AppStateCmenu();
-        this.geoMap = new AppStateGeoMap();
-        this.notify = null;
-        this.modifies = [];
-        this.dirty = false;
-    }
+export class Modify {
+    type: WebMethod;
+    ref: string;
+    data: any;
 }
 
 export class AppStateFileGallery {

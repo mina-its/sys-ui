@@ -4,34 +4,37 @@
 </template>
 
 <script lang="ts">
-	declare let moment: any;
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property, LogType} from "../../../sys/src/types";
+    import {PropChangedEventArg} from "@/types";
 
-	const main = require("@/main");
+    declare let moment: any;
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {Property, LogType} from "../../../sys/src/types";
 
-	@Component
-	export default class PropTime extends Vue {
-		@Prop() private doc: any;
-		@Prop() private prop: Property;
-		@Prop() private viewType: string;
+    const main = require("@/main");
 
-		update() {
-			let val = new Date((event.target as any).value);
-			if (val.getTime()) {
-				this.doc[this.prop.name] = val;
-			} else {
-				main.notify('invalid-date', LogType.Error);
-				this.doc[this.prop.name] = null;
-			}
-			this.$emit("changed", this.prop, this.value);
-		}
+    @Component
+    export default class PropTime extends Vue {
+        @Prop() private doc: any;
+        @Prop() private prop: Property;
+        @Prop() private viewType: string;
 
-		get value() {
-			let val = this.doc[this.prop.name];
-			return val ? moment(val).format("YYYY/MM/DD") : "";
-		}
-	}
+        @Emit('changed')
+        update(): PropChangedEventArg {
+            let val = new Date((event.target as any).value);
+            if (val.getTime()) {
+                this.doc[this.prop.name] = val;
+            } else {
+                main.notify('invalid-date', LogType.Error);
+                this.doc[this.prop.name] = null;
+            }
+            return {prop: this.prop, val: this.value};
+        }
+
+        get value() {
+            let val = this.doc[this.prop.name];
+            return val ? moment(val).format("YYYY/MM/DD") : "";
+        }
+    }
 </script>
 
 <style scoped lang="scss">

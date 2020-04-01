@@ -1,7 +1,17 @@
+let index = {
+    // Vue
+    "Dispatch Modify      ": dispatchStoreModify,
+    "Commits Change       ": commitStoreChange,
+    "Registers Components ": registerComponents,
+    "Start Vue            ": startVue,
+    // Global
+    "Load                 ": load,
+};
 import Vue from 'vue';
 import Vuex from 'vuex';
+import $ from 'jquery';
 import App from './App.vue';
-import { Constants, Global } from './types';
+import { Constants, Global, Modify, StateChangeType } from './types';
 import { Keys, LogType, StatusCode, RequestMode, WebMethod } from '../../sys/src/types';
 const axios = require('axios').default;
 export let glob = new Global();
@@ -51,23 +61,30 @@ export function evalExpression($this, expression) {
 function vueResetFormData() {
     if (!glob.form || !glob.form.declarations || !glob.data)
         return;
+    const setDataMeta = (item, dec) => {
+        item._ = item._ || {};
+        let meta = item._;
+        meta.dec = dec;
+        return meta;
+    };
     for (let ref in glob.data) {
         let data = glob.data[ref];
         let dec = glob.form.declarations[ref];
         if (!data || !dec)
             continue;
-        data._ = data._ || {};
-        let meta = data._;
-        meta.dec = dec;
-        if (Array.isArray(data))
-            data.forEach(data => meta.marked = null);
+        if (Array.isArray(data)) {
+            data.forEach(item => {
+                let meta = setDataMeta(item, dec);
+                meta.marked = null;
+            });
+        }
+        else
+            setDataMeta(data, dec);
         for (const prop of dec.properties) {
-            if (Array.isArray(data)) {
+            if (Array.isArray(data))
                 data.forEach(item => setUndefinedToNull(item, prop));
-            }
-            else {
+            else
                 setUndefinedToNull(data, prop);
-            }
         }
     }
 }
@@ -637,41 +654,98 @@ function registerComponents() {
     Vue.component('GridView', require("@/components/GridView.vue").default);
     Vue.component('DetailsView', require("@/components/DetailsView.vue").default);
 }
+export function commitStoreChange(store, change) {
+    store.commit('_commitStoreChange', change);
+}
+function _commitStoreChange(state, change) {
+    let ref = change.uri;
+    switch (change.type) {
+        case StateChangeType.Patch:
+            state.data[ref][change.prop] = change.newValue;
+            break;
+        case StateChangeType.Insert:
+            state.data[ref] = change.newValue;
+            break;
+        case StateChangeType.Delete:
+            state.data[ref][change.prop] = null;
+            break;
+    }
+}
+export function dispatchStoreModify(vue, change) {
+    vue.$store.dispatch('_dispatchStoreModify', change);
+}
+function _dispatchStoreModify(store, change) {
+    let ref = change.uri;
+    switch (change.type) {
+        case StateChangeType.Patch: {
+            let modify = glob.modifies.find(m => m.ref === ref);
+            if (!modify) {
+                modify = new Modify();
+                modify.ref = ref;
+                modify.type = WebMethod.patch;
+                modify.data = {};
+            }
+            modify.data[change.prop] = change.newValue;
+            break;
+        }
+        case StateChangeType.Insert: {
+            let modify = new Modify();
+            modify.ref = ref;
+            modify.type = WebMethod.post;
+            modify.data = change.newValue;
+            break;
+        }
+        case StateChangeType.Delete: {
+            let modify = glob.modifies.find(m => m.ref === ref);
+            if (!modify) {
+                modify = new Modify();
+                modify.ref = ref;
+                modify.type = WebMethod.patch;
+                modify.data = {};
+            }
+            modify.data[change.prop] = change.newValue;
+            break;
+        }
+    }
+    commitStoreChange(store, change);
+}
+function createStore() {
+    return new Vuex.Store({
+        state: { data: glob.data },
+        mutations: {
+            _commitStoreChange,
+            updateData(state, data) {
+                state.data = data;
+            }
+        },
+        actions: {
+            _dispatchStoreModify
+        }
+    });
+}
+function startVue(res) {
+    handleResponse(res);
+    glob.config = res.config;
+    Object.assign(Vue.config, { productionTip: false, devtools: true });
+    Vue.prototype.glob = glob;
+    Vue.prototype.$t = $t;
+    Vue.directive('focus', {
+        inserted(el, binding) {
+            if (binding.value)
+                el.focus();
+        }
+    });
+    Vue.use(Vuex);
+    registerComponents();
+    const store = createStore();
+    new Vue({ data: glob, store, render: h => h(App) }).$mount('#app');
+}
 function start() {
     console.log('starting ...');
-    const startVue = (res) => {
-        handleResponse(res);
-        glob.config = res.config;
-        Object.assign(Vue.config, { productionTip: false, devtools: true });
-        Vue.prototype.glob = glob;
-        Vue.directive('focus', {
-            inserted(el, binding) {
-                if (binding.value)
-                    el.focus();
-            }
-        });
-        Vue.use(Vuex);
-        registerComponents();
-        const store = new Vuex.Store({
-            state: { data: glob.data },
-            mutations: {
-                updateProp(state, change) {
-                    state.data[change.ref][change.prop] = change.newValue;
-                },
-                updateData(state, data) {
-                    state.data = data;
-                }
-            },
-            actions: {},
-            modules: {}
-        });
-        new Vue({ data: glob, store, render: h => h(App) }).$mount('#app');
-    };
     const mainState = $('#main-state').html();
     const res = parse(mainState);
-    if (res) {
+    if (res)
         startVue(res);
-    }
     else { // load main-state async
         let host = "http://localhost";
         let uri = host + setQs('m', RequestMode.inlineDev, true) + location.hash;

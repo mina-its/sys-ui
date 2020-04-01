@@ -12,77 +12,77 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {Property, Pair} from "../../../sys/src/types";
-	import {MenuItem} from '@/types';
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {Property, Pair} from "../../../sys/src/types";
+    import {MenuItem, PropChangedEventArg} from '@/types';
 
-	const main = require("@/main");
+    const main = require("@/main");
 
-	@Component
-	export default class PropReferenceMultiple extends Vue {
-		@Prop() private type: string;
-		@Prop() private doc: any;
-		@Prop() private prop: Property;
-		@Prop() private styles: string;
+    @Component
+    export default class PropReferenceMultiple extends Vue {
+        @Prop() private type: string;
+        @Prop() private doc: any;
+        @Prop() private prop: Property;
+        @Prop() private styles: string;
 
-		update() {
-			let val = (event.target as any).value;
-			let items = val == "" ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
-			items.forEach(item => (item as MenuItem).hover = false);
-			this.showDropDown(items);
-		}
+        update() {
+            let val = (event.target as any).value;
+            let items = val == "" ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
+            items.forEach(item => (item as MenuItem).hover = false);
+            this.showDropDown(items);
+        }
 
-		refreshText() {
-			let val = this.doc[this.prop.name];
-			this.doc[this.prop.name] = null;
-			this.doc[this.prop.name] = val;
-		}
+        refreshText() {
+            let val = this.doc[this.prop.name];
+            this.doc[this.prop.name] = null;
+            this.doc[this.prop.name] = val;
+        }
 
-		remove(item) {
-			let val = this.doc[this.prop.name];
-			this.doc[this.prop.name] = val.filter(v => JSON.stringify(v) != JSON.stringify(item.ref));
-			this.$emit("changed", this.prop, val);
-		}
+        @Emit('changed')
+        remove(item) {
+            let val = this.doc[this.prop.name];
+            this.doc[this.prop.name] = val.filter(v => JSON.stringify(v) != JSON.stringify(item.ref));
+            return {prop: this.prop, val};
+        }
 
-		showDropDown(items) {
-			let valueStrKeys = this.value.map((v) => {
-				return JSON.stringify(v);
-			});
-			items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
-			main.showCmenu(this.prop, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
-				if (item == null) { // Esc
-					this.refreshText();
-					return;
-				}
-				let val = this.doc[this.prop.name];
-				if (!val)
-					this.doc[this.prop.name] = val = [];
-				val.push(item.ref);
-				this.$emit("changed", this.prop, val);
-			});
-		}
+        showDropDown(items) {
+            let valueStrKeys = this.value.map(v => JSON.stringify(v));
+            items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
+            main.showCmenu(this.prop, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => this.selectItem(item));
+        }
 
-		get value() {
-			let val = this.doc[this.prop.name];
-			if (!val)
-				this.doc[this.prop.name] = val = [];
-			else if (!Array.isArray(val))
-				val = [val];
-			return val;
-		}
+        @Emit('changed')
+        selectItem(item: MenuItem): PropChangedEventArg {
+            if (item == null) { // Esc
+                this.refreshText();
+                return;
+            }
+            let val = this.doc[this.prop.name];
+            if (!val) this.doc[this.prop.name] = val = [];
+            val.push(item.ref);
+            return {prop: this.prop, val: this.value};
+        }
 
-		get items() {
-			let items: Pair[] = [];
-			for (const v of this.value) {
-				let item = this.prop._.items.find(i => i.ref == v);
-				if (item)
-					items.push(item);
-				else
-					items.push({title: "...", ref: v});
-			}
-			return items;
-		}
-	}
+        get value() {
+            let val = this.doc[this.prop.name];
+            if (!val) this.doc[this.prop.name] = val = [];
+            else if (!Array.isArray(val))
+                val = [val];
+            return val;
+        }
+
+        get items() {
+            let items: Pair[] = [];
+            for (const v of this.value) {
+                let item = this.prop._.items.find(i => i.ref == v);
+                if (item)
+                    items.push(item);
+                else
+                    items.push({title: "...", ref: v});
+            }
+            return items;
+        }
+    }
 </script>
 
 <style scoped lang="scss">
