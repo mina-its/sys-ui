@@ -192,18 +192,18 @@
 
         selectAll() {
             this.rowHeaderStyle = GridRowHeaderStyle.select;
-            this.items.forEach(item => (item._ as EntityMeta).marked = true);
+            this.items.forEach(item => main.getMeta(item).marked = true);
         }
 
         deselectAll(but?) {
-            this.items.forEach(item => (item._ as EntityMeta).marked = null);
+            this.items.forEach(item => main.getMeta(item).marked = null);
             if (but)
-                (but._ as EntityMeta).marked = true;
+                main.getMeta(but).marked = true;
         }
 
         rowSelected(item) {
             this.mainCheckState = false;
-            let meta = item._ as EntityMeta;
+            let meta = main.getMeta(item);
             if (this.rowHeaderStyle == GridRowHeaderStyle.select)
                 meta.marked = !meta.marked;
             else {
@@ -285,10 +285,9 @@
         }
 
         rowMove(up: boolean) {
-            let item = this.items.find(item => (item._ as EntityMeta).marked = true);
+            let item = this.items.find(item => main.getMeta(item).marked);
             let index = this.items.indexOf(item);
-            if ((up && index == 0) || (!up && index == this.items.length - 1))
-                return;
+            if ((up && index == 0) || (!up && index == this.items.length - 1)) return;
             glob.dirty = true;
 
             let emptyZs = this.items.filter(item => !item._z);

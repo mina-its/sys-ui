@@ -14,6 +14,8 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {ObjectDec, Property, EntityMeta} from "../../../sys/src/types";
 
+    const main = require('../main');
+
     @Component
     export default class GridViewRow extends Vue {
         @Prop() private item: any;
@@ -48,7 +50,7 @@
         }
 
         get meta(): EntityMeta {
-            return this.item._ as EntityMeta;
+            return main.getMeta(this.item);
         }
     }
 </script>

@@ -130,7 +130,7 @@
         }
 
         get item() {
-            return glob.form.dataset[this.uri];
+            return glob.data[this.uri];
         }
 
         get groups() {

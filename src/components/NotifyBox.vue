@@ -25,7 +25,7 @@
     #notify-box {
         position: absolute;
         left: 0;
-        top: 2px;
+        top: 1px;
         z-index: 100000;
         cursor: pointer;
         color: white;

@@ -17,10 +17,8 @@
                 return;
             }
 
-            let data = glob.form.dataset[e.obj.ref];
-            if (!data) {
-                data = glob.form.dataset[e.obj.ref] = {};
-            }
+            let data = glob.data[e.obj.ref];
+            if (!data) data = glob.data[e.obj.ref] = {};
             const dec = glob.form.declarations[e.obj.ref];
             glob.form.toolbar = true;
             let rt = this.root == null ? true : this.root;

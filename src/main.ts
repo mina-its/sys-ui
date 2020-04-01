@@ -1,5 +1,6 @@
 declare let WeakSet, $: any;
 import Vue from 'vue';
+import Vuex from 'vuex'
 import App from './App.vue';
 import {MenuItem, Constants, Global} from './types';
 import {
@@ -73,12 +74,12 @@ export function evalExpression($this: any, expression: string): any {
     }
 }
 
-function vueResetFormData(form: FormDto) {
-    if (!form.dataset || !form.declarations) return;
+function vueResetFormData() {
+    if (!glob.form || !glob.form.declarations || !glob.data) return;
 
-    for (let ref in form.dataset) {
-        let data = form.dataset[ref];
-        let dec = form.declarations[ref];
+    for (let ref in glob.data) {
+        let data = glob.data[ref];
+        let dec = glob.form.declarations[ref];
         if (!data || !dec)
             continue;
 
@@ -121,8 +122,18 @@ function setUndefinedToNull(item, prop: Property) {
 //     }
 // }
 
-function validateData(data, ref: string): boolean {
-    let meta = data._ as EntityMeta;
+export function getMeta(data: any): EntityMeta {
+    if (!data || !data._) return null;
+    return data._ as EntityMeta;
+}
+
+export function getDec(data: any): ObjectDec | FunctionDec {
+    let meta = getMeta(data);
+    return meta ? meta.dec : null;
+}
+
+function validateData(data: any, ref: string): boolean {
+    let meta = getMeta(data);
     let requiredProps = meta.dec.properties.filter(p => p.required);
     for (const prop of requiredProps) {
         if (data[prop.name] == null) {
@@ -136,16 +147,12 @@ function validateData(data, ref: string): boolean {
 }
 
 export function validate(): boolean {
-    for (const ref in glob.form.dataset) {
-        if (Array.isArray(glob.form.dataset[ref])) {
-            for (const item of glob.form.dataset[ref]) {
-                if (!validateData(item, ref)) {
-                    return false;
-                }
+    for (const ref in glob.data) {
+        if (Array.isArray(glob.data[ref])) {
+            for (const item of glob.data[ref]) {
+                if (!validateData(item, ref)) return false;
             }
-        } else if (!validateData(glob.form.dataset[ref], ref)) {
-            return false;
-        }
+        } else if (!validateData(glob.data[ref], ref)) return false;
     }
     return true;
 }
@@ -196,10 +203,11 @@ export function handleResponse(res: WebResponse) {
     else if (res.message)
         notify(res.message, LogType.Info);
     else if (res.form) {
+        glob.data = res.data;
         glob.form = res.form;
         document.title = glob.form.title as string;
         glob.headFuncs = [];
-        vueResetFormData(glob.form);
+        vueResetFormData();
         $('.details-view').scrollTop(0);
     } else {
         notify("WHAT should I do now?", LogType.Warning);
@@ -241,18 +249,24 @@ export function getPropTextValue(meta: Property, data): any {
         return val;
 }
 
-export function getPropReferenceValue(meta: Property, data): string {
+export function equalRef(ref1: any, ref2: any): boolean {
+    if (!ref1 && !ref2) return true;
+    else if (!ref1 || !ref2) return false;
+    else return ref1.toString() == ref2.toString();
+}
+
+export function getPropReferenceValue(prop: Property, data: any): string {
     if (!data) return '';
-    let val = data[meta.name];
+    let val = data[prop.name];
     if (!val) return '';
 
-    if (meta.isList) {
+    if (prop.isList) {
         if (!Array.isArray(val))
             val = [val];
 
         let values = [];
         for (const valItem of val) {
-            let item = meta._.items.find(i => i.ref == valItem);
+            let item = prop._.items.find(i => equalRef(i.ref, valItem));
             if (!item)
                 values.push('...');
             else
@@ -260,7 +274,7 @@ export function getPropReferenceValue(meta: Property, data): string {
         }
         return values.join(', ');
     } else {
-        let item = meta._.items.find(i => i.ref == val);
+        let item = prop._.items.find(i => equalRef(i.ref, val));
         if (!item) return '...';
         return item.title;
     }
@@ -694,17 +708,31 @@ function start() {
         glob.config = res.config;
 
         Object.assign(Vue.config, {productionTip: false, devtools: true});
+        Vue.prototype.glob = glob;
         Vue.directive('focus', {
             inserted(el, binding) {
                 if (binding.value) el.focus();
             }
         });
+        Vue.use(Vuex);
 
         registerComponents();
 
-        Vue['glob'] = Vue.prototype.glob = glob;
-        window['glob'] = glob;
-        new Vue({data: glob, render: h => h(App)}).$mount('#app');
+        const store = new Vuex.Store({
+            state: {data: glob.data},
+            mutations: {
+                updateProp(state, change: { ref: string, prop: string, newValue: any }) {
+                    state.data[change.ref][change.prop] = change.newValue;
+                },
+                updateData(state, data) {
+                    state.data = data;
+                }
+            },
+            actions: {},
+            modules: {}
+        });
+
+        new Vue({data: glob, store, render: h => h(App)}).$mount('#app');
     };
 
     const mainState = $('#main-state').html();

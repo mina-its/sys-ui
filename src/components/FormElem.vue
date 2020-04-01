@@ -22,9 +22,9 @@
                 case ElemType.Function: {
                     console.assert(this.elem.func.ref, `ref is expected for the function:`, this.elem.func);
                     let ref = this.elem.func.ref as any;
-                    let data = glob.form.dataset[ref];
-                    let dec = (data._ as EntityMeta).dec as FunctionDec;
-                    console.assert(dec, `meta not found for func ref '${ref}'`);
+                    let data = glob.data[ref];
+                    let dec = main.getDec(data) as FunctionDec;
+                    if (!dec) throw `meta not found for func ref '${ref}'`;
 
                     let exec = this.elem.func.exec;
                     if (!exec && dec.clientSide) {
@@ -39,13 +39,13 @@
                 }
 
                 case ElemType.Property: {
-                    let item = glob.form.dataset[this.elem.property.entityRef];
-                    let dec = (item._ as EntityMeta).dec;
-                    if (!dec)
-                        throw `property elem: meta not found for ref '${this.elem.property.entityRef}'`;
+                    let item = glob.data[this.elem.property.entityRef];
+                    let dec = main.getDec(item);
+                    if (!dec) throw `property elem: meta not found for ref '${this.elem.property.entityRef}'`;
+
                     let prop = dec.properties.find(prop => prop.name == this.elem.property.name);
-                    if (!prop)
-                        throw `error rendering property elem. property '${this.elem.property.name}' dec not found!`;
+                    if (!prop) throw `error rendering property elem. property '${this.elem.property.name}' dec not found!`;
+
                     return ce('prop', {
                         props: {
                             item,
@@ -78,11 +78,11 @@
                 case ElemType.Component:
                     let data, props = this.elem.component.props;
                     if (this.elem.component._ref)
-                        data = glob.form.dataset[this.elem.component._ref];
+                        data = glob.data[this.elem.component._ref];
                     return ce(this.elem.component.name, {props: {data, ...props}});
 
                 case ElemType.Chart:
-                    return ce('chart', {props: {data: glob.form.dataset['tests']}});
+                    return ce('chart', {props: {data: glob.data['tests']}});
             }
         }
     }

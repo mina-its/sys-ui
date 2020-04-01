@@ -38,7 +38,7 @@
         }
 
         validate(data) {
-            let dec = (data._ as EntityMeta).dec as FunctionDec;
+            let dec = main.getDec(data) as FunctionDec;
             if (dec && dec.properties) {
                 let requiredProps = dec.properties.filter(p => p.required);
                 let error = "";
@@ -70,11 +70,11 @@
                 }
             } else {
                 let functionName = this.name;
-                if (!this.data)
-                    throw `data must be set for 'Function' element '${functionName}'`;
-                let dec = (this.data._ as EntityMeta).dec as FunctionDec;
-                if (!this.validate(this.data))
-                    return;
+                if (!this.data) throw `data must be set for 'Function' element '${functionName}'`;
+
+                let dec = main.getDec(this.data) as FunctionDec;
+                if (!this.validate(this.data)) return;
+
                 main.log(`calling '${this.name}' ...`, this.data);
                 main.ajax("/" + this.name, this.data, null, (res) => {
                     this.showProgress = false;

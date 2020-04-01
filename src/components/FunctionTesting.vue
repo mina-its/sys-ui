@@ -47,7 +47,7 @@
 		// }
 
 		functionTest(x, y) {
-			let data = glob.form.dataset["functionTest"];
+			const data = glob.data["functionTest"];
 			this.message = "Running ...";
 			main.ajax("/functionTest", data, null, (res) => {
 				if (res.message)
