@@ -740,7 +740,6 @@ export function commitStoreChange(store, change: StateChange) {
 
 function _commitStoreChange(state, change: StateChange) {
     let ref = change.uri;
-    glob.dirty = true;
 
     switch (change.type) {
         case StateChangeType.Patch:
@@ -755,6 +754,8 @@ function _commitStoreChange(state, change: StateChange) {
             state.data[ref].splice(state.data[ref].indexOf(change.item), 1);
             break;
     }
+
+    glob.dirty = glob.modifies.length > 0;
     change.vue.$forceUpdate();
 }
 
@@ -791,14 +792,11 @@ function _dispatchStoreModify(store, change: StateChange) {
     let ref = change.uri;
     switch (change.type) {
         case StateChangeType.Patch: {
-            let modify = glob.modifies.find(m => m.ref === ref && m.type == WebMethod.post);
+            let modify = glob.modifies.find(m => m.state == change.item);
             if (!modify) {
                 ref = ref + "/" + getBsonId(change.item);
-                modify = glob.modifies.find(m => m.ref === ref);
-                if (!modify) {
-                    modify = {ref, type: WebMethod.patch, data: {}, state: change.item};
-                    glob.modifies.push(modify);
-                }
+                modify = {ref, type: WebMethod.patch, data: {}, state: change.item};
+                glob.modifies.push(modify);
             }
             modify.data[change.prop] = change.value;
             break;
@@ -813,10 +811,12 @@ function _dispatchStoreModify(store, change: StateChange) {
 
         case StateChangeType.Delete: {
             ref = ref + "/" + getBsonId(change.item);
-            let modify = glob.modifies.find(m => m.ref === ref);
-            if (modify)
+            let modify = glob.modifies.find(m => m.state == change.item);
+            if (modify) {
                 glob.modifies.splice(glob.modifies.indexOf(modify), 1);
-            else
+                if (modify.type != WebMethod.post) // delete before saving in server
+                    glob.modifies.push({state: change.item, ref, type: WebMethod.del});
+            } else
                 glob.modifies.push({state: change.item, ref, type: WebMethod.del});
             break;
         }
