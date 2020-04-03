@@ -15,6 +15,9 @@ let GridView = class GridView extends Vue {
         this.rowHeaderStyle = GridRowHeaderStyle.empty;
         this.mainChecked = false;
     }
+    get items() {
+        return this.$store.state.data[this.uri] || [];
+    }
     mainCheckChange(e) {
         this.mainChecked = e.val;
         if (e.val)
@@ -24,24 +27,44 @@ let GridView = class GridView extends Vue {
             this.deselectAll();
         }
     }
-    get items() {
-        return this.$store.state.data[this.uri] || [];
-    }
     changed(e) {
         main.dispatchStoreModify(this, {
             type: StateChangeType.Patch,
-            prop: e.prop.name,
+            prop: e.prop,
             value: e.val,
             item: e.item,
-            uri: this.uri,
+            uri: this.uri + "/" + main.getBsonId(e.item),
             vue: e.vue
         });
-        // todo : remove dependecny change here
-        let dependents = this.dec.properties.filter(p => p.dependsOn == e.prop.name);
-        for (const prop of dependents) {
-            e.item[prop.name] = null;
-            if (prop._.items)
-                prop._.items = null;
+    }
+    keydown(e) {
+        switch (e.event.which) {
+            case Keys.esc:
+                break;
+            case Keys.up:
+            case Keys.down:
+            case Keys.enter:
+                let $t = $(e.event.target);
+                let ci = $t.closest('td')[0].cellIndex;
+                let ri = $t.closest('tr')[0].rowIndex + (e.event.which == Keys.up ? -1 : 1);
+                let table = $t.closest('table');
+                if (e.event.which == Keys.enter && ri == table[0].rows.length - 1)
+                    this.insert();
+                else if (ri <= 0 || ri >= table[0].rows.length - 1)
+                    return;
+                setTimeout(() => {
+                    let row = table[0].rows[ri];
+                    let cell = row.cells[ci].firstChild;
+                    row.click();
+                    cell.focus();
+                }, 0);
+                if (e.event.ctrlKey) {
+                    if (e.event.which == Keys.up)
+                        this.rowMove(true);
+                    if (e.event.which == Keys.down)
+                        this.rowMove(false);
+                }
+                break;
         }
     }
     insert() {
@@ -218,36 +241,6 @@ let GridView = class GridView extends Vue {
         // reorder items index for UI effect
         this.items.splice(index, 1);
         this.items.splice(siblingIndex, 0, item);
-    }
-    keydown(e, item, prop) {
-        switch (e.which) {
-            case Keys.esc:
-                break;
-            case Keys.up:
-            case Keys.down:
-            case Keys.enter:
-                let $t = $(e.target);
-                let ci = $t.closest('td')[0].cellIndex;
-                let ri = $t.closest('tr')[0].rowIndex + (e.which == Keys.up ? -1 : 1);
-                let table = $t.closest('table');
-                if (e.which == Keys.enter && ri == table[0].rows.length - 1)
-                    this.insert();
-                else if (ri <= 0 || ri >= table[0].rows.length - 1)
-                    return;
-                setTimeout(() => {
-                    let row = table[0].rows[ri];
-                    let cell = row.cells[ci].firstChild;
-                    row.click();
-                    cell.focus();
-                }, 0);
-                if (e.ctrlKey) {
-                    if (e.which == Keys.up)
-                        this.rowMove(true);
-                    if (e.which == Keys.down)
-                        this.rowMove(false);
-                }
-                break;
-        }
     }
 };
 __decorate([

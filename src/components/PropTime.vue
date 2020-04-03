@@ -4,7 +4,7 @@
 </template>
 
 <script lang="ts">
-    import {PropChangedEventArg} from "@/types";
+    import {ItemChangeEventArg} from "@/types";
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, LogType} from "../../../sys/src/types";
 
@@ -18,16 +18,17 @@
         @Prop() private viewType: string;
 
         update(e) {
-            let val = moment.utc(e.target.value);
-            if (!val.isValid()) {
+            let val = e.target.value ? moment.utc(e.target.value) : null;
+            let date = val && val.isValid() ? val.toDate() : null;
+            if (!date && e.target.value) {
                 main.notify('invalid-date' + ": " + e.target.value, LogType.Error);
                 this.$forceUpdate();
             } else
-                this.change(val.toDate());
+                this.change(date);
         }
 
         @Emit('changed')
-        change(val): PropChangedEventArg {
+        change(val): ItemChangeEventArg {
             return {prop: this.prop, val, vue: this};
         }
 
@@ -38,6 +39,8 @@
     }
 </script>
 
-<style scoped lang="scss">
-
+<style lang="scss">
+    .prop-time:hover {
+        background: url('/images/calendar.png') no-repeat var(--right) 5px center;
+    }
 </style>

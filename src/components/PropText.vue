@@ -1,12 +1,12 @@
 <template>
-    <input @focus="$emit('focus', $event)" :type="type" :value="value" :placeholder="placeholder" tabindex="1"
+    <input @focus="focus" :type="type" :value="value" :placeholder="placeholder" tabindex="1"
            :name="viewType!=1 ? prop.name : null" @input="update" @keydown="keydown" :readonly="readonly">
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
-    import {PropChangedEventArg} from '@/types';
+    import {ItemChangeEventArg, PropEventArg} from '@/types';
     import {getQs} from "@/main";
 
     const main = require("@/main");
@@ -19,13 +19,18 @@
         @Prop() private prop: Property;
 
         @Emit("keydown")
-        keydown(e) {
+        keydown(e): PropEventArg {
             if (e.which === Keys.up || e.which === Keys.down) e.preventDefault();
-            return {e};
+            return {prop: this.prop, event: e};
+        }
+
+        @Emit('focus')
+        focus(e): PropEventArg {
+            return {prop: this.prop, event: e};
         }
 
         @Emit("changed")
-        update(e): PropChangedEventArg {
+        update(e): ItemChangeEventArg {
             let text = this.type == "number" ? (e.target as any).valueAsNumber : (e.target as any).value;
             if (text === "") text = null;
             let locale = getQs('e') || 'en';

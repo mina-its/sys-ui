@@ -2,7 +2,7 @@ import {ElemType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {Elem, EmbeddedInfo, GlobalType, ObjectViewType, Property, ElemType} from "../../../sys/src/types";
-    import {ItemPropChangedEventArg, PropChangedEventArg, PropertyLabelMode, PropKeydownEventArg} from '@/types';
+    import {ItemChangeEventArg, ItemChangeEventArg, PropertyLabelMode, ItemEventArg} from '@/types';
     import PropBoolean from "@/components/PropBoolean.vue";
     import PropFile from "@/components/PropFile.vue";
     import PropLink from "@/components/PropLink.vue";
@@ -62,7 +62,7 @@ import {ElemType} from "../../../sys/src/types";
         }
 
         @Emit("changed")
-        changed(e: PropChangedEventArg): ItemPropChangedEventArg {
+        changed(e: ItemChangeEventArg): ItemChangeEventArg {
             main.setPropertyEmbeddedError(this.item, e.prop.name, null);
             return {prop: e.prop, item: this.item, val: e.val, vue: e.vue};
         }
@@ -73,7 +73,7 @@ import {ElemType} from "../../../sys/src/types";
         }
 
         @Emit('keydown')
-        keydown(e: PropKeydownEventArg) {
+        keydown(e: ItemEventArg) {
             return e;
         }
 
@@ -98,7 +98,7 @@ import {ElemType} from "../../../sys/src/types";
 
             let styles = "form-group";
             if (this.prop._.gtype == GlobalType.boolean)
-                return ce('div', {attrs: {"class": styles + " form-check"}}, [ce('label', {attrs: {"class": "prop-label-boolean"}}, [vl, title]), cmt]);
+                return ce('div', {attrs: {"class": styles}}, [vl, cmt]); // + " form-check"
             else
                 return ce('div', {attrs: {"class": styles}}, [lbl, vl, msg, cmt]);
         }
@@ -186,6 +186,9 @@ import {ElemType} from "../../../sys/src/types";
                     if (this.viewType == ObjectViewType.TreeView)
                         return null;
 
+                    if (this.viewType == ObjectViewType.DetailsView)
+                        pr["label"] = this.prop.title;
+
                     return ce('prop-boolean', {
                         on: {changed: this.changed, keydown: this.keydown, focus: this.focused},
                         props: pr,
@@ -233,18 +236,6 @@ import {ElemType} from "../../../sys/src/types";
     $right: right;
 
     .prop- {
-        &time:hover {
-            background: url('/images/calendar.png') no-repeat $right 5px center;
-        }
-
-        &location:not(.has-data) {
-            opacity: .2;
-        }
-
-        &document-editor {
-            min-height: 200px;
-        }
-
         &label {
             width: 160px;
         }
@@ -264,38 +255,6 @@ import {ElemType} from "../../../sys/src/types";
             }
         }
 
-        &file {
-            width: 500px;
-            overflow: hidden;
-            word-break: break-all;
-            margin-left: 0 !important;
-            box-sizing: content-box;
-
-            &-item:hover {
-                background-color: var(--light);
-            }
-
-            &-preview {
-                position: relative;
-
-                img {
-                    max-height: 350px;
-                    object-fit: cover;
-                    max-width: 100%;
-                }
-
-                div {
-                    float: left;
-                    position: absolute;
-                    left: 0px;
-                    top: 0px;
-                    z-index: 1000;
-                    background-color: #92AD40;
-                    padding: 0 10px;
-                    color: #FFF;
-                }
-            }
-        }
 
         &message {
             display: block;
@@ -320,10 +279,6 @@ import {ElemType} from "../../../sys/src/types";
             display: block;
             width: 100%;
             max-width: 420px;
-        }
-
-        .prop-value.prop-file {
-            width: 100%;
         }
     }
 

@@ -14,7 +14,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Pair} from "../../../sys/src/types";
-    import {MenuItem, PropChangedEventArg} from '@/types';
+    import {MenuItem, ItemChangeEventArg} from '@/types';
 
     const $ = require('jquery');
     const main = require("@/main");
@@ -57,7 +57,7 @@
         }
 
         @Emit('changed')
-        selectItem(item: MenuItem): PropChangedEventArg {
+        selectItem(item: MenuItem): ItemChangeEventArg {
             if (!item) { // Esc
                 this.refreshText();
                 return;

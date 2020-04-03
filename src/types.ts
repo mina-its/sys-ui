@@ -44,7 +44,7 @@ export class MenuItem {
 
 export class StateChange {
     type: StateChangeType;
-    prop?: string;
+    prop?: Property;
     value?: any;
     item: any;
     uri: string;
@@ -68,10 +68,15 @@ export class AppStateGeoMap {
     }
 }
 
-export class PropChangedEventArg {
+export class PropEventArg {
     prop: Property;
-    val: any;
-    vue?: Vue;
+    event: any;
+}
+
+export class ItemEventArg {
+    item: any;
+    prop?: Property;
+    event?: any;
 }
 
 export class FunctionExecEventArg {
@@ -80,22 +85,11 @@ export class FunctionExecEventArg {
     name?: string;
 }
 
-export class ItemPropChangedEventArg {
+export class ItemChangeEventArg {
     item: any;
     prop: Property;
     val: any;
     vue?: Vue;
-}
-
-export class ItemEventArg {
-    item: any;
-    event?: any;
-}
-
-export class PropKeydownEventArg {
-    item: any;
-    event: any;
-    prop: Property;
 }
 
 export class AppStateCmenu {

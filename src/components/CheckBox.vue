@@ -1,9 +1,9 @@
 <template>
-    <div class="checkbox-wrapper text-center" @click="changed">
+    <div class="checkbox-wrapper text-center mr-2" @click="changed">
         <!--        <input @focus="$emit('focus', $event)" :id="prop.name" :name="prop.name">-->
         <input class="checkbox" @keyup.space="changed" @keydown="keydown" type="checkbox" v-model="checked" tabindex="0"
                @input="changed">
-        <label class="checkbox-label">{{label}}</label>
+        <label :class="{'checkbox-label':true, 'no-label':!label}">{{label}}</label>
     </div>
 </template>
 
@@ -30,6 +30,11 @@
 <style lang="scss">
     .checkbox-wrapper {
         outline: none;
+        display: inline-block;
+    }
+
+    td > .checkbox-wrapper {
+        display: block;
     }
 
     .checkbox {
@@ -52,14 +57,17 @@
         content: '';
         display: inline-block;
         vertical-align: middle;
-        width: 1.2rem;
-        height: 1.2rem;
+        width: 1.4rem;
+        height: 1.4rem;
         margin-top: -.5rem;
         text-align: center;
+        margin-right: 0.5rem;
+        border: 1px solid #eee;
+        border-radius: 3px;
     }
 
-    .checkbox:not(:checked) + .checkbox-label:before {
-        border: 2px solid #eee;
+    .checkbox-label.no-label:before {
+        margin-right: -0.5rem;
     }
 
     .checkbox:focus + .checkbox-label:before {

@@ -8,7 +8,7 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
     import {glob} from "@/main";
-    import {Constants, MenuItem, PropChangedEventArg} from '@/types';
+    import {Constants, MenuItem, ItemChangeEventArg} from '@/types';
 
     const main = require("@/main");
 
@@ -57,7 +57,7 @@
         }
 
         @Emit('changed')
-        selectItem(val: any): PropChangedEventArg {
+        selectItem(val: any): ItemChangeEventArg {
             return {prop: this.prop, val, vue: this};
         }
 

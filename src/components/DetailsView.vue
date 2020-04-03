@@ -26,6 +26,8 @@
 </template>
 
 <script lang="ts">
+    import {ItemChangeEventArg, StateChange, StateChangeType} from "@/types";
+
     declare let $: any;
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
@@ -100,9 +102,15 @@
             );
         }
 
-        changed(prop, instance, val) {
-            glob.dirty = true;
-            main.checkPropDependencyOnChange(this.dec, prop, instance);
+        changed(e: ItemChangeEventArg) {
+            main.dispatchStoreModify(this, {
+                type: StateChangeType.Patch,
+                prop: e.prop,
+                value: e.val,
+                item: e.item,
+                uri: this.uri,
+                vue: e.vue
+            } as StateChange);
         }
 
         getProps(group: string) {

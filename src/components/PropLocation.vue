@@ -8,7 +8,7 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
     import {glob} from "@/main";
-    import {PropChangedEventArg} from "@/types";
+    import {ItemChangeEventArg} from "@/types";
 
     const main = require("@/main");
 
@@ -18,7 +18,7 @@
         @Prop() private doc: any;
 
         @Emit('changed')
-        changed(val): PropChangedEventArg {
+        changed(val): ItemChangeEventArg {
             return {prop: this.prop, val, vue: this};
         }
 
@@ -38,6 +38,8 @@
     }
 </script>
 
-<style scoped lang="scss">
-
+<style lang="scss">
+    .prop-location:not(.has-data) {
+        opacity: .2;
+    }
 </style>

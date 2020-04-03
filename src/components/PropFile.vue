@@ -22,157 +22,194 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {DirFile, DriveMode, File, LogType, Property, RequestMode, WebMethod} from "../../../sys/src/types";
-	import {MenuItem, Modify} from '@/types';
-	import {$t, glob} from '@/main';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {DirFile, DriveMode, File, LogType, Property, RequestMode, WebMethod} from "../../../sys/src/types";
+    import {MenuItem, Modify} from '@/types';
+    import {$t, glob} from '@/main';
 
-	const main = require("@/main");
+    const main = require("@/main");
 
-	@Component
-	export default class PropFile extends Vue {
-		@Prop() private prop: Property;
-		@Prop() private doc: any;
-		@Prop() private viewType: any;
-		@Prop() private styles: string;
+    @Component
+    export default class PropFile extends Vue {
+        @Prop() private prop: Property;
+        @Prop() private doc: any;
+        @Prop() private viewType: any;
+        @Prop() private styles: string;
 
-		private info: string;
+        private info: string;
 
-		showMenu(file, e) {
-			if (this.prop.file && this.prop.file.drive) {
-				let items: MenuItem[] = [
-					{ref: "select", title: $t('select')},
-					{ref: "download", title: $t('download')},
-				];
-				main.showCmenu(file, items, e, this.selectMenu);
-			}
-		}
+        showMenu(file, e) {
+            if (this.prop.file && this.prop.file.drive) {
+                let items: MenuItem[] = [
+                    {ref: "select", title: $t('select')},
+                    {ref: "download", title: $t('download')},
+                ];
+                main.showCmenu(file, items, e, this.selectMenu);
+            }
+        }
 
-		selectMenu(file: File, item) {
-			main.hideCmenu();
-			if (!item) return;
-			switch (item.ref) {
-				case "download":
-					window.open(file._.uri + `?m=${RequestMode.download}`, '_blank');
-					break;
-				case "select":
-					let val = this.doc[this.prop.name] as File;
-					let path = val && val.path ? val.path : this.prop.file.path;
-					main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect);
-					break;
-			}
-		}
+        selectMenu(file: File, item) {
+            main.hideCmenu();
+            if (!item) return;
+            switch (item.ref) {
+                case "download":
+                    window.open(file._.uri + `?m=${RequestMode.download}`, '_blank');
+                    break;
+                case "select":
+                    let val = this.doc[this.prop.name] as File;
+                    let path = val && val.path ? val.path : this.prop.file.path;
+                    main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect);
+                    break;
+            }
+        }
 
-		fileSelect(path: string, item: DirFile) {
-			let val = this.doc[this.prop.name];
-			let uri = `http://${main.joinUri(this.prop.file.drive.uri, path, item.name)}`;
-			let newItem = {_id: -Math.random(), name: item.name, path, _: {uri}, size: item.size};
-			if (Array.isArray(val))
-				val.push(newItem);
-			else
-				val = newItem;
-			this.doc[this.prop.name] = val;
-			glob.dirty = true;
-		}
+        fileSelect(path: string, item: DirFile) {
+            let val = this.doc[this.prop.name];
+            let uri = `http://${main.joinUri(this.prop.file.drive.uri, path, item.name)}`;
+            let newItem = {_id: -Math.random(), name: item.name, path, _: {uri}, size: item.size};
+            if (Array.isArray(val))
+                val.push(newItem);
+            else
+                val = newItem;
+            this.doc[this.prop.name] = val;
+            glob.dirty = true;
+        }
 
-		browseFile(cn, done) {
-			let item = this.doc;
-			if (this.prop.file && this.prop.file.drive && this.prop.file.drive.mode == DriveMode.Gallery) {
-				let val = item[this.prop.name] as File;
-				let path = val && val.path ? val.path : this.prop.file.path;
-				main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect, done);
-			} else {
-				main.browseFile((files) => {
-					done();
-					if (!files.length) return;
-					item._files = item._files || [];
-					for (const file of files) {
-						item._files.push(file);
-					}
-					if (this.prop.file && this.prop.file.sizeLimit) {
-						if (files.find(file => file.size > this.prop.file.sizeLimit)) {
-							main.notify(`File size must be less than ${this.prop.file.sizeLimit}`, LogType.Error);
-							return;
-						}
-					}
+        browseFile(cn, done) {
+            let item = this.doc;
+            if (this.prop.file && this.prop.file.drive && this.prop.file.drive.mode == DriveMode.Gallery) {
+                let val = item[this.prop.name] as File;
+                let path = val && val.path ? val.path : this.prop.file.path;
+                main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect, done);
+            } else {
+                main.browseFile((files) => {
+                    done();
+                    if (!files.length) return;
+                    item._files = item._files || [];
+                    for (const file of files) {
+                        item._files.push(file);
+                    }
+                    if (this.prop.file && this.prop.file.sizeLimit) {
+                        if (files.find(file => file.size > this.prop.file.sizeLimit)) {
+                            main.notify(`File size must be less than ${this.prop.file.sizeLimit}`, LogType.Error);
+                            return;
+                        }
+                    }
 
-					let val = item[this.prop.name];
-					if (this.prop.isList) {
-						if (!val) val = [];
-						else if (!Array.isArray(val)) val = [val]; // in case of set property to multiple which already has data
-					}
+                    let val = item[this.prop.name];
+                    if (this.prop.isList) {
+                        if (!val) val = [];
+                        else if (!Array.isArray(val)) val = [val]; // in case of set property to multiple which already has data
+                    }
 
-					for (const file of files) {
-						let newItem = {_id: -Math.random(), name: file.name, size: file.size};
-						if (Array.isArray(val))
-							val.push(newItem);
-						else
-							val = newItem;
-					}
-					item[this.prop.name] = val;
+                    for (const file of files) {
+                        let newItem = {_id: -Math.random(), name: file.name, size: file.size};
+                        if (Array.isArray(val))
+                            val.push(newItem);
+                        else
+                            val = newItem;
+                    }
+                    item[this.prop.name] = val;
 
-					if (glob.form.toolbar) {
-						glob.modifies.push({ref: this.prop._.ref, data: val, type: WebMethod.patch} as Modify);
-						glob.dirty = true;
-					}
-				});
-			}
-		}
+                    if (glob.form.toolbar) {
+                        glob.modifies.push({ref: this.prop._.ref, data: val, type: WebMethod.patch} as Modify);
+                        glob.dirty = true;
+                    }
+                });
+            }
+        }
 
-		remove(file, e) {
-			glob.modifies = glob.modifies.filter(mod => mod.data._id != file._id);
-			let val = this.doc[this.prop.name];
-			if (Array.isArray(val)) {
-				val = val.filter((item) => {
-					return item._id != file._id;
-				});
-				if (val.length == 0)
-					val = null;
-			} else
-				val = null;
-			this.doc[this.prop.name] = val;
-			glob.dirty = true;
-			console.log(1);
-			e.stopPropagation();
-		}
+        remove(file, e) {
+            glob.modifies = glob.modifies.filter(mod => mod.data._id != file._id);
+            let val = this.doc[this.prop.name];
+            if (Array.isArray(val)) {
+                val = val.filter((item) => {
+                    return item._id != file._id;
+                });
+                if (val.length == 0)
+                    val = null;
+            } else
+                val = null;
+            this.doc[this.prop.name] = val;
+            glob.dirty = true;
+            console.log(1);
+            e.stopPropagation();
+        }
 
-		size(file) {
-			if (file.size)
-				return "(" + main.toFriendlyFileSizeString(file.size) + ")";
-			else
-				return null;
-		}
+        size(file) {
+            if (file.size)
+                return "(" + main.toFriendlyFileSizeString(file.size) + ")";
+            else
+                return null;
+        }
 
-		title(file) {
-			return file.path ? main.joinUri(file.path, file.name) : file.name;
-		}
+        title(file) {
+            return file.path ? main.joinUri(file.path, file.name) : file.name;
+        }
 
-		getInfo() {
-			if (this.$refs.preview && this.$refs.preview[0] && this.$refs.preview[0].naturalWidth)
-				this.info = this.$refs.preview[0].naturalWidth + " x " + this.$refs.preview[0].naturalHeight;
-		}
+        getInfo() {
+            if (this.$refs.preview && this.$refs.preview[0] && this.$refs.preview[0].naturalWidth)
+                this.info = this.$refs.preview[0].naturalWidth + " x " + this.$refs.preview[0].naturalHeight;
+        }
 
-		get showBrowseButton() {
-			return !this.files || this.prop.isList || !this.prop.file;
-		}
+        get showBrowseButton() {
+            return !this.files || this.prop.isList || !this.prop.file;
+        }
 
-		get files() {
-			let val = this.doc[this.prop.name];
-			if (!val || val.length == 0)
-				return null;
+        get files() {
+            let val = this.doc[this.prop.name];
+            if (!val || val.length == 0)
+                return null;
 
-			if (!Array.isArray(val))
-				val = [val];
+            if (!Array.isArray(val))
+                val = [val];
 
-			return val;
-		}
+            return val;
+        }
 
-		get allowUpload() {
-			return !this.files || this.prop.isList;
-		}
-	}
+        get allowUpload() {
+            return !this.files || this.prop.isList;
+        }
+    }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+    .prop-file {
+        width: 500px;
+        overflow: hidden;
+        word-break: break-all;
+        margin-left: 0 !important;
+        box-sizing: content-box;
 
+        &-item:hover {
+            background-color: var(--light);
+        }
+
+        &-preview {
+            position: relative;
+
+            img {
+                max-height: 350px;
+                object-fit: cover;
+                max-width: 100%;
+            }
+
+            div {
+                float: left;
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                z-index: 1000;
+                background-color: #92AD40;
+                padding: 0 10px;
+                color: #FFF;
+            }
+        }
+    }
+
+    @media (max-width: 576px) {
+        .prop-value.prop-file {
+            width: 100%;
+        }
+    }
 </style>

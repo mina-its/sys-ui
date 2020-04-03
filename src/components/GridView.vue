@@ -46,7 +46,6 @@ import {StateChangeType} from "@/types";
 </template>
 
 <script lang="ts">
-    import FilterItem from "@/components/FilterItem.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {
         EntityMeta,
@@ -57,19 +56,18 @@ import {StateChangeType} from "@/types";
         ObjectDec,
         ObjectViewType,
         Pair,
-        ReqParams,
-        WebMethod
+        ReqParams
     } from '../../../sys/src/types';
-    import {$t, glob} from '@/main';
-    import {ItemEventArg, ItemPropChangedEventArg, MenuItem, Modify, StateChange, StateChangeType} from '@/types';
+    import {$t, getBsonId, glob} from '@/main';
+    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, StateChangeType} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";
-    import CheckBox from "@/components/CheckBox.vue";
+    import FilterItem from "@/components/FilterItem.vue";
     import {v4 as uuidv4} from 'uuid';
 
     const $ = require('jquery');
     const main = require('@/main');
     @Component({
-        components: {CheckBox, GridViewRow, FilterItem}
+        components: {GridViewRow, FilterItem}
     })
     export default class GridView extends Vue {
         @Prop() private uri: string;
@@ -78,6 +76,10 @@ import {StateChangeType} from "@/types";
 
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainChecked = false;
+
+        get items() {
+            return this.$store.state.data[this.uri] || [];
+        }
 
         mainCheckChange(e) {
             this.mainChecked = e.val;
@@ -89,26 +91,50 @@ import {StateChangeType} from "@/types";
             }
         }
 
-        get items() {
-            return this.$store.state.data[this.uri] || [];
-        }
-
-        changed(e: ItemPropChangedEventArg) {
+        changed(e: ItemChangeEventArg) {
             main.dispatchStoreModify(this, {
                 type: StateChangeType.Patch,
-                prop: e.prop.name,
+                prop: e.prop,
                 value: e.val,
                 item: e.item,
-                uri: this.uri,
+                uri: this.uri + "/" + main.getBsonId(e.item),
                 vue: e.vue
             } as StateChange);
+        }
 
-            // todo : remove dependecny change here
-            let dependents = this.dec.properties.filter(p => p.dependsOn == e.prop.name);
-            for (const prop of dependents) {
-                e.item[prop.name] = null;
-                if (prop._.items)
-                    prop._.items = null;
+        keydown(e: ItemEventArg) {
+            switch (e.event.which) {
+                case Keys.esc:
+                    break;
+
+                case Keys.up:
+                case Keys.down:
+                case Keys.enter:
+                    let $t = $(e.event.target);
+                    let ci = $t.closest('td')[0].cellIndex;
+                    let ri = $t.closest('tr')[0].rowIndex + (e.event.which == Keys.up ? -1 : 1);
+                    let table = $t.closest('table');
+                    if (e.event.which == Keys.enter && ri == table[0].rows.length - 1)
+                        this.insert();
+                    else if (ri <= 0 || ri >= table[0].rows.length - 1)
+                        return;
+
+                    setTimeout(() => {
+                        let row = table[0].rows[ri];
+                        let cell = row.cells[ci].firstChild;
+                        row.click();
+                        cell.focus();
+                    }, 0);
+
+                    if (e.event.ctrlKey) {
+                        if (e.event.which == Keys.up)
+                            this.rowMove(true);
+
+                        if (e.event.which == Keys.down)
+                            this.rowMove(false);
+                    }
+
+                    break;
             }
         }
 
@@ -313,48 +339,12 @@ import {StateChangeType} from "@/types";
             this.items.splice(index, 1);
             this.items.splice(siblingIndex, 0, item);
         }
-
-        keydown(e, item, prop) {
-            switch (e.which) {
-                case Keys.esc:
-                    break;
-
-                case Keys.up:
-                case Keys.down:
-                case Keys.enter:
-                    let $t = $(e.target);
-                    let ci = $t.closest('td')[0].cellIndex;
-                    let ri = $t.closest('tr')[0].rowIndex + (e.which == Keys.up ? -1 : 1);
-                    let table = $t.closest('table');
-                    if (e.which == Keys.enter && ri == table[0].rows.length - 1)
-                        this.insert();
-                    else if (ri <= 0 || ri >= table[0].rows.length - 1)
-                        return;
-
-                    setTimeout(() => {
-                        let row = table[0].rows[ri];
-                        let cell = row.cells[ci].firstChild;
-                        row.click();
-                        cell.focus();
-                    }, 0);
-
-                    if (e.ctrlKey) {
-                        if (e.which == Keys.up)
-                            this.rowMove(true);
-
-                        if (e.which == Keys.down)
-                            this.rowMove(false);
-                    }
-
-                    break;
-            }
-        }
     }
 </script>
 
 <style lang="scss">
-    $left: left;
-    $right: right;
+    $left: var(--left);
+    $right: var(--right);
 
     .grid-view {
 

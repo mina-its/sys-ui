@@ -9,7 +9,7 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, WebMethod} from "../../../sys/src/types";
     import {glob} from "@/main";
-    import {Modify, PropChangedEventArg} from '@/types';
+    import {Modify, ItemChangeEventArg} from '@/types';
 
     const main = require("@/main");
 
@@ -28,7 +28,7 @@
         }
 
         @Emit('changed')
-        update(e): PropChangedEventArg {
+        update(e): ItemChangeEventArg {
             try {
                 let val = (e.target as any).value ? JSON.parse((e.target as any).value) : null;
                 this.invalidData = false;
@@ -59,6 +59,8 @@
     }
 </script>
 
-<style scoped lang="scss">
-
+<style lang="scss">
+    .prop-document-editor {
+        min-height: 200px;
+    }
 </style>

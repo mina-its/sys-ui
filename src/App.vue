@@ -143,9 +143,6 @@
 </script>
 
 <style lang="scss">
-    $left: left;
-    $right: right;
-
     :root {
         --primary: #0072C6;
         --danger: #ff4136;
@@ -166,7 +163,16 @@
 
         --font-size-base: 15px;
         --badge-padding-x: 0.25rem;
+
+        --left: left;
+        --right: right;
+
+        --wide-props-width: 500px;
+        --text-multiline-height: 150px;
     }
+
+    $left: var(--left);
+    $right: var(--right);
 
     @import "bootstrap";
 
@@ -199,7 +205,7 @@
     header {
         flex: 0 1 auto;
 
-        nav{
+        nav {
             background-color: var(--header-bg);
         }
 
@@ -328,19 +334,19 @@
 
     .fa-chevron- {
         &left:before {
-            @if $left == left {
-                content: "\f053" !important;
-            } @else {
-                content: "\f054" !important;
-            }
+            //@if var(--left) == left {
+            //    content: "\f053" !important;
+            //} @else {
+            //    content: "\f054" !important;
+            //}
         }
 
         &right:before {
-            @if $right == right {
-                content: "\f054" !important;
-            } @else {
-                content: "\f053" !important;
-            }
+            //@if var(--right) == right {
+            //    content: "\f054" !important;
+            //} @else {
+            //    content: "\f053" !important;
+            //}
         }
     }
 

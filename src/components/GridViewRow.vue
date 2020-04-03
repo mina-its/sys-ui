@@ -17,7 +17,7 @@
     declare let $: any;
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {ObjectDec, Property, EntityMeta} from "../../../sys/src/types";
-    import {ItemPropChangedEventArg, ItemEventArg, PropKeydownEventArg} from '@/types';
+    import {ItemChangeEventArg, ItemEventArg} from '@/types';
 
     const main = require('../main');
     @Component({
@@ -34,7 +34,7 @@
         }
 
         @Emit('changed')
-        changed(e: ItemPropChangedEventArg): ItemPropChangedEventArg {
+        changed(e: ItemChangeEventArg): ItemChangeEventArg {
             return e;
         }
 
@@ -53,8 +53,8 @@
         }
 
         @Emit('keydown')
-        keydown(e: PropKeydownEventArg): PropKeydownEventArg {
-            return {event: e.event, item: this.item, prop: e.prop} as PropKeydownEventArg;
+        keydown(e: ItemEventArg): ItemEventArg {
+            return {event: e.event, item: this.item, prop: e.prop} as ItemEventArg;
         }
 
         get meta(): EntityMeta {

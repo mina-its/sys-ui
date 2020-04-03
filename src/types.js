@@ -32,15 +32,13 @@ export class AppStateGeoMap {
         this.show = false;
     }
 }
-export class PropChangedEventArg {
-}
-export class FunctionExecEventArg {
-}
-export class ItemPropChangedEventArg {
+export class PropEventArg {
 }
 export class ItemEventArg {
 }
-export class PropKeydownEventArg {
+export class FunctionExecEventArg {
+}
+export class ItemChangeEventArg {
 }
 export class AppStateCmenu {
     constructor() {

@@ -1,12 +1,12 @@
 <template>
-    <textarea @focus="$emit('focus', $event)" :value="value" @input="update()"
+    <textarea @focus="focus" :value="value" @input="update"
               class="text-nowrap form-control"></textarea>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
-    import {PropChangedEventArg} from "@/types";
+    import {ItemChangeEventArg, PropEventArg} from "@/types";
 
     @Component
     export default class PropTextMultiline extends Vue {
@@ -14,11 +14,15 @@
         @Prop() private prop: Property;
 
         @Emit('changed')
-        update(): PropChangedEventArg {
-            let val = (event.target as any).value;
+        update(e): ItemChangeEventArg {
+            let val = e.target.value;
             if (val === "") val = null;
-            this.doc[this.prop.name] = val;
-            return {prop: this.prop, val: this.value};
+            return {prop: this.prop, val, vue: this};
+        }
+
+        @Emit('focus')
+        focus(e): PropEventArg {
+            return {prop: this.prop, event: e};
         }
 
         get value() {
@@ -28,14 +32,14 @@
 </script>
 
 <style lang="scss">
-    .prop-text-multiline {
-        width: 500px;
-        min-height: 150px;
+    .prop-value.prop-text-multiline {
+        width: var(--wide-props-width);
+        min-height: var(--text-multiline-height);
         resize: both;
     }
 
     @media (max-width: 576px) {
-        .prop-text-multiline {
+        .prop-value.prop-text-multiline {
             width: 100%;
         }
     }

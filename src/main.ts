@@ -743,7 +743,15 @@ function _commitStoreChange(state, change: StateChange) {
 
     switch (change.type) {
         case StateChangeType.Patch:
-            change.item[change.prop] = change.value;
+            change.item[change.prop.name] = change.value;
+
+            // todo : remove dependecny change here
+            // let dependents = this.dec.properties.filter(p => p.dependsOn == change.prop.name);
+            // for (const prop of dependents) {
+            //     change.item[prop.name] = null;
+            //     if (prop._.items)
+            //         prop._.items = null;
+            // }
             break;
 
         case StateChangeType.Insert:
@@ -794,11 +802,10 @@ function _dispatchStoreModify(store, change: StateChange) {
         case StateChangeType.Patch: {
             let modify = glob.modifies.find(m => m.state == change.item);
             if (!modify) {
-                ref = ref + "/" + getBsonId(change.item);
                 modify = {ref, type: WebMethod.patch, data: {}, state: change.item};
                 glob.modifies.push(modify);
             }
-            modify.data[change.prop] = change.value;
+            modify.data[change.prop.name] = change.value;
             break;
         }
 
