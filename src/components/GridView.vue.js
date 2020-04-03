@@ -6,11 +6,12 @@ import { $t, glob } from '@/main';
 import { StateChangeType } from '@/types';
 import GridViewRow from "@/components/GridViewRow.vue";
 import CheckBox from "@/components/CheckBox.vue";
+import { v4 as uuidv4 } from 'uuid';
+const $ = require('jquery');
 const main = require('@/main');
 let GridView = class GridView extends Vue {
     constructor() {
         super(...arguments);
-        this.ni = -1;
         this.rowHeaderStyle = GridRowHeaderStyle.empty;
         this.mainChecked = false;
     }
@@ -32,7 +33,7 @@ let GridView = class GridView extends Vue {
             prop: e.prop.name,
             value: e.val,
             item: e.item,
-            uri: this.uri + "/" + (e.item._id ? e.item._id.$oid : e.item._id),
+            uri: this.uri,
             vue: e.vue
         });
         // todo : remove dependecny change here
@@ -50,7 +51,7 @@ let GridView = class GridView extends Vue {
                 main.load(location.pathname + '?n=true');
                 break;
             default:
-                let newItem = { _id: this.ni--, _: { marked: false, dec: this.dec } };
+                let newItem = { _id: uuidv4(), _: { marked: false, dec: this.dec } };
                 this.dec.properties.forEach(prop => newItem[prop.name] = null);
                 if (this.dec.reorderable)
                     newItem['_z'] = (Math.max(...this.items.map(item => item._z)) || 0) + 1;
@@ -100,7 +101,12 @@ let GridView = class GridView extends Vue {
     deleteItems() {
         let selectedItems = this.items.filter(item => main.getMeta(item).marked);
         for (let item of selectedItems) {
-            main.dispatchStoreModify(this, { type: StateChangeType.Delete, uri: this.dec.ref, item });
+            main.dispatchStoreModify(this, {
+                type: StateChangeType.Delete,
+                uri: this.dec.ref,
+                item,
+                vue: this
+            });
         }
         this.rowHeaderStyle = GridRowHeaderStyle.empty;
     }

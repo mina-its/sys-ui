@@ -692,7 +692,15 @@ export function commitServerChangeResponse(store, modify, res) {
 function _commitServerChangeResponse(store, arg) {
     switch (arg.modify.type) {
         case WebMethod.patch:
+            for (let key in arg.res) {
+                arg.modify.state[key] = arg.res[key];
+            }
+            break;
         case WebMethod.post:
+            if (arg.modify.state._id != arg.res._reqId)
+                notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._reqId}' are not same`, LogType.Error);
+            else
+                delete arg.res._reqId;
             for (let key in arg.res) {
                 arg.modify.state[key] = arg.res[key];
             }
@@ -707,10 +715,14 @@ function _dispatchStoreModify(store, change) {
     let ref = change.uri;
     switch (change.type) {
         case StateChangeType.Patch: {
-            let modify = glob.modifies.find(m => m.ref === ref);
+            let modify = glob.modifies.find(m => m.ref === ref && m.type == WebMethod.post);
             if (!modify) {
-                modify = { ref, type: WebMethod.patch, data: {}, state: change.item };
-                glob.modifies.push(modify);
+                ref = ref + "/" + getBsonId(change.item);
+                modify = glob.modifies.find(m => m.ref === ref);
+                if (!modify) {
+                    modify = { ref, type: WebMethod.patch, data: {}, state: change.item };
+                    glob.modifies.push(modify);
+                }
             }
             modify.data[change.prop] = change.value;
             break;
@@ -743,7 +755,7 @@ function _dispatchRequestServerModify(store, done) {
         glob.dirty = false;
         return done();
     }
-    let modify = glob.modifies.pop();
+    let modify = glob.modifies.shift();
     //main.log(modify.type, modify.ref, modify.data);
     ajax(prepareServerUrl(modify.ref), modify.data, { method: modify.type }, (res) => {
         res.data = flat2recursive(res.data);

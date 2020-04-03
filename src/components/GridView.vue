@@ -1,9 +1,9 @@
 import {StateChangeType} from "@/types";
 <template>
     <div :class="'grid-view' + (root?' p-4':'')" @scroll="onScroll()">
-<!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->
-<!--            <filter-item :item="item" :key="item.id" v-for="item in dec.filter.items" :dec="dec"></filter-item>-->
-<!--        </div>-->
+        <!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->
+        <!--            <filter-item :item="item" :key="item.id" v-for="item in dec.filter.items" :dec="dec"></filter-item>-->
+        <!--        </div>-->
         <table class="table table-sm">
             <thead>
             <tr>
@@ -64,9 +64,9 @@ import {StateChangeType} from "@/types";
     import {ItemEventArg, ItemPropChangedEventArg, MenuItem, Modify, StateChange, StateChangeType} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";
     import CheckBox from "@/components/CheckBox.vue";
+    import {v4 as uuidv4} from 'uuid';
 
-    declare let $: any;
-
+    const $ = require('jquery');
     const main = require('@/main');
     @Component({
         components: {CheckBox, GridViewRow, FilterItem}
@@ -76,7 +76,6 @@ import {StateChangeType} from "@/types";
         @Prop() private root: boolean;
         @Prop() private dec: ObjectDec;
 
-        private ni = -1;
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainChecked = false;
 
@@ -100,7 +99,7 @@ import {StateChangeType} from "@/types";
                 prop: e.prop.name,
                 value: e.val,
                 item: e.item,
-                uri: this.uri + "/" + (e.item._id ? e.item._id.$oid : e.item._id),
+                uri: this.uri,
                 vue: e.vue
             } as StateChange);
 
@@ -121,7 +120,7 @@ import {StateChangeType} from "@/types";
                     break;
 
                 default:
-                    let newItem = {_id: this.ni--, _: {marked: false, dec: this.dec} as EntityMeta};
+                    let newItem = {_id: uuidv4(), _: {marked: false, dec: this.dec} as EntityMeta};
                     this.dec.properties.forEach(prop => newItem[prop.name] = null);
                     if (this.dec.reorderable)
                         newItem['_z'] = (Math.max(...this.items.map(item => item._z)) || 0) + 1;
@@ -180,7 +179,12 @@ import {StateChangeType} from "@/types";
         deleteItems() {
             let selectedItems = this.items.filter(item => main.getMeta(item).marked);
             for (let item of selectedItems) {
-                main.dispatchStoreModify(this, {type: StateChangeType.Delete, uri: this.dec.ref, item} as StateChange);
+                main.dispatchStoreModify(this, {
+                    type: StateChangeType.Delete,
+                    uri: this.dec.ref,
+                    item,
+                    vue: this
+                } as StateChange);
             }
             this.rowHeaderStyle = GridRowHeaderStyle.empty;
         }
