@@ -12,14 +12,11 @@ let GridView = class GridView extends Vue {
         super(...arguments);
         this.ni = -1;
         this.rowHeaderStyle = GridRowHeaderStyle.empty;
-        this.mainCheckState = null;
+        this.mainChecked = false;
     }
-    get mainChecked() {
-        return this.mainCheckState;
-    }
-    set mainChecked(value) {
-        this.mainCheckState = value;
-        if (value)
+    mainCheckChange(e) {
+        this.mainChecked = e.val;
+        if (e.val)
             this.selectAll();
         else {
             this.rowHeaderStyle = GridRowHeaderStyle.empty;
@@ -120,7 +117,7 @@ let GridView = class GridView extends Vue {
             main.getMeta(but).marked = true;
     }
     rowSelected(e) {
-        this.mainCheckState = false;
+        this.mainChecked = false;
         let meta = main.getMeta(e.item);
         if (this.rowHeaderStyle == GridRowHeaderStyle.select)
             meta.marked = !meta.marked;

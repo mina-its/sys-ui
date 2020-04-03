@@ -233,10 +233,6 @@ import {ElemType} from "../../../sys/src/types";
     $right: right;
 
     .prop- {
-        &reference:hover {
-            background: url("/images/updown.png") no-repeat $right 5px center;
-        }
-
         &time:hover {
             background: url('/images/calendar.png') no-repeat $right 5px center;
         }

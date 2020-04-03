@@ -50,14 +50,16 @@
 
     .checkbox + .checkbox-label:before {
         content: '';
-        background: #fff;
-        border: 1px solid #ddd;
         display: inline-block;
         vertical-align: middle;
-        width: 1.4rem;
-        height: 1.4rem;
+        width: 1.2rem;
+        height: 1.2rem;
         margin-top: -.5rem;
         text-align: center;
+    }
+
+    .checkbox:not(:checked) + .checkbox-label:before {
+        border: 2px solid #eee;
     }
 
     .checkbox:focus + .checkbox-label:before {

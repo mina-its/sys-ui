@@ -1,10 +1,10 @@
 <template>
     <tr :class="{'highlight': meta.marked}" @click="click">
-        <th tabindex="0" scope="row" v-if="selectable" class="text-center">
+        <th scope="row" v-if="selectable" class="text-center">
             <CheckBox :checked="meta.marked"></CheckBox>
         </th>
         <th v-else @click="headerClick" class="text-center"></th>
-        <td v-for="(pMeta, index) in dec.properties" tabindex="0">
+        <td v-for="(pMeta, index) in dec.properties">
             <Prop @focus="focused($event)" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
                   :viewType="1" :indexInGrid="index"></Prop>
         </td>
@@ -66,7 +66,7 @@
 <style lang="scss">
     tbody {
         tr {
-            td:first-child {
+            td:nth-child(2) {
                 white-space: nowrap;
             }
 

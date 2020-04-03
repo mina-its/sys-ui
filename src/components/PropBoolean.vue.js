@@ -4,11 +4,11 @@ let PropBoolean = class PropBoolean extends Vue {
     keydown(e) {
         return { e };
     }
-    change() {
-        return { prop: this.prop, val: !this.value, vue: this };
+    change(e) {
+        return { prop: this.prop, val: e.val, vue: this };
     }
-    get value() {
-        return this.doc[this.prop.name];
+    get checked() {
+        return !!this.doc[this.prop.name];
     }
 };
 __decorate([

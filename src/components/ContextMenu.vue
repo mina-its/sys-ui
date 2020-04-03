@@ -3,12 +3,14 @@
         <template v-for="item in glob.cmenu.items">
             <div v-if="item.title==='-'" class="dropdown-divider"></div>
             <a v-else :class="'dropdown-item' + (item.hover ? ' active' : '') " @click="click(item)"
-               href="javascript:;">{{item.title || '&nbsp;'}}</a>
+               href="javascript:;" v-html="item.title || '&nbsp;'"></a>
         </template>
     </div>
 </template>
 
 <script lang="ts">
+    import {MenuItem} from "@/types";
+
     declare let $: any;
     import {Component, Vue} from 'vue-property-decorator';
     import {glob} from '@/main';
@@ -78,5 +80,9 @@
 <style lang="scss">
     .context-menu {
         max-height: 300px;
+    }
+
+    .dropdown-item {
+        line-height: 1.3;
     }
 </style>

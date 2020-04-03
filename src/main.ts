@@ -231,9 +231,10 @@ export function handleResponse(res: WebResponse) {
     else if (res.message)
         notify(res.message, LogType.Info);
     else if (res.form) {
+        // WARNING: never change these orders:
         glob.form = res.form;
-        glob.data = res.data;
         vueResetFormData(res.data);
+        glob.data = res.data;
         store.state.data = res.data;
         document.title = glob.form.title as string;
         glob.headFuncs = [];
@@ -257,9 +258,15 @@ export function getPropTextValue(meta: Property, data): any {
 }
 
 export function equalRef(ref1: any, ref2: any): boolean {
-    if (!ref1 && !ref2) return true;
-    else if (!ref1 || !ref2) return false;
-    else return ref1.toString() == ref2.toString();
+    if (!ref1 && !ref2) {
+        return true;
+    } else if (!ref1 || !ref2) {
+        return false;
+    } else if (ref1.$oid) {
+        return ref1.$oid == ref2.$oid;
+    } else {
+        return ref1 == ref2;
+    }
 }
 
 export function getPropReferenceValue(prop: Property, data: any): string {
@@ -336,7 +343,7 @@ export function hideCmenu() {
     glob.cmenu.show = false;
 }
 
-function handleCmenuKeys(e) {
+export function handleCmenuKeys(e) {
     switch (e.which) {
         case Keys.tab:
         case Keys.esc:
@@ -413,6 +420,7 @@ export function setQs(key: string, value: any, fullPath: boolean, href?: string)
 }
 
 export function checkPropDependencyOnChange(dec: ObjectDec | FunctionDec, prop, instance: any) {
+    if (!instance) return;
     let dependents = dec.properties.filter(p => p.dependsOn == prop.name);
     for (const prop of dependents) {
         instance[prop.name] = null;

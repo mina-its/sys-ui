@@ -4,6 +4,7 @@ export const Constants = {
     redirectSelf: '_self',
     notifyEvent: 'notify',
     questionEvent: 'question',
+    contextMenuVisibleItems: 10,
 };
 export const ChartColors = [
     'rgba(54, 162, 235, 0.8)',

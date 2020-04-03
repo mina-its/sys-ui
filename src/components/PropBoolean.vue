@@ -18,12 +18,12 @@
         }
 
         @Emit('changed')
-        change(): PropChangedEventArg {
-            return {prop: this.prop, val: !this.checked, vue: this};
+        change(e): PropChangedEventArg {
+            return {prop: this.prop, val: e.val, vue: this};
         }
 
-        get checked() {
-            return this.doc[this.prop.name];
+        get checked(): boolean {
+            return !!this.doc[this.prop.name];
         }
     }
 </script>

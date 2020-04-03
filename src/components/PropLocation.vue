@@ -1,6 +1,7 @@
 <template>
-    <div :class="'prop-location text-center ' + (value ? 'has-data': '')" @click="changing"><i
-            class="fa fa-map-marker-alt"></i></div>
+    <div :class="'prop-location text-center ' + (value ? 'has-data': '')" @click="changing">
+        <i class="fa fa-map-marker-alt"></i>
+    </div>
 </template>
 
 <script lang="ts">
@@ -17,8 +18,8 @@
         @Prop() private doc: any;
 
         @Emit('changed')
-        changed(): PropChangedEventArg {
-            return {prop: this.prop, val: this.value};
+        changed(val): PropChangedEventArg {
+            return {prop: this.prop, val, vue: this};
         }
 
         changing() {
@@ -27,11 +28,7 @@
             glob.geoMap = {
                 show: true,
                 val: this.value,
-                select: function (value) {
-                    doc[this.prop.name] = value;
-                    console.log(doc);
-                    changed();
-                }
+                select: changed
             };
         }
 

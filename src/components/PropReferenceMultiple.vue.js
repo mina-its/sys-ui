@@ -19,8 +19,8 @@ let PropReferenceMultiple = class PropReferenceMultiple extends Vue {
     }
     remove(item) {
         let val = this.doc[this.prop.name];
-        this.doc[this.prop.name] = val.filter(v => JSON.stringify(v) != JSON.stringify(item.ref));
-        return { prop: this.prop, val };
+        val = val.filter(v => !main.equalRef(v, item.ref));
+        return { prop: this.prop, val, vue: this };
     }
     showDropDown(items) {
         let valueStrKeys = this.value.map(v => JSON.stringify(v));
@@ -28,15 +28,16 @@ let PropReferenceMultiple = class PropReferenceMultiple extends Vue {
         main.showCmenu(this.prop, items, { ctrl: this.$refs.ctrl }, (state, item) => this.selectItem(item));
     }
     selectItem(item) {
-        if (item == null) { // Esc
+        if (!item) { // Esc
             this.refreshText();
             return;
         }
         let val = this.doc[this.prop.name];
         if (!val)
-            this.doc[this.prop.name] = val = [];
+            val = [];
+        val = [...val];
         val.push(item.ref);
-        return { prop: this.prop, val: this.value };
+        return { prop: this.prop, val, vue: this };
     }
     get value() {
         let val = this.doc[this.prop.name];

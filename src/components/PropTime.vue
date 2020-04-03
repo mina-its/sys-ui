@@ -5,11 +5,10 @@
 
 <script lang="ts">
     import {PropChangedEventArg} from "@/types";
-
-    declare let moment: any;
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, LogType} from "../../../sys/src/types";
 
+    const moment = require('moment');
     const main = require("@/main");
 
     @Component
@@ -18,16 +17,18 @@
         @Prop() private prop: Property;
         @Prop() private viewType: string;
 
+        update(e) {
+            let val = moment.utc(e.target.value);
+            if (!val.isValid()) {
+                main.notify('invalid-date' + ": " + e.target.value, LogType.Error);
+                this.$forceUpdate();
+            } else
+                this.change(val.toDate());
+        }
+
         @Emit('changed')
-        update(): PropChangedEventArg {
-            let val = new Date((event.target as any).value);
-            if (val.getTime()) {
-                this.doc[this.prop.name] = val;
-            } else {
-                main.notify('invalid-date', LogType.Error);
-                this.doc[this.prop.name] = null;
-            }
-            return {prop: this.prop, val: this.value};
+        change(val): PropChangedEventArg {
+            return {prop: this.prop, val, vue: this};
         }
 
         get value() {
