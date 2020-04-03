@@ -1,10 +1,10 @@
 <template>
-    <div ref="ctrl" :class="styles + ' prop-reference ref-multi'">
+    <div @focus="focus" tabindex="1" ref="ctrl" :class="styles + ' prop-reference ref-multi'">
         <div v-for="item in items" class="rounded-lg rmI d-inline-block mr-1 my-1 px-1 border text-nowrap">
             <i @click="remove(item)" class="text-black-50 rmD fa fa-times" style="cursor:pointer"></i>
             <span class="rmV">{{item.title}}</span>
         </div>
-        <textarea @click="showDropDown(meta._items)" style="width:50px;outline: none;resize:none;overflow:hidden;"
+        <textarea @click="showDropDown(prop._.items)" style="width:50px;outline: none;resize:none;overflow:hidden;"
                   @blur="refreshText" @input="update()" class="bg-transparent align-middle rmT d-inline border-0"
                   rows="1" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
                   tabindex="1"></textarea>
@@ -16,6 +16,7 @@
     import {Property, Pair} from "../../../sys/src/types";
     import {MenuItem, PropChangedEventArg} from '@/types';
 
+    const $ = require('jquery');
     const main = require("@/main");
 
     @Component
@@ -36,6 +37,10 @@
             let val = this.doc[this.prop.name];
             this.doc[this.prop.name] = null;
             this.doc[this.prop.name] = val;
+        }
+
+        focus() {
+            $(this.$refs.ctrl).find("textarea").focus();
         }
 
         @Emit('changed')
@@ -74,7 +79,7 @@
         get items() {
             let items: Pair[] = [];
             for (const v of this.value) {
-                let item = this.prop._.items.find(i => i.ref == v);
+                let item = this.prop._.items.find(i => main.equalRef(v, i.ref));
                 if (item)
                     items.push(item);
                 else
@@ -85,6 +90,16 @@
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+    .prop-reference.ref-multi {
+        outline: none;
+    }
 
+    .prop-reference.ref-multi textarea {
+        display: none !important;
+    }
+
+    .prop-reference.ref-multi:focus textarea, .prop-reference.ref-multi:focus-within textarea {
+        display: inline-block !important;
+    }
 </style>

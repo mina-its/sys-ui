@@ -1,6 +1,8 @@
 <script lang="ts">
+    import {FunctionExecEventArg} from "@/types";
+
     declare let $: any;
-    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {FunctionDec, LogType, Context, StatusCode, EntityMeta} from "../../../sys/src/types";
     import {glob} from '@/main';
 
@@ -56,14 +58,21 @@
             return true;
         }
 
+        @Emit('exec')
+        emitExec(e: FunctionExecEventArg): FunctionExecEventArg {
+            return e;
+        }
+
         click(e) {
             this.showProgress = true;
             if (this.$listeners && this.$listeners.exec) {
-                let cn: Context = {event: e, name: this.name, data: this.$store.state.data} as Context;
                 try {
-                    this.$emit('exec', cn, () => {
-                        this.showProgress = false;
-                    });
+                    let arg: FunctionExecEventArg = {
+                        name: this.name, data: this.$store.state.data, then: () => {
+                            this.showProgress = false;
+                        }
+                    };
+                    this.$emit('exec', arg);
                 } catch (ex) {
                     this.showProgress = false;
                     console.error(`function '${this.name}' click error.`, ex);

@@ -1,13 +1,17 @@
 let index = {
+    // Vuex
+    "Modify: Dispatch               ": _dispatchStoreModify,
+    "Modify: Commits                ": _commitStoreChange,
+    "Server: Dispatch Changes       ": _dispatchRequestServerModify,
+    "Server: Commit Changes         ": _commitServerChangeResponse,
+
     // Vue
-    "Dispatch Modify      ": dispatchStoreModify,
-    "Commits Change       ": commitStoreChange,
-    "Registers Components ": registerComponents,
-    "Start Vue            ": startVue,
+    "Registers Components           ": registerComponents,
+    "Start Vue                      ": startVue,
 
     // Global
-    "Load                 ": load,
-    "Handle Response      ": handleResponse,
+    "Load                           ": load,
+    "Handle Response                ": handleResponse,
 };
 
 
@@ -15,27 +19,26 @@ import Vue from 'vue';
 import Vuex, {Store} from 'vuex';
 import $ from 'jquery';
 import App from './App.vue';
-import {MenuItem, Constants, Global, Modify, StateChange, StateChangeType} from './types';
+import {Constants, Global, MenuItem, Modify, StateChange, StateChangeType} from './types';
 import {
+    AjaxConfig,
+    ComponentParams,
     DirFile,
     Drive,
+    EmbeddedInfo,
+    EntityMeta,
+    FunctionDec,
+    IError,
     Keys,
-    Property,
-    WebResponse,
     LogType,
     NotificationInfo,
-    ComponentParams,
-    StatusCode,
-    IError,
-    Pair,
-    EmbeddedInfo,
-    RequestMode,
-    AjaxConfig,
-    WebMethod,
     ObjectDec,
-    FunctionDec,
-    EntityMeta,
-    FormDto
+    Pair,
+    Property,
+    RequestMode,
+    StatusCode,
+    WebMethod,
+    WebResponse
 } from '../../sys/src/types';
 
 const axios = require('axios').default;
@@ -229,6 +232,7 @@ export function handleResponse(res: WebResponse) {
         notify(res.message, LogType.Info);
     else if (res.form) {
         glob.form = res.form;
+        glob.data = res.data;
         vueResetFormData(res.data);
         store.state.data = res.data;
         document.title = glob.form.title as string;
@@ -238,28 +242,6 @@ export function handleResponse(res: WebResponse) {
         notify("WHAT should I do now?", LogType.Warning);
         console.log(res);
     }
-}
-
-export function setPropTextValue(prop: Property, data, val): void {
-    let locale = getQs('e') || 'en';
-    let oldValue = data[prop.name];
-
-    if (prop.text && prop.text.multiLanguage) {
-        if (locale) {
-            if (typeof oldValue == 'string')
-                data[prop.name] = {'en': oldValue};
-            else
-                data[prop.name] = data[prop.name] || {};
-
-            data[prop.name][locale] = val;
-        } else {
-            if (oldValue && typeof oldValue == 'object')
-                data[prop.name]['en'] = val;
-            else
-                data[prop.name] = val;
-        }
-    } else
-        data[prop.name] = val;
 }
 
 export function getPropTextValue(meta: Property, data): any {
@@ -335,7 +317,7 @@ export function showCmenu(state, items: MenuItem[], event, handler: (state, item
         hideCmenu();
         return;
     }
-    for (const item of items) {
+    for (let item of items) {
         item.hover = item.hover || false;
     }
     if (!items.find(i => i.hover)) {
@@ -401,10 +383,6 @@ function handleCmenuKeys(e) {
     }
 }
 
-export function changeLocale(locale) {
-    location.href = setQs('e', locale, true);
-}
-
 export function getQs(key: string): string {
     let search = location.search;
     let query = new URLSearchParams(search);
@@ -453,6 +431,7 @@ function parse(str: string): any {
 }
 
 export function flat2recursive(flatJson: any): any {
+    if (!flatJson) return flatJson;
     let keys = {};
     const findKeys = obj => {
         if (obj && obj._0) {
@@ -692,7 +671,7 @@ export function ajax(url: string, data: any, config: AjaxConfig,
     }
 
     fail = fail || notify;
-    // console.log(params);
+    console.log(params);
     axios(params).then(res => {
         if (res.code && res.code !== StatusCode.Ok) {
             fail({code: res.code, message: res.message});
@@ -723,89 +702,15 @@ function registerComponents() {
     Vue.component('Modal', require("@/components/Modal.vue").default);
     Vue.component('Prop', require("@/components/Prop.vue").default);
     Vue.component('ObjectView', require("@/components/ObjectView.vue").default);
+    Vue.component('FormElem', require("@/components/ObjectView.vue").default);
     Vue.component('GridView', require("@/components/GridView.vue").default);
     Vue.component('DetailsView', require("@/components/DetailsView.vue").default);
-}
-
-export function commitStoreChange(store, change: StateChange) {
-    store.commit('_commitStoreChange', change);
-}
-
-function _commitStoreChange(state, change: StateChange) {
-    let ref = change.uri;
-    switch (change.type) {
-        case StateChangeType.Patch:
-            state.data[ref][change.prop] = change.newValue;
-            break;
-
-        case StateChangeType.Insert:
-            state.data[ref] = change.newValue;
-            break;
-
-        case StateChangeType.Delete:
-            state.data[ref][change.prop] = null;
-            break;
-    }
-}
-
-export function dispatchStoreModify(vue: Vue, change: StateChange) {
-    vue.$store.dispatch('_dispatchStoreModify', change);
-}
-
-function _dispatchStoreModify(store, change: StateChange) {
-    let ref = change.uri;
-    switch (change.type) {
-        case StateChangeType.Patch: {
-            let modify = glob.modifies.find(m => m.ref === ref);
-            if (!modify) {
-                modify = new Modify();
-                modify.ref = ref;
-                modify.type = WebMethod.patch;
-                modify.data = {};
-            }
-            modify.data[change.prop] = change.newValue;
-            break;
-        }
-
-        case StateChangeType.Insert: {
-            let modify = new Modify();
-            modify.ref = ref;
-            modify.type = WebMethod.post;
-            modify.data = change.newValue;
-            break;
-        }
-
-        case StateChangeType.Delete: {
-            let modify = glob.modifies.find(m => m.ref === ref);
-            if (!modify) {
-                modify = new Modify();
-                modify.ref = ref;
-                modify.type = WebMethod.patch;
-                modify.data = {};
-            }
-            modify.data[change.prop] = change.newValue;
-            break;
-        }
-
-    }
-    commitStoreChange(store, change);
-}
-
-function createStore() {
-    return new Store({
-        mutations: {
-            _commitStoreChange
-        },
-        actions: {
-            _dispatchStoreModify
-        }
-    });
+    Vue.component('CheckBox', require("@/components/CheckBox.vue").default);
 }
 
 function startVue(res: WebResponse) {
     Vue.use(Vuex);
     store = createStore();
-
     handleResponse(res);
 
     Object.assign(Vue.config, {productionTip: false, devtools: true});
@@ -821,6 +726,124 @@ function startVue(res: WebResponse) {
     new Vue({data: glob, store, render: h => h(App)}).$mount('#app');
 }
 
+export function commitStoreChange(store, change: StateChange) {
+    store.commit('_commitStoreChange', change);
+}
+
+function _commitStoreChange(state, change: StateChange) {
+    let ref = change.uri;
+    glob.dirty = true;
+
+    switch (change.type) {
+        case StateChangeType.Patch:
+            change.item[change.prop] = change.value;
+            break;
+
+        case StateChangeType.Insert:
+            state.data[ref].push(change.item);
+            break;
+
+        case StateChangeType.Delete:
+            state.data[ref].splice(state.data[ref].indexOf(change.item), 1);
+            break;
+    }
+    change.vue.$forceUpdate();
+}
+
+export function commitServerChangeResponse(store, modify: Modify, res: any) {
+    store.commit('_commitServerChangeResponse', {modify, res});
+}
+
+function _commitServerChangeResponse(store, arg: { modify: Modify, res: any }) {
+    switch (arg.modify.type) {
+        case WebMethod.patch:
+        case WebMethod.post:
+            for (let key in arg.res) {
+                arg.modify.state[key] = arg.res[key];
+            }
+            //Object.assign(arg.modify.state, arg.res);
+            break;
+    }
+}
+
+export function dispatchStoreModify(vue: Vue, change: StateChange) {
+    vue.$store.dispatch('_dispatchStoreModify', change);
+}
+
+function _dispatchStoreModify(store, change: StateChange) {
+    let ref = change.uri;
+    switch (change.type) {
+        case StateChangeType.Patch: {
+            let modify = glob.modifies.find(m => m.ref === ref);
+            if (!modify) {
+                modify = {ref, type: WebMethod.patch, data: {}, state: change.item};
+                glob.modifies.push(modify);
+            }
+            modify.data[change.prop] = change.value;
+            break;
+        }
+
+        case StateChangeType.Insert: {
+            let data = {_id: change.item._id};
+            if (change.item._z) data["_z"] = change.item._z;
+            glob.modifies.push({ref, type: WebMethod.post, data, state: change.item});
+            break;
+        }
+
+        case StateChangeType.Delete: {
+            ref = ref + "/" + getBsonId(change.item);
+            let modify = glob.modifies.find(m => m.ref === ref);
+            if (modify)
+                glob.modifies.splice(glob.modifies.indexOf(modify), 1);
+            else
+                glob.modifies.push({state: change.item, ref, type: WebMethod.del});
+            break;
+        }
+
+    }
+    commitStoreChange(store, change);
+}
+
+export function dispatchRequestServerModify(store, done: (err?) => void) {
+    store.dispatch('_dispatchRequestServerModify', done);
+}
+
+function _dispatchRequestServerModify(store, done: (err?) => void) {
+    if (glob.modifies.length == 0) {
+        notify($t('saved'), LogType.Debug);
+        glob.dirty = false;
+        return done();
+    }
+
+    let modify = glob.modifies.pop();
+    //main.log(modify.type, modify.ref, modify.data);
+    ajax(prepareServerUrl(modify.ref), modify.data, {method: modify.type}, (res) => {
+        res.data = flat2recursive(res.data);
+        commitServerChangeResponse(store, modify, res.data);
+
+        if (res.redirect && glob.modifies.length == 0)
+            return handleResponseRedirect(res);
+        else
+            dispatchRequestServerModify(store, done);
+    }, (err) => {
+        done(err);
+        notify(err);
+    });
+}
+
+function createStore() {
+    return new Store({
+        mutations: {
+            _commitStoreChange,
+            _commitServerChangeResponse
+        },
+        actions: {
+            _dispatchStoreModify,
+            _dispatchRequestServerModify,
+        }
+    });
+}
+
 function start() {
     console.log('starting ...');
     const mainState = $('#main-state').html();
@@ -831,8 +854,7 @@ function start() {
     else {  // load main-state async
         let host = "http://localhost";
         let uri = host + setQs('m', RequestMode.inlineDev, true) + location.hash;
-        console.log(uri);
-
+        //console.log(uri);
         axios.get(uri, {withCredentials: true}).then(res => {
             if (res.data)
                 startVue(res.data);

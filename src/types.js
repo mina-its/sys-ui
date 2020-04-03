@@ -33,7 +33,13 @@ export class AppStateGeoMap {
 }
 export class PropChangedEventArg {
 }
+export class FunctionExecEventArg {
+}
 export class ItemPropChangedEventArg {
+}
+export class ItemEventArg {
+}
+export class PropKeydownEventArg {
 }
 export class AppStateCmenu {
     constructor() {
@@ -60,26 +66,6 @@ export class TreeViewNode {
 export class TreeViewLine {
 }
 export class TreeViewAttribute {
-}
-export class ApiDocParameter {
-}
-export class ApiDocOperation {
-}
-export class ApiDocBlock {
-    constructor() {
-        this.operations = [];
-    }
-}
-export class ApiDocSchema {
-}
-export class ApiDocEnum {
-}
-export class ApiDoc {
-    constructor() {
-        this.blocks = [];
-        this.schemas = [];
-        this.enums = [];
-    }
 }
 export class Global {
     constructor() {

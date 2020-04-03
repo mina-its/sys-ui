@@ -1,4 +1,3 @@
-import {WebMethod} from "../../../sys/src/types";
 <template>
     <div :class="'p-0 border-0 ' + styles">
         <div v-if="viewType==2" class="prop-file-box">
@@ -9,10 +8,10 @@ import {WebMethod} from "../../../sys/src/types";
                     <i @click="remove(file, $event)" class="text-black-50 fa fa-times float-right p-1 fa-xs"
                        style="cursor:pointer"></i>
                 </div>
-                <div v-if="meta.file && meta.file.preview && file._" class="prop-file-preview">
-                    <img ref="preview" class="border" :src="file._.uri" @load="getInfo"/>
-                    <div v-if="info">{{info}}</div>
-                </div>
+                <figure v-if="prop.file && prop.file.preview && file._" class="figure prop-file-preview">
+                    <img ref="preview" class="figure-img img-fluid border" :src="file._.uri" @load="getInfo"/>
+                    <figcaption v-if="info" class="figure-caption">{{info}}</figcaption>
+                </figure>
             </div>
             <function v-if="showBrowseButton" title="Browse file ..." styles="btn-secondary border"
                       @exec="browseFile"></function>

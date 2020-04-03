@@ -12,13 +12,14 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav">
-                <li v-for="item of glob.config.menu" :class="getStyle(item)">
+                <li v-for="item of glob.config.menu"
+                    :class="{'nav-item': true, 'active':currentRef===item.ref, 'dropdown':item.items}">
                     <a v-if="item.items && item.items.length" href="#" class="nav-link dropdown-toggle"
                        id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">{{item.title}}</a>
                     <div v-if="item.items && item.items.length" class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a v-for="subitem of item.items" class="dropdown-item" :href="subitem.uri">{{subitem.title}}</a>
+                        <a v-for="subitem of item.items" class="dropdown-item" :href="subitem.ref">{{subitem.title}}</a>
                     </div>
-                    <a v-else class="nav-link" :href="item.uri">{{item.title}}</a>
+                    <a v-else class="nav-link" :href="item.ref">{{item.title}}</a>
                 </li>
             </ul>
 
@@ -32,17 +33,11 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import AppLocaleMenu from "@/components/AppLocaleMenu.vue";
-    import {glob} from "@/main";
 
     @Component({components: {AppLocaleMenu}})
     export default class NavBar extends Vue {
-        getStyle(item) {
-            let style = "nav-item";
-            if (location.hostname == item.ref)
-                style += " active";
-            if (item.items)
-                style += " dropdown";
-            return style;
+        get currentRef() {
+            return location.hostname;
         }
     }
 </script>

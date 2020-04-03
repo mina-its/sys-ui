@@ -156,8 +156,8 @@
         --grid-border: #d7d9dc;
         --panel-separator-line: #dee2e6;
         --grid-row-hover: #f0f8ff;
-        --grid-row-selected: #FFC;
-        --grid-row-header-selected: #FFE;
+        --grid-row-highlight: #FFC;
+        --grid-row-header-highlight: #FFE;
         --form-label: #666;
         --layout-border: #ddd;
         --side-nav-bg: #2f353c;

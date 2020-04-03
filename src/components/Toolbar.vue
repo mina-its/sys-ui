@@ -26,8 +26,9 @@
 <script lang="ts">
     import Function from "@/components/Function.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {prepareServerUrl, $t, flat2recursive, glob} from "@/main";
-    import {Keys, WebMethod, LogType} from '../../../sys/src/types';
+    import {glob} from "@/main";
+    import {Keys} from '../../../sys/src/types';
+    import {FunctionExecEventArg} from '@/types';
 
     const $ = require('jquery');
     const main = require("@/main");
@@ -39,26 +40,13 @@
         mounted() {
             $(window).on("keydown", (e) => {
                 if (e.ctrlKey && e.which == Keys.s) {
-                    this.apply();
+                    this.apply({});
                     return false;
                 }
             });
         }
 
-        apply(cn?, done?) {
-            main.updateStateRoot({notify: null});
-            if (!done) done = () => {
-                main.log('Apply done!');
-            };
-            if (!main.validate(this.$store.state.data)) return done();
-
-            if (main.getQs("n") == "true")
-                return main.commitNewItem();
-
-            this.commitModify(done);
-        }
-
-        cancel() {
+        cancel(e: FunctionExecEventArg) {
             glob.dirty = false;
             if (main.getQs("n") == "true")
                 location.href = location.pathname;
@@ -66,33 +54,16 @@
                 location.reload();
         }
 
-        clickTitlePin() {
+        clickTitlePin(e: FunctionExecEventArg) {
             console.log('clickTitlePin');
         }
 
-        commitModify(done?) {
-            if (glob.modifies.length == 0) {
-                main.notify($t('saved'), LogType.Debug);
-                glob.dirty = false;
-                return done();
-            }
-
-            let modify = glob.modifies.pop();
-            //main.log(modify.type, modify.ref, modify.data);
-            main.ajax(prepareServerUrl(modify.ref), modify.data, {method: modify.type}, (res) => {
-                res.data = flat2recursive(res.data);
-
-                if (modify.type === WebMethod.post || modify.type == WebMethod.patch)
-                    Object.assign(modify.data, res.data);
-
-                if (res.redirect && glob.modifies.length == 0)
-                    return main.handleResponseRedirect(res);
-                else
-                    this.commitModify(done);
-            }, (err) => {
-                done(err);
-                main.notify(err);
-            });
+        apply(e: FunctionExecEventArg) {
+            glob.notify = null;
+            if (!e.then) e.then = () => main.log('Apply done!');
+            if (!main.validate(this.$store.state.data)) return e.then();
+            if (main.getQs("n") == "true") return main.commitNewItem();
+            main.dispatchRequestServerModify(this.$store, e.then);
         }
 
         // submitFile(modify: Modify, done) {

@@ -23,7 +23,7 @@
                                     class="fa text-secondary fa-spin fa-refresh fa-lg"></i><span
                                     class="p-2">loading ...</span></div>
                         </transition>
-                        <div v-for="item of files" @dblclick="select(null, null, item)"
+                        <div v-for="item of files" @dblclick="select({}, item)"
                              class="file-gallery-item m-1 p-1" tabindex="1" @focus="focus(item)"
                              @contextmenu="openMenu($event, item)" v-focus="isSelected(item)">
                             <div class="gallery-item-file d-flex align-items-center justify-content-center">
@@ -37,8 +37,8 @@
                 <div class="modal-footer">
                     <div class="d-flex w-100">
                         <Function v-if="glob.fileGallery.selectable" styles="m-2 btn-primary" @exec="select"
-                                  title="${$t('select')}"></Function>
-                        <Function styles="m-2 btn-secondary" @exec="close" title="${$t('close')}"></Function>
+                                  :title="$t('select')"></Function>
+                        <Function styles="m-2 btn-secondary" @exec="close" :title="$t('close')"></Function>
                     </div>
                 </div>
             </div>
@@ -51,7 +51,7 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {glob, $t} from '@/main';
     import {DirFile, LogType, DirFileType, YesNo, Pair} from '../../../sys/src/types';
-    import {MenuItem} from '@/types';
+    import {MenuItem, FunctionExecEventArg} from '@/types';
 
     const main = require("@/main");
     @Component({components: {}})
@@ -219,22 +219,22 @@
                 main.notify("Current directory Can not be changed!", LogType.Debug);
         }
 
-        select(cn, done, item: DirFile) {
+        select(e: FunctionExecEventArg, item?: DirFile) {
             if (item)
                 glob.fileGallery.selected = item;
             if (glob.fileGallery.selected && glob.fileGallery.selected.type == DirFileType.Folder) {
                 glob.fileGallery.path = main.joinUri(glob.fileGallery.path, glob.fileGallery.selected.name);
-                main.refreshFileGallery(null, done);
+                main.refreshFileGallery(null, e.then);
             } else {
                 $("#file-gallery").modal('hide');
                 glob.fileGallery.fileSelectCallback(glob.fileGallery.path, glob.fileGallery.selected);
-                if (done) done();
+                if (e.then) e.then();
             }
         }
 
-        close(cn, done) {
+        close(e: FunctionExecEventArg) {
             $("#file-gallery").modal('hide');
-            done();
+            e.then();
         }
 
         focus(item: DirFile) {

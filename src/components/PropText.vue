@@ -1,12 +1,13 @@
 <template>
-    <input @focus="$emit('focus', $event)" ref="ctrl" :type="type" :value="value" :placeholder="placeholder"
-           :name="viewType!=1 ? prop.name : null" @input="update()" @keydown="keydown" :readonly="readonly">
+    <input @focus="$emit('focus', $event)" :type="type" :value="value" :placeholder="placeholder" tabindex="1"
+           :name="viewType!=1 ? prop.name : null" @input="update" @keydown="keydown" :readonly="readonly">
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
     import {PropChangedEventArg} from '@/types';
+    import {getQs} from "@/main";
 
     const main = require("@/main");
 
@@ -19,22 +20,39 @@
 
         @Emit("keydown")
         keydown(e) {
-            if (e.which === Keys.up || e.which === Keys.down)
-                e.preventDefault();
-
+            if (e.which === Keys.up || e.which === Keys.down) e.preventDefault();
             return {e};
         }
 
         @Emit("changed")
-        update(): PropChangedEventArg {
-            let val = this.type == "number" ? (event.target as any).valueAsNumber : (event.target as any).value;
-            if (val === "") val = null;
-            main.setPropTextValue(this.prop, this.doc, val);
-            return {prop: this.prop, val: this.value};
+        update(e): PropChangedEventArg {
+            let text = this.type == "number" ? (e.target as any).valueAsNumber : (e.target as any).value;
+            if (text === "") text = null;
+            let locale = getQs('e') || 'en';
+            let val = this.doc[this.prop.name];
+
+            if (this.prop.text && this.prop.text.multiLanguage) {
+                if (locale) {
+                    if (typeof val == 'string')
+                        val = {'en': val};
+                    else
+                        val = val || {};
+
+                    val[locale] = text;
+                } else {
+                    if (val && typeof val == 'object')
+                        val['en'] = text;
+                    else
+                        val = text;
+                }
+            } else
+                val = text;
+
+            return {prop: this.prop, val, vue: this};
         }
 
         get readonly() {
-            return this.prop.formula;
+            return !!this.prop.formula;
         }
 
         get value() {
@@ -57,6 +75,6 @@
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 
 </style>

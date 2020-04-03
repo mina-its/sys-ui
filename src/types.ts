@@ -43,9 +43,11 @@ export class MenuItem {
 
 export class StateChange {
     type: StateChangeType;
-    prop: string;
-    newValue: any;
+    prop?: string;
+    value?: any;
+    item: any;
     uri: string;
+    vue: Vue;
 }
 
 export enum StateChangeType {
@@ -68,12 +70,31 @@ export class AppStateGeoMap {
 export class PropChangedEventArg {
     prop: Property;
     val: any;
+    vue?: Vue;
+}
+
+export class FunctionExecEventArg {
+    then?: () => void;
+    data?: any;
+    name?: string;
 }
 
 export class ItemPropChangedEventArg {
     item: any;
     prop: Property;
     val: any;
+    vue?: Vue;
+}
+
+export class ItemEventArg {
+    item: any;
+    event?: any;
+}
+
+export class PropKeydownEventArg {
+    item: any;
+    event: any;
+    prop: Property;
 }
 
 export class AppStateCmenu {
@@ -124,54 +145,8 @@ export class TreeViewAttribute {
     item: any;
 }
 
-export class ApiDocParameter {
-    title: string;
-    name: string;
-    type: string;
-    required: boolean;
-    comment: string;
-}
-
-export class ApiDocOperation {
-    method: WebMethod;
-    uri: string;
-    comment: string;
-    params: ApiDocParameter[];
-}
-
-export class ApiDocBlock {
-    title: string;
-    name: string;
-    operations: ApiDocOperation[] = [];
-}
-
-export class ApiDocSchema {
-    name: string;
-    properties: Array<{
-        name: string;
-        type: string;
-        required: boolean;
-    }>;
-}
-
-export class ApiDocEnum {
-    title: string;
-    name: string;
-    items: Array<{
-        name: string;
-        value: number;
-    }>;
-}
-
-export class ApiDoc {
-    version: string;
-    uriPrefix: string;
-    blocks: ApiDocBlock[] = [];
-    schemas: ApiDocSchema[] = [];
-    enums: ApiDocEnum[] = [];
-}
-
 export class Global {
+    data: any;
     form: FormDto;
     question = new AppStateQuestion();
     fileGallery = new AppStateFileGallery();
@@ -190,7 +165,8 @@ export class Global {
 export class Modify {
     type: WebMethod;
     ref: string;
-    data: any;
+    data?: any;
+    state: any;
 }
 
 export class AppStateFileGallery {

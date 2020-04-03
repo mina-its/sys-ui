@@ -1,8 +1,10 @@
 <template>
-    <tr :class="{selected: meta.marked}" @click="click">
-        <td v-if="selectable" class="text-center"><input type="checkbox" v-model="status" @change="updateStatus()"></td>
-        <td v-else @click="headerClick" class="text-center"></td>
-        <td v-for="(pMeta, index) in dec.properties">
+    <tr :class="{'highlight': meta.marked}" @click="click">
+        <th tabindex="0" scope="row" v-if="selectable" class="text-center">
+            <CheckBox :checked="meta.marked"></CheckBox>
+        </th>
+        <th v-else @click="headerClick" class="text-center"></th>
+        <td v-for="(pMeta, index) in dec.properties" tabindex="0">
             <Prop @focus="focused($event)" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
                   :viewType="1" :indexInGrid="index"></Prop>
         </td>
@@ -10,14 +12,17 @@
 </template>
 
 <script lang="ts">
+    import CheckBox from "@/components/CheckBox.vue";
+
     declare let $: any;
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {ObjectDec, Property, EntityMeta} from "../../../sys/src/types";
-    import {ItemPropChangedEventArg} from '@/types';
+    import {ItemPropChangedEventArg, ItemEventArg, PropKeydownEventArg} from '@/types';
 
     const main = require('../main');
-
-    @Component
+    @Component({
+        components: {CheckBox}
+    })
     export default class GridViewRow extends Vue {
         @Prop() private item: any;
         @Prop() private selectable: boolean;
@@ -38,18 +43,18 @@
         }
 
         @Emit('headerClick')
-        headerClick(e) {
-            return {item: this.item, e};
+        headerClick(e): ItemEventArg {
+            return {item: this.item, event: e};
         }
 
         @Emit('selected')
-        click() {
-            return this.item;
+        click(e): ItemEventArg {
+            return {item: this.item, event: e};
         }
 
         @Emit('keydown')
-        keydown(e, prop) {
-            return {e, item: this.item, prop};
+        keydown(e: PropKeydownEventArg): PropKeydownEventArg {
+            return {event: e.event, item: this.item, prop: e.prop} as PropKeydownEventArg;
         }
 
         get meta(): EntityMeta {
@@ -58,6 +63,24 @@
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+    tbody {
+        tr {
+            td:first-child {
+                white-space: nowrap;
+            }
 
+            &:hover td {
+                background-color: var(--grid-row-hover);
+            }
+
+            &.highlight td {
+                background-color: var(--grid-row-highlight);
+            }
+
+            &:hover th, &.highlight th {
+                background-color: var(--grid-row-header-highlight);
+            }
+        }
+    }
 </style>

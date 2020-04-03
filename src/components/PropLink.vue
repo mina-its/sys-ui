@@ -23,7 +23,7 @@
                 return main.evalExpression(this.doc, this.prop.formula);
 
             let val = this.doc[this.prop.name];
-            if (typeof val == "object") {
+            if (val && typeof val == "object") {
                 let locale = main.getQs('e') || "en";
                 return val[locale];
             } else

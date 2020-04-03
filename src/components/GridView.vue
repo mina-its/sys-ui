@@ -1,29 +1,32 @@
+import {StateChangeType} from "@/types";
 <template>
     <div :class="'grid-view' + (root?' p-4':'')" @scroll="onScroll()">
-        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">
-            <FilterItem :item="item" :key="item.id" v-for="item in dec.filter.items" :dec="dec"></FilterItem>
-        </div>
-        <table>
+<!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->
+<!--            <filter-item :item="item" :key="item.id" v-for="item in dec.filter.items" :dec="dec"></filter-item>-->
+<!--        </div>-->
+        <table class="table table-sm">
             <thead>
             <tr>
-                <th v-if="rowHeaderStyle===2" class="text-center"><input type="checkbox" v-model="mainCheckState"
-                                                                         @change="mainSelect"></th>
-                <th v-else></th>
-                <th class="text-nowrap" @click="showColumnMenu(prop, $event)" v-for="prop in dec.properties">
+                <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
+                    <CheckBox :checked="mainChecked" @changed="mainCheckChange"></CheckBox>
+                </th>
+                <th scope="col" v-else></th>
+                <th scope="col" class="text-nowrap" @click="showColumnMenu(prop, $event)"
+                    v-for="prop in dec.properties">
                     {{prop.title || prop.name}}
                 </th>
             </tr>
             </thead>
             <tbody>
-            <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown"
-                         @headerClick="showRowMenu" v-for="item in items" :item="item" :dec="dec"
-                         @changed="changed"></GridViewRow>
+            <grid-view-row @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown"
+                           @headerClick="showRowMenu" v-for="item in items" :item="item" :dec="dec"
+                           @changed="changed"></grid-view-row>
             </tbody>
             <tfoot>
             <tr>
                 <td class="border-0" colspan="100">
                     <div class="align-items-center d-flex">
-                        <function styles="m-2 fa-plus" @exec="newItem" name="newItem" :title="$t('add')"></function>
+                        <function styles="m-2 fa-plus" @exec="insert" name="newItem" :title="$t('add')"></function>
                         <function v-if="rowHeaderStyle===2" styles="fa-trash" @exec="deleteItems" name="deleteItems"
                                   :title="$t('delete')"></function>
                         <ul v-if="dec.pages > 1" class="m-2 pagination flex-grow-1">
@@ -44,29 +47,29 @@
 
 <script lang="ts">
     import FilterItem from "@/components/FilterItem.vue";
-
-    declare let $: any;
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {
-        ObjectViewType,
-        GridRowHeaderStyle,
-        NewItemMode,
-        LogType,
-        ReqParams,
-        WebMethod,
-        Pair,
-        Keys,
-        ObjectDec,
         EntityMeta,
-        Property
+        GridRowHeaderStyle,
+        Keys,
+        LogType,
+        NewItemMode,
+        ObjectDec,
+        ObjectViewType,
+        Pair,
+        ReqParams,
+        WebMethod
     } from '../../../sys/src/types';
-    import {glob, $t} from '@/main';
-    import {Modify, MenuItem, StateChangeType, StateChange, ItemPropChangedEventArg} from '@/types';
+    import {$t, glob} from '@/main';
+    import {ItemEventArg, ItemPropChangedEventArg, MenuItem, Modify, StateChange, StateChangeType} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";
+    import CheckBox from "@/components/CheckBox.vue";
+
+    declare let $: any;
 
     const main = require('@/main');
     @Component({
-        components: {GridViewRow, FilterItem}
+        components: {CheckBox, GridViewRow, FilterItem}
     })
     export default class GridView extends Vue {
         @Prop() private uri: string;
@@ -75,7 +78,17 @@
 
         private ni = -1;
         private rowHeaderStyle = GridRowHeaderStyle.empty;
-        private mainCheckState = null;
+        private mainChecked = false;
+
+        mainCheckChange(e) {
+            this.mainChecked = e.val;
+            if (e.val)
+                this.selectAll();
+            else {
+                this.rowHeaderStyle = GridRowHeaderStyle.empty;
+                this.deselectAll();
+            }
+        }
 
         get items() {
             return this.$store.state.data[this.uri] || [];
@@ -85,12 +98,13 @@
             main.dispatchStoreModify(this, {
                 type: StateChangeType.Patch,
                 prop: e.prop.name,
-                newValue: e.val,
-                uri: this.uri
+                value: e.val,
+                item: e.item,
+                uri: this.uri + "/" + (e.item._id ? e.item._id.$oid : e.item._id),
+                vue: e.vue
             } as StateChange);
-            this.$forceUpdate();
 
-            glob.dirty = true;
+            // todo : remove dependecny change here
             let dependents = this.dec.properties.filter(p => p.dependsOn == e.prop.name);
             for (const prop of dependents) {
                 e.item[prop.name] = null;
@@ -99,7 +113,7 @@
             }
         }
 
-        newItem() {
+        insert() {
             switch (this.dec.newItemMode) {
                 case NewItemMode.newPage:
                     history.pushState(null, null, location.pathname + '?n=true');
@@ -107,12 +121,14 @@
                     break;
 
                 default:
-                    let newItem = {_id: this.ni--, _: {marked: false}};
+                    let newItem = {_id: this.ni--, _: {marked: false, dec: this.dec} as EntityMeta};
                     this.dec.properties.forEach(prop => newItem[prop.name] = null);
                     if (this.dec.reorderable)
                         newItem['_z'] = (Math.max(...this.items.map(item => item._z)) || 0) + 1;
-                    this.items.push(newItem);
-                    glob.dirty = true;
+
+                    main.dispatchStoreModify(this, {
+                        type: StateChangeType.Insert, item: newItem, uri: this.uri, vue: this
+                    } as StateChange);
                     break;
 
                 case NewItemMode.modal:
@@ -162,39 +178,15 @@
         }
 
         deleteItems() {
-            for (let i = this.items.length - 1; i >= 0; i--) {
-                let item = this.items[i];
-                if (item._status) {
-                    this.items.splice(i, 1);
-
-                    if (!(item._id < 0)) { // not newly added item
-                        let url = `${this.dec.ref}/${main.getBsonId(item)}`;
-                        glob.modifies.push({type: WebMethod.del, ref: url} as Modify);
-                        throw 'todo';
-                        // glob.modifies[this.meta._ref].forEach((oitem, oi) => {
-                        // 		if (main.getBsonId(oitem) == main.getBsonId(item)) {
-                        // 			glob.modifies[this.meta._ref].splice(oi, 1);
-                        // 		}
-                        // 	}
-                        // );
-                    }
-                }
+            let selectedItems = this.items.filter(item => main.getMeta(item).marked);
+            for (let item of selectedItems) {
+                main.dispatchStoreModify(this, {type: StateChangeType.Delete, uri: this.dec.ref, item} as StateChange);
             }
             this.rowHeaderStyle = GridRowHeaderStyle.empty;
-            glob.dirty = true;
         }
 
         onScroll() {
             main.hideCmenu();
-        }
-
-        mainSelect(e) {
-            if (this.mainCheckState)
-                this.selectAll();
-            else {
-                this.rowHeaderStyle = GridRowHeaderStyle.empty;
-                this.deselectAll();
-            }
         }
 
         selectAll() {
@@ -208,16 +200,16 @@
                 main.getMeta(but).marked = true;
         }
 
-        rowSelected(item) {
-            this.mainCheckState = false;
-            let meta = main.getMeta(item);
+        rowSelected(e: ItemEventArg) {
+            this.mainChecked = false;
+            let meta = main.getMeta(e.item);
             if (this.rowHeaderStyle == GridRowHeaderStyle.select)
                 meta.marked = !meta.marked;
             else
-                this.deselectAll(item);
+                this.deselectAll(e.item);
         }
 
-        showRowMenu(item, e) {
+        showRowMenu(e: ItemEventArg) {
             let items: Pair[] = [
                 {ref: 'select', title: $t('select')},
                 {ref: 'select-all', title: $t('select-all')},
@@ -225,7 +217,7 @@
                 {ref: 'delete', title: $t('delete')},
             ];
 
-            if (item._id && main.getBsonId(item)) {
+            if (e.item._id && main.getBsonId(e.item)) {
                 if (this.root)
                     items.unshift({ref: 'tree', title: $t('tree-view')});
                 items.unshift({ref: 'details', title: $t('details')});
@@ -237,10 +229,10 @@
                 items.push({ref: 'move-down', title: $t('row-move-down')});
             }
 
-            main.showCmenu(item, items, e, (state, item) => {
+            main.showCmenu(e.item, items, e.event, (state, item: MenuItem) => {
                 main.hideCmenu();
                 if (!item) return;
-                switch (item.uri) {
+                switch (item.ref) {
                     case 'delete':
                         this.deleteItems();
                         break;
@@ -286,7 +278,7 @@
                         break;
                 }
             });
-            this.deselectAll(item);
+            this.deselectAll(e.item);
         }
 
         rowMove(up: boolean) {
@@ -331,7 +323,7 @@
                     let ri = $t.closest('tr')[0].rowIndex + (e.which == Keys.up ? -1 : 1);
                     let table = $t.closest('table');
                     if (e.which == Keys.enter && ri == table[0].rows.length - 1)
-                        this.newItem();
+                        this.insert();
                     else if (ri <= 0 || ri >= table[0].rows.length - 1)
                         return;
 
@@ -362,37 +354,22 @@
 
     .grid-view {
 
-        th {
-            padding: .5rem;
-            font-weight: 500;
+        td, th {
             border: 1px solid var(--grid-border);
-
-            &:first-child {
-                min-width: 50px;
-            }
         }
 
-        td {
-            border: 1px solid var(--grid-border);
+        th {
+            background-color: var(--grid-head);
+
+            &:first-child {
+                min-width: 3rem;
+            }
         }
 
         input {
             border: none;
             background-color: transparent;
             outline: none;
-
-            &[type="checkbox"] {
-                width: 100%;
-                margin: auto;
-                position: inherit;
-            }
-        }
-
-        thead {
-            tr {
-                background-color: var(--grid-head);
-                cursor: pointer;
-            }
         }
 
         .filter-item {
@@ -403,31 +380,6 @@
 
             &:hover {
                 opacity: .9;
-            }
-        }
-
-        tbody {
-            tr {
-                td:nth-child(2) {
-                    white-space: nowrap;
-                }
-
-                td:first-child {
-                    background-color: var(--grid-head);
-                    cursor: pointer;
-                }
-
-                &:hover {
-                    background-color: var(--grid-row-hover);
-                }
-
-                &.selected td:first-child {
-                    background-color: var(--grid-row-header-selected);
-                }
-
-                &.selected td:not(:first-child) {
-                    background-color: var(--grid-row-selected);
-                }
             }
         }
 

@@ -1,6 +1,5 @@
 <template>
-    <input @focus="$emit('focus', $event)" type="checkbox" :id="prop.name" class="form-check-input" v-model="value"
-           :name="prop.name" @keydown="keydown" @change="update">
+    <CheckBox :checked="checked" @changed="change"></CheckBox>
 </template>
 
 <script lang="ts">
@@ -19,17 +18,16 @@
         }
 
         @Emit('changed')
-        update(): PropChangedEventArg {
-            this.doc[this.prop.name] = (event.target as any).checked;
-            return {prop: this.prop, val: this.value};
+        change(): PropChangedEventArg {
+            return {prop: this.prop, val: !this.checked, vue: this};
         }
 
-        get value() {
+        get checked() {
             return this.doc[this.prop.name];
         }
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 
 </style>

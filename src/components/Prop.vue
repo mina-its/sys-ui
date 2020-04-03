@@ -2,7 +2,7 @@ import {ElemType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {Elem, EmbeddedInfo, GlobalType, ObjectViewType, Property, ElemType} from "../../../sys/src/types";
-    import {ItemPropChangedEventArg, PropChangedEventArg, PropertyLabelMode} from '@/types';
+    import {ItemPropChangedEventArg, PropChangedEventArg, PropertyLabelMode, PropKeydownEventArg} from '@/types';
     import PropBoolean from "@/components/PropBoolean.vue";
     import PropFile from "@/components/PropFile.vue";
     import PropLink from "@/components/PropLink.vue";
@@ -64,7 +64,7 @@ import {ElemType} from "../../../sys/src/types";
         @Emit("changed")
         changed(e: PropChangedEventArg): ItemPropChangedEventArg {
             main.setPropertyEmbeddedError(this.item, e.prop.name, null);
-            return {prop: e.prop, item: this.item, val: e.val};
+            return {prop: e.prop, item: this.item, val: e.val, vue: e.vue};
         }
 
         @Emit("focus")
@@ -73,8 +73,8 @@ import {ElemType} from "../../../sys/src/types";
         }
 
         @Emit('keydown')
-        keydown(e) {
-            return {e, prop: this.prop};
+        keydown(e: PropKeydownEventArg) {
+            return e;
         }
 
         renderDetailsView(ce) {

@@ -1,0 +1,73 @@
+<template>
+    <div class="checkbox-wrapper text-center" @click="changed">
+        <!--        <input @focus="$emit('focus', $event)" :id="prop.name" :name="prop.name">-->
+        <input class="checkbox" @keyup.space="changed" @keydown="keydown" type="checkbox" v-model="checked" tabindex="0"
+               @input="changed">
+        <label class="checkbox-label">{{label}}</label>
+    </div>
+</template>
+
+<script lang="ts">
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+
+    @Component
+    export default class CheckBox extends Vue {
+        @Prop() private checked: boolean;
+        @Prop() private label?: string;
+
+        @Emit('changed')
+        changed() {
+            return {val: !this.checked};
+        }
+
+        @Emit('keydown')
+        keydown(e) {
+            return e;
+        }
+    }
+</script>
+
+<style lang="scss">
+    .checkbox-wrapper {
+        outline: none;
+    }
+
+    .checkbox {
+        opacity: 0;
+        position: absolute;
+    }
+
+    .checkbox, .checkbox-label {
+        display: inline-block;
+        vertical-align: middle;
+        cursor: pointer;
+    }
+
+    .checkbox-label {
+        position: relative;
+        margin-bottom: 0;
+    }
+
+    .checkbox + .checkbox-label:before {
+        content: '';
+        background: #fff;
+        border: 1px solid #ddd;
+        display: inline-block;
+        vertical-align: middle;
+        width: 1.4rem;
+        height: 1.4rem;
+        margin-top: -.5rem;
+        text-align: center;
+    }
+
+    .checkbox:focus + .checkbox-label:before {
+        border-color: var(--primary);
+    }
+
+    .checkbox:checked + .checkbox-label:before {
+        content: "\f00c";
+        font-family: 'FontAwesome';
+        color: #666;
+    }
+
+</style>

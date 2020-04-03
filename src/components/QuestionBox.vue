@@ -10,7 +10,8 @@
                     <div class="flex-grow-1 mx-2" v-html="message"></div>
                 </div>
                 <div class="modal-footer">
-                    <Function styles="btn-primary" :title="option.title" @exec="select(option)" :key="option.ref"
+                    <Function styles="btn-primary" :title="option.title" @exec="select({...$event, data: option})"
+                              :key="option.ref"
                               v-for="option in glob.question.options"></Function>
                 </div>
             </div>
@@ -19,36 +20,39 @@
 </template>
 
 <script lang="ts">
-	declare let $, marked: any;
-	import Function from "@/components/Function.vue";
-	import {Component, Vue} from 'vue-property-decorator';
-	import {glob} from "@/main";
-	import {Pair} from '../../../sys/src/types';
+    import {FunctionExecEventArg} from "@/types";
 
-	const main = require("@/main");
+    declare let $, marked: any;
+    import Function from "@/components/Function.vue";
+    import {Component, Vue} from 'vue-property-decorator';
+    import {glob} from "@/main";
+    import {Pair} from '../../../sys/src/types';
 
-	@Component({components: {Function}})
-	export default class QuestionBox extends Vue {
-		mounted() {
-			$("#question-box").on('hidden.bs.modal', function () {
-				if (glob.question.options.length)
-					glob.question.select(null);
-			});
-		}
+    const main = require("@/main");
 
-		select(option: Pair) {
-			glob.question.select(option);
-			glob.question.options = []; // to not send again null
-			$("#question-box").modal('hide');
-		}
+    @Component({components: {Function}})
+    export default class QuestionBox extends Vue {
+        mounted() {
+            $("#question-box").on('hidden.bs.modal', function () {
+                if (glob.question.options.length)
+                    glob.question.select(null);
+            });
+        }
 
-		get message() {
-			if (glob.question.message)
-				return marked(glob.question.message);
-			else
-				return "";
-		}
-	}
+        select(e: FunctionExecEventArg) {
+            let option = e.data as Pair;
+            glob.question.select(option);
+            glob.question.options = []; // to not send again null
+            $("#question-box").modal('hide');
+        }
+
+        get message() {
+            if (glob.question.message)
+                return marked(glob.question.message);
+            else
+                return "";
+        }
+    }
 </script>
 
 <style lang="scss">
