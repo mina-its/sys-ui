@@ -11,12 +11,10 @@
 <script lang="ts">
     import TreeViewNode from "@/components/TreeViewNode.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Property, Keys, GlobalType, EntityMeta} from "../../../sys/src/types";
-    import {glob} from "@/main";
+    import {Property, Keys, GlobalType} from "../../../sys/src/types";
     import {TreeViewNode as Node, TreeViewLine, TreeViewAttribute} from '@/types';
-
-    declare let $: any;
-    const main = require("@/main");
+    import $ from 'jquery';
+    import * as main from '@/main';
 
     @Component({components: {TreeViewNode}})
     export default class TreeView extends Vue {
@@ -25,8 +23,8 @@
 
         nodes = [];
         $refs: {
-            textInput: HTMLFormElement
-            blinkingCursor: HTMLFormElement
+            textInput: HTMLInputElement;
+            blinkingCursor: HTMLFormElement;
         };
 
         mounted() {

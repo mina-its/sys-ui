@@ -10,8 +10,7 @@
     import {Property, WebMethod} from "../../../sys/src/types";
     import {glob} from "@/main";
     import {Modify, ItemChangeEventArg} from '@/types';
-
-    const main = require("@/main");
+    import * as main from '@/main';
 
     @Component
     export default class PropDocumentEditor extends Vue {

@@ -2,7 +2,7 @@ import {ElemType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {Elem, EmbeddedInfo, GlobalType, ObjectViewType, Property, ElemType} from "../../../sys/src/types";
-    import {ItemChangeEventArg, ItemChangeEventArg, PropertyLabelMode, ItemEventArg} from '@/types';
+    import {PropertyLabelMode, ItemEventArg, ItemChangeEventArg} from '@/types';
     import PropBoolean from "@/components/PropBoolean.vue";
     import PropFile from "@/components/PropFile.vue";
     import PropLink from "@/components/PropLink.vue";
@@ -13,8 +13,7 @@ import {ElemType} from "../../../sys/src/types";
     import PropTextMultiline from "@/components/PropTextMultiline.vue";
     import PropTime from "@/components/PropTime.vue";
     import PropReferenceMultiple from "@/components/PropReferenceMultiple.vue";
-
-    const main = require("@/main");
+    import * as main from '@/main';
 
     @Component({
         components: {
@@ -243,12 +242,8 @@ import {ElemType} from "../../../sys/src/types";
         &value {
             display: inline-block;
             width: 320px;
-            margin-left: 0.5rem !important;
-            padding: 0.25rem 0.5rem !important;
-
-            .prop-file {
-                padding: 0 0 !important;
-            }
+            margin-left: 0.5rem;
+            padding: 0.25rem 0.5rem;
 
             &-wide {
                 width: 500px;

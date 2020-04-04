@@ -1,12 +1,9 @@
 <script lang="ts">
     import {FunctionExecEventArg} from "@/types";
-
-    declare let $: any;
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {FunctionDec, LogType, Context, StatusCode, EntityMeta} from "../../../sys/src/types";
-    import {glob} from '@/main';
-
-    const main = require("@/main");
+    import {FunctionDec, LogType, StatusCode} from "../../../sys/src/types";
+    import $ from 'jquery';
+    import * as main from '@/main';
 
     @Component
     export default class Function extends Vue {
@@ -67,9 +64,10 @@
             this.showProgress = true;
             if (this.$listeners && this.$listeners.exec) {
                 try {
+                    let $this = this;
                     let arg: FunctionExecEventArg = {
-                        name: this.name, data: this.$store.state.data, then: () => {
-                            this.showProgress = false;
+                        name: this.name, data: this.$store.state.data, stopProgress() {
+                            $this.showProgress = false;
                         }
                     };
                     this.$emit('exec', arg);

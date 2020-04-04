@@ -22,13 +22,13 @@
 <script lang="ts">
     import {FunctionExecEventArg} from "@/types";
 
-    declare let $, marked: any;
+    declare let marked: any;
     import Function from "@/components/Function.vue";
     import {Component, Vue} from 'vue-property-decorator';
     import {glob} from "@/main";
     import {Pair} from '../../../sys/src/types';
-
-    const main = require("@/main");
+    import $ from 'jquery';
+    import * as main from '@/main';
 
     @Component({components: {Function}})
     export default class QuestionBox extends Vue {
@@ -43,7 +43,7 @@
             let option = e.data as Pair;
             glob.question.select(option);
             glob.question.options = []; // to not send again null
-            $("#question-box").modal('hide');
+            glob.question.show = false;
         }
 
         get message() {

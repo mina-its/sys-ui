@@ -1,5 +1,5 @@
 <template>
-    <div :class="'p-0 border-0 ' + styles">
+    <div :class="styles + ' border-0'">
         <div v-if="viewType==2" class="prop-file-box">
             <div v-for="file in files">
                 <div @click="showMenu(file, $event)" style="cursor: pointer"
@@ -8,13 +8,14 @@
                     <i @click="remove(file, $event)" class="text-black-50 fa fa-times float-right p-1 fa-xs"
                        style="cursor:pointer"></i>
                 </div>
-                <figure v-if="prop.file && prop.file.preview && file._" class="figure prop-file-preview">
-                    <img ref="preview" class="figure-img img-fluid border" :src="file._.uri" @load="getInfo"/>
-                    <figcaption v-if="info" class="figure-caption">{{info}}</figcaption>
+                <figure class="m-0" v-if="prop.file && prop.file.preview && file._">
+                    <img class="figure-img img-fluid border" :src="file._.uri"
+                         @load="resetFileInfo($event, file)"/>
+                    <figcaption v-if="file._.dimensions">{{file._.dimensions}}</figcaption>
                 </figure>
             </div>
-            <function v-if="showBrowseButton" title="Browse file ..." styles="btn-secondary border"
-                      @exec="browseFile"></function>
+            <Function v-if="showBrowseButton" title="Browse file ..." styles="btn-secondary border"
+                      @exec="browseFile"></Function>
         </div>
         <div v-else :class="'p-1 '+(viewType==3 ? 'd-inline-block': '')" v-for="file in files">{{title(file)}}<span
                 class="text-secondary mx-2">{{size(file)}}</span></div>
@@ -22,21 +23,19 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {DirFile, DriveMode, File, LogType, Property, RequestMode, WebMethod} from "../../../sys/src/types";
-    import {MenuItem, Modify} from '@/types';
-    import {$t, glob} from '@/main';
-
-    const main = require("@/main");
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {DirFile, DriveMode, LogType, Property, RequestMode, IData, mFile} from "../../../sys/src/types";
+    import {FileAction, FileActionType, FunctionExecEventArg, MenuItem} from '@/types';
+    import {$t, glob, joinUri} from '@/main';
+    import {v4 as uuidv4} from 'uuid';
+    import * as main from '@/main';
 
     @Component
     export default class PropFile extends Vue {
         @Prop() private prop: Property;
-        @Prop() private doc: any;
+        @Prop() private doc: IData;
         @Prop() private viewType: any;
         @Prop() private styles: string;
-
-        private info: string;
 
         showMenu(file, e) {
             if (this.prop.file && this.prop.file.drive) {
@@ -48,7 +47,7 @@
             }
         }
 
-        selectMenu(file: File, item) {
+        selectMenu(file: mFile, item) {
             main.hideCmenu();
             if (!item) return;
             switch (item.ref) {
@@ -56,7 +55,7 @@
                     window.open(file._.uri + `?m=${RequestMode.download}`, '_blank');
                     break;
                 case "select":
-                    let val = this.doc[this.prop.name] as File;
+                    let val = this.doc[this.prop.name] as mFile;
                     let path = val && val.path ? val.path : this.prop.file.path;
                     main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect);
                     break;
@@ -64,31 +63,34 @@
         }
 
         fileSelect(path: string, item: DirFile) {
+            let uri = `http://${joinUri(this.prop.file.drive.uri, path, item.name)}`;
+            let file = {_id: uuidv4(), path, _: {uri}, name: item.name, size: item.size} as mFile;
+
             let val = this.doc[this.prop.name];
-            let uri = `http://${main.joinUri(this.prop.file.drive.uri, path, item.name)}`;
-            let newItem = {_id: -Math.random(), name: item.name, path, _: {uri}, size: item.size};
             if (Array.isArray(val))
-                val.push(newItem);
+                val.push(file);
             else
-                val = newItem;
-            this.doc[this.prop.name] = val;
-            glob.dirty = true;
+                val = file;
+
+            main.dispatchFileAction(this, {
+                prop: this.prop,
+                val,
+                item: this.doc,
+                type: FileActionType.Select
+            } as FileAction);
         }
 
-        browseFile(cn, done) {
+        browseFile(e: FunctionExecEventArg) {
+            e.stopProgress();
             let item = this.doc;
             if (this.prop.file && this.prop.file.drive && this.prop.file.drive.mode == DriveMode.Gallery) {
-                let val = item[this.prop.name] as File;
+                let val = item[this.prop.name] as mFile;
                 let path = val && val.path ? val.path : this.prop.file.path;
-                main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect, done);
+                main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect);
             } else {
                 main.browseFile((files) => {
-                    done();
                     if (!files.length) return;
-                    item._files = item._files || [];
-                    for (const file of files) {
-                        item._files.push(file);
-                    }
+
                     if (this.prop.file && this.prop.file.sizeLimit) {
                         if (files.find(file => file.size > this.prop.file.sizeLimit)) {
                             main.notify(`File size must be less than ${this.prop.file.sizeLimit}`, LogType.Error);
@@ -96,43 +98,31 @@
                         }
                     }
 
-                    let val = item[this.prop.name];
-                    if (this.prop.isList) {
-                        if (!val) val = [];
-                        else if (!Array.isArray(val)) val = [val]; // in case of set property to multiple which already has data
-                    }
-
-                    for (const file of files) {
-                        let newItem = {_id: -Math.random(), name: file.name, size: file.size};
-                        if (Array.isArray(val))
-                            val.push(newItem);
-                        else
-                            val = newItem;
-                    }
-                    item[this.prop.name] = val;
-
-                    if (glob.form.toolbar) {
-                        glob.modifies.push({ref: this.prop._.ref, data: val, type: WebMethod.patch} as Modify);
-                        glob.dirty = true;
-                    }
+                    main.dispatchFileAction(this, {
+                        prop: this.prop,
+                        files,
+                        item: this.doc,
+                        type: FileActionType.Upload
+                    } as FileAction);
                 });
             }
         }
 
-        remove(file, e) {
-            glob.modifies = glob.modifies.filter(mod => mod.data._id != file._id);
+        remove(file: mFile, e) {
             let val = this.doc[this.prop.name];
             if (Array.isArray(val)) {
-                val = val.filter((item) => {
-                    return item._id != file._id;
-                });
+                val = val.filter(item => item._id != file._id);
                 if (val.length == 0)
                     val = null;
             } else
                 val = null;
-            this.doc[this.prop.name] = val;
-            glob.dirty = true;
-            console.log(1);
+
+            main.dispatchFileAction(this, {
+                prop: this.prop,
+                item: this.doc,
+                val,
+                type: FileActionType.Delete
+            } as FileAction);
             e.stopPropagation();
         }
 
@@ -147,9 +137,11 @@
             return file.path ? main.joinUri(file.path, file.name) : file.name;
         }
 
-        getInfo() {
-            if (this.$refs.preview && this.$refs.preview[0] && this.$refs.preview[0].naturalWidth)
-                this.info = this.$refs.preview[0].naturalWidth + " x " + this.$refs.preview[0].naturalHeight;
+        resetFileInfo(e, file: mFile) {
+            if (e.path && e.path[0] && e.path[0].naturalWidth) {
+                file._.dimensions = e.path[0].naturalWidth + " x " + e.path[0].naturalHeight;
+                this.$forceUpdate();
+            }
         }
 
         get showBrowseButton() {
@@ -174,8 +166,8 @@
 </script>
 
 <style lang="scss">
-    .prop-file {
-        width: 500px;
+    .prop-value.prop-file {
+        width: var(--wide-props-width);
         overflow: hidden;
         word-break: break-all;
         margin-left: 0 !important;
@@ -185,21 +177,18 @@
             background-color: var(--light);
         }
 
-        &-preview {
-            position: relative;
-
+        figure {
             img {
                 max-height: 350px;
                 object-fit: cover;
                 max-width: 100%;
             }
 
-            div {
-                float: left;
+            figcaption {
                 position: absolute;
-                left: 0px;
-                top: 0px;
                 z-index: 1000;
+                margin-top: -40px;
+                margin-left: 10px;
                 background-color: #92AD40;
                 padding: 0 10px;
                 color: #FFF;

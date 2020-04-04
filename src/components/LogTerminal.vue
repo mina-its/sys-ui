@@ -11,8 +11,7 @@
 	import {$t, glob} from "@/main";
 	import {ClientCommand, MenuItem} from '../../../sys/src/types';
 	import WebSocket from "@/components/WebSocket.vue";
-
-	const main = require("@/main");
+    import * as main from '@/main';
 
 	@Component
 	export default class LogTerminal extends Vue {

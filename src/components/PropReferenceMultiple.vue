@@ -15,9 +15,8 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Pair} from "../../../sys/src/types";
     import {MenuItem, ItemChangeEventArg} from '@/types';
-
-    const $ = require('jquery');
-    const main = require("@/main");
+    import $ from 'jquery';
+    import * as main from '@/main';
 
     @Component
     export default class PropReferenceMultiple extends Vue {

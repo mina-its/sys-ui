@@ -2,13 +2,11 @@
 </template>
 
 <script lang="ts">
-    import {AppStateLog} from "@/types";
     import {Component, Vue} from 'vue-property-decorator';
     import {ClientCommand, LogType, Pair} from '../../../sys/src/types';
     import {glob} from "@/main";
-
+    import * as main from '@/main';
     declare let io: any;
-    const main = require("@/main");
 
     @Component
     export default class WebSocket extends Vue {

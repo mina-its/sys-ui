@@ -1,59 +1,65 @@
 <template>
-    <div id="file-gallery" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content" @contextmenu="openRootMenu">
-                <div class="modal-header" v-if="glob.fileGallery.drive">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb pt-2 p-0 m-0 bg-transparent">
-                            <li v-for="item in breadcrumb" class="breadcrumb-item">
-                                <a @click="browse(item.uri)" href="#">{{item.title}}</a>
-                                <i class="fa fa-chevron-right ml-1"></i>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">{{current}}</li>
-                        </ol>
-                    </nav>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="d-flex flex-wrap p-3">
-                        <transition name="fade">
-                            <div v-if="glob.fileGallery.loading" class="file-gallery-waiting"><i
-                                    class="fa text-secondary fa-spin fa-refresh fa-lg"></i><span
-                                    class="p-2">loading ...</span></div>
-                        </transition>
-                        <div v-for="item of files" @dblclick="select({}, item)"
-                             class="file-gallery-item m-1 p-1" tabindex="1" @focus="focus(item)"
-                             @contextmenu="openMenu($event, item)" v-focus="isSelected(item)">
-                            <div class="gallery-item-file d-flex align-items-center justify-content-center">
-                                <img :class="imageStyle(item)" :src="icon(item)"/>
+    <div v-if="glob.fileGallery.show" id="file-gallery">
+        <transition name="fade">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content" @contextmenu="openRootMenu">
+                            <div class="modal-header" v-if="glob.fileGallery.drive">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb pt-2 p-0 m-0 bg-transparent">
+                                        <li v-for="item in breadcrumb" class="breadcrumb-item">
+                                            <a @click="browse(item.uri)" href="#">{{item.title}}</a>
+                                            <i class="fa fa-chevron-right ml-1"></i>
+                                        </li>
+                                        <li class="breadcrumb-item active" aria-current="page">{{current}}</li>
+                                    </ol>
+                                </nav>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" @click="glob.fileGallery.show = false">&times;</span>
+                                </button>
                             </div>
-                            <label class="text-center w-100 file-gallery-label">{{item.name}}<span
-                                    class="file-gallery-size">{{size(item)}}</span></label>
+                            <div class="modal-body">
+                                <div class="d-flex flex-wrap p-3">
+                                    <transition name="fade">
+                                        <div v-if="glob.fileGallery.loading" class="file-gallery-waiting p-5"><i
+                                                class="fa text-secondary fa-spin fa-refresh fa-lg"></i><span
+                                                class="p-2">loading ...</span></div>
+                                    </transition>
+                                    <div v-for="item of files" @dblclick="select({}, item)"
+                                         class="file-gallery-item m-1 p-1" tabindex="1" @focus="focus(item)"
+                                         @contextmenu="openMenu($event, item)" v-focus="isSelected(item)">
+                                        <div class="gallery-item-file d-flex align-items-center justify-content-center">
+                                            <img :class="{'file-gallery-image-src': isImage(item)}" :src="icon(item)"/>
+                                        </div>
+                                        <label class="text-center w-100 file-gallery-label">{{item.name}}<span
+                                                class="file-gallery-size">{{size(item)}}</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="d-flex w-100">
+                                    <Function v-if="glob.fileGallery.selectable" styles="m-2 btn-primary" @exec="select"
+                                              :title="$t('select')"></Function>
+                                    <Function styles="m-2 btn-secondary" @exec="close" :title="$t('close')"></Function>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <div class="d-flex w-100">
-                        <Function v-if="glob.fileGallery.selectable" styles="m-2 btn-primary" @exec="select"
-                                  :title="$t('select')"></Function>
-                        <Function styles="m-2 btn-secondary" @exec="close" :title="$t('close')"></Function>
-                    </div>
-                </div>
             </div>
-        </div>
+        </transition>
     </div>
 </template>
 
 <script lang="ts">
-    declare let $: any;
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {glob, $t} from '@/main';
-    import {DirFile, LogType, DirFileType, YesNo, Pair} from '../../../sys/src/types';
-    import {MenuItem, FunctionExecEventArg} from '@/types';
+    import {DirFile, LogType, DirFileType, YesNo, Pair, AjaxConfig} from '../../../sys/src/types';
+    import {MenuItem, FunctionExecEventArg, Constants} from '@/types';
+    import $ from 'jquery';
+    import * as main from '@/main';
 
-    const main = require("@/main");
     @Component({components: {}})
     export default class FileGallery extends Vue {
         get glob() {
@@ -65,6 +71,8 @@
         }
 
         openRootMenu(e) {
+            e.preventDefault();
+
             let items: MenuItem[] = [
                 {ref: "upload", title: $t('upload')},
                 {title: "-"},
@@ -73,18 +81,7 @@
             main.showCmenu(null, items, e, (state, item: MenuItem) => {
                 switch (item.ref) {
                     case "upload":
-                        main.browseFile((files) => {
-                            main.ajax('/uploadToFileGallery?m=1', {
-                                    _files: files,
-                                    drive: glob.fileGallery.drive._id,
-                                    path: glob.fileGallery.path
-                                }, null, res => {
-                                    main.refreshFileGallery();
-                                    main.notify('upload done!', LogType.Debug);
-                                }
-                            )
-                            ;
-                        });
+                        this.upload();
                         break;
 
                     case "refresh":
@@ -92,7 +89,33 @@
                         break;
                 }
             });
-            e.preventDefault();
+        }
+
+        upload() {
+            main.browseFile((files) => {
+                main.ajax('/uploadToFileGallery?m=1', {
+                        drive: glob.fileGallery.drive._id,
+                        path: glob.fileGallery.path
+                    } as any, {files} as AjaxConfig, res => {
+                        main.refreshFileGallery();
+                        main.notify('upload done!', LogType.Debug);
+                    }
+                )
+                ;
+            });
+        }
+
+        removeFile(name: string) {
+            main.question(null,
+                `### Delete Confirm\n\nAre you sure you want to delete the file '${name}'`,
+                [{title: "YES", ref: YesNo.Yes}, {title: "NO", ref: YesNo.No}], (option: Pair) => {
+                    if (!option || option.ref == YesNo.No) return;
+                    main.ajax("/deleteFromFileGallery?m=1", {
+                        drive: glob.fileGallery.drive._id,
+                        pth: glob.fileGallery.path,
+                        name
+                    }, null, () => main.refreshFileGallery());
+                });
         }
 
         openMenu(e, item: DirFile) {
@@ -110,22 +133,7 @@
             main.showCmenu(item, items, e, (state, menu: MenuItem) => {
                     switch (menu.ref) {
                         case "remove":
-                            main.question(null, `### Delete Confirm\n\nAre you sure you want to delete the file '${item.name}'`, [{
-                                title: "YES",
-                                uri: YesNo.Yes
-                            }, {
-                                title: "NO",
-                                uri: YesNo.No
-                            }], (option: Pair) => {
-                                if (!option || option.ref == YesNo.No) return;
-                                main.ajax("/deleteFromFileGallery?m=1", {
-                                    drive: glob.fileGallery.drive._id,
-                                    pth: glob.fileGallery.path,
-                                    name: item.name
-                                }, null, () => {
-                                    main.refreshFileGallery();
-                                });
-                            });
+                            this.removeFile(item.name);
                             break;
                         case "preview":
                         case "download":
@@ -148,19 +156,9 @@
             e.preventDefault();
         }
 
-        imageStyle(item: DirFile) {
+        isImage(item: DirFile): boolean {
             let ext = item.name.split('.').pop().toLowerCase();
-            switch (ext) {
-                case "png":
-                case "jpg":
-                case "jpeg":
-                case "gif":
-                case "tiff":
-                case "ico":
-                    return "file-gallery-image-src";
-                default:
-                    return null;
-            }
+            return Constants.imageExtensions.includes(ext);
         }
 
         size(item: DirFile) {
@@ -172,15 +170,10 @@
                 return '/images/gallery/folder2.png';
 
             let ext = item.name.split('.').pop().toLowerCase();
-            switch (ext) {
-                case "png":
-                case "jpg":
-                case "jpeg":
-                case "gif":
-                case "tiff":
-                case "ico":
-                    return main.joinUri(glob.fileGallery.uri, item.name);
+            if (Constants.imageExtensions.includes(ext))
+                return main.joinUri(glob.fileGallery.uri, item.name);
 
+            switch (ext) {
                 case "doc":
                 case "docx":
                     return '/images/gallery/doc.png';
@@ -220,21 +213,22 @@
         }
 
         select(e: FunctionExecEventArg, item?: DirFile) {
-            if (item)
-                glob.fileGallery.selected = item;
+            glob.fileGallery.show = false;
+            if (item) glob.fileGallery.selected = item;
+            if (e.stopProgress) e.stopProgress();
+
             if (glob.fileGallery.selected && glob.fileGallery.selected.type == DirFileType.Folder) {
                 glob.fileGallery.path = main.joinUri(glob.fileGallery.path, glob.fileGallery.selected.name);
-                main.refreshFileGallery(null, e.then);
+                main.refreshFileGallery(null);
             } else {
-                $("#file-gallery").modal('hide');
+                glob.fileGallery.show = false;
                 glob.fileGallery.fileSelectCallback(glob.fileGallery.path, glob.fileGallery.selected);
-                if (e.then) e.then();
             }
         }
 
         close(e: FunctionExecEventArg) {
-            $("#file-gallery").modal('hide');
-            e.then();
+            glob.fileGallery.show = false;
+            e.stopProgress();
         }
 
         focus(item: DirFile) {
@@ -275,6 +269,7 @@
 
 <style lang="scss">
     #file-gallery {
+
         .gallery-item-file {
             width: 100%;
             height: 128px;

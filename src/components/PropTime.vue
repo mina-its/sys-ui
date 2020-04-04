@@ -7,9 +7,8 @@
     import {ItemChangeEventArg} from "@/types";
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, LogType} from "../../../sys/src/types";
-
-    const moment = require('moment');
-    const main = require("@/main");
+    import moment from 'moment';
+    import * as main from '@/main';
 
     @Component
     export default class PropTime extends Vue {

@@ -7,7 +7,9 @@ import {
     LogType,
     NotificationInfo,
     AppStateConfig,
-    FormDto
+    FormDto,
+    IData,
+    mFile
 } from '../../sys/src/types';
 import Prop from "@/components/Prop.vue";
 
@@ -17,6 +19,8 @@ export const Constants = {
     notifyEvent: 'notify',
     questionEvent: 'question',
     contextMenuVisibleItems: 10,
+    delayToStartProgressBar: 300,
+    imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
 };
 
 export const ChartColors = [
@@ -74,19 +78,19 @@ export class PropEventArg {
 }
 
 export class ItemEventArg {
-    item: any;
+    item: IData;
     prop?: Property;
     event?: any;
 }
 
 export class FunctionExecEventArg {
-    then?: () => void;
+    stopProgress?: () => void;
     data?: any;
     name?: string;
 }
 
 export class ItemChangeEventArg {
-    item: any;
+    item?: any;
     prop: Property;
     val: any;
     vue?: Vue;
@@ -155,6 +159,7 @@ export class Global {
     geoMap = new AppStateGeoMap();
     modifies: Modify[] = [];
     socket: any;
+    progress: number = null;
 }
 
 export class Modify {
@@ -166,36 +171,39 @@ export class Modify {
 
 export class AppStateFileGallery {
     drive: Drive;
-    path: string;
-    list: DirFile[];
-    file: string;
+    path: string = '';
+    list: DirFile[] = [];
+    file: string = '';
+    show?: boolean = false;
     selectable: boolean;
-    loading: boolean;
-    fixedPath: boolean;
+    loading: boolean = false;
+    fixedPath: boolean = false;
     selected?: DirFile;
-    uri?: string;
+    uri?: string = '';
     fileSelectCallback: (path: string, item: DirFile) => void;
     fileBrowsed?: (files: any[]) => void;
+}
 
-    constructor() {
-        this.path = '';
-        this.list = [];
-        this.file = '';
-        this.loading = false;
-        this.fixedPath = false;
-        this.uri = '';
-    }
+export class FileAction {
+    item: IData;
+    val: any;
+    prop: Property;
+    files: any[];
+    type: FileActionType;
+}
+
+export enum FileActionType {
+    Upload = 1,
+    Select = 2,
+    Delete = 3,
 }
 
 export class AppStateQuestion {
     message: string;
-    options: [];
+    options: [] = [];
+    show: boolean = false;
     questionId: string;
     select: (item: Pair) => void;
-
-    constructor() {
-        this.options = [];
-    }
 }
 
 export class AppStateLog {

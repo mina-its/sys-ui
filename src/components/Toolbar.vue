@@ -29,9 +29,8 @@
     import {glob} from "@/main";
     import {Keys} from '../../../sys/src/types';
     import {FunctionExecEventArg} from '@/types';
-
-    const $ = require('jquery');
-    const main = require("@/main");
+    import $ from 'jquery';
+    import * as main from '@/main';
 
     @Component({components: {Function}})
     export default class Toolbar extends Vue {
@@ -50,8 +49,9 @@
             glob.dirty = false;
             if (main.getQs("n") == "true")
                 location.href = location.pathname;
-            else
-                location.reload();
+            else {
+                main.load(location.pathname);
+            }
         }
 
         clickTitlePin(e: FunctionExecEventArg) {
@@ -60,10 +60,10 @@
 
         apply(e: FunctionExecEventArg) {
             glob.notify = null;
-            if (!e.then) e.then = () => main.log('Apply done!');
-            if (!main.validate(this.$store.state.data)) return e.then();
-            if (main.getQs("n") == "true") return main.commitNewItem();
-            main.dispatchRequestServerModify(this.$store, e.then);
+            if (!e.stopProgress) e.stopProgress = () => main.log('Apply done!');
+            if (!main.validate(this.$store.state.data)) return e.stopProgress();
+            // todo: if (main.getQs("n") == "true") return main.commitNewItem();
+            main.dispatchRequestServerModify(this.$store, e.stopProgress);
         }
 
         // submitFile(modify: Modify, done) {

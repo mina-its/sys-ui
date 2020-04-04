@@ -18,9 +18,9 @@ import {StateChangeType} from "@/types";
             </tr>
             </thead>
             <tbody>
-            <grid-view-row @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown"
-                           @headerClick="showRowMenu" v-for="item in items" :item="item" :dec="dec"
-                           @changed="changed"></grid-view-row>
+            <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown"
+                         @headerClick="showRowMenu" v-for="item in items" :item="item"
+                         @changed="changed"></GridViewRow>
             </tbody>
             <tfoot>
             <tr>
@@ -56,16 +56,17 @@ import {StateChangeType} from "@/types";
         ObjectDec,
         ObjectViewType,
         Pair,
-        ReqParams
+        ReqParams,
+        IData
     } from '../../../sys/src/types';
     import {$t, getBsonId, glob} from '@/main';
     import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, StateChangeType} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";
     import FilterItem from "@/components/FilterItem.vue";
     import {v4 as uuidv4} from 'uuid';
+    import $ from 'jquery';
+    import * as main from '@/main';
 
-    const $ = require('jquery');
-    const main = require('@/main');
     @Component({
         components: {GridViewRow, FilterItem}
     })
@@ -77,7 +78,7 @@ import {StateChangeType} from "@/types";
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainChecked = false;
 
-        get items() {
+        get items(): IData[] {
             return this.$store.state.data[this.uri] || [];
         }
 
@@ -103,6 +104,7 @@ import {StateChangeType} from "@/types";
         }
 
         keydown(e: ItemEventArg) {
+            if (!e || !e.event) return;
             switch (e.event.which) {
                 case Keys.esc:
                     break;
@@ -181,12 +183,12 @@ import {StateChangeType} from "@/types";
                 {ref: 'sort', title: $t('sort')},
                 // {ref: "filter", title: $t('filter')},
             ];
-            main.showCmenu(prop, items, e, (state, item) => {
+            main.showCmenu(prop, items, e, (state, item: MenuItem) => {
                 main.hideCmenu();
                 if (!item)
                     return;
 
-                switch (item.uri) {
+                switch (item.ref) {
                     case 'sort':
                         let prevSort = main.getQs(ReqParams.sort);
                         let sort = (prevSort && prevSort.indexOf('-') == -1 ? '-' : '') + state.name;
@@ -203,7 +205,7 @@ import {StateChangeType} from "@/types";
         }
 
         deleteItems() {
-            let selectedItems = this.items.filter(item => main.getMeta(item).marked);
+            let selectedItems = this.items.filter(item => item._.marked);
             for (let item of selectedItems) {
                 main.dispatchStoreModify(this, {
                     type: StateChangeType.Delete,
@@ -221,20 +223,19 @@ import {StateChangeType} from "@/types";
 
         selectAll() {
             this.rowHeaderStyle = GridRowHeaderStyle.select;
-            this.items.forEach(item => main.getMeta(item).marked = true);
+            this.items.forEach(item => item._.marked = true);
         }
 
-        deselectAll(but?) {
-            this.items.forEach(item => main.getMeta(item).marked = false);
+        deselectAll(but?: IData) {
+            this.items.forEach(item => item._.marked = false);
             if (but)
-                main.getMeta(but).marked = true;
+                but._.marked = true;
         }
 
         rowSelected(e: ItemEventArg) {
             this.mainChecked = false;
-            let meta = main.getMeta(e.item);
             if (this.rowHeaderStyle == GridRowHeaderStyle.select)
-                meta.marked = !meta.marked;
+                e.item._.marked = !e.item._.marked;
             else
                 this.deselectAll(e.item);
         }
@@ -312,32 +313,7 @@ import {StateChangeType} from "@/types";
         }
 
         rowMove(up: boolean) {
-            let item = this.items.find(item => main.getMeta(item).marked);
-            let index = this.items.indexOf(item);
-            if ((up && index == 0) || (!up && index == this.items.length - 1)) return;
-            glob.dirty = true;
-
-            let emptyZs = this.items.filter(item => !item._z);
-            if (emptyZs.length) {
-                let min = Math.min(...this.items.map(item => item._z)) || 0;
-                this.items.forEach(item => item._z = ++min);
-            }
-
-            let siblingIndex = up ? index - 1 : index + 1;
-            let sibling = this.items[siblingIndex];
-
-            // check if _z are same (happens in some situations)
-            if (item._z == sibling._z) {
-                let min = Math.min(...this.items.map((item) => item._z));
-                this.items.forEach(item => item._z = min++);
-            }
-            // replace items _z
-            let _z = item._z;
-            item._z = sibling._z;
-            sibling._z = _z;
-            // reorder items index for UI effect
-            this.items.splice(index, 1);
-            this.items.splice(siblingIndex, 0, item);
+            main.commitReorderItems(this, this.items, up);
         }
     }
 </script>

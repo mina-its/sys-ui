@@ -1,12 +1,16 @@
-import { AppStateConfig } from '../../sys/src/types';
-export const Constants = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const types_1 = require("../../sys/src/types");
+exports.Constants = {
     redirectBack: '_back',
     redirectSelf: '_self',
     notifyEvent: 'notify',
     questionEvent: 'question',
     contextMenuVisibleItems: 10,
+    delayToStartProgressBar: 300,
+    imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
 };
-export const ChartColors = [
+exports.ChartColors = [
     'rgba(54, 162, 235, 0.8)',
     'rgba(255, 99, 132, 0.8)',
     'rgba(75, 192, 192, 0.8)',
@@ -15,32 +19,40 @@ export const ChartColors = [
     'rgba(153, 102, 255, 0.8)',
     'rgba(231,233,237, 0.8)' // grey:
 ];
-export class HeadFunc {
+class HeadFunc {
 }
-export class MenuItem {
+exports.HeadFunc = HeadFunc;
+class MenuItem {
 }
-export class StateChange {
+exports.MenuItem = MenuItem;
+class StateChange {
 }
-export var StateChangeType;
+exports.StateChange = StateChange;
+var StateChangeType;
 (function (StateChangeType) {
     StateChangeType[StateChangeType["Patch"] = 1] = "Patch";
     StateChangeType[StateChangeType["Insert"] = 2] = "Insert";
     StateChangeType[StateChangeType["Delete"] = 3] = "Delete";
-})(StateChangeType || (StateChangeType = {}));
-export class AppStateGeoMap {
+})(StateChangeType = exports.StateChangeType || (exports.StateChangeType = {}));
+class AppStateGeoMap {
     constructor() {
         this.show = false;
     }
 }
-export class PropEventArg {
+exports.AppStateGeoMap = AppStateGeoMap;
+class PropEventArg {
 }
-export class ItemEventArg {
+exports.PropEventArg = PropEventArg;
+class ItemEventArg {
 }
-export class FunctionExecEventArg {
+exports.ItemEventArg = ItemEventArg;
+class FunctionExecEventArg {
 }
-export class ItemChangeEventArg {
+exports.FunctionExecEventArg = FunctionExecEventArg;
+class ItemChangeEventArg {
 }
-export class AppStateCmenu {
+exports.ItemChangeEventArg = ItemChangeEventArg;
+class AppStateCmenu {
     constructor() {
         this.show = false;
         this.items = [];
@@ -48,55 +60,76 @@ export class AppStateCmenu {
         this.top = 0;
     }
 }
-export var PropertyLabelMode;
+exports.AppStateCmenu = AppStateCmenu;
+var PropertyLabelMode;
 (function (PropertyLabelMode) {
     PropertyLabelMode[PropertyLabelMode["Hidden"] = 1] = "Hidden";
     PropertyLabelMode[PropertyLabelMode["Visible"] = 2] = "Visible";
-})(PropertyLabelMode || (PropertyLabelMode = {}));
-export var DiffKind;
+})(PropertyLabelMode = exports.PropertyLabelMode || (exports.PropertyLabelMode = {}));
+var DiffKind;
 (function (DiffKind) {
     DiffKind["newlyAdded"] = "N";
     DiffKind["edited"] = "E";
     DiffKind["deleted"] = "D";
     DiffKind["arrayChange"] = "A";
-})(DiffKind || (DiffKind = {}));
-export class TreeViewNode {
+})(DiffKind = exports.DiffKind || (exports.DiffKind = {}));
+class TreeViewNode {
 }
-export class TreeViewLine {
+exports.TreeViewNode = TreeViewNode;
+class TreeViewLine {
 }
-export class TreeViewAttribute {
+exports.TreeViewLine = TreeViewLine;
+class TreeViewAttribute {
 }
-export class Global {
+exports.TreeViewAttribute = TreeViewAttribute;
+class Global {
     constructor() {
         this.question = new AppStateQuestion();
         this.fileGallery = new AppStateFileGallery();
         this.modal = false;
         this.headFuncs = [];
-        this.config = new AppStateConfig();
+        this.config = new types_1.AppStateConfig();
         this.dirty = false;
         this.notify = null;
         this.cmenu = new AppStateCmenu();
         this.geoMap = new AppStateGeoMap();
         this.modifies = [];
+        this.progress = null;
     }
 }
-export class Modify {
+exports.Global = Global;
+class Modify {
 }
-export class AppStateFileGallery {
+exports.Modify = Modify;
+class AppStateFileGallery {
     constructor() {
         this.path = '';
         this.list = [];
         this.file = '';
+        this.show = false;
         this.loading = false;
         this.fixedPath = false;
         this.uri = '';
     }
 }
-export class AppStateQuestion {
+exports.AppStateFileGallery = AppStateFileGallery;
+class FileAction {
+}
+exports.FileAction = FileAction;
+var FileActionType;
+(function (FileActionType) {
+    FileActionType[FileActionType["Upload"] = 1] = "Upload";
+    FileActionType[FileActionType["Select"] = 2] = "Select";
+    FileActionType[FileActionType["Delete"] = 3] = "Delete";
+})(FileActionType = exports.FileActionType || (exports.FileActionType = {}));
+class AppStateQuestion {
     constructor() {
         this.options = [];
+        this.show = false;
     }
 }
-export class AppStateLog {
+exports.AppStateQuestion = AppStateQuestion;
+class AppStateLog {
 }
+exports.AppStateLog = AppStateLog;
 //# sourceMappingURL=types.js.map

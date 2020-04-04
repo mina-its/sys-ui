@@ -9,8 +9,7 @@
     import {Property} from "../../../sys/src/types";
     import {glob} from "@/main";
     import {ItemChangeEventArg} from "@/types";
-
-    const main = require("@/main");
+    import * as main from '@/main';
 
     @Component
     export default class PropLocation extends Vue {

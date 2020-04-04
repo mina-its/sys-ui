@@ -8,8 +8,7 @@
     import {Property, Keys} from "../../../sys/src/types";
     import {ItemChangeEventArg, PropEventArg} from '@/types';
     import {getQs} from "@/main";
-
-    const main = require("@/main");
+    import * as main from '@/main';
 
     @Component
     export default class PropText extends Vue {

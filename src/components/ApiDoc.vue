@@ -69,7 +69,7 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	const main = require("@/main");
+    import * as main from '@/main';
 
 	@Component
 	export default class ApiDoc extends Vue {

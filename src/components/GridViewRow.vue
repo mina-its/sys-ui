@@ -4,29 +4,23 @@
             <CheckBox :checked="meta.marked"></CheckBox>
         </th>
         <th v-else @click="headerClick" class="text-center"></th>
-        <td v-for="(pMeta, index) in dec.properties">
-            <Prop @focus="focused($event)" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
+        <td v-for="(pMeta, index) in item._.dec.properties">
+            <Prop @focus="focused" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
                   :viewType="1" :indexInGrid="index"></Prop>
         </td>
     </tr>
 </template>
 
 <script lang="ts">
-    import CheckBox from "@/components/CheckBox.vue";
-
-    declare let $: any;
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {ObjectDec, Property, EntityMeta} from "../../../sys/src/types";
+    import {Property, EntityMeta, IData} from "../../../sys/src/types";
     import {ItemChangeEventArg, ItemEventArg} from '@/types';
+    import $ from 'jquery';
 
-    const main = require('../main');
-    @Component({
-        components: {CheckBox}
-    })
+    @Component
     export default class GridViewRow extends Vue {
-        @Prop() private item: any;
+        @Prop() private item: IData;
         @Prop() private selectable: boolean;
-        @Prop() private dec: ObjectDec;
 
         focused(e, prop: Property) {
             $(".prop-focused").removeClass("prop-focused");
@@ -58,7 +52,7 @@
         }
 
         get meta(): EntityMeta {
-            return main.getMeta(this.item);
+            return this.item._;
         }
     }
 </script>

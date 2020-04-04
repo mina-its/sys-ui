@@ -29,6 +29,7 @@
         z-index: 100000;
         cursor: pointer;
         color: white;
+        border-bottom: 1px solid #333;
 
         &.notify-type-4 {
             background-color: var(--warning);

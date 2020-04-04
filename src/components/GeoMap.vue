@@ -11,10 +11,9 @@
 
 <script lang="ts">
 	declare let google: any;
-	import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+	import {Component, Vue, Watch} from 'vue-property-decorator';
 	import {glob} from "@/main";
-
-	const main = require("@/main");
+    import * as main from '@/main';
 
 	@Component
 	export default class GeoMap extends Vue {

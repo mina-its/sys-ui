@@ -8,7 +8,7 @@
             <div class="d-flex flex-column flex-fill overflow-auto">
                 <Toolbar></Toolbar>
                 <div class="main-body h-100 overflow-auto w-100 d-flex" @scroll="onScroll()">
-                    <FormElem v-for="elem in glob.form.elems" :elem="elem"></FormElem>
+                    <FormElem v-for="elem in glob.form.elems" :elem="elem" :key="elem.id"></FormElem>
                 </div>
             </div>
         </main>
@@ -21,6 +21,7 @@
             <WebSocket></WebSocket>
             <QuestionBox></QuestionBox>
             <ContextMenu></ContextMenu>
+            <ProgressBar></ProgressBar>
             <!--  <geo-map></geo-map>-->
         </section>
     </div>
@@ -28,8 +29,6 @@
 
 <script lang="ts">
     import {Constants} from "@/types";
-
-    declare let $: any;
     import {Component, Vue} from 'vue-property-decorator';
     import {$t, hideCmenu, load, notify, glob} from "@/main";
     import SideNav from "@/components/SideNav.vue";
@@ -42,11 +41,13 @@
     import ContextMenu from "@/components/ContextMenu.vue";
     import Toolbar from "@/components/Toolbar.vue";
     import {LogType, NotificationInfo} from '../../sys/src/types';
-
-    const main = require("@/main");
+    import ProgressBar from "@/components/ProgressBar.vue";
+    import $ from 'jquery';
+    import * as main from '@/main';
 
     @Component({
         components: {
+            ProgressBar,
             ContextMenu,
             QuestionBox,
             WebSocket,
@@ -143,6 +144,8 @@
 </script>
 
 <style lang="scss">
+    @import '../node_modules/bootstrap/scss/bootstrap.scss';
+
     :root {
         --primary: #0072C6;
         --danger: #ff4136;
@@ -173,8 +176,6 @@
 
     $left: var(--left);
     $right: var(--right);
-
-    @import "bootstrap";
 
     html {
         height: 100%;
@@ -381,4 +382,22 @@
             //color: gray;
         }
     }
+
+    .modal-mask {
+        position: fixed;
+        z-index: 9998;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, .5);
+        display: table;
+        transition: opacity .3s ease;
+    }
+
+    .modal-wrapper {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
 </style>

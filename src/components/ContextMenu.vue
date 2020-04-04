@@ -9,13 +9,10 @@
 </template>
 
 <script lang="ts">
-    import {MenuItem} from "@/types";
-
-    declare let $: any;
     import {Component, Vue} from 'vue-property-decorator';
     import {glob} from '@/main';
-
-    const main = require("@/main");
+    import $ from 'jquery';
+    import * as main from '@/main';
 
     @Component
     export default class ContextMenu extends Vue {

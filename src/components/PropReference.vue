@@ -1,16 +1,14 @@
 <template>
     <input @focus="$emit('focus', $event)" ref="ctrl" v-bind:type="type" @keydown="keydown"
-           :value="value" tabindex="-1"
-           @blur="refreshText" @input="update()" @click="update" class="form-control">
+           :value="value" @blur="refreshText" @input="update" @click="update" class="form-control">
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
     import {glob} from "@/main";
-    import {Constants, MenuItem, ItemChangeEventArg} from '@/types';
-
-    const main = require("@/main");
+    import {Constants, MenuItem, ItemChangeEventArg, PropEventArg} from '@/types';
+    import * as main from '@/main';
 
     @Component
     export default class PropReference extends Vue {
@@ -19,13 +17,13 @@
         @Prop() private prop: Property;
 
         @Emit('keydown')
-        keydown(e) {
+        keydown(e): PropEventArg {
             if (glob.cmenu.show && (e.which === Keys.up || e.which === Keys.down)) {
                 e.preventDefault();
             }
 
             if (!glob.cmenu.show)
-                return {e};
+                return {prop: this.prop, event: e};
         }
 
         update(e) {
@@ -35,10 +33,12 @@
             this.showDropDown(items);
         }
 
+        $refs: {
+            ctrl: HTMLInputElement
+        };
+
         refreshText() {
-            let val = this.doc[this.prop.name];
-            this.doc[this.prop.name] = null;
-            this.doc[this.prop.name] = val;
+            this.$refs.ctrl.value = this.value;
         }
 
         showDropDown(items) {

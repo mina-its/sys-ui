@@ -5,7 +5,7 @@
                 <li v-for="item in sideMenu" class="nav-item">
                     <a @click="selectGroup(item)"
                        :class="{'text-nowrap text-secondary nav-link': true, 'active': $data.currentGroup===item.title}"
-                       href="#">{{item.title}}</a>
+                       href="javascript:void(0);">{{item.title}}</a>
                 </li>
             </ul>
         </aside>
@@ -27,13 +27,11 @@
 
 <script lang="ts">
     import {ItemChangeEventArg, StateChange, StateChangeType} from "@/types";
-
-    declare let $: any;
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
     import {glob} from '@/main';
-
-    const main = require("@/main");
+    import $ from 'jquery';
+    import * as main from '@/main';
 
     @Component
     export default class DetailsView extends Vue {

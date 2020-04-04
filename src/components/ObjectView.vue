@@ -1,9 +1,9 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, LogType, ObjectViewType, EntityMeta} from "../../../sys/src/types";
+    import {Elem, LogType, ObjectViewType} from "../../../sys/src/types";
     import {glob} from '@/main';
+    import * as main from '@/main';
 
-    const main = require("@/main");
     @Component
     export default class ObjectView extends Vue {
         @Prop() private elem: Elem;

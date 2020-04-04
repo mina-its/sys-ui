@@ -26,11 +26,11 @@
 
 <script lang="ts">
 	import FormElem from "@/components/FormElem.vue";
-    declare let $: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import {glob} from "@/main";
+    import $ from 'jquery';
+    import * as main from '@/main';
 
-	const main = require("@/main");
     @Component({
         components: {FormElem}
     })

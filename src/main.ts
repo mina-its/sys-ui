@@ -1,25 +1,29 @@
 let index = {
     // Vuex
-    "Modify: Dispatch               ": _dispatchStoreModify,
-    "Modify: Commits                ": _commitStoreChange,
-    "Server: Dispatch Changes       ": _dispatchRequestServerModify,
-    "Server: Commit Changes         ": _commitServerChangeResponse,
+    "Modify                         ": dispatchStoreModify,
+    "Server: Dispatch Changes       ": dispatchRequestServerModify,
+    "Server: Commit Changes         ": commitServerChangeResponse,
+    "Reorder Items                  ": commitReorderItems,
+    "File Action                    ": dispatchFileAction,
 
     // Vue
     "Registers Components           ": registerComponents,
+    "Reset Form Data                ": vueResetFormData,
     "Start Vue                      ": startVue,
 
     // Global
     "Load                           ": load,
     "Handle Response                ": handleResponse,
+    "Ajax                           ": ajax,
 };
 
 
 import Vue from 'vue';
 import Vuex, {Store} from 'vuex';
+import {v4 as uuidv4} from 'uuid';
 import $ from 'jquery';
 import App from './App.vue';
-import {Constants, Global, MenuItem, Modify, StateChange, StateChangeType} from './types';
+import {Constants, FileAction, FileActionType, Global, MenuItem, Modify, StateChange, StateChangeType} from './types';
 import {
     AjaxConfig,
     ComponentParams,
@@ -28,9 +32,12 @@ import {
     EmbeddedInfo,
     EntityMeta,
     FunctionDec,
+    IData,
     IError,
     Keys,
+    Locale,
     LogType,
+    MultilangText,
     NotificationInfo,
     ObjectDec,
     Pair,
@@ -38,7 +45,8 @@ import {
     RequestMode,
     StatusCode,
     WebMethod,
-    WebResponse
+    WebResponse,
+    mFile
 } from '../../sys/src/types';
 
 const axios = require('axios').default;
@@ -52,6 +60,16 @@ export function $t(text: string): string {
     //
     // console.warn(`Warning: text '${pack}.${key}' not found`);
     // return key.replace(/-/g, " ");
+}
+
+export function getText(text: string | MultilangText): string {
+    if (typeof text == "string") return text;
+
+    let localeName = Locale[glob.config.locale];
+    if (text[localeName])
+        return text[localeName];
+    else
+        return Object.values(text)[0];
 }
 
 // export function getNavmenu(res: WebResponse) {
@@ -91,14 +109,17 @@ export function evalExpression($this: any, expression: string): any {
     }
 }
 
-function vueResetFormData(dataset) {
-    if (!glob.form || !glob.form.declarations || !dataset) return;
+function vueResetFormData(res: WebResponse) {
+    let dataset = res.data;
+    glob.form = res.form;
 
-    const setDataMeta = (item, dec) => {
-        item._ = item._ || {};
-        let meta = item._ as EntityMeta;
-        meta.dec = dec;
-        return meta;
+    if (!glob.form || !glob.form.declarations || !dataset) return;
+    glob.form.elems.forEach(elem => elem.id = uuidv4()); // needs for refreshing form while cancel changes
+
+    const setDataMeta = (ref: string, item: IData, dec: ObjectDec | FunctionDec) => {
+        item._ = item._ || {ref} as any;
+        item._.dec = dec;
+        return item._;
     };
 
     for (let ref in dataset) {
@@ -108,12 +129,12 @@ function vueResetFormData(dataset) {
             continue;
 
         if (Array.isArray(data)) {
-            data.forEach(item => {
-                let meta = setDataMeta(item, dec);
+            data.forEach((item: IData) => {
+                let meta = setDataMeta(ref + "/" + getBsonId(item._id), item, dec);
                 meta.marked = null;
             });
         } else
-            setDataMeta(data, dec);
+            setDataMeta(ref, data, dec);
 
         for (const prop of dec.properties) {
             if (Array.isArray(data))
@@ -122,6 +143,10 @@ function vueResetFormData(dataset) {
                 setUndefinedToNull(data, prop);
         }
     }
+
+    glob.data = res.data;
+    glob.headFuncs = [];
+    commitReloadData(store, res.data);
 }
 
 function setUndefinedToNull(item, prop: Property) {
@@ -137,27 +162,12 @@ function setUndefinedToNull(item, prop: Property) {
     } // to check later
 }
 
-// export function vueResetProperties(data: any, dec: ObjectDeclare | FunctionDeclare) {
-//     data._ = data._ || {};
-//     let meta = data._ as EntityMeta;
-//     meta.dec = dec;
-//     for (const prop of meta.dec.properties) {
-//         setUndefinedToNull(data, prop);
-//     }
-// }
-
-export function getMeta(data: any): EntityMeta {
-    if (!data || !data._) return null;
-    return data._ as EntityMeta;
+export function getDec(data: IData): ObjectDec | FunctionDec {
+    return data._ ? data._.dec : null;
 }
 
-export function getDec(data: any): ObjectDec | FunctionDec {
-    let meta = getMeta(data);
-    return meta ? meta.dec : null;
-}
-
-function validateData(data: any, ref: string): boolean {
-    let meta = getMeta(data);
+function validateData(data: IData, ref: string): boolean {
+    let meta = data._;
     let requiredProps = meta.dec.properties.filter(p => p.required);
     for (const prop of requiredProps) {
         if (data[prop.name] == null) {
@@ -185,28 +195,6 @@ export function someProps(prop): boolean {
     return Array.isArray(prop.properties) && prop.properties.length;
 }
 
-export function commitNewItem() {
-    // todo
-    // let objectName = location.pathname.replace(/\//, '');
-    // let data = glob.data[objectName];
-    // if (data._id != -1) {
-    // 	notify('Invalid state, please refresh and check if the item already has been added!', LogType.Error);
-    // 	return;
-    // }
-    // for (const ref in glob.data) {
-    // 	if (ref.indexOf(objectName + "/") == 0) {
-    // 		data[ref.substr(objectName.length + 1)] = glob.data[ref];
-    // 	}
-    // }
-    //
-    // ajax(prepareServerUrl(objectName), data, null, (res) => {
-    // 	commitStateRoot({dirty: false});
-    // 	location.href = `/${objectName}/${res.data._id.$oid}`;
-    // }, (err) => {
-    // 	notify(err);
-    // });
-}
-
 export function prepareServerUrl(ref: string): string {
     ref = '/' + ref;
     let locale = getQs('e');
@@ -232,12 +220,8 @@ export function handleResponse(res: WebResponse) {
         notify(res.message, LogType.Info);
     else if (res.form) {
         // WARNING: never change these orders:
-        glob.form = res.form;
-        vueResetFormData(res.data);
-        glob.data = res.data;
-        store.state.data = res.data;
+        vueResetFormData(res);
         document.title = glob.form.title as string;
-        glob.headFuncs = [];
         $('.details-view').scrollTop(0);
     } else {
         notify("WHAT should I do now?", LogType.Warning);
@@ -488,12 +472,12 @@ export function browseFile(fileBrowsed?: (files: any[]) => void) {
     $('#file-browse').val('').click();
 }
 
-export function refreshFileGallery(file?: string, done?) {
-    openFileGallery(glob.fileGallery.drive, file, glob.fileGallery.path, glob.fileGallery.fixedPath, glob.fileGallery.fileSelectCallback, done);
+export function refreshFileGallery(file?: string) {
+    openFileGallery(glob.fileGallery.drive, file, glob.fileGallery.path, glob.fileGallery.fixedPath, glob.fileGallery.fileSelectCallback);
 }
 
 export function openFileGallery(drive: Drive, file: string, path: string, fixedPath: boolean,
-                                fileSelectCallback: (path: string, item: DirFile) => void, done?) {
+                                fileSelectCallback: (path: string, item: DirFile) => void) {
     glob.fileGallery = {
         list: [],
         loading: true,
@@ -502,18 +486,15 @@ export function openFileGallery(drive: Drive, file: string, path: string, fixedP
         path: path || '',
         fixedPath,
         selectable: true,
+        show: true,
         fileSelectCallback: fileSelectCallback
     };
 
-    $('#file-gallery').modal('show');
     ajax('/getFileGallery?m=1', {drive: drive._id, path}, {}, res => {
         glob.fileGallery.loading = false;
         glob.fileGallery.uri = res.data.uri;
         glob.fileGallery.list = res.data.list;
         glob.fileGallery.selected = glob.fileGallery.list.find(l => l.name === glob.fileGallery.file);
-        if (done) {
-            done();
-        }
     });
 }
 
@@ -654,24 +635,25 @@ export function load(href) {
     ajax(setQs('m', RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
 
-export function ajax(url: string, data: any, config: AjaxConfig,
+export function ajax(url: string, data, config: AjaxConfig,
                      done: (res: WebResponse) => void,
                      fail?: (err: { code: StatusCode, message: string }) => void) {
 
+    config = config || {};
     let headers = {};
     if (glob.config.host) {
         url = joinUri(glob.config.host, url);
     }
     let params: any = {url, data, headers, withCredentials: true};
-    if (config && config.method) {
+    if (config.method) {
         params.method = config.method;
     } else {
         params.method = data ? WebMethod.post : WebMethod.get;
     }
 
-    if (data && data._files) {
+    if (config.files) {
         params.data = new FormData();
-        for (const file of data._files) {
+        for (const file of config.files) {
             params.data.append('files[]', file, file['name']);
         }
         params.data.append('data', JSON.stringify(data));
@@ -680,7 +662,9 @@ export function ajax(url: string, data: any, config: AjaxConfig,
 
     fail = fail || notify;
     console.log(params);
+    startProgress();
     axios(params).then(res => {
+        stopProgress();
         if (res.code && res.code !== StatusCode.Ok) {
             fail({code: res.code, message: res.message});
         } else {
@@ -692,6 +676,7 @@ export function ajax(url: string, data: any, config: AjaxConfig,
             }
         }
     }).catch(err => {
+        stopProgress();
         console.error(`error on ajax '${url}'`, err);
 
         if (err.response && err.response.data && err.response.data.message) {
@@ -702,6 +687,21 @@ export function ajax(url: string, data: any, config: AjaxConfig,
             fail({message: err.toString(), code: StatusCode.UnknownError});
         }
     });
+}
+
+function startProgress() {
+    glob.progress = 0;
+    setTimeout(() => {
+        if (glob.progress != null) {
+            glob.progress = 1;
+            setTimeout(() => glob.progress = glob.progress ? 50 : 0, 0);
+            setTimeout(() => glob.progress = glob.progress ? 95 : 0, 1000);
+        }
+    }, Constants.delayToStartProgressBar);
+}
+
+function stopProgress() {
+    glob.progress = null;
 }
 
 function registerComponents() {
@@ -732,6 +732,74 @@ function startVue(res: WebResponse) {
 
     registerComponents();
     new Vue({data: glob, store, render: h => h(App)}).$mount('#app');
+}
+
+function commitFileAction(store, action: FileAction) {
+    store.commit('_commitFileAction', action);
+}
+
+function _commitFileAction(state, e: FileAction) {
+    let val = e.item[e.prop.name];
+    switch (e.type) {
+        case FileActionType.Upload:
+            e.item._.files = e.item._.files || {};
+            e.item._.files[e.prop.name] = e.item._.files[e.prop.name] || [];
+            for (const file of e.files) {
+                e.item._.files[e.prop.name].push(file);
+            }
+
+            if (this.prop.isList) {
+                if (!val) val = [];
+                else if (!Array.isArray(val)) val = [val]; // in case of set property to multiple which already has data
+            }
+
+            for (const file of e.files) {
+                let newItem = {_id: -Math.random(), name: file.name, size: file.size};
+                if (Array.isArray(val)) {
+                    val.push(newItem);
+                } else
+                    val = newItem;
+            }
+            break;
+
+        case FileActionType.Select:
+        case FileActionType.Delete:
+            e.item[e.prop.name] = e.val;
+            break;
+    }
+
+    glob.dirty = true;
+}
+
+export function dispatchFileAction(vue: Vue, e: FileAction) {
+    vue.$store.dispatch('_dispatchFileAction', e);
+}
+
+function _dispatchFileAction(store, e: FileAction) {
+    let modify = glob.modifies.find(m => m.state == e.item);
+    if (!modify) {
+        modify = {ref: e.item._.ref, type: WebMethod.patch, data: {}, state: e.item};
+        glob.modifies.push(modify);
+    }
+    switch (e.type) {
+        case FileActionType.Select:
+        case FileActionType.Delete:
+            modify.data[e.prop.name] = e.val;
+            break;
+
+        case FileActionType.Upload:
+            break;
+    }
+
+    commitFileAction(store, e);
+}
+
+function commitReloadData(store, data: any) {
+    store.commit('_commitReloadData', data);
+}
+
+function _commitReloadData(state, data: any) {
+    state.data = data;
 }
 
 export function commitStoreChange(store, change: StateChange) {
@@ -790,6 +858,40 @@ function _commitServerChangeResponse(store, arg: { modify: Modify, res: any }) {
             //Object.assign(arg.modify.state, arg.res);
             break;
     }
+}
+
+export function commitReorderItems(store, items: IData[], up: boolean) {
+    store.commit('_commitReorderItems', {items, up});
+}
+
+function _commitReorderItems(store, arg) {
+    let {items, up} = arg as { items: IData[], up: boolean };
+    let item = items.find(item => item._.marked);
+    let index = items.indexOf(item);
+    if ((up && index == 0) || (!up && index == items.length - 1)) return;
+    glob.dirty = true;
+
+    let emptyZs = items.filter(item => !item._z);
+    if (emptyZs.length) {
+        let min = Math.min(...items.map(item => item._z)) || 0;
+        items.forEach(item => item._z = ++min);
+    }
+
+    let siblingIndex = up ? index - 1 : index + 1;
+    let sibling = items[siblingIndex];
+
+    // check if _z are same (happens in some situations)
+    if (item._z == sibling._z) {
+        let min = Math.min(...items.map(item => item._z));
+        items.forEach(item => item._z = min++);
+    }
+    // replace items _z
+    let _z = item._z;
+    item._z = sibling._z;
+    sibling._z = _z;
+    // reorder items index for UI effect
+    items.splice(index, 1);
+    items.splice(siblingIndex, 0, item);
 }
 
 export function dispatchStoreModify(vue: Vue, change: StateChange) {
@@ -863,10 +965,14 @@ function createStore() {
     return new Store({
         mutations: {
             _commitStoreChange,
-            _commitServerChangeResponse
+            _commitServerChangeResponse,
+            _commitReloadData,
+            _commitFileAction,
+            _commitReorderItems,
         },
         actions: {
             _dispatchStoreModify,
+            _dispatchFileAction,
             _dispatchRequestServerModify,
         }
     });
