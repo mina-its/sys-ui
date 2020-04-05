@@ -2,7 +2,7 @@
     <div v-if="glob.fileGallery.show" id="file-gallery">
         <transition name="fade">
             <div class="modal-mask">
-                <div class="modal-wrapper">
+                <div class="modal-wrapper align-middle">
                     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                         <div class="modal-content" @contextmenu="openRootMenu">
                             <div class="modal-header" v-if="glob.fileGallery.drive">

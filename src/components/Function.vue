@@ -4,6 +4,7 @@
     import {FunctionDec, LogType, StatusCode} from "../../../sys/src/types";
     import $ from 'jquery';
     import * as main from '@/main';
+    import {glob} from "@/main";
 
     @Component
     export default class Function extends Vue {
@@ -90,7 +91,7 @@
                     else if (res.code != StatusCode.Ok)
                         main.notify(res.message, LogType.Error);
                     else {
-                        $(".my-modal").modal('hide');
+                        glob.modal = false;
                         setTimeout(() => {
                             main.handleResponse(res);
                         }, 100);

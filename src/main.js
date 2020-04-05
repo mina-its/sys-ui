@@ -523,7 +523,7 @@ function notify(content, type, params) {
 exports.notify = notify;
 function question(questionId, message, options, select) {
     window.dispatchEvent(new CustomEvent(types_1.Constants.questionEvent, { detail: { questionId, message, options, select } }));
-    jquery_1.default('#question-box').modal('show');
+    exports.glob.question.show = true;
 }
 exports.question = question;
 function getBsonId(item) {

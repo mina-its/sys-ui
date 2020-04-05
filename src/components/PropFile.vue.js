@@ -1,6 +1,88 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+;
+class {
+}
+"styles + ' border-0'" >
+    v - ;
+if ( = "viewType==2")
+    class {
+    }
+"prop-file-box" >
+    v - ;
+for ( = "file in files" >
+; ; )
+"showMenu(file, $event)";
+style = "cursor: pointer";
+class {
+}
+"prop-file-item d-flex px-2 py-1 mb-2 border border-bottom" > class {
+};
+"flex-grow-1" > {};
+{
+    title(file);
+}
+/span><span;
+class {
+}
+"property-file-size text-secondary text-nowrap mx-2" > {};
+{
+    size(file);
+}
+/span>
+    < i;
+"remove(file, $event)";
+class {
+}
+"text-black-50 fa fa-times float-right p-1 fa-xs";
+style = "cursor:pointer" > /i>
+    < /div>
+    < figure;
+class {
+}
+"m-0";
+v - ;
+if ( = "prop.file && prop.file.preview && file._" >
+    class {
+    })
+     = "figure-img img-fluid border";
+src = "file._.uri";
+"resetFileInfo($event, file)" /  >
+    v - ;
+if ( = "file._.dimensions" > {}) {
+    file._.dimensions;
+}
+/figcaption>
+    < /figure>
+    < /div>
+    < Function;
+v - ;
+if ( = "showBrowseButton")
+    title = "Browse file ...";
+styles = "btn-secondary border";
+"selectFile" > /Function>
+    < /div>
+    < div;
+v - ;
+class {
+}
+"'p-1 '+(viewType==3 ? 'd-inline-block': '')";
+v - ;
+for ( = "file in files" > {}; {}; )
+    ;
+class {
+};
+"text-secondary mx-2" > {};
+{
+    size(file);
+}
+/span></div >
+    /div>
+    < /template>
+    < script;
+lang = "ts" >
+;
 const vue_property_decorator_1 = require("vue-property-decorator");
 const types_1 = require("../../../sys/src/types");
 const types_2 = require("@/types");
@@ -88,7 +170,8 @@ let PropFile = class PropFile extends vue_property_decorator_1.Vue {
                     lastModified: file.lastModified,
                     type: file.type,
                     _: {
-                        rawData: file
+                        rawData: file,
+                        uri: URL.createObjectURL(file)
                     }
                 });
             }
@@ -172,4 +255,70 @@ PropFile = tslib_1.__decorate([
     vue_property_decorator_1.Component
 ], PropFile);
 exports.default = PropFile;
+/script>
+    < style;
+lang = "scss" >
+        .prop - value.prop - file;
+{
+    width: var ;
+    (--wide - props - width);
+    overflow: hidden;
+    word - ;
+    break ;
+    break ;
+    -all;
+    margin - left;
+    0;
+    important;
+    box - sizing;
+    content - box;
+        & -item;
+    hover;
+    {
+        background - color;
+        var ;
+        (--light);
+    }
+    figure;
+    {
+        img;
+        {
+            max - height;
+            350;
+            px;
+            object - fit;
+            cover;
+            max - width;
+            100 % ;
+        }
+        figcaption;
+        {
+            margin - top;
+            -45;
+            px;
+            margin - left;
+            10;
+            px;
+            font - weight;
+            500;
+            text - shadow;
+            1;
+            px;
+            1;
+            px;
+            1;
+            px;
+            666;
+            color: ;
+            FFF;
+        }
+    }
+}
+{
+    prop - value.prop - file;
+    {
+        width: 100 % ;
+    }
+}
+/style>;
 //# sourceMappingURL=PropFile.vue.js.map

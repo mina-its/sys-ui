@@ -546,7 +546,7 @@ export function notify(content: string | IError, type?: LogType, params?: Notifi
 
 export function question(questionId: string, message: string, options: Pair[], select: (item: Pair) => void) {
     window.dispatchEvent(new CustomEvent(Constants.questionEvent, {detail: {questionId, message, options, select}}));
-    $('#question-box').modal('show');
+    glob.question.show = true;
 }
 
 export function getBsonId(item: IData): string {
