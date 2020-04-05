@@ -1,5 +1,5 @@
 <template>
-<textarea :value="value" wrap="off" @blur="update" autocorrect="off" spellcheck="false" autocapitalize="off"
+<textarea :value="value" wrap="off" @blur="blur" autocorrect="off" spellcheck="false" autocapitalize="off"
           @keydown="keydown"
           :class="'prop-document-editor col-md-8 border '+styles+(invalidData ? ' border-danger': '')">
      </textarea>
@@ -9,7 +9,7 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, WebMethod} from "../../../sys/src/types";
     import {glob} from "@/main";
-    import {Modify, ItemChangeEventArg} from '@/types';
+    import {Modify, ItemChangeEventArg, ChangeType} from '@/types';
     import * as main from '@/main';
 
     @Component
@@ -26,25 +26,28 @@
             return {e};
         }
 
-        @Emit('changed')
-        update(e): ItemChangeEventArg {
+        blur(e) {
             try {
-                let val = (e.target as any).value ? JSON.parse((e.target as any).value) : null;
+                let val = (e.target as any).value ? JSON.parse(e.target.value) : null;
                 this.invalidData = false;
-                this.doc[this.prop.name] = val;
 
-                let ref = this.prop._.ref.replace(new RegExp(`/${this.prop.name}$`), "");
-                let data = {};
-                data[this.prop.name] = val;
-                glob.modifies.push({type: WebMethod.patch, ref, data} as Modify);
-                glob.modifies[ref][this.prop.name] = JSON.parse(JSON.stringify(val));
+                // let ref = this.prop._.ref.replace(new RegExp(`/${this.prop.name}$`), "");
+                // let data = {};
+                // data[this.prop.name] = val;
+                // glob.modifies.push({type: ChangeType.EditProp, data, ref} as Modify);
+                // glob.modifies[ref][this.prop.name] = JSON.parse(JSON.stringify(val));
 
-                return {prop: this.prop, val};
+                this.update(val);
             } catch (ex) {
                 //this.doc._error = `Property '${this.prop.title}' invalid data.`;
                 this.invalidData = true;
                 glob.dirty = true;
             }
+        }
+
+        @Emit('changed')
+        update(val): ItemChangeEventArg {
+            return {prop: this.prop, val} as ItemChangeEventArg;
         }
 
         get value() {

@@ -20,7 +20,7 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <div class="d-flex flex-wrap p-3">
+                                <div class="d-flex flex-wrap px-4">
                                     <transition name="fade">
                                         <div v-if="glob.fileGallery.loading" class="file-gallery-waiting p-5"><i
                                                 class="fa text-secondary fa-spin fa-refresh fa-lg"></i><span
@@ -29,10 +29,10 @@
                                     <div v-for="item of files" @dblclick="select({}, item)"
                                          class="file-gallery-item m-1 p-1" tabindex="1" @focus="focus(item)"
                                          @contextmenu="openMenu($event, item)" v-focus="isSelected(item)">
-                                        <div class="gallery-item-file d-flex align-items-center justify-content-center">
+                                        <div class="gallery-item-file d-flex align-items-end justify-content-center">
                                             <img :class="{'file-gallery-image-src': isImage(item)}" :src="icon(item)"/>
                                         </div>
-                                        <label class="text-center w-100 file-gallery-label">{{item.name}}<span
+                                        <label class="text-center mt-1 w-100 file-gallery-label">{{item.name}}<span
                                                 class="file-gallery-size">{{size(item)}}</span></label>
                                     </div>
                                 </div>

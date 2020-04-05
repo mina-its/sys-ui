@@ -15,8 +15,7 @@
         <section class="helpers-section">
             <FileGallery></FileGallery>
             <div id="snackbar"></div>
-            <input id="file-browse" type="file" class="d-none" @change="fileBrowsed" style="width: 0;height: 0;"
-                   multiple="true">
+            <BrowseFile></BrowseFile>
             <NotifyBox></NotifyBox>
             <WebSocket></WebSocket>
             <QuestionBox></QuestionBox>
@@ -44,9 +43,11 @@
     import ProgressBar from "@/components/ProgressBar.vue";
     import $ from 'jquery';
     import * as main from '@/main';
+    import BrowseFile from "@/components/BrowseFile.vue";
 
     @Component({
         components: {
+            BrowseFile,
             ProgressBar,
             ContextMenu,
             QuestionBox,
@@ -62,11 +63,6 @@
     export default class App extends Vue {
         onScroll() {
             main.hideCmenu();
-        }
-
-        fileBrowsed(e) {
-            console.log("fileBrowsed!");
-            glob.fileGallery.fileBrowsed(e.target.files);
         }
 
         handleWindowEvents() {

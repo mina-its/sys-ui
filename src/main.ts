@@ -23,7 +23,7 @@ import Vuex, {Store} from 'vuex';
 import {v4 as uuidv4} from 'uuid';
 import $ from 'jquery';
 import App from './App.vue';
-import {Constants, FileAction, FileActionType, Global, MenuItem, Modify, StateChange, StateChangeType} from './types';
+import {Constants, FileAction, FileActionType, Global, MenuItem, Modify, StateChange, ChangeType} from './types';
 import {
     AjaxConfig,
     ComponentParams,
@@ -130,7 +130,7 @@ function vueResetFormData(res: WebResponse) {
 
         if (Array.isArray(data)) {
             data.forEach((item: IData) => {
-                let meta = setDataMeta(ref + "/" + getBsonId(item._id), item, dec);
+                let meta = setDataMeta(ref + "/" + getBsonId(item), item, dec);
                 meta.marked = null;
             });
         } else
@@ -467,7 +467,7 @@ export function flat2recursive(flatJson: any): any {
     return flatJson;
 }
 
-export function browseFile(fileBrowsed?: (files: any[]) => void) {
+export function browseFile(fileBrowsed?: (files: FileList) => void) {
     glob.fileGallery.fileBrowsed = fileBrowsed;
     $('#file-browse').val('').click();
 }
@@ -549,7 +549,7 @@ export function question(questionId: string, message: string, options: Pair[], s
     $('#question-box').modal('show');
 }
 
-export function getBsonId(item: any): string {
+export function getBsonId(item: IData): string {
     if (!item) {
         throw 'Item is null';
     } else if (!item._id) {
@@ -651,14 +651,28 @@ export function ajax(url: string, data, config: AjaxConfig,
         params.method = data ? WebMethod.post : WebMethod.get;
     }
 
-    if (config.files) {
-        params.data = new FormData();
-        for (const file of config.files) {
-            params.data.append('files[]', file, file['name']);
+    if (data) { // extract files raw data
+        let formData: FormData = null;
+        for (let key in data) {
+            if (!data[key]) continue;
+            let itemArray: any[] = Array.isArray(data[key]) ? data[key] : [data[key]];
+            for (let item of itemArray) {
+                if (item._ && item._.rawData) {
+                    formData = formData || new FormData();
+                    let blob = (item as mFile)._.rawData;
+                    formData.append('files[]', blob, (item as mFile).name);
+                    delete (item as mFile)._.rawData;
+                }
+            }
         }
-        params.data.append('data', JSON.stringify(data));
-        params.headers['Content-Type'] = 'multipart/form-data';
+
+        if (formData) {
+            params.data = formData;
+            params.data.append('data', JSON.stringify(data));
+            params.headers['Content-Type'] = 'multipart/form-data';
+        }
     }
+
 
     fail = fail || notify;
     console.log(params);
@@ -739,35 +753,7 @@ function commitFileAction(store, action: FileAction) {
 }
 
 function _commitFileAction(state, e: FileAction) {
-    let val = e.item[e.prop.name];
-    switch (e.type) {
-        case FileActionType.Upload:
-            e.item._.files = e.item._.files || {};
-            e.item._.files[e.prop.name] = e.item._.files[e.prop.name] || [];
-            for (const file of e.files) {
-                e.item._.files[e.prop.name].push(file);
-            }
-
-            if (this.prop.isList) {
-                if (!val) val = [];
-                else if (!Array.isArray(val)) val = [val]; // in case of set property to multiple which already has data
-            }
-
-            for (const file of e.files) {
-                let newItem = {_id: -Math.random(), name: file.name, size: file.size};
-                if (Array.isArray(val)) {
-                    val.push(newItem);
-                } else
-                    val = newItem;
-            }
-            break;
-
-        case FileActionType.Select:
-        case FileActionType.Delete:
-            e.item[e.prop.name] = e.val;
-            break;
-    }
-
+    e.item[e.prop.name] = e.val;
     glob.dirty = true;
 }
 
@@ -776,21 +762,14 @@ export function dispatchFileAction(vue: Vue, e: FileAction) {
 }
 
 function _dispatchFileAction(store, e: FileAction) {
-    let modify = glob.modifies.find(m => m.state == e.item);
-    if (!modify) {
-        modify = {ref: e.item._.ref, type: WebMethod.patch, data: {}, state: e.item};
-        glob.modifies.push(modify);
-    }
-    switch (e.type) {
-        case FileActionType.Select:
-        case FileActionType.Delete:
-            modify.data[e.prop.name] = e.val;
-            break;
-
-        case FileActionType.Upload:
-            break;
-    }
-
+    let modify = {
+        ref: e.item._.ref,
+        type: ChangeType.EditFileProp,
+        data: {},
+        state: e.item,
+    } as Modify;
+    glob.modifies.push(modify);
+    modify.data[e.prop.name] = e.val;
     commitFileAction(store, e);
 }
 
@@ -810,7 +789,7 @@ function _commitStoreChange(state, change: StateChange) {
     let ref = change.uri;
 
     switch (change.type) {
-        case StateChangeType.Patch:
+        case ChangeType.EditProp:
             change.item[change.prop.name] = change.value;
 
             // todo : remove dependecny change here
@@ -822,11 +801,11 @@ function _commitStoreChange(state, change: StateChange) {
             // }
             break;
 
-        case StateChangeType.Insert:
+        case ChangeType.InsertItem:
             state.data[ref].push(change.item);
             break;
 
-        case StateChangeType.Delete:
+        case ChangeType.DeleteItem:
             state.data[ref].splice(state.data[ref].indexOf(change.item), 1);
             break;
     }
@@ -841,13 +820,13 @@ export function commitServerChangeResponse(store, modify: Modify, res: any) {
 
 function _commitServerChangeResponse(store, arg: { modify: Modify, res: any }) {
     switch (arg.modify.type) {
-        case WebMethod.patch:
+        case ChangeType.EditProp:
             for (let key in arg.res) {
                 arg.modify.state[key] = arg.res[key];
             }
             break;
 
-        case WebMethod.post:
+        case ChangeType.InsertItem:
             if (arg.modify.state._id != arg.res._reqId)
                 notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._reqId}' are not same`, LogType.Error);
             else
@@ -901,32 +880,32 @@ export function dispatchStoreModify(vue: Vue, change: StateChange) {
 function _dispatchStoreModify(store, change: StateChange) {
     let ref = change.uri;
     switch (change.type) {
-        case StateChangeType.Patch: {
-            let modify = glob.modifies.find(m => m.state == change.item);
+        case ChangeType.EditProp: {
+            let modify = glob.modifies.find(m => m.state == change.item && (m.type == ChangeType.InsertItem || m.type == ChangeType.EditProp));
             if (!modify) {
-                modify = {ref, type: WebMethod.patch, data: {}, state: change.item};
+                modify = {ref, type: ChangeType.EditProp, data: {} as IData, state: change.item};
                 glob.modifies.push(modify);
             }
             modify.data[change.prop.name] = change.value;
             break;
         }
 
-        case StateChangeType.Insert: {
+        case ChangeType.InsertItem: {
             let data = {_id: change.item._id};
             if (change.item._z) data["_z"] = change.item._z;
-            glob.modifies.push({ref, type: WebMethod.post, data, state: change.item});
+            glob.modifies.push({ref, type: ChangeType.InsertItem, data, state: change.item});
             break;
         }
 
-        case StateChangeType.Delete: {
+        case ChangeType.DeleteItem: {
             ref = ref + "/" + getBsonId(change.item);
             let modify = glob.modifies.find(m => m.state == change.item);
             if (modify) {
                 glob.modifies.splice(glob.modifies.indexOf(modify), 1);
-                if (modify.type != WebMethod.post) // delete before saving in server
-                    glob.modifies.push({state: change.item, ref, type: WebMethod.del});
+                if (modify.type != ChangeType.InsertItem) // delete before saving in server
+                    glob.modifies.push({state: change.item, ref, type: ChangeType.DeleteItem});
             } else
-                glob.modifies.push({state: change.item, ref, type: WebMethod.del});
+                glob.modifies.push({state: change.item, ref, type: ChangeType.DeleteItem});
             break;
         }
 
@@ -947,7 +926,17 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
 
     let modify = glob.modifies.shift();
     //main.log(modify.type, modify.ref, modify.data);
-    ajax(prepareServerUrl(modify.ref), modify.data, {method: modify.type}, (res) => {
+    let method = WebMethod.patch;
+    switch (modify.type) {
+        case ChangeType.InsertItem:
+            method = WebMethod.post;
+            break;
+
+        case ChangeType.DeleteItem:
+            method = WebMethod.del;
+            break;
+    }
+    ajax(prepareServerUrl(modify.ref), modify.data, {method}, (res) => {
         res.data = flat2recursive(res.data);
         commitServerChangeResponse(store, modify, res.data);
 

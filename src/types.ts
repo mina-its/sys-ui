@@ -21,6 +21,7 @@ export const Constants = {
     contextMenuVisibleItems: 10,
     delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
+    uniqueFilenameRegex : /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}__/,
 };
 
 export const ChartColors = [
@@ -47,7 +48,7 @@ export class MenuItem {
 }
 
 export class StateChange {
-    type: StateChangeType;
+    type: ChangeType;
     prop?: Property;
     value?: any;
     item: any;
@@ -55,10 +56,11 @@ export class StateChange {
     vue: Vue;
 }
 
-export enum StateChangeType {
-    Patch = 1,
-    Insert = 2,
-    Delete = 3,
+export enum ChangeType {
+    EditProp = 1,
+    InsertItem = 2,
+    DeleteItem = 3,
+    EditFileProp = 4,
 }
 
 export class AppStateGeoMap {
@@ -120,13 +122,6 @@ export enum PropertyLabelMode {
     Visible = 2,
 }
 
-export enum DiffKind {
-    newlyAdded = 'N', //  // newly added property/element
-    edited = 'E', // property/element was edited
-    deleted = 'D', // property/element was deleted
-    arrayChange = 'A',
-}
-
 export class TreeViewNode {
     line: TreeViewLine;
     nodes?: TreeViewNode[];
@@ -163,7 +158,7 @@ export class Global {
 }
 
 export class Modify {
-    type: WebMethod;
+    type: ChangeType;
     ref: string;
     data?: any;
     state: any;
@@ -181,14 +176,13 @@ export class AppStateFileGallery {
     selected?: DirFile;
     uri?: string = '';
     fileSelectCallback: (path: string, item: DirFile) => void;
-    fileBrowsed?: (files: any[]) => void;
+    fileBrowsed?: (files: FileList) => void;
 }
 
 export class FileAction {
     item: IData;
     val: any;
     prop: Property;
-    files: any[];
     type: FileActionType;
 }
 

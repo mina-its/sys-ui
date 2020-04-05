@@ -9,6 +9,7 @@ exports.Constants = {
     contextMenuVisibleItems: 10,
     delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
+    uniqueFilenameRegex: /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}__/,
 };
 exports.ChartColors = [
     'rgba(54, 162, 235, 0.8)',
@@ -28,12 +29,13 @@ exports.MenuItem = MenuItem;
 class StateChange {
 }
 exports.StateChange = StateChange;
-var StateChangeType;
-(function (StateChangeType) {
-    StateChangeType[StateChangeType["Patch"] = 1] = "Patch";
-    StateChangeType[StateChangeType["Insert"] = 2] = "Insert";
-    StateChangeType[StateChangeType["Delete"] = 3] = "Delete";
-})(StateChangeType = exports.StateChangeType || (exports.StateChangeType = {}));
+var ChangeType;
+(function (ChangeType) {
+    ChangeType[ChangeType["EditProp"] = 1] = "EditProp";
+    ChangeType[ChangeType["InsertItem"] = 2] = "InsertItem";
+    ChangeType[ChangeType["DeleteItem"] = 3] = "DeleteItem";
+    ChangeType[ChangeType["EditFileProp"] = 4] = "EditFileProp";
+})(ChangeType = exports.ChangeType || (exports.ChangeType = {}));
 class AppStateGeoMap {
     constructor() {
         this.show = false;
@@ -66,13 +68,6 @@ var PropertyLabelMode;
     PropertyLabelMode[PropertyLabelMode["Hidden"] = 1] = "Hidden";
     PropertyLabelMode[PropertyLabelMode["Visible"] = 2] = "Visible";
 })(PropertyLabelMode = exports.PropertyLabelMode || (exports.PropertyLabelMode = {}));
-var DiffKind;
-(function (DiffKind) {
-    DiffKind["newlyAdded"] = "N";
-    DiffKind["edited"] = "E";
-    DiffKind["deleted"] = "D";
-    DiffKind["arrayChange"] = "A";
-})(DiffKind = exports.DiffKind || (exports.DiffKind = {}));
 class TreeViewNode {
 }
 exports.TreeViewNode = TreeViewNode;

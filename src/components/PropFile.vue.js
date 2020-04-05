@@ -28,16 +28,24 @@ let PropFile = class PropFile extends vue_property_decorator_1.Vue {
             case "select":
                 let val = this.doc[this.prop.name];
                 let path = val && val.path ? val.path : this.prop.file.path;
-                main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect);
+                main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
                 break;
         }
     }
-    fileSelect(path, item) {
+    selectFromGallery(path, item) {
         let uri = `http://${main_1.joinUri(this.prop.file.drive.uri, path, item.name)}`;
-        let file = { _id: uuid_1.v4(), path, _: { uri }, name: item.name, size: item.size };
+        let file = {
+            path,
+            _: { uri },
+            name: item.name,
+            size: item.size,
+            lastModified: item.lastModified
+        };
         let val = this.doc[this.prop.name];
-        if (Array.isArray(val))
+        if (Array.isArray(val)) {
+            val = [...val]; // to prevent change it here
             val.push(file);
+        }
         else
             val = file;
         main.dispatchFileAction(this, {
@@ -47,37 +55,62 @@ let PropFile = class PropFile extends vue_property_decorator_1.Vue {
             type: types_2.FileActionType.Select
         });
     }
-    browseFile(e) {
+    selectFile(e) {
         e.stopProgress();
-        let item = this.doc;
+        let val = this.getVal();
         if (this.prop.file && this.prop.file.drive && this.prop.file.drive.mode == types_1.DriveMode.Gallery) {
-            let val = item[this.prop.name];
             let path = val && val.path ? val.path : this.prop.file.path;
-            main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect);
+            main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
         }
         else {
-            main.browseFile((files) => {
-                if (!files.length)
-                    return;
-                if (this.prop.file && this.prop.file.sizeLimit) {
-                    if (files.find(file => file.size > this.prop.file.sizeLimit)) {
-                        main.notify(`File size must be less than ${this.prop.file.sizeLimit}`, types_1.LogType.Error);
-                        return;
-                    }
-                }
-                main.dispatchFileAction(this, {
-                    prop: this.prop,
-                    files,
-                    item: this.doc,
-                    type: types_2.FileActionType.Upload
-                });
-            });
+            this.browseFile(val);
         }
+    }
+    getVal() {
+        let val = this.doc[this.prop.name];
+        if (this.prop.isList) {
+            if (!val)
+                val = [];
+            else if (!Array.isArray(val))
+                val = [val]; // in case of set property to multiple which already has data
+        }
+        return val;
+    }
+    browseFile(val) {
+        main.browseFile((fileList) => {
+            if (!fileList.length)
+                return;
+            let files = [];
+            for (const file of fileList) {
+                files.push({
+                    name: uuid_1.v4() + "__" + file.name,
+                    size: file.size,
+                    lastModified: file.lastModified,
+                    type: file.type,
+                    _: {
+                        rawData: file
+                    }
+                });
+            }
+            if (this.prop.file && this.prop.file.sizeLimit) {
+                if (files.find(item => item.size > this.prop.file.sizeLimit)) {
+                    main.notify(`File size must be less than ${this.prop.file.sizeLimit}`, types_1.LogType.Error);
+                    return;
+                }
+            }
+            val = this.prop.isList ? val.concat(...files) : files[0];
+            main.dispatchFileAction(this, {
+                prop: this.prop,
+                val,
+                item: this.doc,
+                type: types_2.FileActionType.Upload
+            });
+        });
     }
     remove(file, e) {
         let val = this.doc[this.prop.name];
         if (Array.isArray(val)) {
-            val = val.filter(item => item._id != file._id);
+            val = val.filter(item => item.name != file.name);
             if (val.length == 0)
                 val = null;
         }
@@ -98,6 +131,8 @@ let PropFile = class PropFile extends vue_property_decorator_1.Vue {
             return null;
     }
     title(file) {
+        if (types_2.Constants.uniqueFilenameRegex.test(file.name))
+            return file.name.replace(types_2.Constants.uniqueFilenameRegex, "");
         return file.path ? main.joinUri(file.path, file.name) : file.name;
     }
     resetFileInfo(e, file) {

@@ -15,7 +15,7 @@
                 </figure>
             </div>
             <Function v-if="showBrowseButton" title="Browse file ..." styles="btn-secondary border"
-                      @exec="browseFile"></Function>
+                      @exec="selectFile"></Function>
         </div>
         <div v-else :class="'p-1 '+(viewType==3 ? 'd-inline-block': '')" v-for="file in files">{{title(file)}}<span
                 class="text-secondary mx-2">{{size(file)}}</span></div>
@@ -25,7 +25,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {DirFile, DriveMode, LogType, Property, RequestMode, IData, mFile} from "../../../sys/src/types";
-    import {FileAction, FileActionType, FunctionExecEventArg, MenuItem} from '@/types';
+    import {Constants, FileAction, FileActionType, FunctionExecEventArg, MenuItem} from '@/types';
     import {$t, glob, joinUri} from '@/main';
     import {v4 as uuidv4} from 'uuid';
     import * as main from '@/main';
@@ -57,19 +57,26 @@
                 case "select":
                     let val = this.doc[this.prop.name] as mFile;
                     let path = val && val.path ? val.path : this.prop.file.path;
-                    main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect);
+                    main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
                     break;
             }
         }
 
-        fileSelect(path: string, item: DirFile) {
+        selectFromGallery(path: string, item: DirFile) {
             let uri = `http://${joinUri(this.prop.file.drive.uri, path, item.name)}`;
-            let file = {_id: uuidv4(), path, _: {uri}, name: item.name, size: item.size} as mFile;
+            let file = {
+                path,
+                _: {uri},
+                name: item.name,
+                size: item.size,
+                lastModified: item.lastModified
+            } as mFile;
 
             let val = this.doc[this.prop.name];
-            if (Array.isArray(val))
+            if (Array.isArray(val)) {
+                val = [...val]; // to prevent change it here
                 val.push(file);
-            else
+            } else
                 val = file;
 
             main.dispatchFileAction(this, {
@@ -80,38 +87,66 @@
             } as FileAction);
         }
 
-        browseFile(e: FunctionExecEventArg) {
+        selectFile(e: FunctionExecEventArg) {
             e.stopProgress();
-            let item = this.doc;
+            let val = this.getVal();
+
             if (this.prop.file && this.prop.file.drive && this.prop.file.drive.mode == DriveMode.Gallery) {
-                let val = item[this.prop.name] as mFile;
                 let path = val && val.path ? val.path : this.prop.file.path;
-                main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.fileSelect);
+                main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
             } else {
-                main.browseFile((files) => {
-                    if (!files.length) return;
-
-                    if (this.prop.file && this.prop.file.sizeLimit) {
-                        if (files.find(file => file.size > this.prop.file.sizeLimit)) {
-                            main.notify(`File size must be less than ${this.prop.file.sizeLimit}`, LogType.Error);
-                            return;
-                        }
-                    }
-
-                    main.dispatchFileAction(this, {
-                        prop: this.prop,
-                        files,
-                        item: this.doc,
-                        type: FileActionType.Upload
-                    } as FileAction);
-                });
+                this.browseFile(val);
             }
+        }
+
+        getVal() {
+            let val = this.doc[this.prop.name];
+            if (this.prop.isList) {
+                if (!val) val = [];
+                else if (!Array.isArray(val)) val = [val]; // in case of set property to multiple which already has data
+            }
+            return val;
+        }
+
+        browseFile(val: mFile | mFile[]) {
+            main.browseFile((fileList: FileList) => {
+                if (!fileList.length) return;
+
+                let files: mFile[] = [];
+                for (const file of fileList) {
+                    files.push({
+                        name: uuidv4() + "__" + file.name,
+                        size: file.size,
+                        lastModified: file.lastModified,
+                        type: file.type,
+                        _: {
+                            rawData: file,
+                            uri: URL.createObjectURL(file)
+                        }
+                    } as mFile);
+                }
+
+                if (this.prop.file && this.prop.file.sizeLimit) {
+                    if (files.find(item => item.size > this.prop.file.sizeLimit)) {
+                        main.notify(`File size must be less than ${this.prop.file.sizeLimit}`, LogType.Error);
+                        return;
+                    }
+                }
+
+                val = this.prop.isList ? (val as mFile[]).concat(...files) : files[0];
+                main.dispatchFileAction(this, {
+                    prop: this.prop,
+                    val,
+                    item: this.doc,
+                    type: FileActionType.Upload
+                } as FileAction);
+            });
         }
 
         remove(file: mFile, e) {
             let val = this.doc[this.prop.name];
             if (Array.isArray(val)) {
-                val = val.filter(item => item._id != file._id);
+                val = (val as mFile[]).filter(item => item.name != file.name);
                 if (val.length == 0)
                     val = null;
             } else
@@ -134,6 +169,9 @@
         }
 
         title(file) {
+            if (Constants.uniqueFilenameRegex.test(file.name))
+                return file.name.replace(Constants.uniqueFilenameRegex, "");
+
             return file.path ? main.joinUri(file.path, file.name) : file.name;
         }
 
@@ -185,12 +223,10 @@
             }
 
             figcaption {
-                position: absolute;
-                z-index: 1000;
-                margin-top: -40px;
+                margin-top: -45px;
                 margin-left: 10px;
-                background-color: #92AD40;
-                padding: 0 10px;
+                font-weight: 500;
+                text-shadow: 1px 1px 1px #666;
                 color: #FFF;
             }
         }

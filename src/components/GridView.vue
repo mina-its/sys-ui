@@ -60,7 +60,7 @@ import {StateChangeType} from "@/types";
         IData
     } from '../../../sys/src/types';
     import {$t, getBsonId, glob} from '@/main';
-    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, StateChangeType} from '@/types';
+    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";
     import FilterItem from "@/components/FilterItem.vue";
     import {v4 as uuidv4} from 'uuid';
@@ -94,7 +94,7 @@ import {StateChangeType} from "@/types";
 
         changed(e: ItemChangeEventArg) {
             main.dispatchStoreModify(this, {
-                type: StateChangeType.Patch,
+                type: ChangeType.EditProp,
                 prop: e.prop,
                 value: e.val,
                 item: e.item,
@@ -154,7 +154,7 @@ import {StateChangeType} from "@/types";
                         newItem['_z'] = (Math.max(...this.items.map(item => item._z)) || 0) + 1;
 
                     main.dispatchStoreModify(this, {
-                        type: StateChangeType.Insert, item: newItem, uri: this.uri, vue: this
+                        type: ChangeType.InsertItem, item: newItem, uri: this.uri, vue: this
                     } as StateChange);
                     break;
 
@@ -208,7 +208,7 @@ import {StateChangeType} from "@/types";
             let selectedItems = this.items.filter(item => item._.marked);
             for (let item of selectedItems) {
                 main.dispatchStoreModify(this, {
-                    type: StateChangeType.Delete,
+                    type: ChangeType.DeleteItem,
                     uri: this.dec.ref,
                     item,
                     vue: this

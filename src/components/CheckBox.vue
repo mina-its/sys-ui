@@ -71,7 +71,7 @@
     }
 
     .checkbox:focus + .checkbox-label:before {
-        border-color: var(--primary);
+        border-color: #999;
     }
 
     .checkbox:checked + .checkbox-label:before {

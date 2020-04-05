@@ -1,5 +1,5 @@
 <template>
-    <input @focus="focus" :type="type" :value="value" :placeholder="placeholder" tabindex="1"
+    <input @focus="focus" :type="type" :value="value" :placeholder="placeholder"
            :name="viewType!=1 ? prop.name : null" @input="update" @keydown="keydown" :readonly="readonly">
 </template>
 

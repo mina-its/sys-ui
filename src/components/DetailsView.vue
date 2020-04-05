@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-    import {ItemChangeEventArg, StateChange, StateChangeType} from "@/types";
+    import {ItemChangeEventArg, StateChange, ChangeType} from "@/types";
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
     import {glob} from '@/main';
@@ -102,7 +102,7 @@
 
         changed(e: ItemChangeEventArg) {
             main.dispatchStoreModify(this, {
-                type: StateChangeType.Patch,
+                type: ChangeType.EditProp,
                 prop: e.prop,
                 value: e.val,
                 item: e.item,
