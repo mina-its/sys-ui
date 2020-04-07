@@ -2,7 +2,6 @@
     import {FunctionExecEventArg} from "@/types";
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {FunctionDec, LogType, StatusCode} from "../../../sys/src/types";
-    import $ from 'jquery';
     import * as main from '@/main';
     import {glob} from "@/main";
 
@@ -104,7 +103,3 @@
         }
     }
 </script>
-
-<style scoped lang="scss">
-
-</style>

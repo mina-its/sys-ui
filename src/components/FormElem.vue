@@ -3,6 +3,7 @@
     import {Elem, ElemType, ObjectViewType, FunctionDec, EntityMeta} from "../../../sys/src/types";
     import Markdown from "@/components/Markdown.vue";
     import * as main from '@/main';
+    import {ChangeType, ItemChangeEventArg, StateChange} from "@/types";
 
     @Component({
         components: {
@@ -37,20 +38,35 @@
                 }
 
                 case ElemType.Property: {
-                    let item = this.$store.state.data[this.elem.property.entityRef];
+                    let uri = this.elem.property.entityRef;
+                    let item = this.$store.state.data[uri];
+                    let vue = this;
                     let dec = main.getDec(item);
                     if (!dec) throw `property elem: meta not found for ref '${this.elem.property.entityRef}'`;
 
                     let prop = dec.properties.find(prop => prop.name == this.elem.property.name);
                     if (!prop) throw `error rendering property elem. property '${this.elem.property.name}' dec not found!`;
 
-                    return ce('prop', {
+                    let propElem = ce('prop', {
                         props: {
                             item,
                             prop,
                             viewType: this.elem.property.detailsView ? ObjectViewType.DetailsView : ObjectViewType.GridView
+                        },
+                        on: {
+                            changed(e: ItemChangeEventArg) {
+                                main.commitStoreChange(vue.$store, {
+                                    type: ChangeType.EditProp,
+                                    prop: e.prop,
+                                    value: e.val,
+                                    item,
+                                    uri,
+                                    vue: e.vue,
+                                } as StateChange);
+                            }
                         }
                     });
+                    return propElem;
                 }
 
                 case ElemType.Text:
@@ -86,7 +102,3 @@
     }
 
 </script>
-
-<style scoped lang="scss">
-
-</style>

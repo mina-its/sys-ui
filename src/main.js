@@ -769,7 +769,6 @@ function _commitStoreChange(state, change) {
             state.data[ref].splice(state.data[ref].indexOf(change.item), 1);
             break;
     }
-    exports.glob.dirty = exports.glob.modifies.length > 0;
     change.vue.$forceUpdate();
 }
 function commitServerChangeResponse(store, modify, res) {
@@ -862,6 +861,7 @@ function _dispatchStoreModify(store, change) {
             break;
         }
     }
+    exports.glob.dirty = exports.glob.modifies.length > 0;
     commitStoreChange(store, change);
 }
 function dispatchRequestServerModify(store, done) {

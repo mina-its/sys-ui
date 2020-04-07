@@ -810,7 +810,6 @@ function _commitStoreChange(state, change: StateChange) {
             break;
     }
 
-    glob.dirty = glob.modifies.length > 0;
     change.vue.$forceUpdate();
 }
 
@@ -910,6 +909,8 @@ function _dispatchStoreModify(store, change: StateChange) {
         }
 
     }
+
+    glob.dirty = glob.modifies.length > 0;
     commitStoreChange(store, change);
 }
 
