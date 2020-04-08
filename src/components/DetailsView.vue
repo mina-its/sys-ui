@@ -18,8 +18,10 @@
                           :viewType="2"></Prop>
                 </div>
             </div>
-            <Prop v-if="nonGroupVisible()" v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
-                  @changed="changed" :viewType="2"></Prop>
+            <div v-if="nonGroupVisible()" class="gp">
+                <Prop v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
+                      @changed="changed" :viewType="2"></Prop>
+            </div>
             <div v-if="root" class="h-25"></div>
         </div>
     </div>

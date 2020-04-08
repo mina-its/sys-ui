@@ -30,15 +30,15 @@
     import {Constants} from "@/types";
     import {Component, Vue} from 'vue-property-decorator';
     import {$t, hideCmenu, load, notify, glob} from "@/main";
-    import SideNav from "@/components/SideNav.vue";
+    import SideNav from "./components/SideNav.vue";
     import NavBar from './components/NavBar.vue';
-    import FormElem from "@/components/FormElem.vue";
-    import FileGallery from "@/components/FileGallery.vue";
-    import NotifyBox from "@/components/NotifyBox.vue";
-    import WebSocket from "@/components/WebSocket.vue";
-    import QuestionBox from "@/components/QuestionBox.vue";
-    import ContextMenu from "@/components/ContextMenu.vue";
-    import Toolbar from "@/components/Toolbar.vue";
+    import FormElem from "./components/FormElem.vue";
+    import FileGallery from "./components/FileGallery.vue";
+    import NotifyBox from "./components/NotifyBox.vue";
+    import WebSocket from "./components/WebSocket.vue";
+    import QuestionBox from "./components/QuestionBox.vue";
+    import ContextMenu from "./components/ContextMenu.vue";
+    import Toolbar from "./components/Toolbar.vue";
     import {LogType, NotificationInfo} from '../../sys/src/types';
     import ProgressBar from "@/components/ProgressBar.vue";
     import $ from 'jquery';
@@ -141,6 +141,7 @@
 
 <style lang="scss">
     @import '../node_modules/bootstrap/scss/bootstrap.scss';
+    @import url('https://fonts.googleapis.com/css?family=Roboto');
 
     :root {
         --primary: #0072C6;

@@ -645,6 +645,7 @@ function ajax(url, data, config, done, fail) {
             params.headers['Content-Type'] = 'multipart/form-data';
         }
     }
+    axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     fail = fail || notify;
     console.log(params);
     startProgress();
@@ -708,6 +709,7 @@ function startVue(res) {
     Object.assign(vue_1.default.config, { productionTip: false, devtools: true });
     vue_1.default.prototype.glob = exports.glob;
     vue_1.default.prototype.$t = $t;
+    vue_1.default.config.productionTip = false;
     vue_1.default.directive('focus', {
         inserted(el, binding) {
             if (binding.value)
@@ -914,14 +916,13 @@ function createStore() {
     });
 }
 function start() {
-    console.log('starting ...');
+    // console.log('starting ...');
     const mainState = jquery_1.default('#main-state').html();
     const res = parse(mainState);
     if (res)
         startVue(res);
     else { // load main-state async
-        let host = "http://localhost";
-        let uri = host + setQs('m', types_2.RequestMode.inlineDev, true) + location.hash;
+        let uri = "http://" + location.host + setQs('m', types_2.RequestMode.inlineDev, true) + location.hash;
         //console.log(uri);
         axios.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
@@ -931,5 +932,6 @@ function start() {
         }).catch(err => console.error(err));
     }
 }
+exports.start = start;
 start();
 //# sourceMappingURL=main.js.map

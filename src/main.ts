@@ -673,6 +673,7 @@ export function ajax(url: string, data, config: AjaxConfig,
         }
     }
 
+    axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
     fail = fail || notify;
     console.log(params);
@@ -738,6 +739,7 @@ function startVue(res: WebResponse) {
     Object.assign(Vue.config, {productionTip: false, devtools: true});
     Vue.prototype.glob = glob;
     Vue.prototype.$t = $t;
+    Vue.config.productionTip = false;
     Vue.directive('focus', {
         inserted(el, binding) {
             if (binding.value) el.focus();
@@ -968,16 +970,15 @@ function createStore() {
     });
 }
 
-function start() {
-    console.log('starting ...');
+export function start() {
+    // console.log('starting ...');
     const mainState = $('#main-state').html();
     const res: WebResponse = parse(mainState);
 
     if (res)
         startVue(res);
     else {  // load main-state async
-        let host = "http://localhost";
-        let uri = host + setQs('m', RequestMode.inlineDev, true) + location.hash;
+        let uri = "http://" + location.host + setQs('m', RequestMode.inlineDev, true) + location.hash;
         //console.log(uri);
         axios.get(uri, {withCredentials: true}).then(res => {
             if (res.data)

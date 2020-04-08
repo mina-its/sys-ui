@@ -10,6 +10,10 @@ module.exports = {
         }
     },
 
+    devServer: {
+        proxy: 'http://localhost'
+    },
+
     productionSourceMap: false,
 
     crossorigin: "",
