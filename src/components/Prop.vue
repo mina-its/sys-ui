@@ -91,7 +91,10 @@ import {ElemType} from "../../../sys/src/types";
             let embed: EmbeddedInfo = this.item && this.item._ && this.item._[this.prop.name];
             let msg = null;
             if (embed) msg = ce('prop-message', {props: {message: embed.err}});
-            let cmt = this.prop.comment ? ce('div', {attrs: {"class": "prop-comment p-4 mt-3"}}, this.prop.comment) : null;
+            let cmt = this.prop.comment ? ce('p', {attrs: {"class": "prop-comment mt-3 p-2"}}, [
+                ce('i', {attrs: {"class": "fa fa-info-circle m-1 fa-lg"}},),
+                ce('span', {attrs: {"class": "ml-3"}}, this.prop.comment),
+            ]) : null;
             let title = this.prop.title || this.prop.name;
             let lbl = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top"}}, title);
 
@@ -257,10 +260,16 @@ import {ElemType} from "../../../sys/src/types";
         }
 
         &comment {
-            background-color: #fbfbfb;
-            border: 1px solid #F2F2F2;
-            color: #4F4F4F;
-            font-size: smaller;
+            background-color: #fef6e0;
+            border: 1px solid #FFDE80;
+            border-radius: 6px;
+            color: rgba(0, 0, 0, 0.87);
+            display: flex;
+            font-size: 12px;
+
+            .fa {
+                color: #f4b400;
+            }
         }
     }
 

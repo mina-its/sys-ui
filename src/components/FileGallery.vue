@@ -10,7 +10,7 @@
                                     <ol class="breadcrumb pt-2 p-0 m-0 bg-transparent">
                                         <li v-for="item in breadcrumb" class="breadcrumb-item">
                                             <a @click="browse(item.uri)" href="#">{{item.title}}</a>
-                                            <i class="fa fa-chevron-right ml-1"></i>
+                                            <i class="fa fa-chevron-right ml-2"></i>
                                         </li>
                                         <li class="breadcrumb-item active" aria-current="page">{{current}}</li>
                                     </ol>

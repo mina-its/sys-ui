@@ -4,7 +4,7 @@ import {StateChangeType} from "@/types";
         <!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->
         <!--            <filter-item :item="item" :key="item.id" v-for="item in dec.filter.items" :dec="dec"></filter-item>-->
         <!--        </div>-->
-        <table class="table table-sm">
+        <table :class="{'table table-sm':true, 'table-box':root}">
             <thead>
             <tr>
                 <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
@@ -323,6 +323,16 @@ import {StateChangeType} from "@/types";
     $right: var(--right);
 
     .grid-view {
+
+        table {
+            background: #fff;
+            color: rgba(0, 0, 0, 0.54);
+        }
+
+        .table-box {
+            border-radius: 2px;
+            box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+        }
 
         td, th {
             border: 1px solid var(--grid-border);

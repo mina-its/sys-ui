@@ -1,17 +1,17 @@
 <template>
     <div class="d-flex overflow-auto details-view" @scroll="onScroll()">
-        <aside v-if="sideMenuVisible" class="border-right separator-line sidenav p-2 my-3 d-none d-md-block">
+        <aside v-if="sideMenuVisible" class="border-right separator-line sidenav p-2 py-4 d-none d-md-block">
             <ul class="nav flex-column tree pr-5" id="menus">
                 <li v-for="item in sideMenu" class="nav-item">
                     <a @click="selectGroup(item)"
-                       :class="{'text-nowrap text-secondary nav-link': true, 'active': $data.currentGroup===item.title}"
+                       :class="{'pr-5 text-nowrap text-secondary nav-link': true, 'active': $data.currentGroup===item.title}"
                        href="javascript:void(0);">{{item.title}}</a>
                 </li>
             </ul>
         </aside>
         <div :class="{'p-4':root, 'border rounded': !root && dec.detailsViewType===2}">
-            <div v-if="groupVisible(group)" :class="{'py-4':dec.detailsViewType===2}" v-for="group in groups"
-                 :id="'gp-' + group.replace(/\s/g, '-')">
+            <div v-if="groupVisible(group)" :class="{'py-4':dec.detailsViewType===2, 'gp':root}" v-for="group in groups"
+                 :id="getGroupId(group)">
                 <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
                 <div class="group">
                     <Prop v-for="prop in getProps(group)" :key="prop.name" :item="item" :prop="prop" @changed="changed"
@@ -53,6 +53,13 @@
                         });
                     }
             }
+        }
+
+        getGroupId(group: string) {
+            if (this.root)
+                return 'gp-' + group.replace(/\s/g, '-');
+            else
+                return undefined;
         }
 
         @Watch('uri')
@@ -155,6 +162,10 @@
         scroll-behavior: smooth;
         min-width: 100%;
 
+        .sidenav {
+            background-color: white;
+        }
+
         label {
             color: var(--form-label);
             font-weight: 600;
@@ -164,10 +175,23 @@
             border-color: var(--grid-border);
         }
 
+        .gp {
+            background: #fff;
+            border-radius: 2px;
+            box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+            color: rgba(0, 0, 0, 0.54);
+            margin-bottom: 12px;
+            margin-left: auto;
+            margin-right: auto;
+            outline: none;
+            position: relative;
+            padding: 30px;
+        }
+
         .active {
             font-weight: 500;
             background-color: #eee;
-            border-left: 3px solid #999;
+            border-left: 3px solid var(--link-color);
             margin-left: -3px;
         }
     }

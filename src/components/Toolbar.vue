@@ -1,11 +1,12 @@
 <template>
-    <div v-if="alwaysVisible || glob.form.toolbar" class="d-flex p-2 pl-4 btn-toolbar border-bottom separator-line"
+    <div v-if="alwaysVisible || glob.form.toolbar"
+         class="d-flex p-2 pl-4 btn-toolbar separator-line toolbar"
          role="toolbar" aria-label="Toolbar with button groups">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb pt-2 p-0 m-0 bg-transparent">
                 <li v-for="item in glob.form.breadcrumb" class="breadcrumb-item">
                     <a :href="item.ref">{{item.title}}</a>
-                    <i class="fa fa-chevron-right ml-1"></i>
+                    <i class="fa fa-chevron-right ml-2"></i>
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">{{glob.form.title}}</li>
             </ol>
@@ -85,6 +86,9 @@
     }
 </script>
 
-<style scoped lang="scss">
-
+<style lang="scss">
+    .toolbar {
+        z-index: 1;
+        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 2px 6px 2px rgba(60, 64, 67, .15);
+    }
 </style>

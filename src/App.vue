@@ -159,6 +159,8 @@
         --side-nav-bg: #2f353c;
         --side-nav-color: #fff;
         --breadcrumb-separator: #aaa;
+        --link-color: #4285f4;
+        --main-body-bg: #eee;
 
         --font-size-base: 15px;
         --badge-padding-x: 0.25rem;
@@ -181,7 +183,7 @@
         height: 100%;
         overflow: hidden;
         text-align: $left;
-        font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+        font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
         font-size: 15px;
     }
 
@@ -212,7 +214,7 @@
     }
 
     a {
-        color: #0366d6;
+        color: var(--link-color);
 
         &:hover {
             color: #0366d6;
@@ -227,6 +229,10 @@
         .prop-focused {
             outline: 1px solid var(--primary);
         }
+    }
+
+    .main-body{
+        background-color: var(--main-body-bg);
     }
 
     // todo: disable print
