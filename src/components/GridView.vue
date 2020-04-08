@@ -47,6 +47,13 @@ import {StateChangeType} from "@/types";
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {$t} from '@/main';
+    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType} from '@/types';
+    import GridViewRow from "@/components/GridViewRow.vue";
+    import FilterItem from "@/components/FilterItem.vue";
+    import {v4 as uuidv4} from 'uuid';
+    import $ from 'jquery';
+    import * as main from '@/main';
     import {
         EntityMeta,
         GridRowHeaderStyle,
@@ -59,13 +66,6 @@ import {StateChangeType} from "@/types";
         ReqParams,
         IData
     } from '../../../sys/src/types';
-    import {$t, getBsonId, glob} from '@/main';
-    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType} from '@/types';
-    import GridViewRow from "@/components/GridViewRow.vue";
-    import FilterItem from "@/components/FilterItem.vue";
-    import {v4 as uuidv4} from 'uuid';
-    import $ from 'jquery';
-    import * as main from '@/main';
 
     @Component({
         components: {GridViewRow, FilterItem}
@@ -336,6 +336,11 @@ import {StateChangeType} from "@/types";
 
         td, th {
             border: 1px solid var(--grid-border);
+            // border-left: none;
+        }
+
+        td:last-child, th:last-child {
+            // border-right: none;
         }
 
         th {
