@@ -8,9 +8,9 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, WebMethod} from "../../../sys/src/types";
-    import {glob} from "@/main";
-    import {Modify, ItemChangeEventArg, ChangeType} from '@/types';
-    import * as main from '@/main';
+    import {glob} from '../main';;
+    import {Modify, ItemChangeEventArg, ChangeType} from '../types';
+    import * as main from '../main';
 
     @Component
     export default class PropDocumentEditor extends Vue {

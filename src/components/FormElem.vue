@@ -2,8 +2,8 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {Elem, ElemType, ObjectViewType, FunctionDec, EntityMeta} from "../../../sys/src/types";
     import Markdown from "@/components/Markdown.vue";
-    import * as main from '@/main';
-    import {ChangeType, ItemChangeEventArg, StateChange} from "@/types";
+    import * as main from '../main';
+    import {ChangeType, ItemChangeEventArg, StateChange} from '../types';;
 
     @Component({
         components: {

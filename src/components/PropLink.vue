@@ -5,7 +5,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
-    import * as main from '@/main';
+    import * as main from '../main';
 
     @Component
     export default class PropLink extends Vue {

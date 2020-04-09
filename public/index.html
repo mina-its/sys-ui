@@ -8,6 +8,7 @@
           content='width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0'/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <script src="/vendor/jquery-3.4.1.min.js"></script>
     <script src="/vendor/socket.io.slim.js"></script>
     <script src="/vendor/marked.min.js"></script>
     <link rel='stylesheet' href='/vendor/fontawesome/css/font-awesome.min.css'>
@@ -17,4 +18,7 @@
 <noscript>Please enable your browser JavaScript.</noscript>
 <div id="app"></div>
 </body>
+<script>
+    window["start"]();
+</script>
 </html>

@@ -59,10 +59,9 @@
         vertical-align: middle;
         width: 1.4rem;
         height: 1.4rem;
-        margin-top: -.5rem;
         text-align: center;
         margin-right: 0.5rem;
-        border: 1px solid #eee;
+        border: 1px solid var(--check-box-border);
         border-radius: 3px;
     }
 

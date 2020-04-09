@@ -27,23 +27,23 @@
 </template>
 
 <script lang="ts">
-    import {Constants} from "@/types";
-    import {Component, Vue} from 'vue-property-decorator';
-    import {$t, hideCmenu, load, notify, glob} from "@/main";
-    import SideNav from "./components/SideNav.vue";
-    import NavBar from './components/NavBar.vue';
-    import FormElem from "./components/FormElem.vue";
-    import FileGallery from "./components/FileGallery.vue";
-    import NotifyBox from "./components/NotifyBox.vue";
-    import WebSocket from "./components/WebSocket.vue";
-    import QuestionBox from "./components/QuestionBox.vue";
-    import ContextMenu from "./components/ContextMenu.vue";
-    import Toolbar from "./components/Toolbar.vue";
-    import {LogType, NotificationInfo} from '../../sys/src/types';
+    import SideNav from "@/components/SideNav.vue";
+    import NavBar from '@/components/NavBar.vue';
+    import FormElem from "@/components/FormElem.vue";
+    import FileGallery from "@/components/FileGallery.vue";
+    import NotifyBox from "@/components/NotifyBox.vue";
+    import WebSocket from "@/components/WebSocket.vue";
+    import QuestionBox from "@/components/QuestionBox.vue";
+    import ContextMenu from "@/components/ContextMenu.vue";
+    import Toolbar from "@/components/Toolbar.vue";
     import ProgressBar from "@/components/ProgressBar.vue";
-    import $ from 'jquery';
-    import * as main from '@/main';
     import BrowseFile from "@/components/BrowseFile.vue";
+    import {Component, Vue} from 'vue-property-decorator';
+    import {$t, hideCmenu, load, notify, glob} from "./main";
+    import {Constants} from "./types";
+    import {LogType, NotificationInfo} from '../../sys/src/types';
+    import $ from 'jquery';
+    import * as main from './main';
 
     @Component({
         components: {
@@ -83,7 +83,7 @@
                 .on("popstate", (e) => {
                     load(location.href);
                 })
-                .on("beforeunload", (e) => {
+                .on("beforeunload", (e: any) => {
                     if (glob.dirty) {
                         e = e || window.event;
                         if (e)
@@ -99,7 +99,7 @@
                         main.handleCmenuKeys(e);
                     glob.notify = null;
                 })
-                .on("click", (e) => {
+                .on("click", (e: any) => {
                     if (e.target.tagName == "A") {
                         if (e.target.getAttribute('target')) return; // especially _blank
                         let href = e.target.getAttribute('href');
@@ -118,7 +118,7 @@
                         }
                     }
                 })
-                .on("mouseup", (e) => {
+                .on("mouseup", (e: any) => {
                     if (glob.cmenu.show &&
                         !$('.dropdown-item').is(e.target)
                         && $('.dropdown-item').has(e.target).length === 0
@@ -151,6 +151,7 @@
         --warning: #ff7700;
         --grid-head: #f6f8fa;
         --grid-border: #d7d9dc;
+        --check-box-border: #d7d9dc;
         --panel-separator-line: #dee2e6;
         --grid-row-hover: #f0f8ff;
         --grid-row-highlight: #FFC;
@@ -232,7 +233,7 @@
         }
     }
 
-    .main-body{
+    .main-body {
         background-color: var(--main-body-bg);
     }
 

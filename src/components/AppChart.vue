@@ -7,7 +7,7 @@
 <script lang="ts">
 	declare let Chart: any;
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {ChartColors} from '@/types';
+	import {ChartColors} from '../types';
 
 	@Component
 	export default class AppChart extends Vue {

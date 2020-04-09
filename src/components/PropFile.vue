@@ -25,10 +25,10 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {DirFile, DriveMode, LogType, Property, RequestMode, IData, mFile} from "../../../sys/src/types";
-    import {Constants, FileAction, FileActionType, FunctionExecEventArg, MenuItem} from '@/types';
-    import {$t, glob, joinUri} from '@/main';
+    import {Constants, FileAction, FileActionType, FunctionExecEventArg, MenuItem} from '../types';
+    import {$t, glob, joinUri} from '../main';
     import {v4 as uuidv4} from 'uuid';
-    import * as main from '@/main';
+    import * as main from '../main';
 
     @Component
     export default class PropFile extends Vue {

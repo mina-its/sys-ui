@@ -1,8 +1,7 @@
-import {ElemType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {Elem, EmbeddedInfo, GlobalType, ObjectViewType, Property, ElemType} from "../../../sys/src/types";
-    import {PropertyLabelMode, ItemEventArg, ItemChangeEventArg} from '@/types';
+    import {PropertyLabelMode, ItemEventArg, ItemChangeEventArg} from '../types';
     import PropBoolean from "@/components/PropBoolean.vue";
     import PropFile from "@/components/PropFile.vue";
     import PropLink from "@/components/PropLink.vue";
@@ -13,7 +12,7 @@ import {ElemType} from "../../../sys/src/types";
     import PropTextMultiline from "@/components/PropTextMultiline.vue";
     import PropTime from "@/components/PropTime.vue";
     import PropReferenceMultiple from "@/components/PropReferenceMultiple.vue";
-    import * as main from '@/main';
+    import * as main from '../main';
 
     @Component({
         components: {

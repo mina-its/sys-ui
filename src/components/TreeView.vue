@@ -12,9 +12,9 @@
     import TreeViewNode from "@/components/TreeViewNode.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {Property, Keys, GlobalType} from "../../../sys/src/types";
-    import {TreeViewNode as Node, TreeViewLine, TreeViewAttribute} from '@/types';
+    import {TreeViewNode as Node, TreeViewLine, TreeViewAttribute} from '../types';
     import $ from 'jquery';
-    import * as main from '@/main';
+    import * as main from '../main';
 
     @Component({components: {TreeViewNode}})
     export default class TreeView extends Vue {
@@ -43,8 +43,8 @@
         locateCursor() {
             let $tk = $(".current-token");
 
-            let x = $tk.offset().x + $tk.width();
-            let y = $tk.offset().y;
+            let x = $tk.offset().left + $tk.width();
+            let y = $tk.offset().top;
 
             let blinkingCursor = this.$refs.blinkingCursor;
             blinkingCursor.style.left = x + "px";

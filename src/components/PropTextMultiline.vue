@@ -6,7 +6,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
-    import {ItemChangeEventArg, PropEventArg} from "@/types";
+    import {ItemChangeEventArg, PropEventArg} from '../types';;
 
     @Component
     export default class PropTextMultiline extends Vue {

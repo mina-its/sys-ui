@@ -6,9 +6,9 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
-    import {glob} from "@/main";
-    import {Constants, MenuItem, ItemChangeEventArg, PropEventArg} from '@/types';
-    import * as main from '@/main';
+    import {glob} from '../main';;
+    import {Constants, MenuItem, ItemChangeEventArg, PropEventArg} from '../types';
+    import * as main from '../main';
 
     @Component
     export default class PropReference extends Vue {

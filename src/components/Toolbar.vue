@@ -27,18 +27,17 @@
 <script lang="ts">
     import Function from "@/components/Function.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob} from "@/main";
+    import {glob} from '../main';
     import {Keys} from '../../../sys/src/types';
-    import {FunctionExecEventArg} from '@/types';
-    import $ from 'jquery';
-    import * as main from '@/main';
+    import {FunctionExecEventArg} from '../types';
+    import * as main from '../main';
 
     @Component({components: {Function}})
     export default class Toolbar extends Vue {
         @Prop() private alwaysVisible: boolean;
 
         mounted() {
-            $(window).on("keydown", (e) => {
+            window.addEventListener("keydown", (e) => {
                 if (e.ctrlKey && e.which == Keys.s) {
                     this.apply({});
                     return false;

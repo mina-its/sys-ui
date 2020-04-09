@@ -1,4 +1,4 @@
-import {StateChangeType} from "@/types";
+import {StateChangeType} from '../types';;
 <template>
     <div :class="'grid-view' + (root?' p-4':'')" @scroll="onScroll()">
         <!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->
@@ -47,13 +47,13 @@ import {StateChangeType} from "@/types";
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {$t} from '@/main';
-    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType} from '@/types';
+    import {$t} from '../main';
+    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType} from '../types';
     import GridViewRow from "@/components/GridViewRow.vue";
     import FilterItem from "@/components/FilterItem.vue";
     import {v4 as uuidv4} from 'uuid';
     import $ from 'jquery';
-    import * as main from '@/main';
+    import * as main from '../main';
     import {
         EntityMeta,
         GridRowHeaderStyle,

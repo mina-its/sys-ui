@@ -18,25 +18,25 @@ let index = {
 };
 
 
-import Vue from 'vue';
-import Vuex, {Store} from 'vuex';
 import {v4 as uuidv4} from 'uuid';
 import $ from 'jquery';
+import Vue from 'vue';
+import Vuex, {Store} from 'vuex';
 import App from './App.vue';
-import {Constants, FileAction, FileActionType, Global, MenuItem, Modify, StateChange, ChangeType} from './types';
+import {ChangeType, Constants, FileAction, Global, MenuItem, Modify, StateChange} from './types';
 import {
     AjaxConfig,
     ComponentParams,
     DirFile,
     Drive,
     EmbeddedInfo,
-    EntityMeta,
     FunctionDec,
     IData,
     IError,
     Keys,
     Locale,
     LogType,
+    mFile,
     MultilangText,
     NotificationInfo,
     ObjectDec,
@@ -45,8 +45,7 @@ import {
     RequestMode,
     StatusCode,
     WebMethod,
-    WebResponse,
-    mFile
+    WebResponse
 } from '../../sys/src/types';
 
 const axios = require('axios').default;
@@ -209,6 +208,12 @@ export function onlyUnique(value, index, self) {
 }
 
 export function handleResponse(res: WebResponse) {
+    if (!res) throw "handleResponse: res is empty";
+    if (typeof res != "object") {
+        console.warn("handleResponse res", res);
+        throw "handleResponse: res must be object";
+    }
+
     res = flat2recursive(res);
 
     if (res.config)
@@ -290,9 +295,9 @@ export function handleResponseRedirect(res: WebResponse) {
         refresh();
     } else if (!$.isEmptyObject(res.data)) {
         let form = '';
-        $.each(res.data, function (key, value) {
-            form += '<input type="hidden" name="' + key + '" value="' + value + '">';
-        });
+        for (let key of res.data) {
+            form += '<input type="hidden" name="' + key + '" value="' + res.data[key] + '">';
+        }
         $('<form action="' + res.redirect + '" method="POST">' + form + '</form>').appendTo('body').submit();
     } else {
         window.open(res.redirect, '_self'); // res.newWindow ? '_blank' : '_self'
@@ -534,14 +539,18 @@ export function notify(content: string | IError, type?: LogType, params?: Notifi
         return;
     }
     const message = typeof content === 'string' ? content : content.message;
-    if (!type) {
+    if (type === null) {
         if (typeof content !== 'string') {
             type = content.code && content.code !== StatusCode.Ok ? LogType.Error : LogType.Info;
         } else {
             type = LogType.Info;
         }
     }
-    window.dispatchEvent(new CustomEvent(Constants.notifyEvent, {detail: {message, type}}));
+
+    if (type === LogType.Fatal)
+        $("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
+    else
+        window.dispatchEvent(new CustomEvent(Constants.notifyEvent, {detail: {message, type}}));
 }
 
 export function question(questionId: string, message: string, options: Pair[], select: (item: Pair) => void) {
@@ -719,7 +728,7 @@ function stopProgress() {
     glob.progress = null;
 }
 
-function registerComponents() {
+export function registerComponents() {
     Vue.component('Function', require("@/components/Function.vue").default);
     Vue.component('Panel', require("@/components/Panel.vue").default);
     Vue.component('Modal', require("@/components/Modal.vue").default);
@@ -732,22 +741,27 @@ function registerComponents() {
 }
 
 function startVue(res: WebResponse) {
-    Vue.use(Vuex);
-    store = createStore();
-    handleResponse(res);
+    try {
+        Vue.use(Vuex);
+        store = createStore();
+        handleResponse(res);
 
-    Object.assign(Vue.config, {productionTip: false, devtools: true});
-    Vue.prototype.glob = glob;
-    Vue.prototype.$t = $t;
-    Vue.config.productionTip = false;
-    Vue.directive('focus', {
-        inserted(el, binding) {
-            if (binding.value) el.focus();
-        }
-    });
+        Object.assign(Vue.config, {productionTip: false, devtools: true});
+        Vue.prototype.glob = glob;
+        Vue.prototype.$t = $t;
+        Vue.config.productionTip = false;
+        Vue.directive('focus', {
+            inserted(el, binding) {
+                if (binding.value) el.focus();
+            }
+        });
 
-    registerComponents();
-    new Vue({data: glob, store, render: h => h(App)}).$mount('#app');
+        registerComponents();
+        new Vue({data: glob, store, render: h => h(App)}).$mount('#app');
+    } catch (err) {
+        console.error(err);
+        notify("<strong>Starting Vue failed:</strong> " + err.message, LogType.Fatal);
+    }
 }
 
 function commitFileAction(store, action: FileAction) {
@@ -977,16 +991,19 @@ export function start() {
 
     if (res)
         startVue(res);
-    else {  // load main-state async
-        let uri = "http://" + location.host + setQs('m', RequestMode.inlineDev, true) + location.hash;
-        //console.log(uri);
+    else {
+        let uri = "http://localhost" + setQs('m', RequestMode.inlineDev, true) + location.hash;
+        console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, {withCredentials: true}).then(res => {
             if (res.data)
                 startVue(res.data);
             else
                 console.error(res);
-        }).catch(err => console.error(err));
+        }).catch(err => {
+            console.error(err);
+            notify("Connecting to proxy server failed! " + err.message, LogType.Fatal);
+        });
     }
 }
 
-start();
+window["start"] = start;

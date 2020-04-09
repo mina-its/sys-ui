@@ -10,9 +10,9 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {glob} from '@/main';
+    import {glob} from '../main';
     import $ from 'jquery';
-    import * as main from '@/main';
+    import * as main from '../main';
 
     @Component
     export default class ContextMenu extends Vue {

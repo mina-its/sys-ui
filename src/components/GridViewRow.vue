@@ -14,7 +14,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, EntityMeta, IData} from "../../../sys/src/types";
-    import {ItemChangeEventArg, ItemEventArg} from '@/types';
+    import {ItemChangeEventArg, ItemEventArg} from '../types';
     import $ from 'jquery';
 
     @Component

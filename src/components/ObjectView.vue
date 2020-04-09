@@ -1,8 +1,8 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {Elem, LogType, ObjectViewType} from "../../../sys/src/types";
-    import {glob} from '@/main';
-    import * as main from '@/main';
+    import {glob} from '../main';
+    import * as main from '../main';
 
     @Component
     export default class ObjectView extends Vue {

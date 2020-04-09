@@ -6,9 +6,9 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
-    import {ItemChangeEventArg, PropEventArg} from '@/types';
-    import {getQs} from "@/main";
-    import * as main from '@/main';
+    import {ItemChangeEventArg, PropEventArg} from '../types';
+    import {getQs} from '../main';;
+    import * as main from '../main';
 
     @Component
     export default class PropText extends Vue {

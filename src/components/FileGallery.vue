@@ -54,11 +54,11 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob, $t} from '@/main';
+    import {glob, $t} from '../main';
     import {DirFile, LogType, DirFileType, YesNo, Pair, AjaxConfig} from '../../../sys/src/types';
-    import {MenuItem, FunctionExecEventArg, Constants} from '@/types';
+    import {MenuItem, FunctionExecEventArg, Constants} from '../types';
     import $ from 'jquery';
-    import * as main from '@/main';
+    import * as main from '../main';
 
     @Component({components: {}})
     export default class FileGallery extends Vue {

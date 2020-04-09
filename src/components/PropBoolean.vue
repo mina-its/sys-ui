@@ -5,7 +5,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
-    import {ItemChangeEventArg} from "@/types";
+    import {ItemChangeEventArg} from '../types';;
 
     @Component
     export default class PropBoolean extends Vue {

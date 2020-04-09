@@ -17,10 +17,10 @@ let index = {
     "Handle Response                ": handleResponse,
     "Ajax                           ": ajax,
 };
-const vue_1 = tslib_1.__importDefault(require("vue"));
-const vuex_1 = tslib_1.__importStar(require("vuex"));
 const uuid_1 = require("uuid");
 const jquery_1 = tslib_1.__importDefault(require("jquery"));
+const vue_1 = tslib_1.__importDefault(require("vue"));
+const vuex_1 = tslib_1.__importStar(require("vuex"));
 const App_vue_1 = tslib_1.__importDefault(require("./App.vue"));
 const types_1 = require("./types");
 const types_2 = require("../../sys/src/types");
@@ -177,6 +177,12 @@ function onlyUnique(value, index, self) {
 }
 exports.onlyUnique = onlyUnique;
 function handleResponse(res) {
+    if (!res)
+        throw "handleResponse: res is empty";
+    if (typeof res != "object") {
+        console.warn("handleResponse res", res);
+        throw "handleResponse: res must be object";
+    }
     res = flat2recursive(res);
     if (res.config)
         exports.glob.config = res.config;
@@ -265,9 +271,9 @@ function handleResponseRedirect(res) {
     }
     else if (!jquery_1.default.isEmptyObject(res.data)) {
         let form = '';
-        jquery_1.default.each(res.data, function (key, value) {
-            form += '<input type="hidden" name="' + key + '" value="' + value + '">';
-        });
+        for (let key of res.data) {
+            form += '<input type="hidden" name="' + key + '" value="' + res.data[key] + '">';
+        }
         jquery_1.default('<form action="' + res.redirect + '" method="POST">' + form + '</form>').appendTo('body').submit();
     }
     else {
@@ -510,7 +516,7 @@ function notify(content, type, params) {
         return;
     }
     const message = typeof content === 'string' ? content : content.message;
-    if (!type) {
+    if (type === null) {
         if (typeof content !== 'string') {
             type = content.code && content.code !== types_2.StatusCode.Ok ? types_2.LogType.Error : types_2.LogType.Info;
         }
@@ -518,7 +524,10 @@ function notify(content, type, params) {
             type = types_2.LogType.Info;
         }
     }
-    window.dispatchEvent(new CustomEvent(types_1.Constants.notifyEvent, { detail: { message, type } }));
+    if (type === types_2.LogType.Fatal)
+        jquery_1.default("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
+    else
+        window.dispatchEvent(new CustomEvent(types_1.Constants.notifyEvent, { detail: { message, type } }));
 }
 exports.notify = notify;
 function question(questionId, message, options, select) {
@@ -702,22 +711,29 @@ function registerComponents() {
     vue_1.default.component('DetailsView', require("@/components/DetailsView.vue").default);
     vue_1.default.component('CheckBox', require("@/components/CheckBox.vue").default);
 }
+exports.registerComponents = registerComponents;
 function startVue(res) {
-    vue_1.default.use(vuex_1.default);
-    store = createStore();
-    handleResponse(res);
-    Object.assign(vue_1.default.config, { productionTip: false, devtools: true });
-    vue_1.default.prototype.glob = exports.glob;
-    vue_1.default.prototype.$t = $t;
-    vue_1.default.config.productionTip = false;
-    vue_1.default.directive('focus', {
-        inserted(el, binding) {
-            if (binding.value)
-                el.focus();
-        }
-    });
-    registerComponents();
-    new vue_1.default({ data: exports.glob, store, render: h => h(App_vue_1.default) }).$mount('#app');
+    try {
+        vue_1.default.use(vuex_1.default);
+        store = createStore();
+        handleResponse(res);
+        Object.assign(vue_1.default.config, { productionTip: false, devtools: true });
+        vue_1.default.prototype.glob = exports.glob;
+        vue_1.default.prototype.$t = $t;
+        vue_1.default.config.productionTip = false;
+        vue_1.default.directive('focus', {
+            inserted(el, binding) {
+                if (binding.value)
+                    el.focus();
+            }
+        });
+        registerComponents();
+        new vue_1.default({ data: exports.glob, store, render: h => h(App_vue_1.default) }).$mount('#app');
+    }
+    catch (err) {
+        console.error(err);
+        notify("<strong>Starting Vue failed:</strong> " + err.message, types_2.LogType.Fatal);
+    }
 }
 function commitFileAction(store, action) {
     store.commit('_commitFileAction', action);
@@ -921,17 +937,20 @@ function start() {
     const res = parse(mainState);
     if (res)
         startVue(res);
-    else { // load main-state async
-        let uri = "http://" + location.host + setQs('m', types_2.RequestMode.inlineDev, true) + location.hash;
-        //console.log(uri);
+    else {
+        let uri = "http://localhost" + setQs('m', types_2.RequestMode.inlineDev, true) + location.hash;
+        console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
                 startVue(res.data);
             else
                 console.error(res);
-        }).catch(err => console.error(err));
+        }).catch(err => {
+            console.error(err);
+            notify("Connecting to proxy server failed! " + err.message, types_2.LogType.Fatal);
+        });
     }
 }
 exports.start = start;
-start();
+window["start"] = start;
 //# sourceMappingURL=main.js.map

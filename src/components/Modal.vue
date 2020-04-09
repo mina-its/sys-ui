@@ -33,8 +33,8 @@
 <script lang="ts">
     import FormElem from "@/components/FormElem.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob} from '@/main';
-    import * as main from '@/main';
+    import {glob} from '../main';
+    import * as main from '../main';
 
     @Component({
         components: {FormElem}

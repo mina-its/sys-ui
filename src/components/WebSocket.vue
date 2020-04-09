@@ -4,8 +4,8 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {ClientCommand, LogType, Pair} from '../../../sys/src/types';
-    import {glob} from "@/main";
-    import * as main from '@/main';
+    import {glob} from '../main';;
+    import * as main from '../main';
     declare let io: any;
 
     @Component

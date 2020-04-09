@@ -7,9 +7,9 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
-    import {glob} from "@/main";
-    import {ItemChangeEventArg} from "@/types";
-    import * as main from '@/main';
+    import {glob} from '../main';;
+    import {ItemChangeEventArg} from '../types';;
+    import * as main from '../main';
 
     @Component
     export default class PropLocation extends Vue {

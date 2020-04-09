@@ -28,12 +28,12 @@
 </template>
 
 <script lang="ts">
-    import {ItemChangeEventArg, StateChange, ChangeType} from "@/types";
+    import {ItemChangeEventArg, StateChange, ChangeType} from '../types';;
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
-    import {glob} from '@/main';
+    import {glob} from '../main';
     import $ from 'jquery';
-    import * as main from '@/main';
+    import * as main from '../main';
 
     @Component
     export default class DetailsView extends Vue {

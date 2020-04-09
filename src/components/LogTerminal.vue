@@ -8,10 +8,10 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import {$t, glob} from "@/main";
+	import {$t, glob} from '../main';;
 	import {ClientCommand, MenuItem} from '../../../sys/src/types';
 	import WebSocket from "@/components/WebSocket.vue";
-    import * as main from '@/main';
+    import * as main from '../main';
 
 	@Component
 	export default class LogTerminal extends Vue {
