@@ -19,12 +19,12 @@ let index = {
 };
 const uuid_1 = require("uuid");
 const jquery_1 = tslib_1.__importDefault(require("jquery"));
+const axios_1 = tslib_1.__importDefault(require("axios"));
 const vue_1 = tslib_1.__importDefault(require("vue"));
-const vuex_1 = tslib_1.__importStar(require("vuex"));
-const App_vue_1 = tslib_1.__importDefault(require("./App.vue"));
+const vuex_1 = tslib_1.__importDefault(require("vuex"));
 const types_1 = require("./types");
 const types_2 = require("../../sys/src/types");
-const axios = require('axios').default;
+const App_vue_1 = tslib_1.__importDefault(require("./App.vue"));
 exports.glob = new types_1.Global();
 let store;
 function $t(text) {
@@ -478,11 +478,6 @@ function openFileGallery(drive, file, path, fixedPath, fileSelectCallback) {
     });
 }
 exports.openFileGallery = openFileGallery;
-function component(name, props, params) {
-    params.props = props;
-    vue_1.default.component(name, params);
-}
-exports.component = component;
 function log(...message) {
     console.log(message);
 }
@@ -654,14 +649,14 @@ function ajax(url, data, config, done, fail) {
             params.headers['Content-Type'] = 'multipart/form-data';
         }
     }
-    axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+    axios_1.default.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     fail = fail || notify;
     console.log(params);
     startProgress();
-    axios(params).then(res => {
+    axios_1.default(params).then(res => {
         stopProgress();
-        if (res.code && res.code !== types_2.StatusCode.Ok) {
-            fail({ code: res.code, message: res.message });
+        if (res.status && res.status !== types_2.StatusCode.Ok) {
+            fail({ code: res.status, message: res.statusText });
         }
         else {
             try {
@@ -700,16 +695,17 @@ function startProgress() {
 function stopProgress() {
     exports.glob.progress = null;
 }
-function registerComponents() {
-    vue_1.default.component('Function', require("@/components/Function.vue").default);
-    vue_1.default.component('Panel', require("@/components/Panel.vue").default);
-    vue_1.default.component('Modal', require("@/components/Modal.vue").default);
-    vue_1.default.component('Prop', require("@/components/Prop.vue").default);
-    vue_1.default.component('ObjectView', require("@/components/ObjectView.vue").default);
-    vue_1.default.component('FormElem', require("@/components/ObjectView.vue").default);
-    vue_1.default.component('GridView', require("@/components/GridView.vue").default);
-    vue_1.default.component('DetailsView', require("@/components/DetailsView.vue").default);
-    vue_1.default.component('CheckBox', require("@/components/CheckBox.vue").default);
+function registerComponents(vue) {
+    vue.component('Root', require("@/components/Root.vue").default);
+    vue.component('Function', require("@/components/Function.vue").default);
+    vue.component('Panel', require("@/components/Panel.vue").default);
+    vue.component('Modal', require("@/components/Modal.vue").default);
+    vue.component('Prop', require("@/components/Prop.vue").default);
+    vue.component('ObjectView', require("@/components/ObjectView.vue").default);
+    vue.component('FormElem', require("@/components/ObjectView.vue").default);
+    vue.component('GridView', require("@/components/GridView.vue").default);
+    vue.component('DetailsView', require("@/components/DetailsView.vue").default);
+    vue.component('CheckBox', require("@/components/CheckBox.vue").default);
 }
 exports.registerComponents = registerComponents;
 function startVue(res) {
@@ -727,7 +723,7 @@ function startVue(res) {
                     el.focus();
             }
         });
-        registerComponents();
+        registerComponents(vue_1.default);
         new vue_1.default({ data: exports.glob, store, render: h => h(App_vue_1.default) }).$mount('#app');
     }
     catch (err) {
@@ -916,7 +912,7 @@ function _dispatchRequestServerModify(store, done) {
     });
 }
 function createStore() {
-    return new vuex_1.Store({
+    return new vuex_1.default.Store({
         mutations: {
             _commitStoreChange,
             _commitServerChangeResponse,
@@ -940,7 +936,7 @@ function start() {
     else {
         let uri = "http://localhost" + setQs('m', types_2.RequestMode.inlineDev, true) + location.hash;
         console.log(`loading main-state async from '${uri}' ...`);
-        axios.get(uri, { withCredentials: true }).then(res => {
+        axios_1.default.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
                 startVue(res.data);
             else

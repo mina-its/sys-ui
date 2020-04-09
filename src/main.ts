@@ -20,13 +20,12 @@ let index = {
 
 import {v4 as uuidv4} from 'uuid';
 import $ from 'jquery';
+import axios from 'axios';
 import Vue from 'vue';
-import Vuex, {Store} from 'vuex';
-import App from './App.vue';
+import Vuex from 'vuex';
 import {ChangeType, Constants, FileAction, Global, MenuItem, Modify, StateChange} from './types';
 import {
     AjaxConfig,
-    ComponentParams,
     DirFile,
     Drive,
     EmbeddedInfo,
@@ -47,10 +46,10 @@ import {
     WebMethod,
     WebResponse
 } from '../../sys/src/types';
+import App from './App.vue';
 
-const axios = require('axios').default;
 export let glob = new Global();
-let store: Store<{ data: any }>;
+let store;
 
 export function $t(text: string): string {
     return typeof (text) == 'object' ? text[glob.config.locale] || Object.values(text)[0] as string : text;
@@ -503,11 +502,6 @@ export function openFileGallery(drive: Drive, file: string, path: string, fixedP
     });
 }
 
-export function component(name: string, props: string[], params: ComponentParams) {
-    (params as any).props = props;
-    Vue.component(name, params);
-}
-
 export function log(...message) {
     console.log(message);
 }
@@ -689,8 +683,8 @@ export function ajax(url: string, data, config: AjaxConfig,
     startProgress();
     axios(params).then(res => {
         stopProgress();
-        if (res.code && res.code !== StatusCode.Ok) {
-            fail({code: res.code, message: res.message});
+        if (res.status && res.status !== StatusCode.Ok) {
+            fail({code: res.status, message: res.statusText});
         } else {
             try {
                 done(res.data);
@@ -728,16 +722,17 @@ function stopProgress() {
     glob.progress = null;
 }
 
-export function registerComponents() {
-    Vue.component('Function', require("@/components/Function.vue").default);
-    Vue.component('Panel', require("@/components/Panel.vue").default);
-    Vue.component('Modal', require("@/components/Modal.vue").default);
-    Vue.component('Prop', require("@/components/Prop.vue").default);
-    Vue.component('ObjectView', require("@/components/ObjectView.vue").default);
-    Vue.component('FormElem', require("@/components/ObjectView.vue").default);
-    Vue.component('GridView', require("@/components/GridView.vue").default);
-    Vue.component('DetailsView', require("@/components/DetailsView.vue").default);
-    Vue.component('CheckBox', require("@/components/CheckBox.vue").default);
+export function registerComponents(vue) {
+    vue.component('Root', require("@/components/Root.vue").default);
+    vue.component('Function', require("@/components/Function.vue").default);
+    vue.component('Panel', require("@/components/Panel.vue").default);
+    vue.component('Modal', require("@/components/Modal.vue").default);
+    vue.component('Prop', require("@/components/Prop.vue").default);
+    vue.component('ObjectView', require("@/components/ObjectView.vue").default);
+    vue.component('FormElem', require("@/components/ObjectView.vue").default);
+    vue.component('GridView', require("@/components/GridView.vue").default);
+    vue.component('DetailsView', require("@/components/DetailsView.vue").default);
+    vue.component('CheckBox', require("@/components/CheckBox.vue").default);
 }
 
 function startVue(res: WebResponse) {
@@ -756,7 +751,7 @@ function startVue(res: WebResponse) {
             }
         });
 
-        registerComponents();
+        registerComponents(Vue);
         new Vue({data: glob, store, render: h => h(App)}).$mount('#app');
     } catch (err) {
         console.error(err);
@@ -968,7 +963,7 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
 }
 
 function createStore() {
-    return new Store({
+    return new Vuex.Store({
         mutations: {
             _commitStoreChange,
             _commitServerChangeResponse,
