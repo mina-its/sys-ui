@@ -9,7 +9,7 @@
     import * as main from "@/main";
 
     @Component
-    export default class FormRoot extends Vue {
+    export default class FormView extends Vue {
         onScroll() {
             main.hideCmenu();
         }

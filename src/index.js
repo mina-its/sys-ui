@@ -1,6 +1,6 @@
 export * from './types';
 export * from './main';
 
-import App from "./App.vue";
+import FormView from "./components/FormView.vue";
 
-export default {App};
+export default {FormView};

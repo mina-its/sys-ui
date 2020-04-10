@@ -707,7 +707,6 @@ function registerComponents(vue) {
     vue.component('DetailsView', require("@/components/DetailsView.vue").default);
     vue.component('CheckBox', require("@/components/CheckBox.vue").default);
 }
-exports.registerComponents = registerComponents;
 function startVue(res) {
     try {
         vue_1.default.use(vuex_1.default);

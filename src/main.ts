@@ -722,7 +722,7 @@ function stopProgress() {
     glob.progress = null;
 }
 
-export function registerComponents(vue) {
+function registerComponents(vue) {
     vue.component('Root', require("@/components/Root.vue").default);
     vue.component('Function', require("@/components/Function.vue").default);
     vue.component('Panel', require("@/components/Panel.vue").default);
