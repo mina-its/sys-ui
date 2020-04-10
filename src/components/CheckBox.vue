@@ -1,6 +1,5 @@
 <template>
     <div class="checkbox-wrapper text-center mr-2" @click="changed">
-        <!--        <input @focus="$emit('focus', $event)" :id="prop.name" :name="prop.name">-->
         <input class="checkbox" @keyup.space="changed" @keydown="keydown" type="checkbox" v-model="checked" tabindex="0"
                @input="changed">
         <label :class="{'checkbox-label':true, 'no-label':!label}">{{label}}</label>

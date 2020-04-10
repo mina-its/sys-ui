@@ -68,17 +68,17 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
     import * as main from '../main';
 
-	@Component
-	export default class ApiDoc extends Vue {
-		@Prop() private data: any;
+    @Component
+    export default class ApiDoc extends Vue {
+        @Prop() private data: any;
 
-		getOprId(block, opr) {
-			return 'oper-' + block.name + '-' + opr.method + "-" + opr.uri.replace(/\//g, '-');
-		}
-	}
+        getOprId(block, opr) {
+            return 'oper-' + block.name + '-' + opr.method + "-" + opr.uri.replace(/\//g, '-');
+        }
+    }
 </script>
 
 <style lang="scss">

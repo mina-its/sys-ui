@@ -7,9 +7,7 @@
             <SideNav></SideNav>
             <div class="d-flex flex-column flex-fill overflow-auto">
                 <Toolbar></Toolbar>
-                <div class="main-body h-100 overflow-auto w-100 d-flex" @scroll="onScroll()">
-                    <FormElem v-for="elem in glob.form.elems" :elem="elem" :key="elem.id"></FormElem>
-                </div>
+                <FormRoot></FormRoot>
             </div>
         </main>
         <section class="helpers-section">
@@ -44,9 +42,11 @@
     import {LogType, NotificationInfo} from '../../../sys/src/types';
     import $ from 'jquery';
     import * as main from '../main';
+    import FormRoot from "@/components/FormRoot.vue";
 
     @Component({
         components: {
+            FormRoot,
             BrowseFile,
             ProgressBar,
             ContextMenu,
@@ -61,10 +61,6 @@
         }
     })
     export default class Root extends Vue {
-        onScroll() {
-            main.hideCmenu();
-        }
-
         handleWindowEvents() {
             $(window)
                 .on(Constants.notifyEvent, function (e: any) {
@@ -231,10 +227,6 @@
         .prop-focused {
             outline: 1px solid var(--primary);
         }
-    }
-
-    .main-body {
-        background-color: var(--main-body-bg);
     }
 
     // todo: disable print

@@ -15,9 +15,10 @@ module.exports = {
     },
 
     productionSourceMap: false,
-
     crossorigin: "",
+    pwa: {},
 
-    pwa: {}
-
+    css: {
+        modules: true
+    }
 }

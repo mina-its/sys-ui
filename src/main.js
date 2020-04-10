@@ -927,6 +927,17 @@ function createStore() {
         }
     });
 }
+function libraryStart(app, vue, vuex) {
+    vue.use(vuex);
+    registerComponents(vue);
+    let store = new vuex.Store({
+        mutations: {},
+        actions: {}
+    });
+    let glob = {};
+    new vue({ data: glob, store, render: h => h(app) }).$mount('#app');
+}
+exports.libraryStart = libraryStart;
 function start() {
     // console.log('starting ...');
     const mainState = jquery_1.default('#main-state').html();
