@@ -926,15 +926,14 @@ function createStore() {
         }
     });
 }
-function libraryStart(app, vue, vuex) {
-    vue.use(vuex);
-    registerComponents(vue);
-    let store = new vuex.Store({
+function libraryStart(app) {
+    vue_1.default.use(vuex_1.default);
+    let store = new vuex_1.default.Store({
         mutations: {},
         actions: {}
     });
     let glob = {};
-    new vue({ data: glob, store, render: h => h(app) }).$mount('#app');
+    new vue_1.default({ data: glob, store, render: h => h(app) }).$mount('#app');
 }
 exports.libraryStart = libraryStart;
 function start() {
