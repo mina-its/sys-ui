@@ -9,7 +9,7 @@
   },
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name sys.main src/build-lib.js",
+    "build": "vue-cli-service build --target lib --name sys.main src/index.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

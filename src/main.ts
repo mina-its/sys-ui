@@ -1013,3 +1013,4 @@ export function start() {
 }
 
 window["start"] = start;
+export default {};

@@ -960,4 +960,5 @@ function start() {
 }
 exports.start = start;
 window["start"] = start;
+exports.default = {};
 //# sourceMappingURL=main.js.map
