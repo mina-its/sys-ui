@@ -107,6 +107,15 @@ export function evalExpression($this: any, expression: string): any {
     }
 }
 
+function addHeadStyle(css: string) {
+    let head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style');
+
+    head.appendChild(style);
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+}
+
 function vueResetFormData(res: WebResponse) {
     // console.log(res);
     let dataset = res.data;
@@ -219,8 +228,11 @@ export function handleResponse(res: WebResponse) {
 
     res = flat2recursive(res);
 
-    if (res.config)
+    if (res.config) {
         glob.config = res.config;
+        if (res.config.style)
+            addHeadStyle(res.config.style);
+    }
 
     if (res.redirect)
         handleResponseRedirect(res);

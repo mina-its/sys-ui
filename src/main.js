@@ -82,6 +82,12 @@ function evalExpression($this, expression) {
     }
 }
 exports.evalExpression = evalExpression;
+function addHeadStyle(css) {
+    let head = document.head || document.getElementsByTagName('head')[0], style = document.createElement('style');
+    head.appendChild(style);
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+}
 function vueResetFormData(res) {
     // console.log(res);
     let dataset = res.data;
@@ -187,8 +193,11 @@ function handleResponse(res) {
         throw "handleResponse: res must be object";
     }
     res = flat2recursive(res);
-    if (res.config)
+    if (res.config) {
         exports.glob.config = res.config;
+        if (res.config.style)
+            addHeadStyle(res.config.style);
+    }
     if (res.redirect)
         handleResponseRedirect(res);
     else if (res.message)
