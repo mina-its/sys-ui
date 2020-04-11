@@ -1,17 +1,19 @@
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, ElemType, ObjectViewType, FunctionDec, EntityMeta} from "../../../sys/src/types";
     import Markdown from "@/components/Markdown.vue";
+    import Panel from "@/components/Panel.vue";
+    import ObjectView from "@/components/ObjectView.vue";
+    import Function from "@/components/Function.vue";
+    import DocumentEditor from "@/components/DocumentEditor.vue";
+    import AppChart from "@/components/AppChart.vue";
+    import Prop from "@/components/Prop.vue";
+    import {Component, Prop as ComProp, Vue} from 'vue-property-decorator';
+    import {Elem, ElemType, ObjectViewType, FunctionDec} from "../../../sys/src/types";
     import * as main from '../main';
     import {ChangeType, ItemChangeEventArg, StateChange} from '@/types';
 
-    @Component({
-        components: {
-            Markdown
-        }
-    })
+    @Component({components: {AppChart, DocumentEditor, Function, ObjectView, Panel, Markdown, Prop}})
     export default class FormElem extends Vue {
-        @Prop() private elem: Elem;
+        @ComProp() private elem: Elem;
 
         render(ce: (...args: any) => void) {
             switch (this.elem.type) {
@@ -39,6 +41,7 @@
 
                 case ElemType.Property: {
                     let uri = this.elem.property.entityRef;
+                    if (!this.$store.state.data) throw 'data is null!';
                     let item = this.$store.state.data[uri];
                     let vue = this;
                     let dec = main.getDec(item);
@@ -87,7 +90,6 @@
                     return ce('img', {attrs: {"class": this.elem.styles, "src": this.elem.image.ref}});
 
                 case ElemType.Panel:
-                    console.log('panel');
                     return ce('panel', {props: {"elem": this.elem}});
 
                 case ElemType.Component:
@@ -97,7 +99,7 @@
                     return ce(this.elem.component.name, {props: {data, ...props}});
 
                 case ElemType.Chart:
-                    return ce('chart', {props: {data: this.$store.state.data['tests']}});
+                    return ce('AppChart', {props: {data: this.$store.state.data['tests']}});
             }
         }
     }

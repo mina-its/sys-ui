@@ -13,7 +13,8 @@ module.exports = {
     },
 
     devServer: {
-        proxy: 'http://localhost'
+        host: 'alchemyadmin.localhost',
+        proxy: 'http://alchemyadmin.localhost'
     },
 
     productionSourceMap: false,

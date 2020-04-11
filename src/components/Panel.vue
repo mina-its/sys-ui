@@ -1,24 +1,25 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {ElemType, Elem, PanelType, Orientation} from "../../../sys/src/types";
-    import {glob} from '../main';;
+    import {glob} from '@/main';
+    import Modal from "@/components/Modal.vue";
 
-    @Component
+    @Component({components: {Modal}})
     export default class Panel extends Vue {
-        @Prop() private elem: any;
+        @Prop() private elem: Elem;
 
         render(ce) {
-            let e = this.elem as Elem;
-            let elems = e.panel.elems || [];
+            let panel = this.elem.panel;
+            let elems = panel.elems || [];
 
-            switch (e.panel.type) {
+            switch (panel.type) {
                 case PanelType.Modal:
-                    let bodyElems = e.panel.elems.filter(el => el.type !== ElemType.Function);
-                    let footerElems = e.panel.elems.filter(el => el.type === ElemType.Function);
+                    let bodyElems = elems.filter(el => el.type !== ElemType.Function);
+                    let footerElems = elems.filter(el => el.type === ElemType.Function);
                     glob.modal = true;
-                    return ce('modal', {
+                    return ce('Modal', {
                         props: {
-                            title: e.title,
+                            title: this.elem.title,
                             bodyElems,
                             footerElems,
                             // todo: message: e.panel.modal.message
@@ -27,34 +28,34 @@
 
                 case PanelType.Stack: {
                     let children = elems.map((elem) => {
-                        return ce("elem", {props: {elem}});
+                        return ce("FormElem", {props: {elem}});
                     });
-                    let horizontal = e.panel.stack && e.panel.stack.orientation == Orientation.Horizontal;
+                    let horizontal = panel.stack && panel.stack.orientation == Orientation.Horizontal;
                     return ce('div', {
                         attrs: {
-                            class: "d-flex " + (horizontal ? "flex-row" : "flex-column") + " " + e.styles
+                            class: "d-flex " + (horizontal ? "flex-row" : "flex-column") + " " + this.elem.styles
                         }
                     }, children);
                 }
 
                 case PanelType.Wrap: {
                     let children = elems.map((elem) => {
-                        return ce("elem", {props: {elem}});
+                        return ce("FormElem", {props: {elem}});
                     });
                     return ce('div', {
                         attrs: {
-                            class: e.styles
+                            class: this.elem.styles
                         }
                     }, children);
                 }
 
                 case PanelType.Flex: {
                     let children = elems.map((elem) => {
-                        return ce("elem", {props: {elem}});
+                        return ce("FormElem", {props: {elem}});
                     });
                     return ce('div', {
                         attrs: {
-                            class: "d-flex " + e.styles
+                            class: "d-flex " + this.elem.styles
                         }
                     }, children);
                 }
@@ -63,7 +64,3 @@
         }
     }
 </script>
-
-<style scoped lang="scss">
-
-</style>

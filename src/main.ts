@@ -108,37 +108,41 @@ export function evalExpression($this: any, expression: string): any {
 }
 
 function vueResetFormData(res: WebResponse) {
+    // console.log(res);
     let dataset = res.data;
     glob.form = res.form;
 
-    if (!glob.form || !glob.form.declarations || !dataset) return;
-    glob.form.elems.forEach(elem => elem.id = uuidv4()); // needs for refreshing form while cancel changes
+    if (!dataset) return;
 
-    const setDataMeta = (ref: string, item: IData, dec: ObjectDec | FunctionDec) => {
-        item._ = item._ || {ref} as any;
-        item._.dec = dec;
-        return item._;
-    };
+    if (glob.form && glob.form.declarations) {
+        glob.form.elems.forEach(elem => elem.id = uuidv4()); // needs for refreshing form while cancel changes
 
-    for (let ref in dataset) {
-        let data = dataset[ref];
-        let dec = glob.form.declarations[ref];
-        if (!data || !dec)
-            continue;
+        const setDataMeta = (ref: string, item: IData, dec: ObjectDec | FunctionDec) => {
+            item._ = item._ || {ref} as any;
+            item._.dec = dec;
+            return item._;
+        };
 
-        if (Array.isArray(data)) {
-            data.forEach((item: IData) => {
-                let meta = setDataMeta(ref + "/" + getBsonId(item), item, dec);
-                meta.marked = null;
-            });
-        } else
-            setDataMeta(ref, data, dec);
+        for (let ref in dataset) {
+            let data = dataset[ref];
+            let dec = glob.form.declarations[ref];
+            if (!data || !dec)
+                continue;
 
-        for (const prop of dec.properties) {
-            if (Array.isArray(data))
-                data.forEach(item => setUndefinedToNull(item, prop));
-            else
-                setUndefinedToNull(data, prop);
+            if (Array.isArray(data)) {
+                data.forEach((item: IData) => {
+                    let meta = setDataMeta(ref + "/" + getBsonId(item), item, dec);
+                    meta.marked = null;
+                });
+            } else
+                setDataMeta(ref, data, dec);
+
+            for (const prop of dec.properties) {
+                if (Array.isArray(data))
+                    data.forEach(item => setUndefinedToNull(item, prop));
+                else
+                    setUndefinedToNull(data, prop);
+            }
         }
     }
 
@@ -728,7 +732,7 @@ function registerComponents(vue) {
     vue.component('Modal', require("@/components/Modal.vue").default);
     vue.component('Prop', require("@/components/Prop.vue").default);
     vue.component('ObjectView', require("@/components/ObjectView.vue").default);
-    vue.component('FormElem', require("@/components/ObjectView.vue").default);
+    vue.component('FormElem', require("@/components/FormElem.vue").default);
     vue.component('GridView', require("@/components/GridView.vue").default);
     vue.component('DetailsView', require("@/components/DetailsView.vue").default);
     vue.component('CheckBox', require("@/components/CheckBox.vue").default);
