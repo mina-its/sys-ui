@@ -11,9 +11,9 @@
 
         render(ce) {
             let e = this.elem as Elem;
-            //console.log("object-view:" + e.obj.ref);
             if (!e.obj) {
-                main.notify("Element 'object-view' needs obj property.", LogType.Error);
+                console.error("Element 'object-view' needs obj property.", e);
+                ce('div', '...');
                 return;
             }
 

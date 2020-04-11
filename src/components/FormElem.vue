@@ -3,7 +3,7 @@
     import {Elem, ElemType, ObjectViewType, FunctionDec, EntityMeta} from "../../../sys/src/types";
     import Markdown from "@/components/Markdown.vue";
     import * as main from '../main';
-    import {ChangeType, ItemChangeEventArg, StateChange} from '../types';;
+    import {ChangeType, ItemChangeEventArg, StateChange} from '@/types';
 
     @Component({
         components: {
@@ -87,6 +87,7 @@
                     return ce('img', {attrs: {"class": this.elem.styles, "src": this.elem.image.ref}});
 
                 case ElemType.Panel:
+                    console.log('panel');
                     return ce('panel', {props: {"elem": this.elem}});
 
                 case ElemType.Component:
