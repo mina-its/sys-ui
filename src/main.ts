@@ -735,7 +735,7 @@ function registerComponents(vue) {
     vue.component('CheckBox', require("@/components/CheckBox.vue").default);
 }
 
-function startVue(res: WebResponse) {
+function startVue(res: WebResponse, app) {
     try {
         Vue.use(Vuex);
         store = createStore();
@@ -752,7 +752,7 @@ function startVue(res: WebResponse) {
         });
 
         registerComponents(Vue);
-        new Vue({data: glob, store, render: h => h(App)}).$mount('#app');
+        new Vue({data: glob, store, render: h => h(app || App)}).$mount('#app');
     } catch (err) {
         console.error(err);
         notify("<strong>Starting Vue failed:</strong> " + err.message, LogType.Fatal);
@@ -979,29 +979,19 @@ function createStore() {
     });
 }
 
-export function libraryStart(app) {
-    Vue.use(Vuex);
-    let store = new Vuex.Store({
-        mutations: {},
-        actions: {}
-    });
-    let glob = {};
-    new Vue({data: glob, store, render: h => h(app)}).$mount('#app');
-}
-
-export function start() {
+export function start(app?) {
     // console.log('starting ...');
     const mainState = $('#main-state').html();
     const res: WebResponse = parse(mainState);
 
     if (res)
-        startVue(res);
+        startVue(res, app);
     else {
         let uri = "http://localhost" + setQs('m', RequestMode.inlineDev, true) + location.hash;
         console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, {withCredentials: true}).then(res => {
             if (res.data)
-                startVue(res.data);
+                startVue(res.data, app);
             else
                 console.error(res);
         }).catch(err => {

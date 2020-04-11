@@ -707,7 +707,7 @@ function registerComponents(vue) {
     vue.component('DetailsView', require("@/components/DetailsView.vue").default);
     vue.component('CheckBox', require("@/components/CheckBox.vue").default);
 }
-function startVue(res) {
+function startVue(res, app) {
     try {
         vue_1.default.use(vuex_1.default);
         store = createStore();
@@ -723,7 +723,7 @@ function startVue(res) {
             }
         });
         registerComponents(vue_1.default);
-        new vue_1.default({ data: exports.glob, store, render: h => h(App_vue_1.default) }).$mount('#app');
+        new vue_1.default({ data: exports.glob, store, render: h => h(app || App_vue_1.default) }).$mount('#app');
     }
     catch (err) {
         console.error(err);
@@ -926,28 +926,18 @@ function createStore() {
         }
     });
 }
-function libraryStart(app) {
-    vue_1.default.use(vuex_1.default);
-    let store = new vuex_1.default.Store({
-        mutations: {},
-        actions: {}
-    });
-    let glob = {};
-    new vue_1.default({ data: glob, store, render: h => h(app) }).$mount('#app');
-}
-exports.libraryStart = libraryStart;
-function start() {
+function start(app) {
     // console.log('starting ...');
     const mainState = jquery_1.default('#main-state').html();
     const res = parse(mainState);
     if (res)
-        startVue(res);
+        startVue(res, app);
     else {
         let uri = "http://localhost" + setQs('m', types_2.RequestMode.inlineDev, true) + location.hash;
         console.log(`loading main-state async from '${uri}' ...`);
         axios_1.default.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
-                startVue(res.data);
+                startVue(res.data, app);
             else
                 console.error(res);
         }).catch(err => {
