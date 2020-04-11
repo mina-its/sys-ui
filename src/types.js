@@ -5,6 +5,7 @@ exports.Constants = {
     redirectBack: '_back',
     redirectSelf: '_self',
     notifyEvent: 'notify',
+    defaultAddress: '/_default',
     questionEvent: 'question',
     contextMenuVisibleItems: 10,
     delayToStartProgressBar: 300,

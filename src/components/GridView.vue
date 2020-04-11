@@ -1,4 +1,3 @@
-import {StateChangeType} from '../types';;
 <template>
     <div :class="'grid-view' + (root?' p-4':'')" @scroll="onScroll()">
         <!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->

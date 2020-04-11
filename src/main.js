@@ -696,7 +696,6 @@ function stopProgress() {
     exports.glob.progress = null;
 }
 function registerComponents(vue) {
-    vue.component('Root', require("@/components/Root.vue").default);
     vue.component('Function', require("@/components/Function.vue").default);
     vue.component('Panel', require("@/components/Panel.vue").default);
     vue.component('Modal', require("@/components/Modal.vue").default);
@@ -933,7 +932,8 @@ function start(app) {
     if (res)
         startVue(res, app);
     else {
-        let uri = "http://localhost" + setQs('m', types_2.RequestMode.inlineDev, true) + location.hash;
+        let uri = setQs('m', types_2.RequestMode.inlineDev, false, types_1.Constants.defaultAddress);
+        uri = setQs('t', Math.random(), false, uri);
         console.log(`loading main-state async from '${uri}' ...`);
         axios_1.default.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
