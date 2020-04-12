@@ -648,9 +648,8 @@ function del_script(src) {
 }
 exports.del_script = del_script;
 function head_link(href) {
-    if (document.querySelector('link[href=\'' + href + '\']')) {
+    if (document.querySelector('link[href=\'' + href + '\']'))
         return;
-    }
     const link = document.createElement('link');
     link.setAttribute('href', href);
     link.setAttribute('rel', 'stylesheet');

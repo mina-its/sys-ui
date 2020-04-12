@@ -671,9 +671,9 @@ export function del_script(src) {
 }
 
 export function head_link(href) {
-    if (document.querySelector('link[href=\'' + href + '\']')) {
+    if (document.querySelector('link[href=\'' + href + '\']'))
         return;
-    }
+
     const link = document.createElement('link');
     link.setAttribute('href', href);
     link.setAttribute('rel', 'stylesheet');
