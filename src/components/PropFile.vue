@@ -29,8 +29,10 @@
     import {$t, glob, joinUri} from '../main';
     import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
-
-    @Component
+    import Function from "@/components/Function.vue";
+    @Component({
+        components: {Function}
+    })
     export default class PropFile extends Vue {
         @Prop() private prop: Property;
         @Prop() private doc: IData;

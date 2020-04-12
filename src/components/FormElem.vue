@@ -89,8 +89,10 @@
 
                 case ElemType.Component:
                     let data, props = this.elem.component.props;
-                    if (this.elem.component._ref)
-                        data = this.$store.state.data[this.elem.component._ref];
+                    if (this.elem.component._)
+                        data = this.elem.component._.data;
+                    // if (this.elem.component._)
+                    //     data = this.$store.state.data[this.elem.component._ref];
                     return ce(this.elem.component.name, {props: {data, ...props}});
 
                 case ElemType.Chart:

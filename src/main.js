@@ -771,7 +771,7 @@ function startProgress() {
 function stopProgress() {
     exports.glob.progress = null;
 }
-function registerComponents(vue) {
+function registerComponents(vue, components) {
     vue.component('function', require("@/components/Function.vue").default);
     vue.component('panel', require("@/components/Panel.vue").default);
     vue.component('modal', require("@/components/Modal.vue").default);
@@ -782,8 +782,13 @@ function registerComponents(vue) {
     vue.component('grid-view', require("@/components/GridView.vue").default);
     vue.component('details-view', require("@/components/DetailsView.vue").default);
     vue.component('check-box', require("@/components/CheckBox.vue").default);
+    if (components) {
+        for (let component in components) {
+            vue.component(component, components[component]);
+        }
+    }
 }
-function startVue(res, app) {
+function startVue(res, app, components) {
     try {
         handleWindowEvents();
         vue_1.default.use(vuex_1.default);
@@ -799,7 +804,7 @@ function startVue(res, app) {
                     el.focus();
             }
         });
-        registerComponents(vue_1.default);
+        registerComponents(vue_1.default, components);
         new vue_1.default({ data: exports.glob, store, render: h => h(app || App_vue_1.default) }).$mount('#app');
     }
     catch (err) {
@@ -1004,19 +1009,19 @@ function createStore() {
         }
     });
 }
-function start(app) {
+function start(app, components) {
     // console.log('starting ...');
     const mainState = jquery_1.default('#main-state').html();
     const res = parse(mainState);
     if (res)
-        startVue(res, app);
+        startVue(res, app, components);
     else {
-        let uri = setQs('m', types_2.RequestMode.inlineDev, false, types_1.Constants.defaultAddress);
+        let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : types_1.Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
         console.log(`loading main-state async from '${uri}' ...`);
         axios_1.default.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
-                startVue(res.data, app);
+                startVue(res.data, app, components);
             else
                 console.error(res);
         }).catch(err => {

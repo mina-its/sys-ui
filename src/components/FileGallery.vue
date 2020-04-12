@@ -53,14 +53,14 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob, $t} from '../main';
+    import {Component, Vue} from 'vue-property-decorator';
+    import {glob, $t} from '@/main';
     import {DirFile, LogType, DirFileType, YesNo, Pair, AjaxConfig} from '../../../sys/src/types';
-    import {MenuItem, FunctionExecEventArg, Constants} from '../types';
-    import $ from 'jquery';
+    import {MenuItem, FunctionExecEventArg, Constants} from '@/types';
     import * as main from '../main';
+    import Function from "@/components/Function.vue";
 
-    @Component({components: {}})
+    @Component({components: {Function}})
     export default class FileGallery extends Vue {
         get glob() {
             return glob;
