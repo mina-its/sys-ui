@@ -1,11 +1,11 @@
 <script lang="ts">
-    import {FunctionExecEventArg} from '../types';;
+    import {FunctionExecEventArg} from '../types';
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {FunctionDec, LogType, StatusCode} from "../../../sys/src/types";
     import * as main from '../main';
-    import {glob} from '../main';;
+    import {glob} from '../main';
 
-    @Component
+    @Component({name: 'function'})
     export default class Function extends Vue {
         @Prop() private title: string;
         @Prop() private name: string;

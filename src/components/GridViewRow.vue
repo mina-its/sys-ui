@@ -12,15 +12,17 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {Component, Prop as ComProp, Vue, Emit} from 'vue-property-decorator';
     import {Property, EntityMeta, IData} from "../../../sys/src/types";
     import {ItemChangeEventArg, ItemEventArg} from '../types';
     import $ from 'jquery';
+    import CheckBox from "@/components/CheckBox.vue";
+    import Prop from "@/components/Prop.vue";
 
-    @Component
+    @Component({components: {Prop, CheckBox}})
     export default class GridViewRow extends Vue {
-        @Prop() private item: IData;
-        @Prop() private selectable: boolean;
+        @ComProp() private item: IData;
+        @ComProp() private selectable: boolean;
 
         focused(e, prop: Property) {
             $(".prop-focused").removeClass("prop-focused");

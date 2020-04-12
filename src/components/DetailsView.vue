@@ -28,18 +28,21 @@
 </template>
 
 <script lang="ts">
-    import {ItemChangeEventArg, StateChange, ChangeType} from '../types';;
-    import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+    import {ItemChangeEventArg, StateChange, ChangeType} from '@/types';
+    import {Component, Prop as ComProp, Vue, Watch} from 'vue-property-decorator';
     import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
-    import {glob} from '../main';
+    import {glob} from '@/main';
     import $ from 'jquery';
     import * as main from '../main';
+    import Prop from "@/components/Prop.vue";
 
-    @Component
+    @Component({
+        components: {Prop}
+    })
     export default class DetailsView extends Vue {
-        @Prop() private uri: string;
-        @Prop() private root: boolean;
-        @Prop() private dec: ObjectDec;
+        @ComProp() private uri: string;
+        @ComProp() private root: boolean;
+        @ComProp() private dec: ObjectDec;
 
         currentGroup: string = this.groups[0];
 

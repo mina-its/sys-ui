@@ -5,7 +5,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
 
-    @Component
+    @Component({name: 'document-editor'})
     export default class DocumentEditor extends Vue {
         @Prop() private value: string;
 

@@ -15,6 +15,7 @@
     import * as main from '../main';
 
     @Component({
+        name: 'prop',
         components: {
             PropReferenceMultiple,
             PropTime,

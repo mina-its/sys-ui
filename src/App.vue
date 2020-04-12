@@ -116,7 +116,7 @@
                 })
                 .on("mouseup", (e: any) => {
                     if (glob.cmenu.show &&
-                        !$('.dropdown-item').is(e.target)
+                        ! $('.dropdown-item').is(e.target)
                         && $('.dropdown-item').has(e.target).length === 0
                         && $('.dropdown-menu.show').has(e.target).length === 0
                     ) hideCmenu();

@@ -708,15 +708,16 @@ function stopProgress() {
     exports.glob.progress = null;
 }
 function registerComponents(vue) {
-    vue.component('Function', require("@/components/Function.vue").default);
-    vue.component('Panel', require("@/components/Panel.vue").default);
-    vue.component('Modal', require("@/components/Modal.vue").default);
-    vue.component('Prop', require("@/components/Prop.vue").default);
-    vue.component('ObjectView', require("@/components/ObjectView.vue").default);
-    vue.component('FormElem', require("@/components/FormElem.vue").default);
-    vue.component('GridView', require("@/components/GridView.vue").default);
-    vue.component('DetailsView', require("@/components/DetailsView.vue").default);
-    vue.component('CheckBox', require("@/components/CheckBox.vue").default);
+    vue.component('function', require("@/components/Function.vue").default);
+    vue.component('panel', require("@/components/Panel.vue").default);
+    vue.component('modal', require("@/components/Modal.vue").default);
+    vue.component('prop', require("@/components/Prop.vue").default);
+    vue.component('object-view', require("@/components/ObjectView.vue").default);
+    vue.component('document-editor', require("@/components/DocumentEditor.vue").default);
+    vue.component('form-elem', require("@/components/FormElem.vue").default);
+    vue.component('grid-view', require("@/components/GridView.vue").default);
+    vue.component('details-view', require("@/components/DetailsView.vue").default);
+    vue.component('check-box', require("@/components/CheckBox.vue").default);
 }
 function startVue(res, app) {
     try {

@@ -37,6 +37,7 @@
     import * as main from '../main';
 
     @Component({
+        name: 'modal',
         components: {FormElem}
     })
     export default class Modal extends Vue {
