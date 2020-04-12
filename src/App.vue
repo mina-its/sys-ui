@@ -61,70 +61,7 @@
         }
     })
     export default class App extends Vue {
-        handleWindowEvents() {
-            $(window)
-                .on(Constants.notifyEvent, function (e: any) {
-                    let notify = e.detail as NotificationInfo;
-                    if (notify.type == LogType.Debug) {
-                        $("#snackbar").addClass("visible").text(notify.message);
-                        setTimeout(function () {
-                            $("#snackbar").removeClass("visible");
-                        }, 3000);
-                    } else
-                        glob.notify = notify;
-                })
-                .on(Constants.questionEvent, function (e: any) {
-                    glob.question = e.detail;
-                })
-                .on("popstate", (e) => {
-                    load(location.href);
-                })
-                .on("beforeunload", (e: any) => {
-                    if (glob.dirty) {
-                        e = e || window.event;
-                        if (e)
-                            e.returnValue = $t('save-before');
-                        return $t('save-before');
-                    }
-                })
-                .on("resize", (e) => {
-                    hideCmenu();
-                })
-                .on("keydown", (e) => {
-                    if (glob.cmenu.show)
-                        main.handleCmenuKeys(e);
-                    glob.notify = null;
-                })
-                .on("click", (e: any) => {
-                    if (e.target.tagName == "A") {
-                        if (e.target.getAttribute('target')) return; // especially _blank
-                        let href = e.target.getAttribute('href');
-                        if (href) {
-                            if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
-                            e.preventDefault();
-                            if (glob.dirty) {
-                                notify($t('save-before'), LogType.Warning);
-                                return;
-                            } // dirty page
-                            if (/\bf=\d/.test(href)) { // function link
-
-                            } else
-                                history.pushState(null, null, href);
-                            load(href);
-                        }
-                    }
-                })
-                .on("mouseup", (e: any) => {
-                    if (glob.cmenu.show &&
-                        ! $('.dropdown-item').is(e.target)
-                        && $('.dropdown-item').has(e.target).length === 0
-                        && $('.dropdown-menu.show').has(e.target).length === 0
-                    ) hideCmenu();
-                });
-        }
-
         mounted() {
-            this.handleWindowEvents();
             console.log(
                 `%c mina framework started. %c version: ${glob.config.version} %c`,
                 'background:#05B ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff',

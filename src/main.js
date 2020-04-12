@@ -321,6 +321,70 @@ function hideCmenu() {
     exports.glob.cmenu.show = false;
 }
 exports.hideCmenu = hideCmenu;
+function handleWindowEvents() {
+    jquery_1.default(window)
+        .on(types_1.Constants.notifyEvent, function (e) {
+        let notify = e.detail;
+        if (notify.type == types_2.LogType.Debug) {
+            jquery_1.default("#snackbar").addClass("visible").text(notify.message);
+            setTimeout(function () {
+                jquery_1.default("#snackbar").removeClass("visible");
+            }, 3000);
+        }
+        else
+            exports.glob.notify = notify;
+    })
+        .on(types_1.Constants.questionEvent, function (e) {
+        exports.glob.question = e.detail;
+    })
+        .on("popstate", (e) => {
+        load(location.href);
+    })
+        .on("beforeunload", (e) => {
+        if (exports.glob.dirty) {
+            e = e || window.event;
+            if (e)
+                e.returnValue = $t('save-before');
+            return $t('save-before');
+        }
+    })
+        .on("resize", (e) => {
+        hideCmenu();
+    })
+        .on("keydown", (e) => {
+        if (exports.glob.cmenu.show)
+            handleCmenuKeys(e);
+        exports.glob.notify = null;
+    })
+        .on("click", (e) => {
+        let el = e.target;
+        if (el.tagName !== "A" || el.getAttribute('target'))
+            return; // especially _blank
+        let href = el.getAttribute('href');
+        if (href) {
+            if (href.match(/^javascript/) || /^#/.test(href))
+                return; // if (/^#/.test(href)) return false;
+            e.preventDefault();
+            if (exports.glob.dirty) {
+                notify($t('save-before'), types_2.LogType.Warning);
+                return;
+            } // dirty page
+            if (/\bf=\d/.test(href)) { // function link
+            }
+            else
+                history.pushState(null, null, href);
+            load(href);
+            e.stopPropagation();
+        }
+    })
+        .on("mouseup", (e) => {
+        if (exports.glob.cmenu.show &&
+            !jquery_1.default('.dropdown-item').is(e.target)
+            && jquery_1.default('.dropdown-item').has(e.target).length === 0
+            && jquery_1.default('.dropdown-menu.show').has(e.target).length === 0)
+            hideCmenu();
+    });
+}
 function handleCmenuKeys(e) {
     switch (e.which) {
         case types_2.Keys.tab:
@@ -523,7 +587,7 @@ function notify(content, type, params) {
         return;
     }
     const message = typeof content === 'string' ? content : content.message;
-    if (type === null) {
+    if (type == null) {
         if (typeof content !== 'string') {
             type = content.code && content.code !== types_2.StatusCode.Ok ? types_2.LogType.Error : types_2.LogType.Info;
         }
@@ -548,7 +612,7 @@ function getBsonId(item) {
     }
     else if (!item._id) {
         console.error('Invalid item data, _id is expected:', item);
-        notify('Invalid data, please check the logs!');
+        notify('Invalid data, please check the logs!', types_2.LogType.Error);
         return null;
     }
     else {
@@ -721,6 +785,7 @@ function registerComponents(vue) {
 }
 function startVue(res, app) {
     try {
+        handleWindowEvents();
         vue_1.default.use(vuex_1.default);
         store = createStore();
         handleResponse(res);
@@ -918,6 +983,7 @@ function _dispatchRequestServerModify(store, done) {
         else
             dispatchRequestServerModify(store, done);
     }, (err) => {
+        exports.glob.modifies.unshift(modify);
         done(err);
         notify(err);
     });

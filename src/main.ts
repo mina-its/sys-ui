@@ -347,6 +347,69 @@ export function hideCmenu() {
     glob.cmenu.show = false;
 }
 
+function handleWindowEvents() {
+    $(window)
+        .on(Constants.notifyEvent, function (e: any) {
+            let notify = e.detail as NotificationInfo;
+            if (notify.type == LogType.Debug) {
+                $("#snackbar").addClass("visible").text(notify.message);
+                setTimeout(function () {
+                    $("#snackbar").removeClass("visible");
+                }, 3000);
+            } else
+                glob.notify = notify;
+        })
+        .on(Constants.questionEvent, function (e: any) {
+            glob.question = e.detail;
+        })
+        .on("popstate", (e) => {
+            load(location.href);
+        })
+        .on("beforeunload", (e: any) => {
+            if (glob.dirty) {
+                e = e || window.event;
+                if (e)
+                    e.returnValue = $t('save-before');
+                return $t('save-before');
+            }
+        })
+        .on("resize", (e) => {
+            hideCmenu();
+        })
+        .on("keydown", (e) => {
+            if (glob.cmenu.show)
+                handleCmenuKeys(e);
+            glob.notify = null;
+        })
+        .on("click", (e: any) => {
+            let el = e.target as HTMLAnchorElement;
+            if (el.tagName !== "A" || el.getAttribute('target')) return;   // especially _blank
+
+            let href = el.getAttribute('href');
+            if (href) {
+                if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
+                e.preventDefault();
+                if (glob.dirty) {
+                    notify($t('save-before'), LogType.Warning);
+                    return;
+                } // dirty page
+                if (/\bf=\d/.test(href)) { // function link
+
+                } else
+                    history.pushState(null, null, href);
+                load(href);
+                e.stopPropagation()
+            }
+        })
+        .on("mouseup", (e: any) => {
+            if (glob.cmenu.show &&
+                !$('.dropdown-item').is(e.target)
+                && $('.dropdown-item').has(e.target).length === 0
+                && $('.dropdown-menu.show').has(e.target).length === 0
+            ) hideCmenu();
+        });
+}
+
 export function handleCmenuKeys(e) {
     switch (e.which) {
         case Keys.tab:
@@ -549,7 +612,7 @@ export function notify(content: string | IError, type?: LogType, params?: Notifi
         return;
     }
     const message = typeof content === 'string' ? content : content.message;
-    if (type === null) {
+    if (type == null) {
         if (typeof content !== 'string') {
             type = content.code && content.code !== StatusCode.Ok ? LogType.Error : LogType.Info;
         } else {
@@ -573,7 +636,7 @@ export function getBsonId(item: IData): string {
         throw 'Item is null';
     } else if (!item._id) {
         console.error('Invalid item data, _id is expected:', item);
-        notify('Invalid data, please check the logs!');
+        notify('Invalid data, please check the logs!', LogType.Error);
         return null;
     } else {
         return item._id.$oid;
@@ -753,6 +816,7 @@ function registerComponents(vue) {
 
 function startVue(res: WebResponse, app) {
     try {
+        handleWindowEvents();
         Vue.use(Vuex);
         store = createStore();
         handleResponse(res);
@@ -973,6 +1037,7 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
         else
             dispatchRequestServerModify(store, done);
     }, (err) => {
+        glob.modifies.unshift(modify);
         done(err);
         notify(err);
     });

@@ -17,7 +17,7 @@
                     let bodyElems = elems.filter(el => el.type !== ElemType.Function);
                     let footerElems = elems.filter(el => el.type === ElemType.Function);
                     glob.modal = true;
-                    return ce('Modal', {
+                    return ce('modal', {
                         props: {
                             title: this.elem.title,
                             bodyElems,
@@ -28,7 +28,7 @@
 
                 case PanelType.Stack: {
                     let children = elems.map((elem) => {
-                        return ce("FormElem", {props: {elem}});
+                        return ce("form-elem", {props: {elem}});
                     });
                     let horizontal = panel.stack && panel.stack.orientation == Orientation.Horizontal;
                     return ce('div', {
@@ -40,7 +40,7 @@
 
                 case PanelType.Wrap: {
                     let children = elems.map((elem) => {
-                        return ce("FormElem", {props: {elem}});
+                        return ce("form-elem", {props: {elem}});
                     });
                     return ce('div', {
                         attrs: {
@@ -51,7 +51,7 @@
 
                 case PanelType.Flex: {
                     let children = elems.map((elem) => {
-                        return ce("FormElem", {props: {elem}});
+                        return ce("form-elem", {props: {elem}});
                     });
                     return ce('div', {
                         attrs: {

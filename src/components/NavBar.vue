@@ -14,7 +14,7 @@
             <ul class="navbar-nav">
                 <li v-for="item of glob.config.menu"
                     :class="{'nav-item': true, 'active':currentRef===item.ref, 'dropdown':item.items}">
-                    <a v-if="item.items && item.items.length" href="javascript:;" class="nav-link dropdown-toggle"
+                    <a v-if="item.items && item.items.length" href="#" class="nav-link dropdown-toggle"
                        id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">{{item.title}}</a>
                     <div v-if="item.items && item.items.length" class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a v-for="subitem of item.items" class="dropdown-item" :href="subitem.ref">{{subitem.title}}</a>
