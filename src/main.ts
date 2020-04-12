@@ -812,6 +812,7 @@ function registerComponents(vue, components) {
     vue.component('grid-view', require("@/components/GridView.vue").default);
     vue.component('details-view', require("@/components/DetailsView.vue").default);
     vue.component('check-box', require("@/components/CheckBox.vue").default);
+    vue.component('log-terminal', require("@/components/LogTerminal.vue").default);
 
     if (components) {
         for (let component in components) {

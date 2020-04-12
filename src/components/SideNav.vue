@@ -1,5 +1,5 @@
 <template>
-    <div class="side-nav sidenav p-3 d-none d-lg-block">
+    <div class="side-nav sidenav p-3 d-none d-lg-block" v-if="glob.config.navmenu.length">
         <div class="input-group mb-3">
             <input type="text" class="form-control border-right-0" placeholder="Search">
             <span class="input-group-append bg-white rounded border-left-0">
