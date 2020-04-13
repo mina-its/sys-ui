@@ -54,13 +54,12 @@ let store;
 export function getText(text: string | MultilangText, useDictionary?: boolean): string {
     if (!text) return "";
 
-    if (typeof text == "string" && useDictionary) {
-        if (text.indexOf('.') == -1) text = "sys." + text;
-        text = glob.texts[text] || text.replace(/-/g, " ");
+    if (typeof text == "string") {
+        if (!useDictionary) return text;
+        if (glob.texts[text]) return glob.texts[text];
+        if (text.indexOf('.') == -1) return glob.texts["sys." + text] || text.replace(/-/g, " ");
+        return text.replace(/-/g, " ");
     }
-
-    if (typeof text == "string")
-        return text;
 
     let localeName = Locale[glob.config.locale];
     if (text[localeName])

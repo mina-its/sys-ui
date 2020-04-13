@@ -30,13 +30,15 @@ let store;
 function getText(text, useDictionary) {
     if (!text)
         return "";
-    if (typeof text == "string" && useDictionary) {
+    if (typeof text == "string") {
+        if (!useDictionary)
+            return text;
+        if (exports.glob.texts[text])
+            return exports.glob.texts[text];
         if (text.indexOf('.') == -1)
-            text = "sys." + text;
-        text = exports.glob.texts[text] || text.replace(/-/g, " ");
+            return exports.glob.texts["sys." + text] || text.replace(/-/g, " ");
+        return text.replace(/-/g, " ");
     }
-    if (typeof text == "string")
-        return text;
     let localeName = types_2.Locale[exports.glob.config.locale];
     if (text[localeName])
         return text[localeName];
