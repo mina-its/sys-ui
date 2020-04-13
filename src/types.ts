@@ -22,7 +22,7 @@ export const Constants = {
     contextMenuVisibleItems: 10,
     delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
-    uniqueFilenameRegex : /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}__/,
+    uniqueFilenameRegex: /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}__/,
 };
 
 export const ChartColors = [
@@ -149,6 +149,7 @@ export class Global {
     modal: boolean = false;
     headFuncs: HeadFunc[] = [];
     config = new AppStateConfig();
+    texts: { [key: string]: string } = {};
     dirty: boolean = false;
     notify: NotificationInfo = null;
     cmenu = new AppStateCmenu();

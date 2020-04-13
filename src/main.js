@@ -27,15 +27,14 @@ const types_2 = require("../../sys/src/types");
 const App_vue_1 = tslib_1.__importDefault(require("./App.vue"));
 exports.glob = new types_1.Global();
 let store;
-function $t(text) {
-    return typeof (text) == 'object' ? text[exports.glob.config.locale] || Object.values(text)[0] : text;
-    // if (text[pack + "." + key]) return text[pack + "." + key];
-    //
-    // console.warn(`Warning: text '${pack}.${key}' not found`);
-    // return key.replace(/-/g, " ");
-}
-exports.$t = $t;
-function getText(text) {
+function getText(text, useDictionary) {
+    if (!text)
+        return "";
+    if (typeof text == "string" && useDictionary) {
+        if (text.indexOf('.') == -1)
+            text = "sys." + text;
+        text = exports.glob.texts[text] || text.replace(/-/g, " ");
+    }
     if (typeof text == "string")
         return text;
     let localeName = types_2.Locale[exports.glob.config.locale];
@@ -45,6 +44,14 @@ function getText(text) {
         return Object.values(text)[0];
 }
 exports.getText = getText;
+function $t(text) {
+    return getText(text, true);
+    // if (text[pack + "." + key]) return text[pack + "." + key];
+    //
+    // console.warn(`Warning: text '${pack}.${key}' not found`);
+    // return key.replace(/-/g, " ");
+}
+exports.$t = $t;
 // export function getNavmenu(res: WebResponse) {
 // 	let _navmenu = localStorage.getItem('_navmenu');
 // 	// if (_navmenu)
@@ -91,11 +98,10 @@ function addHeadStyle(css) {
 function vueResetFormData(res) {
     // console.log(res);
     let dataset = res.data;
-    exports.glob.form = res.form;
     if (!dataset)
         return;
-    if (exports.glob.form && exports.glob.form.declarations) {
-        exports.glob.form.elems.forEach(elem => elem.id = uuid_1.v4()); // needs for refreshing form while cancel changes
+    if (res.form && res.form.declarations) {
+        res.form.elems.forEach(elem => elem.id = uuid_1.v4()); // needs for refreshing form while cancel changes
         const setDataMeta = (ref, item, dec) => {
             item._ = item._ || { ref };
             item._.dec = dec;
@@ -103,7 +109,7 @@ function vueResetFormData(res) {
         };
         for (let ref in dataset) {
             let data = dataset[ref];
-            let dec = exports.glob.form.declarations[ref];
+            let dec = res.form.declarations[ref];
             if (!data || !dec)
                 continue;
             if (Array.isArray(data)) {
@@ -123,6 +129,7 @@ function vueResetFormData(res) {
         }
     }
     exports.glob.data = res.data;
+    exports.glob.form = res.form;
     exports.glob.headFuncs = [];
     commitReloadData(store, res.data);
 }
@@ -212,6 +219,8 @@ function handleResponse(res) {
         notify("WHAT should I do now?", types_2.LogType.Warning);
         console.log(res);
     }
+    // must be set after binding to Vue
+    exports.glob.texts = res.texts || {};
 }
 exports.handleResponse = handleResponse;
 function getPropTextValue(meta, data) {
