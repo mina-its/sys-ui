@@ -86,7 +86,6 @@ class Global {
         this.modal = false;
         this.headFuncs = [];
         this.config = new types_1.AppStateConfig();
-        this.texts = {};
         this.dirty = false;
         this.notify = null;
         this.cmenu = new AppStateCmenu();

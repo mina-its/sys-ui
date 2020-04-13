@@ -3,22 +3,29 @@
         <template v-for="item in glob.cmenu.items">
             <div v-if="item.title==='-'" class="dropdown-divider"></div>
             <a v-else :class="'dropdown-item' + (item.hover ? ' active' : '') " @click="click(item)"
-               href="javascript:;" v-html="item.title || '&nbsp;'"></a>
+               href="javascript:;" v-html="getTitle(item)"></a>
         </template>
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {glob} from '../main';
+    import {glob} from '@/main';
     import $ from 'jquery';
     import * as main from '../main';
+    import {MenuItem} from "@/types";
 
     @Component
     export default class ContextMenu extends Vue {
         click(item) {
             glob.cmenu.show = false;
             glob.cmenu.handler(glob.cmenu.state, item);
+        }
+
+        getTitle(item: MenuItem) {
+            let title = item.title || '&nbsp;';
+            title = title.replace(/\((.+)\)/, "<span class='float-right ml-3 text-secondary'>($1)</span>");
+            return title;
         }
 
         calcMenuPosition() {

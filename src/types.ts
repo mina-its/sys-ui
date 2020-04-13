@@ -149,7 +149,7 @@ export class Global {
     modal: boolean = false;
     headFuncs: HeadFunc[] = [];
     config = new AppStateConfig();
-    texts: { [key: string]: string } = {};
+    texts: { [key: string]: string };
     dirty: boolean = false;
     notify: NotificationInfo = null;
     cmenu = new AppStateCmenu();

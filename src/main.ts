@@ -30,6 +30,7 @@ import {
     Drive,
     EmbeddedInfo,
     FunctionDec,
+    GlobalType,
     IData,
     IError,
     Keys,
@@ -58,7 +59,9 @@ export function getText(text: string | MultilangText, useDictionary?: boolean): 
     if (typeof text == "string") {
         if (!useDictionary) return text;
         if (glob.texts[text]) return glob.texts[text];
-        if (text.indexOf('.') == -1) return glob.texts["sys." + text] || text.replace(/-/g, " ");
+        if (text.indexOf('.') == -1) {
+            return glob.texts["sys." + text] || text.replace(/-/g, " ");
+        }
         return text.replace(/-/g, " ");
     }
 
@@ -71,11 +74,6 @@ export function getText(text: string | MultilangText, useDictionary?: boolean): 
 
 export function $t(text: string): string {
     return getText(text, true);
-
-    // if (text[pack + "." + key]) return text[pack + "." + key];
-    //
-    // console.warn(`Warning: text '${pack}.${key}' not found`);
-    // return key.replace(/-/g, " ");
 }
 
 // export function getNavmenu(res: WebResponse) {
@@ -256,7 +254,7 @@ export function handleResponse(res: WebResponse) {
     }
 
     // must be set after binding to Vue
-    glob.texts = res.texts || {};
+    glob.texts = glob.texts || res.texts || {};
 }
 
 export function getPropTextValue(meta: Property, data): any {
@@ -837,7 +835,7 @@ function startVue(res: WebResponse, app, components) {
         Vue.use(Vuex);
         store = createStore();
         handleResponse(res);
-        glob.socket = io();
+        if (typeof io != "undefined") glob.socket = io();
         Object.assign(Vue.config, {productionTip: false, devtools: true});
         Vue.prototype.glob = glob;
         Vue.prototype.$t = $t;
@@ -899,6 +897,12 @@ function _commitStoreChange(state, change: StateChange) {
     switch (change.type) {
         case ChangeType.EditProp:
             change.item[change.prop.name] = change.value;
+            // todo : multi language text
+            // if (change.prop._.gtype === GlobalType.string && change.prop.text && change.prop.text.multiLanguage && change.value && typeof (change.value) == "object") {
+            //     for (let locale in change.value) {
+            //         change.vue.$set(change.item[change.prop.name], locale, change.value[locale]);
+            //     }
+            // }
 
             // todo : remove dependecny change here
             // let dependents = this.dec.properties.filter(p => p.dependsOn == change.prop.name);

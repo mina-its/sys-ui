@@ -7,7 +7,9 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
     import {ItemChangeEventArg, PropEventArg} from '../types';
-    import {getQs} from '../main';;
+    import {getQs, glob} from '../main';
+
+    ;
     import * as main from '../main';
 
     @Component
@@ -32,21 +34,27 @@
         update(e): ItemChangeEventArg {
             let text = this.type == "number" ? (e.target as any).valueAsNumber : (e.target as any).value;
             if (text === "") text = null;
-            let locale = getQs('e') || 'en';
             let val = this.doc[this.prop.name];
 
             if (this.prop.text && this.prop.text.multiLanguage) {
-                if (locale) {
-                    if (typeof val == 'string')
-                        val = {'en': val};
-                    else
+                if (val == null)
+                    this.$set(this.doc, this.prop.name, {});
+
+                if (glob.config.locale) {
+                    if (typeof val == 'string') {
+                        this.$set(this.doc[this.prop.name], glob.config.defaultLocale, val);
+                        val = {};
+                        val[glob.config.locale] = text;
+                    } else
                         val = val || {};
 
-                    val[locale] = text;
+                    this.$set(this.doc[this.prop.name], glob.config.locale, text);
+                    val[glob.config.locale] = text;
                 } else {
-                    if (val && typeof val == 'object')
-                        val['en'] = text;
-                    else
+                    if (val && typeof val == 'object' && glob.config.defaultLocale) {
+                        this.$set(this.doc[this.prop.name], glob.config.defaultLocale, text);
+                        val[glob.config.defaultLocale] = text;
+                    } else
                         val = text;
                 }
             } else

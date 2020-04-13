@@ -37,10 +37,10 @@
         @Prop() private alwaysVisible: boolean;
 
         mounted() {
-            window.addEventListener("keydown", (e) => {
+            window.addEventListener("keydown", (e: KeyboardEvent) => {
                 if (e.ctrlKey && e.which == Keys.s) {
                     this.apply({});
-                    return false;
+                    e.preventDefault();
                 }
             });
         }

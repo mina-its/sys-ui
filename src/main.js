@@ -35,8 +35,9 @@ function getText(text, useDictionary) {
             return text;
         if (exports.glob.texts[text])
             return exports.glob.texts[text];
-        if (text.indexOf('.') == -1)
+        if (text.indexOf('.') == -1) {
             return exports.glob.texts["sys." + text] || text.replace(/-/g, " ");
+        }
         return text.replace(/-/g, " ");
     }
     let localeName = types_2.Locale[exports.glob.config.locale];
@@ -48,10 +49,6 @@ function getText(text, useDictionary) {
 exports.getText = getText;
 function $t(text) {
     return getText(text, true);
-    // if (text[pack + "." + key]) return text[pack + "." + key];
-    //
-    // console.warn(`Warning: text '${pack}.${key}' not found`);
-    // return key.replace(/-/g, " ");
 }
 exports.$t = $t;
 // export function getNavmenu(res: WebResponse) {
@@ -222,7 +219,7 @@ function handleResponse(res) {
         console.log(res);
     }
     // must be set after binding to Vue
-    exports.glob.texts = res.texts || {};
+    exports.glob.texts = exports.glob.texts || res.texts || {};
 }
 exports.handleResponse = handleResponse;
 function getPropTextValue(meta, data) {
@@ -806,7 +803,8 @@ function startVue(res, app, components) {
         vue_1.default.use(vuex_1.default);
         store = createStore();
         handleResponse(res);
-        exports.glob.socket = io();
+        if (typeof io != "undefined")
+            exports.glob.socket = io();
         Object.assign(vue_1.default.config, { productionTip: false, devtools: true });
         vue_1.default.prototype.glob = exports.glob;
         vue_1.default.prototype.$t = $t;
@@ -862,6 +860,12 @@ function _commitStoreChange(state, change) {
     switch (change.type) {
         case types_1.ChangeType.EditProp:
             change.item[change.prop.name] = change.value;
+            // todo : multi language text
+            // if (change.prop._.gtype === GlobalType.string && change.prop.text && change.prop.text.multiLanguage && change.value && typeof (change.value) == "object") {
+            //     for (let locale in change.value) {
+            //         change.vue.$set(change.item[change.prop.name], locale, change.value[locale]);
+            //     }
+            // }
             // todo : remove dependecny change here
             // let dependents = this.dec.properties.filter(p => p.dependsOn == change.prop.name);
             // for (const prop of dependents) {
