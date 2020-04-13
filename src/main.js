@@ -793,6 +793,7 @@ function registerComponents(vue, components) {
     vue.component('details-view', require("@/components/DetailsView.vue").default);
     vue.component('check-box', require("@/components/CheckBox.vue").default);
     vue.component('log-terminal', require("@/components/LogTerminal.vue").default);
+    vue.component('api-doc', require("@/components/ApiDoc.vue").default);
     if (components) {
         for (let component in components) {
             vue.component(component, components[component]);
@@ -805,6 +806,7 @@ function startVue(res, app, components) {
         vue_1.default.use(vuex_1.default);
         store = createStore();
         handleResponse(res);
+        exports.glob.socket = io();
         Object.assign(vue_1.default.config, { productionTip: false, devtools: true });
         vue_1.default.prototype.glob = exports.glob;
         vue_1.default.prototype.$t = $t;

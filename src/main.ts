@@ -48,6 +48,7 @@ import {
 } from '../../sys/src/types';
 import App from './App.vue';
 
+declare let io: any;
 export let glob = new Global();
 let store;
 
@@ -726,8 +727,7 @@ export function load(href) {
     ajax(setQs('m', RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
 
-export function ajax(url: string, data, config: AjaxConfig,
-                     done: (res: WebResponse) => void,
+export function ajax(url: string, data, config: AjaxConfig, done: (res: WebResponse) => void,
                      fail?: (err: { code: StatusCode, message: string }) => void) {
 
     config = config || {};
@@ -822,6 +822,7 @@ function registerComponents(vue, components) {
     vue.component('details-view', require("@/components/DetailsView.vue").default);
     vue.component('check-box', require("@/components/CheckBox.vue").default);
     vue.component('log-terminal', require("@/components/LogTerminal.vue").default);
+    vue.component('api-doc', require("@/components/ApiDoc.vue").default);
 
     if (components) {
         for (let component in components) {
@@ -836,7 +837,7 @@ function startVue(res: WebResponse, app, components) {
         Vue.use(Vuex);
         store = createStore();
         handleResponse(res);
-
+        glob.socket = io();
         Object.assign(Vue.config, {productionTip: false, devtools: true});
         Vue.prototype.glob = glob;
         Vue.prototype.$t = $t;

@@ -122,6 +122,10 @@
         font-size: 15px;
     }
 
+    .table {
+        width: inherit;
+    }
+
     main {
         flex: 1 1 auto;
         scroll-behavior: smooth;

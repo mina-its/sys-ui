@@ -32,10 +32,10 @@
                     </div>
                     <div :id="'schema-'+schema.name" class="collapse" data-parent=".api-doc">
                         <div class="card-body"><p>{</p>
-                            <div class="row pl-3" v-for="prop of schema.properties">
-                                <span class="col-2 text-dark text-nowrap">{{prop.name}}<span class="text-danger"
-                                                                                             v-if="prop.required">*</span></span>
-                                <span class="col-2 text-primary text-nowrap">{{prop.type}}</span>
+                            <div class="pl-3" v-for="prop of schema.properties">
+                                <span class="text-dark schema-prop-name text-nowrap">{{prop.name}}<span
+                                        class="text-danger" v-if="prop.required">*</span></span>
+                                <span class="text-primary text-nowrap">{{prop.type}}</span>
                             </div>
                             <p>}</p>
                         </div>
@@ -110,6 +110,11 @@
 
         .api-doc-enum {
             font-family: monospace;
+        }
+
+        .schema-prop-name {
+            width: 200px;
+            display: inline-block;
         }
     }
 </style>

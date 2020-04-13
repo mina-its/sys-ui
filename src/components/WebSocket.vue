@@ -4,9 +4,8 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {ClientCommand, LogType, Pair} from '../../../sys/src/types';
-    import {glob} from '@/main';;
+    import {glob} from '@/main';
     import * as main from '../main';
-    declare let io: any;
 
     @Component
     export default class WebSocket extends Vue {
@@ -19,9 +18,10 @@
         }
 
         mounted() {
-            // console.log("web-socket initing ...");
-            if (glob.config.interactive)
+            if (glob.config.interactive) {
+                console.log("web-socket initing ...");
                 glob.socket.on('cmd', this.handleCommand);
+            }
         }
 
         handleCommand(command: ClientCommand, ...args: any[]) {

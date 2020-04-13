@@ -145,7 +145,7 @@ export class Global {
     form: FormDto;
     question = new AppStateQuestion();
     fileGallery = new AppStateFileGallery();
-    logs: AppStateLog[];
+    logs: AppStateLog[] = [];
     modal: boolean = false;
     headFuncs: HeadFunc[] = [];
     config = new AppStateConfig();

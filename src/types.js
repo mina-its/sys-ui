@@ -82,6 +82,7 @@ class Global {
     constructor() {
         this.question = new AppStateQuestion();
         this.fileGallery = new AppStateFileGallery();
+        this.logs = [];
         this.modal = false;
         this.headFuncs = [];
         this.config = new types_1.AppStateConfig();
