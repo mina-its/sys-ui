@@ -748,7 +748,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
             for (let item of itemArray) {
                 if (item._ && item._.rawData) {
                     formData = formData || new FormData();
-                    let blob = (item as mFile)._.rawData;
+                    let blob = (item as mFile)._.rawData as any as Blob;
                     formData.append('files[]', blob, (item as mFile).name);
                     delete (item as mFile)._.rawData;
                 }

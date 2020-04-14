@@ -1,8 +1,8 @@
 module.exports = {
 
     devServer: {
-        host: '192.168.1.12',
-        proxy: 'http://192.168.1.12'
+        host: 'alchemyadmin.localhost',
+        proxy: 'http://alchemyadmin.localhost'
     },
 
     productionSourceMap: false,

@@ -50,7 +50,7 @@
                     break;
 
                 case ClientCommand.Download:
-                    window.open(args[0], "_self");
+                    window.open(args[0]);
                     break;
 
                 case ClientCommand.FunctionFailed:
