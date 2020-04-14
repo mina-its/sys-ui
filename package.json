@@ -1,6 +1,6 @@
 {
   "name": "sys-ui",
-  "version": "0.1.0",
+  "version": "5.2.7",
   "private": true,
   "main": "./dist/sys.main.umd.js",
   "babel": {
