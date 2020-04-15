@@ -58,9 +58,10 @@
                     window.open(file._.uri + `?m=${RequestMode.download}`, '_blank');
                     break;
                 case "select":
-                    let val = this.doc[this.prop.name] as mFile;
-                    let path = val && val.path ? val.path : this.prop.file.path;
-                    main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
+                    this.selectFile();
+                    // let val = this.doc[this.prop.name] as mFile;
+                    // let path = val && val.path ? val.path : this.prop.file.path;
+                    // main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
                     break;
             }
         }
@@ -90,8 +91,8 @@
             } as FileAction);
         }
 
-        selectFile(e: FunctionExecEventArg) {
-            e.stopProgress();
+        selectFile(e?: FunctionExecEventArg) {
+            if (e) e.stopProgress();
             let val = this.getVal();
 
             if (this.prop.file && this.prop.file.drive && this.prop.file.drive.mode == DriveMode.Gallery) {

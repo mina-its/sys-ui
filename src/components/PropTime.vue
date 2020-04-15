@@ -41,6 +41,6 @@
 
 <style lang="scss">
     .prop-time:hover {
-        background: url('/images/calendar.png') no-repeat var(--right) 5px center;
+        background: url('/@sys-ui/images/calendar.png') no-repeat var(--right) 5px center;
     }
 </style>

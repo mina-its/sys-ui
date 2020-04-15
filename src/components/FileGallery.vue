@@ -166,8 +166,9 @@
         }
 
         icon(item: DirFile) {
+            const root = '/@sys-ui/images/gallery/';
             if (item.type == DirFileType.Folder)
-                return '/images/gallery/folder2.png';
+                return root + 'folder2.png';
 
             let ext = item.name.split('.').pop().toLowerCase();
             if (Constants.imageExtensions.includes(ext))
@@ -176,31 +177,31 @@
             switch (ext) {
                 case "doc":
                 case "docx":
-                    return '/images/gallery/doc.png';
+                    return root + 'doc.png';
 
                 case "exe":
-                    return '/images/gallery/exe.png';
+                    return root + 'exe.png';
 
                 case "mp3":
                 case "wav":
-                    return '/images/gallery/music.png';
+                    return root + 'music.png';
 
                 case "pdf":
-                    return '/images/gallery/pdf.png';
+                    return root + 'pdf.png';
 
                 case "avi":
                 case "mp4":
                 case "mov":
-                    return '/images/gallery/play.png';
+                    return root + 'play.png';
 
                 case "zip":
-                    return '/images/gallery/zip.png';
+                    return root + 'zip.png';
 
                 case "xml":
-                    return '/images/gallery/xml.png';
+                    return root + 'xml.png';
 
                 default:
-                    return '/images/gallery/file.png';
+                    return root + 'file.png';
             }
         }
 

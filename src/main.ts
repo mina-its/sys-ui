@@ -21,7 +21,7 @@ let index = {
 import {v4 as uuidv4} from 'uuid';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {ChangeType, Constants, FileAction, Global, MenuItem, Modify, StateChange, JQuery, Axios, Socket} from './types';
+import {Axios, ChangeType, Constants, FileAction, Global, JQuery, MenuItem, Modify, Socket, StateChange} from './types';
 import {
     AjaxConfig,
     DirFile,
@@ -579,6 +579,12 @@ export function openFileGallery(drive: Drive, file: string, path: string, fixedP
     };
 
     ajax('/getFileGallery?m=1', {drive: drive._id, path}, {}, res => {
+        if (res.code != StatusCode.Ok) {
+            glob.fileGallery.show = false;
+            notify(res.message, LogType.Error);
+            return;
+        }
+
         glob.fileGallery.loading = false;
         glob.fileGallery.uri = res.data.uri;
         glob.fileGallery.list = res.data.list;

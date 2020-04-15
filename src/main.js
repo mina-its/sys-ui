@@ -553,6 +553,11 @@ function openFileGallery(drive, file, path, fixedPath, fileSelectCallback) {
         fileSelectCallback: fileSelectCallback
     };
     ajax('/getFileGallery?m=1', { drive: drive._id, path }, {}, res => {
+        if (res.code != types_2.StatusCode.Ok) {
+            exports.glob.fileGallery.show = false;
+            notify(res.message, types_2.LogType.Error);
+            return;
+        }
         exports.glob.fileGallery.loading = false;
         exports.glob.fileGallery.uri = res.data.uri;
         exports.glob.fileGallery.list = res.data.list;

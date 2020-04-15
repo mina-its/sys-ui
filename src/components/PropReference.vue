@@ -71,6 +71,6 @@
     $right: right;
 
     .prop-reference:hover {
-        background: url("/images/updown.png") no-repeat $right 0 center;
+        background: url("/@sys-ui/images/updown.png") no-repeat $right 0 center;
     }
 </style>
