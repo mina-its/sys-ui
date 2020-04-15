@@ -18,8 +18,6 @@ let index = {
     "Ajax                           ": ajax,
 };
 const uuid_1 = require("uuid");
-const jquery_1 = tslib_1.__importDefault(require("jquery"));
-const axios_1 = tslib_1.__importDefault(require("axios"));
 const vue_1 = tslib_1.__importDefault(require("vue"));
 const vuex_1 = tslib_1.__importDefault(require("vuex"));
 const types_1 = require("./types");
@@ -212,7 +210,7 @@ function handleResponse(res) {
         // WARNING: never change these orders:
         vueResetFormData(res);
         document.title = exports.glob.form.title;
-        jquery_1.default('.details-view').scrollTop(0);
+        $('.details-view').scrollTop(0);
     }
     else {
         notify("WHAT should I do now?", types_2.LogType.Warning);
@@ -289,12 +287,12 @@ function handleResponseRedirect(res) {
     else if (res.redirect == types_1.Constants.redirectSelf) {
         refresh();
     }
-    else if (!jquery_1.default.isEmptyObject(res.data)) {
+    else if (res.data != null) {
         let form = '';
         for (let key of res.data) {
             form += '<input type="hidden" name="' + key + '" value="' + res.data[key] + '">';
         }
-        jquery_1.default('<form action="' + res.redirect + '" method="POST">' + form + '</form>').appendTo('body').submit();
+        $('<form action="' + res.redirect + '" method="POST">' + form + '</form>').appendTo('body').submit();
     }
     else {
         window.open(res.redirect, '_self'); // res.newWindow ? '_blank' : '_self'
@@ -302,7 +300,7 @@ function handleResponseRedirect(res) {
 }
 exports.handleResponseRedirect = handleResponseRedirect;
 function isRtl() {
-    return jquery_1.default('body').attr('dir') == 'rtl';
+    return $('body').attr('dir') == 'rtl';
 }
 exports.isRtl = isRtl;
 function showCmenu(state, items, event, handler) {
@@ -330,13 +328,13 @@ function hideCmenu() {
 }
 exports.hideCmenu = hideCmenu;
 function handleWindowEvents() {
-    jquery_1.default(window)
+    $(window)
         .on(types_1.Constants.notifyEvent, function (e) {
         let notify = e.detail;
         if (notify.type == types_2.LogType.Debug) {
-            jquery_1.default("#snackbar").addClass("visible").text(notify.message);
+            $("#snackbar").addClass("visible").text(notify.message);
             setTimeout(function () {
-                jquery_1.default("#snackbar").removeClass("visible");
+                $("#snackbar").removeClass("visible");
             }, 3000);
         }
         else
@@ -387,9 +385,9 @@ function handleWindowEvents() {
     })
         .on("mouseup", (e) => {
         if (exports.glob.cmenu.show &&
-            !jquery_1.default('.dropdown-item').is(e.target)
-            && jquery_1.default('.dropdown-item').has(e.target).length === 0
-            && jquery_1.default('.dropdown-menu.show').has(e.target).length === 0)
+            !$('.dropdown-item').is(e.target)
+            && $('.dropdown-item').has(e.target).length === 0
+            && $('.dropdown-menu.show').has(e.target).length === 0)
             hideCmenu();
     });
 }
@@ -535,7 +533,7 @@ function flat2recursive(flatJson) {
 exports.flat2recursive = flat2recursive;
 function browseFile(fileBrowsed) {
     exports.glob.fileGallery.fileBrowsed = fileBrowsed;
-    jquery_1.default('#file-browse').val('').click();
+    $('#file-browse').val('').click();
 }
 exports.browseFile = browseFile;
 function refreshFileGallery(file) {
@@ -604,7 +602,7 @@ function notify(content, type, params) {
         }
     }
     if (type === types_2.LogType.Fatal)
-        jquery_1.default("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
+        $("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
     else
         window.dispatchEvent(new CustomEvent(types_1.Constants.notifyEvent, { detail: { message, type } }));
 }
@@ -732,11 +730,11 @@ function ajax(url, data, config, done, fail) {
             params.headers['Content-Type'] = 'multipart/form-data';
         }
     }
-    axios_1.default.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+    axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     fail = fail || notify;
     console.log(params);
     startProgress();
-    axios_1.default(params).then(res => {
+    axios(params).then(res => {
         stopProgress();
         if (res.status && res.status !== types_2.StatusCode.Ok) {
             fail({ code: res.status, message: res.statusText });
@@ -1028,7 +1026,7 @@ function createStore() {
 }
 function start(app, components) {
     // console.log('starting ...');
-    const mainState = jquery_1.default('#main-state').html();
+    const mainState = $('#main-state').html();
     const res = parse(mainState);
     if (res)
         startVue(res, app, components);
@@ -1036,7 +1034,7 @@ function start(app, components) {
         let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : types_1.Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
         console.log(`loading main-state async from '${uri}' ...`);
-        axios_1.default.get(uri, { withCredentials: true }).then(res => {
+        axios.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
                 startVue(res.data, app, components);
             else

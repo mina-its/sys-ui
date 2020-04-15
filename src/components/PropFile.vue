@@ -30,6 +30,7 @@
     import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
     import Function from "@/components/Function.vue";
+
     @Component({
         components: {Function}
     })
@@ -122,7 +123,7 @@
                         lastModified: file.lastModified,
                         type: file.type,
                         _: {
-                            rawData: file,
+                            rawData: file as any,
                             uri: URL.createObjectURL(file)
                         }
                     } as mFile);

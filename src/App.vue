@@ -38,9 +38,9 @@
     import BrowseFile from "@/components/BrowseFile.vue";
     import {Component, Vue} from 'vue-property-decorator';
     import {$t, hideCmenu, load, notify, glob} from "./main";
-    import {Constants} from "./types";
+    import {Constants, JQuery} from "./types";
     import {LogType, NotificationInfo} from '../../sys/src/types';
-    import $ from 'jquery';
+    declare let $: JQuery;
     import * as main from './main';
     import FormView from "@/components/FormView.vue";
 

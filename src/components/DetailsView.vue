@@ -28,11 +28,11 @@
 </template>
 
 <script lang="ts">
-    import {ItemChangeEventArg, StateChange, ChangeType} from '@/types';
+    import {ItemChangeEventArg, StateChange, ChangeType, JQuery} from '@/types';
     import {Component, Prop as ComProp, Vue, Watch} from 'vue-property-decorator';
     import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
     import {glob} from '@/main';
-    import $ from 'jquery';
+    declare let $: JQuery;
     import * as main from '../main';
     import Prop from "@/components/Prop.vue";
 

@@ -14,8 +14,8 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Pair} from "../../../sys/src/types";
-    import {MenuItem, ItemChangeEventArg} from '../types';
-    import $ from 'jquery';
+    import {MenuItem, ItemChangeEventArg, JQuery} from '../types';
+    declare let $: JQuery;
     import * as main from '../main';
 
     @Component

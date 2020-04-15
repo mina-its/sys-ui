@@ -1,6 +1,5 @@
 import {
     Property,
-    WebMethod,
     Drive,
     DirFile,
     Pair,
@@ -8,10 +7,31 @@ import {
     NotificationInfo,
     AppStateConfig,
     FormDto,
-    IData,
-    mFile
+    IData
 } from '../../sys/src/types';
-import Prop from "@/components/Prop.vue";
+
+export interface JQuery {
+    (selector: string | any): any;
+}
+
+export interface Axios {
+    (params: any): any;
+
+    get: any;
+    defaults: any;
+}
+
+export interface Socket {
+    (): any;
+
+    on: any;
+    emit: any;
+}
+
+export interface Moment {
+    (params: any): any;
+    utc;
+}
 
 export const Constants = {
     redirectBack: '_back',
@@ -155,7 +175,7 @@ export class Global {
     cmenu = new AppStateCmenu();
     geoMap = new AppStateGeoMap();
     modifies: Modify[] = [];
-    socket: any;
+    socket: Socket;
     progress: number = null;
 }
 

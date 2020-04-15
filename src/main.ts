@@ -19,18 +19,15 @@ let index = {
 
 
 import {v4 as uuidv4} from 'uuid';
-import $ from 'jquery';
-import axios from 'axios';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {ChangeType, Constants, FileAction, Global, MenuItem, Modify, StateChange} from './types';
+import {ChangeType, Constants, FileAction, Global, MenuItem, Modify, StateChange, JQuery, Axios, Socket} from './types';
 import {
     AjaxConfig,
     DirFile,
     Drive,
     EmbeddedInfo,
     FunctionDec,
-    GlobalType,
     IData,
     IError,
     Keys,
@@ -49,7 +46,7 @@ import {
 } from '../../sys/src/types';
 import App from './App.vue';
 
-declare let io: any;
+declare let $: JQuery, axios: Axios, io: Socket;
 export let glob = new Global();
 let store;
 
@@ -316,7 +313,7 @@ export function handleResponseRedirect(res: WebResponse) {
         window.history.back();
     } else if (res.redirect == Constants.redirectSelf) {
         refresh();
-    } else if (!$.isEmptyObject(res.data)) {
+    } else if (res.data != null) {
         let form = '';
         for (let key of res.data) {
             form += '<input type="hidden" name="' + key + '" value="' + res.data[key] + '">';

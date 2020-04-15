@@ -3,14 +3,9 @@
   "version": "5.2.7",
   "private": true,
   "main": "./dist/sys.main.umd.js",
-  "babel": {
-    "presets": [
-      "@vue/cli-plugin-babel/preset"
-    ]
-  },
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --watch --target lib --no-clean --name sys.main src/index.js",
+    "build": "vue-cli-service build --target lib --report src/index.js & copy dist\\sys-ui.umd.min.js public\\js\\sys.main.js & copy dist\\sys-ui.css public\\css\\sys.main.css",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

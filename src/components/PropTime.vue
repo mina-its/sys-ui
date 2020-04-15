@@ -1,14 +1,15 @@
 <template>
-    <input @focus="$emit('focus', $event)" type="text" :value="value" :name="viewType !== 1 ? prop.name : null"
+    <input @focus="$emit('focus', $event)" type="text" :value="value" :name="viewType!=1 ? prop.name : null"
            @blur="update" class="form-control">
 </template>
 
 <script lang="ts">
-    import {ItemChangeEventArg} from '../types';;
+    import {ItemChangeEventArg, Moment} from '@/types';
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, LogType} from "../../../sys/src/types";
-    import moment from 'moment';
     import * as main from '../main';
+
+    declare let moment: Moment;
 
     @Component
     export default class PropTime extends Vue {

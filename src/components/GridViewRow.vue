@@ -14,8 +14,8 @@
 <script lang="ts">
     import {Component, Prop as ComProp, Vue, Emit} from 'vue-property-decorator';
     import {Property, EntityMeta, IData} from "../../../sys/src/types";
-    import {ItemChangeEventArg, ItemEventArg} from '../types';
-    import $ from 'jquery';
+    import {ItemChangeEventArg, ItemEventArg, JQuery} from '@/types';
+    declare let $: JQuery;
     import CheckBox from "@/components/CheckBox.vue";
     import Prop from "@/components/Prop.vue";
 

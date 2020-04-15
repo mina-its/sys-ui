@@ -12,8 +12,8 @@
     import TreeViewNode from "@/components/TreeViewNode.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {Property, Keys, GlobalType} from "../../../sys/src/types";
-    import {TreeViewNode as Node, TreeViewLine, TreeViewAttribute} from '../types';
-    import $ from 'jquery';
+    import {TreeViewNode as Node, TreeViewLine, TreeViewAttribute, JQuery} from '../types';
+    declare let $: JQuery;
     import * as main from '../main';
 
     @Component({components: {TreeViewNode}})

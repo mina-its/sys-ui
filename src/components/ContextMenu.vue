@@ -11,9 +11,9 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {glob} from '@/main';
-    import $ from 'jquery';
+    declare let $: JQuery;
     import * as main from '../main';
-    import {MenuItem} from "@/types";
+    import {JQuery, MenuItem} from "@/types";
 
     @Component
     export default class ContextMenu extends Vue {
