@@ -40,6 +40,7 @@
     import {$t, hideCmenu, load, notify, glob} from "./main";
     import {Constants, JQuery} from "./types";
     import {LogType, NotificationInfo} from '../../sys/src/types';
+
     declare let $: JQuery;
     import * as main from './main';
     import FormView from "@/components/FormView.vue";
@@ -118,7 +119,7 @@
         height: 100%;
         overflow: hidden;
         text-align: $left;
-        font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+        font-family: Roboto, RobotoDraft, Calibri, Helvetica, Arial, sans-serif;
         font-size: 15px;
     }
 

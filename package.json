@@ -1,13 +1,17 @@
 {
   "name": "sys-ui",
-  "version": "5.2.7",
-  "private": true,
-  "main": "./dist/sys.main.umd.js",
+  "version": "5.2.9",
+  "description": "sys-ui",
+  "main": "./dist/sys-ui.umd.js",
+  "types": "index.d.ts",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --report src/index.js & copy dist\\sys-ui.umd.min.js public\\js\\sys.main.js & copy dist\\sys-ui.css public\\css\\sys.main.css",
     "lint": "vue-cli-service lint"
   },
+  "keywords": [
+    "sys-ui"
+  ],
   "dependencies": {
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
@@ -34,6 +38,10 @@
     "vue-template-compiler": "^2.6.11"
   },
   "repository": "https://github.com/mina-its/sys-ui",
+  "bugs": {
+    "url": "https://github.com/mina-its/sys-ui/issues"
+  },
+  "homepage": "https://github.com/mina-its/sys-ui#readme",
   "browserslist": [
     "last 2 versions",
     "> 1%"
