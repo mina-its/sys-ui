@@ -1,8 +1,8 @@
 {
   "name": "sys-ui",
-  "version": "5.2.9",
+  "version": "5.2.10",
   "description": "sys-ui",
-  "main": "./dist/sys-ui.umd.js",
+  "main": "./public/js/sys.main.js",
   "types": "index.d.ts",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -16,9 +16,6 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "core-js": "^3.6.4",
-    "jquery": "^3.5.0",
-    "moment": "^2.24.0",
-    "popper.js": "^1.16.1",
     "socket.io": "^2.3.0",
     "uuid": "^7.0.3",
     "vue": "^2.6.11",
@@ -28,7 +25,6 @@
   },
   "devDependencies": {
     "@types/jquery": "^3.3.34",
-    "@types/moment": "^2.13.0",
     "@vue/cli-plugin-babel": "^4.2.0",
     "@vue/cli-plugin-typescript": "^4.2.0",
     "@vue/cli-service": "^4.2.0",
