@@ -43,7 +43,7 @@ import {
     StatusCode,
     WebMethod,
     WebResponse
-} from '../../sys/src/types';
+} from 'mina-sys';
 import App from './App.vue';
 
 declare let $: JQuery, axios: Axios, io: Socket;
@@ -158,7 +158,7 @@ function vueResetFormData(res: WebResponse) {
     }
 
     glob.data = res.data;
-    glob.form = res.form;
+    glob.form = res.form as any;
     glob.headFuncs = [];
     commitReloadData(store, res.data);
 }

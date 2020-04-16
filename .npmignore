@@ -1,0 +1,7 @@
+*.vue.js
+*.map
+*.iml
+tsconfig.json
+vue.config.js
+public
+dist
