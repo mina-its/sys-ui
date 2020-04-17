@@ -46,8 +46,8 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {$t} from '../main';
-    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType, JQuery} from '../types';
+    import {$t} from '@/main';
+    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType, JQuery} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";
     import FilterItem from "@/components/FilterItem.vue";
     import {v4 as uuidv4} from 'uuid';

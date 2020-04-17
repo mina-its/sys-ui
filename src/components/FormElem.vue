@@ -68,7 +68,7 @@
                 }
 
                 case ElemType.Text:
-                    console.assert(this.elem.text, 'incomplete text elem: ', this.elem);
+                    console.assert(!!this.elem.text, 'incomplete text elem: ', this.elem);
 
                     if (this.elem.text.markdown)
                         return ce('markdown', {props: {"content": this.elem.text.content, "styles": this.elem.styles}});

@@ -39,7 +39,6 @@
     import {Component, Vue} from 'vue-property-decorator';
     import {$t, hideCmenu, load, notify, glob} from "./main";
     import {Constants, JQuery} from "./types";
-    import {LogType, NotificationInfo} from '../../sys/src/types';
 
     declare let $: JQuery;
     import * as main from './main';

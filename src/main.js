@@ -21,7 +21,7 @@ const uuid_1 = require("uuid");
 const vue_1 = tslib_1.__importDefault(require("vue"));
 const vuex_1 = tslib_1.__importDefault(require("vuex"));
 const types_1 = require("./types");
-const mina_sys_1 = require("mina-sys");
+const types_2 = require("../../sys/src/types");
 const App_vue_1 = tslib_1.__importDefault(require("./App.vue"));
 exports.glob = new types_1.Global();
 let store;
@@ -38,7 +38,7 @@ function getText(text, useDictionary) {
         }
         return text.replace(/-/g, " ");
     }
-    let localeName = mina_sys_1.Locale[exports.glob.config.locale];
+    let localeName = types_2.Locale[exports.glob.config.locale];
     if (text[localeName])
         return text[localeName];
     else
@@ -150,7 +150,7 @@ function validateData(data, ref) {
     let requiredProps = meta.dec.properties.filter(p => p.required);
     for (const prop of requiredProps) {
         if (data[prop.name] == null) {
-            notify(`Property '${prop.name}' is required.`, mina_sys_1.LogType.Warning);
+            notify(`Property '${prop.name}' is required.`, types_2.LogType.Warning);
             // if (!Array.isArray(glob.glob.form.dataset[ref]))
             // 	data._error = `Property '${prop.name}' is required.`;
             return false;
@@ -205,7 +205,7 @@ function handleResponse(res) {
     if (res.redirect)
         handleResponseRedirect(res);
     else if (res.message)
-        notify(res.message, mina_sys_1.LogType.Info);
+        notify(res.message, types_2.LogType.Info);
     else if (res.form) {
         // WARNING: never change these orders:
         vueResetFormData(res);
@@ -213,7 +213,7 @@ function handleResponse(res) {
         $('.details-view').scrollTop(0);
     }
     else {
-        notify("WHAT should I do now?", mina_sys_1.LogType.Warning);
+        notify("WHAT should I do now?", types_2.LogType.Warning);
         console.log(res);
     }
     // must be set after binding to Vue
@@ -331,7 +331,7 @@ function handleWindowEvents() {
     $(window)
         .on(types_1.Constants.notifyEvent, function (e) {
         let notify = e.detail;
-        if (notify.type == mina_sys_1.LogType.Debug) {
+        if (notify.type == types_2.LogType.Debug) {
             $("#snackbar").addClass("visible").text(notify.message);
             setTimeout(function () {
                 $("#snackbar").removeClass("visible");
@@ -372,7 +372,7 @@ function handleWindowEvents() {
                 return; // if (/^#/.test(href)) return false;
             e.preventDefault();
             if (exports.glob.dirty) {
-                notify($t('save-before'), mina_sys_1.LogType.Warning);
+                notify($t('save-before'), types_2.LogType.Warning);
                 return;
             } // dirty page
             if (/\bf=\d/.test(href)) { // function link
@@ -393,12 +393,12 @@ function handleWindowEvents() {
 }
 function handleCmenuKeys(e) {
     switch (e.which) {
-        case mina_sys_1.Keys.tab:
-        case mina_sys_1.Keys.esc:
+        case types_2.Keys.tab:
+        case types_2.Keys.esc:
             exports.glob.cmenu.handler(exports.glob.cmenu.state, null);
             hideCmenu();
             break;
-        case mina_sys_1.Keys.enter: {
+        case types_2.Keys.enter: {
             let item = exports.glob.cmenu.items.find(i => i.hover);
             if (item) {
                 exports.glob.cmenu.handler(exports.glob.cmenu.state, item);
@@ -406,7 +406,7 @@ function handleCmenuKeys(e) {
             }
             break;
         }
-        case mina_sys_1.Keys.down: {
+        case types_2.Keys.down: {
             let item = exports.glob.cmenu.items.find(i => i.hover);
             if (!item) {
                 exports.glob.cmenu.items[0].hover = true;
@@ -420,7 +420,7 @@ function handleCmenuKeys(e) {
             }
             break;
         }
-        case mina_sys_1.Keys.up: {
+        case types_2.Keys.up: {
             let item = exports.glob.cmenu.items.find(i => i.hover);
             if (!item) {
                 exports.glob.cmenu.items[exports.glob.cmenu.items.length - 1].hover = true;
@@ -553,9 +553,9 @@ function openFileGallery(drive, file, path, fixedPath, fileSelectCallback) {
         fileSelectCallback: fileSelectCallback
     };
     ajax('/getFileGallery?m=1', { drive: drive._id, path }, {}, res => {
-        if (res.code != mina_sys_1.StatusCode.Ok) {
+        if (res.code != types_2.StatusCode.Ok) {
             exports.glob.fileGallery.show = false;
-            notify(res.message, mina_sys_1.LogType.Error);
+            notify(res.message, types_2.LogType.Error);
             return;
         }
         exports.glob.fileGallery.loading = false;
@@ -600,13 +600,13 @@ function notify(content, type, params) {
     const message = typeof content === 'string' ? content : content.message;
     if (type == null) {
         if (typeof content !== 'string') {
-            type = content.code && content.code !== mina_sys_1.StatusCode.Ok ? mina_sys_1.LogType.Error : mina_sys_1.LogType.Info;
+            type = content.code && content.code !== types_2.StatusCode.Ok ? types_2.LogType.Error : types_2.LogType.Info;
         }
         else {
-            type = mina_sys_1.LogType.Info;
+            type = types_2.LogType.Info;
         }
     }
-    if (type === mina_sys_1.LogType.Fatal)
+    if (type === types_2.LogType.Fatal)
         $("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
     else
         window.dispatchEvent(new CustomEvent(types_1.Constants.notifyEvent, { detail: { message, type } }));
@@ -623,7 +623,7 @@ function getBsonId(item) {
     }
     else if (!item._id) {
         console.error('Invalid item data, _id is expected:', item);
-        notify('Invalid data, please check the logs!', mina_sys_1.LogType.Error);
+        notify('Invalid data, please check the logs!', types_2.LogType.Error);
         return null;
     }
     else {
@@ -695,10 +695,10 @@ function setPropertyEmbeddedError(doc, propName, error) {
 exports.setPropertyEmbeddedError = setPropertyEmbeddedError;
 function load(href) {
     if (exports.glob.dirty) {
-        notify($t('save-before'), mina_sys_1.LogType.Warning);
+        notify($t('save-before'), types_2.LogType.Warning);
         return;
     }
-    ajax(setQs('m', mina_sys_1.RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
+    ajax(setQs('m', types_2.RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
 exports.load = load;
 function ajax(url, data, config, done, fail) {
@@ -712,7 +712,7 @@ function ajax(url, data, config, done, fail) {
         params.method = config.method;
     }
     else {
-        params.method = data ? mina_sys_1.WebMethod.post : mina_sys_1.WebMethod.get;
+        params.method = data ? types_2.WebMethod.post : types_2.WebMethod.get;
     }
     if (data) { // extract files raw data
         let formData = null;
@@ -741,7 +741,7 @@ function ajax(url, data, config, done, fail) {
     startProgress();
     axios(params).then(res => {
         stopProgress();
-        if (res.status && res.status !== mina_sys_1.StatusCode.Ok) {
+        if (res.status && res.status !== types_2.StatusCode.Ok) {
             fail({ code: res.status, message: res.statusText });
         }
         else {
@@ -763,7 +763,7 @@ function ajax(url, data, config, done, fail) {
             fail({ message: err.response.data, code: err.response.status });
         }
         else {
-            fail({ message: err.toString(), code: mina_sys_1.StatusCode.UnknownError });
+            fail({ message: err.toString(), code: types_2.StatusCode.UnknownError });
         }
     });
 }
@@ -823,7 +823,7 @@ function startVue(res, app, components) {
     }
     catch (err) {
         console.error(err);
-        notify("<strong>Starting Vue failed:</strong> " + err.message, mina_sys_1.LogType.Fatal);
+        notify("<strong>Starting Vue failed:</strong> " + err.message, types_2.LogType.Fatal);
     }
 }
 function commitFileAction(store, action) {
@@ -899,7 +899,7 @@ function _commitServerChangeResponse(store, arg) {
             break;
         case types_1.ChangeType.InsertItem:
             if (arg.modify.state._id != arg.res._reqId)
-                notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._reqId}' are not same`, mina_sys_1.LogType.Error);
+                notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._reqId}' are not same`, types_2.LogType.Error);
             else
                 delete arg.res._reqId;
             for (let key in arg.res) {
@@ -985,19 +985,19 @@ function dispatchRequestServerModify(store, done) {
 exports.dispatchRequestServerModify = dispatchRequestServerModify;
 function _dispatchRequestServerModify(store, done) {
     if (exports.glob.modifies.length == 0) {
-        notify($t('saved'), mina_sys_1.LogType.Debug);
+        notify($t('saved'), types_2.LogType.Debug);
         exports.glob.dirty = false;
         return done();
     }
     let modify = exports.glob.modifies.shift();
     //main.log(modify.type, modify.ref, modify.data);
-    let method = mina_sys_1.WebMethod.patch;
+    let method = types_2.WebMethod.patch;
     switch (modify.type) {
         case types_1.ChangeType.InsertItem:
-            method = mina_sys_1.WebMethod.post;
+            method = types_2.WebMethod.post;
             break;
         case types_1.ChangeType.DeleteItem:
-            method = mina_sys_1.WebMethod.del;
+            method = types_2.WebMethod.del;
             break;
     }
     ajax(prepareServerUrl(modify.ref), modify.data, { method }, (res) => {
@@ -1036,7 +1036,7 @@ function start(app, components) {
     if (res)
         startVue(res, app, components);
     else {
-        let uri = setQs('m', mina_sys_1.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : types_1.Constants.defaultAddress);
+        let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : types_1.Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
         console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, { withCredentials: true }).then(res => {
@@ -1046,7 +1046,7 @@ function start(app, components) {
                 console.error(res);
         }).catch(err => {
             console.error(err);
-            notify("Connecting to proxy server failed! " + err.message, mina_sys_1.LogType.Fatal);
+            notify("Connecting to proxy server failed! " + err.message, types_2.LogType.Fatal);
         });
     }
 }

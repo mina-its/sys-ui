@@ -43,7 +43,7 @@ import {
     StatusCode,
     WebMethod,
     WebResponse
-} from 'mina-sys';
+} from '../../sys/src/types';
 import App from './App.vue';
 
 declare let $: JQuery, axios: Axios, io: Socket;
