@@ -41,5 +41,9 @@
   "browserslist": [
     "last 2 versions",
     "> 1%"
-  ]
+  ],
+  "mina": {
+    "db": "sys",
+    "packageType": "static-website"
+  }
 }

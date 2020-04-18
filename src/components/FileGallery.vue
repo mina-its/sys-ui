@@ -214,6 +214,7 @@
         }
 
         select(e: FunctionExecEventArg, item?: DirFile) {
+            console.log(1);
             glob.fileGallery.show = false;
             if (item) glob.fileGallery.selected = item;
             if (e.stopProgress) e.stopProgress();
@@ -243,7 +244,7 @@
             parts.forEach((part, i) => result.push({title: part, ref: ""}));
 
             if (result.length > 0)
-                result.unshift({title: main.getText(glob.fileGallery.drive.title), ref: ""});
+                result.unshift({title: main.getText(glob.fileGallery.drive.name), ref: ""});
             result.pop();
             return result;
         }
@@ -258,10 +259,10 @@
 
         get current() {
             if (glob.fileGallery.fixedPath) {
-                return main.getText(glob.fileGallery.drive.title) + ` (${glob.fileGallery.path})`;
+                return main.getText(glob.fileGallery.drive.name) + ` (${glob.fileGallery.path})`;
             } else {
                 let parts = glob.fileGallery.path.split("/").filter(el => el);
-                if (parts.length == 0) return main.getText(glob.fileGallery.drive.title);
+                if (parts.length == 0) return main.getText(glob.fileGallery.drive.name);
                 return parts.pop();
             }
         }

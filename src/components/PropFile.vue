@@ -67,7 +67,7 @@
         }
 
         selectFromGallery(path: string, item: DirFile) {
-            let uri = `http://${joinUri(this.prop.file.drive.uri, path, item.name)}`;
+            let uri = `http://${joinUri(this.prop.file.drive._.uri, path, item.name)}`;
             let file = {
                 path,
                 _: {uri},
