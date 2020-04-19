@@ -909,12 +909,12 @@ function _commitServerChangeResponse(store, arg) {
             break;
     }
 }
-function commitReorderItems(store, items, up) {
-    store.commit('_commitReorderItems', { items, up });
+function commitReorderItems(store, items, up, uri) {
+    store.commit('_commitReorderItems', { items, up, uri });
 }
 exports.commitReorderItems = commitReorderItems;
 function _commitReorderItems(store, arg) {
-    let { items, up } = arg;
+    let { items, up, uri } = arg;
     let item = items.find(item => item._.marked);
     let index = items.indexOf(item);
     if ((up && index == 0) || (!up && index == items.length - 1))
@@ -923,22 +923,38 @@ function _commitReorderItems(store, arg) {
     let emptyZs = items.filter(item => !item._z);
     if (emptyZs.length) {
         let min = Math.min(...items.map(item => item._z)) || 0;
-        items.forEach(item => item._z = ++min);
+        items.forEach(item => {
+            item._z = ++min;
+            modifyOrder(item, uri);
+        });
     }
     let siblingIndex = up ? index - 1 : index + 1;
     let sibling = items[siblingIndex];
     // check if _z are same (happens in some situations)
     if (item._z == sibling._z) {
         let min = Math.min(...items.map(item => item._z));
-        items.forEach(item => item._z = min++);
+        items.forEach(item => {
+            item._z = min++;
+            modifyOrder(item, uri);
+        });
     }
     // replace items _z
     let _z = item._z;
     item._z = sibling._z;
+    modifyOrder(item, uri);
     sibling._z = _z;
+    modifyOrder(sibling, uri);
     // reorder items index for UI effect
     items.splice(index, 1);
     items.splice(siblingIndex, 0, item);
+}
+function modifyOrder(item, uri) {
+    let modify = exports.glob.modifies.find(m => m.state == item && (m.type == types_1.ChangeType.InsertItem || m.type == types_1.ChangeType.EditProp));
+    if (!modify) {
+        modify = { ref: uri + "/" + getBsonId(item), type: types_1.ChangeType.EditProp, data: {}, state: item };
+        exports.glob.modifies.push(modify);
+    }
+    modify.data._z = item._z;
 }
 function dispatchStoreModify(vue, change) {
     vue.$store.dispatch('_dispatchStoreModify', change);

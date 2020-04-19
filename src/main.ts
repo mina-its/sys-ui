@@ -953,12 +953,12 @@ function _commitServerChangeResponse(store, arg: { modify: Modify, res: any }) {
     }
 }
 
-export function commitReorderItems(store, items: IData[], up: boolean) {
-    store.commit('_commitReorderItems', {items, up});
+export function commitReorderItems(store, items: IData[], up: boolean, uri: string) {
+    store.commit('_commitReorderItems', {items, up, uri});
 }
 
 function _commitReorderItems(store, arg) {
-    let {items, up} = arg as { items: IData[], up: boolean };
+    let {items, up, uri} = arg as { items: IData[], up: boolean, uri: string };
     let item = items.find(item => item._.marked);
     let index = items.indexOf(item);
     if ((up && index == 0) || (!up && index == items.length - 1)) return;
@@ -967,7 +967,10 @@ function _commitReorderItems(store, arg) {
     let emptyZs = items.filter(item => !item._z);
     if (emptyZs.length) {
         let min = Math.min(...items.map(item => item._z)) || 0;
-        items.forEach(item => item._z = ++min);
+        items.forEach(item => {
+            item._z = ++min;
+            modifyOrder(item, uri);
+        });
     }
 
     let siblingIndex = up ? index - 1 : index + 1;
@@ -976,15 +979,31 @@ function _commitReorderItems(store, arg) {
     // check if _z are same (happens in some situations)
     if (item._z == sibling._z) {
         let min = Math.min(...items.map(item => item._z));
-        items.forEach(item => item._z = min++);
+        items.forEach(item => {
+            item._z = min++;
+            modifyOrder(item, uri);
+        });
     }
     // replace items _z
     let _z = item._z;
     item._z = sibling._z;
+    modifyOrder(item, uri);
+
     sibling._z = _z;
+    modifyOrder(sibling, uri);
+
     // reorder items index for UI effect
     items.splice(index, 1);
     items.splice(siblingIndex, 0, item);
+}
+
+function modifyOrder(item: any, uri: string) {
+    let modify = glob.modifies.find(m => m.state == item && (m.type == ChangeType.InsertItem || m.type == ChangeType.EditProp));
+    if (!modify) {
+        modify = {ref: uri + "/" + getBsonId(item), type: ChangeType.EditProp, data: {} as IData, state: item};
+        glob.modifies.push(modify);
+    }
+    modify.data._z = item._z;
 }
 
 export function dispatchStoreModify(vue: Vue, change: StateChange) {

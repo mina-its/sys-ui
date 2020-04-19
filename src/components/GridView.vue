@@ -51,6 +51,7 @@
     import GridViewRow from "@/components/GridViewRow.vue";
     import FilterItem from "@/components/FilterItem.vue";
     import {v4 as uuidv4} from 'uuid';
+
     declare let $: JQuery;
     import * as main from '../main';
     import {
@@ -129,10 +130,10 @@
 
                     if (e.event.ctrlKey) {
                         if (e.event.which == Keys.up)
-                            this.rowMove(true);
+                            this.rowMove(true, this.uri);
 
                         if (e.event.which == Keys.down)
-                            this.rowMove(false);
+                            this.rowMove(false, this.uri);
                     }
 
                     break;
@@ -300,19 +301,20 @@
                         break;
 
                     case 'move-up':
-                        this.rowMove(true);
+                        this.rowMove(true, this.uri);
                         break;
 
                     case 'move-down':
-                        this.rowMove(false);
+                        this.rowMove(false, this.uri);
                         break;
                 }
             });
             this.deselectAll(e.item);
         }
 
-        rowMove(up: boolean) {
-            main.commitReorderItems(this, this.items, up);
+        rowMove(up: boolean, uri: string) {
+            console.log(1);
+            main.commitReorderItems(this.$store, this.items, up, uri);
         }
     }
 </script>
