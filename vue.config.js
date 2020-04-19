@@ -1,8 +1,8 @@
 module.exports = {
 
     devServer: {
-        host: 'localhost',
-        proxy: 'http://localhost'
+        host: 'tixbox-admin.localhost',
+        proxy: 'http://tixbox-admin.localhost/'
     },
 
     productionSourceMap: false,

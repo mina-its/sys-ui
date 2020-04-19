@@ -6,10 +6,8 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
-    import {ItemChangeEventArg, PropEventArg} from '../types';
-    import {getQs, glob} from '../main';
-
-    ;
+    import {ItemChangeEventArg, PropEventArg} from '@/types';
+    import {glob} from '@/main';
     import * as main from '../main';
 
     @Component
@@ -42,9 +40,11 @@
 
                 if (glob.config.locale) {
                     if (typeof val == 'string') {
-                        this.$set(this.doc[this.prop.name], glob.config.defaultLocale, val);
+                        let oldValue = val;
                         val = {};
+                        val[glob.config.defaultLocale] = oldValue;
                         val[glob.config.locale] = text;
+                        this.$set(this.doc, this.prop.name, val);
                     } else
                         val = val || {};
 

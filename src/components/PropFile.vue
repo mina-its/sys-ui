@@ -120,6 +120,7 @@
                 for (const file of fileList) {
                     files.push({
                         name: uuidv4() + "__" + file.name,
+                        path: this.prop.file.path,
                         size: file.size,
                         lastModified: file.lastModified,
                         type: file.type,

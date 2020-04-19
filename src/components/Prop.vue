@@ -96,7 +96,7 @@
                 ce('span', {attrs: {"class": "ml-3"}}, this.prop.comment),
             ]) : null;
             let title = this.prop.title || this.prop.name;
-            let lbl = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top"}}, title);
+            let lbl = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top pt-2"}}, title);
 
             let styles = "form-group";
             if (this.prop._.gtype == GlobalType.boolean)

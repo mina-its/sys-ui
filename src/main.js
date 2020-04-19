@@ -100,7 +100,8 @@ function vueResetFormData(res) {
     if (res.form && res.form.declarations) {
         res.form.elems.forEach(elem => elem.id = uuid_1.v4()); // needs for refreshing form while cancel changes
         const setDataMeta = (ref, item, dec) => {
-            item._ = item._ || { ref };
+            item._ = item._ || {};
+            item._.ref = ref;
             item._.dec = dec;
             return item._;
         };
@@ -838,6 +839,8 @@ function dispatchFileAction(vue, e) {
 }
 exports.dispatchFileAction = dispatchFileAction;
 function _dispatchFileAction(store, e) {
+    if (e.item._.ref == null)
+        throw "ref is empty!";
     let modify = {
         ref: e.item._.ref,
         type: types_1.ChangeType.EditFileProp,
@@ -854,6 +857,11 @@ function commitReloadData(store, data) {
 function _commitReloadData(state, data) {
     state.data = data;
 }
+function clearModifies() {
+    exports.glob.dirty = false;
+    exports.glob.modifies = [];
+}
+exports.clearModifies = clearModifies;
 function commitStoreChange(store, change) {
     store.commit('_commitStoreChange', change);
 }

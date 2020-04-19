@@ -46,7 +46,7 @@
         }
 
         cancel(e: FunctionExecEventArg) {
-            glob.dirty = false;
+            main.clearModifies();
             if (main.getQs("n") == "true")
                 location.href = location.pathname;
             else {

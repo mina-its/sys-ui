@@ -129,7 +129,8 @@ function vueResetFormData(res: WebResponse) {
         res.form.elems.forEach(elem => elem.id = uuidv4()); // needs for refreshing form while cancel changes
 
         const setDataMeta = (ref: string, item: IData, dec: ObjectDec | FunctionDec) => {
-            item._ = item._ || {ref} as any;
+            item._ = item._ || {} as any;
+            item._.ref = ref;
             item._.dec = dec;
             return item._;
         };
@@ -871,6 +872,7 @@ export function dispatchFileAction(vue: Vue, e: FileAction) {
 }
 
 function _dispatchFileAction(store, e: FileAction) {
+    if (e.item._.ref == null) throw "ref is empty!";
     let modify = {
         ref: e.item._.ref,
         type: ChangeType.EditFileProp,
@@ -888,6 +890,11 @@ function commitReloadData(store, data: any) {
 
 function _commitReloadData(state, data: any) {
     state.data = data;
+}
+
+export function clearModifies() {
+    glob.dirty = false;
+    glob.modifies = [];
 }
 
 export function commitStoreChange(store, change: StateChange) {
