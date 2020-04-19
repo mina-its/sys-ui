@@ -87,6 +87,7 @@ let PropFile = class PropFile extends vue_property_decorator_1.Vue {
             for (const file of fileList) {
                 files.push({
                     name: uuid_1.v4() + "__" + file.name,
+                    path: this.prop.file.path,
                     size: file.size,
                     lastModified: file.lastModified,
                     type: file.type,
