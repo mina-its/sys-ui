@@ -42,7 +42,6 @@
     "> 1%"
   ],
   "mina": {
-    "db": "sys",
     "packageType": "static-website"
   }
 }
