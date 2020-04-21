@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav :class="{'navbar navbar-expand-lg navbar-dark':true, 'container':containerStyle}">
         <a class="navbar-brand" href="/">
             <img v-if="glob.config.brandingLogo" alt="logo" class='branding-logo img-responsive'
                  :src="glob.config.brandingLogo"/>
@@ -24,18 +24,20 @@
             </ul>
 
             <!--<master-search></master-search>-->
-            <AppLocaleMenu></AppLocaleMenu>
+            <AppLocaleMenu/>
             <a class="my-2 my-sm-0 text-light" :href="glob.config.loginRef">{{glob.config.loginTitle}}</a>
         </div>
     </nav>
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
+    import {Component, Vue, Prop} from 'vue-property-decorator';
     import AppLocaleMenu from "@/components/AppLocaleMenu.vue";
 
     @Component({components: {AppLocaleMenu}})
     export default class NavBar extends Vue {
+        @Prop() private containerStyle: boolean;
+
         get currentRef() {
             return location.hostname;
         }
