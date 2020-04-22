@@ -97,7 +97,7 @@ import {GlobalType} from "../../../sys/src/types";
             if (embed) msg = ce('prop-message', {props: {message: embed.err}});
             let cmt = this.prop.comment ? ce('p', {attrs: {"class": "prop-comment mt-3 p-2"}}, [
                 ce('i', {attrs: {"class": "fa fa-info-circle m-1 fa-lg"}},),
-                ce('span', {attrs: {"class": "ml-3"}}, this.prop.comment),
+                ce('span', {attrs: {"class": "ml-3"}, domProps: {'innerHTML': main.markDown(this.prop.comment)}}),
             ]) : null;
             let title = this.prop.title || this.prop.name;
             let lbl = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top pt-2"}}, title);

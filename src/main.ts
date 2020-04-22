@@ -46,7 +46,7 @@ import {
 } from '../../sys/src/types';
 import App from './App.vue';
 
-declare let $: JQuery, axios: Axios, io: Socket;
+declare let $: JQuery, axios: Axios, io: Socket, marked: any;
 export let glob = new Global();
 let store;
 
@@ -1071,6 +1071,10 @@ function _dispatchStoreModify(store, change: StateChange) {
 
 export function dispatchRequestServerModify(store, done: (err?) => void) {
     store.dispatch('_dispatchRequestServerModify', done);
+}
+
+export function markDown(html: string): string {
+    return marked(html).replace(/^\<p\>|\<\/p\>\s*$/g, "");
 }
 
 function _dispatchRequestServerModify(store, done: (err?) => void) {

@@ -1021,6 +1021,10 @@ function dispatchRequestServerModify(store, done) {
     store.dispatch('_dispatchRequestServerModify', done);
 }
 exports.dispatchRequestServerModify = dispatchRequestServerModify;
+function markDown(html) {
+    return marked(html).replace(/^\<p\>|\<\/p\>\s*$/g, "");
+}
+exports.markDown = markDown;
 function _dispatchRequestServerModify(store, done) {
     if (exports.glob.modifies.length == 0) {
         notify($t('saved'), types_2.LogType.Debug);
