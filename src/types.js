@@ -92,6 +92,7 @@ class Global {
         this.geoMap = new AppStateGeoMap();
         this.modifies = [];
         this.progress = null;
+        this.newItemButton = null;
     }
 }
 exports.Global = Global;

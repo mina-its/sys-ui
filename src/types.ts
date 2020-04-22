@@ -30,6 +30,7 @@ export interface Socket {
 
 export interface Moment {
     (params: any): any;
+
     utc;
 }
 
@@ -177,6 +178,7 @@ export class Global {
     modifies: Modify[] = [];
     socket: Socket;
     progress: number = null;
+    newItemButton: string = null;
 }
 
 export class Modify {

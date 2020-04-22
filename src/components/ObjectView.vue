@@ -1,7 +1,8 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, LogType, ObjectViewType} from "../../../sys/src/types";
+    import {Elem, LogType, ObjectViewType, ObjectDec, NewItemMode} from "../../../sys/src/types";
     import {glob} from '../main';
+    import pluralize = require('pluralize');
     import * as main from '../main';
 
     @Component
@@ -25,10 +26,12 @@
             let rt = this.root == null ? true : this.root;
             if (e.obj && e.obj.type == ObjectViewType.TreeView)
                 return ce('tree-view', {props: {uri: e.obj.ref}});
-            else
+            else {
+                glob.newItemButton = Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
                 return Array.isArray(data) ?
                     ce('grid-view', {props: {uri: e.obj.ref, root: rt, dec}}) :
                     ce('details-view', {props: {uri: e.obj.ref, root: rt, dec}});
+            }
         }
     }
 </script>

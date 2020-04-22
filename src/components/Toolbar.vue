@@ -19,6 +19,8 @@
         <div class="mx-2" role="group">
             <Function v-for="func in glob.headFuncs" :key="func._id" styles="btn-primary" :name="func.name"
                       @exec="func.exec" :title="func.title"></Function>
+            <Function v-if="glob.newItemButton" styles="btn-primary" @exec="newItem"
+                      :title="glob.newItemButton"></Function>
         </div>
         <Function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></Function>
     </div>
@@ -43,6 +45,10 @@
                     e.preventDefault();
                 }
             });
+        }
+
+        newItem() {
+            main.load(location.pathname + '?n=1', true);
         }
 
         cancel(e: FunctionExecEventArg) {

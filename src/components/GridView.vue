@@ -46,7 +46,7 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {$t} from '@/main';
+    import {$t, glob} from '@/main';
     import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType, JQuery} from '@/types';
     import GridViewRow from "@/components/GridViewRow.vue";
     import FilterItem from "@/components/FilterItem.vue";
@@ -66,9 +66,10 @@
         ReqParams,
         IData
     } from '../../../sys/src/types';
+    import CheckBox from "@/components/CheckBox.vue";
 
     @Component({
-        components: {GridViewRow, FilterItem}
+        components: {CheckBox, GridViewRow, FilterItem}
     })
     export default class GridView extends Vue {
         @Prop() private uri: string;
@@ -143,8 +144,7 @@
         insert() {
             switch (this.dec.newItemMode) {
                 case NewItemMode.newPage:
-                    history.pushState(null, null, location.pathname + '?n=true');
-                    main.load(location.pathname + '?n=true');
+                    main.load(location.pathname + '?n=1', true);
                     break;
 
                 default:
@@ -193,8 +193,7 @@
                         let prevSort = main.getQs(ReqParams.sort);
                         let sort = (prevSort && prevSort.indexOf('-') == -1 ? '-' : '') + state.name;
                         let href = main.setQs(ReqParams.sort, sort, true);
-                        history.pushState(null, null, href);
-                        main.load(href);
+                        main.load(href, true);
                         break;
 
                     case 'filter':
@@ -275,8 +274,7 @@
                             return;
                         }
                         let href = main.prepareServerUrl(`${this.dec.ref}/${main.getBsonId(state)}`);
-                        history.pushState(null, null, href);
-                        main.load(href);
+                        main.load(href, true);
                         break;
                     }
 
@@ -287,8 +285,7 @@
                             return;
                         }
                         let href = main.prepareServerUrl(`${this.dec.ref}/${main.getBsonId(state)}?t=${ObjectViewType.TreeView}`);
-                        history.pushState(null, null, href);
-                        main.load(href);
+                        main.load(href, true);
                         break;
                     }
 

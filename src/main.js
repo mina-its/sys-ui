@@ -129,6 +129,7 @@ function vueResetFormData(res) {
     exports.glob.data = res.data;
     exports.glob.form = res.form;
     exports.glob.headFuncs = [];
+    exports.glob.newItemButton = null;
     commitReloadData(store, res.data);
 }
 function setUndefinedToNull(item, prop) {
@@ -694,11 +695,13 @@ function setPropertyEmbeddedError(doc, propName, error) {
     doc._[propName].err = error;
 }
 exports.setPropertyEmbeddedError = setPropertyEmbeddedError;
-function load(href) {
+function load(href, pushState = false) {
     if (exports.glob.dirty) {
         notify($t('save-before'), types_2.LogType.Warning);
         return;
     }
+    if (pushState)
+        history.pushState(null, null, href);
     ajax(setQs('m', types_2.RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
 exports.load = load;
@@ -795,6 +798,7 @@ function registerComponents(vue, components) {
     vue.component('check-box', require("@/components/CheckBox.vue").default);
     vue.component('log-terminal', require("@/components/LogTerminal.vue").default);
     vue.component('api-doc', require("@/components/ApiDoc.vue").default);
+    vue.component('range-picker', require("@/components/RangePicker.vue").default);
     if (components) {
         for (let component in components) {
             vue.component(component, components[component]);
@@ -972,10 +976,20 @@ function _dispatchStoreModify(store, change) {
     let ref = change.uri;
     switch (change.type) {
         case types_1.ChangeType.EditProp: {
-            let modify = exports.glob.modifies.find(m => m.state == change.item && (m.type == types_1.ChangeType.InsertItem || m.type == types_1.ChangeType.EditProp));
-            if (!modify) {
-                modify = { ref, type: types_1.ChangeType.EditProp, data: {}, state: change.item };
+            let modify;
+            if (getQs("n")) {
+                let data = { _id: change.item._id };
+                modify = exports.glob.modifies.find(m => m.state == change.item);
+                if (!modify)
+                    modify = { ref, type: types_1.ChangeType.InsertItem, data, state: change.item };
                 exports.glob.modifies.push(modify);
+            }
+            else {
+                modify = exports.glob.modifies.find(m => m.state == change.item && (m.type == types_1.ChangeType.InsertItem || m.type == types_1.ChangeType.EditProp));
+                if (!modify) {
+                    modify = { ref, type: types_1.ChangeType.EditProp, data: {}, state: change.item };
+                    exports.glob.modifies.push(modify);
+                }
             }
             modify.data[change.prop.name] = change.value;
             break;
@@ -1027,7 +1041,11 @@ function _dispatchRequestServerModify(store, done) {
     ajax(prepareServerUrl(modify.ref), modify.data, { method }, (res) => {
         res.data = flat2recursive(res.data);
         commitServerChangeResponse(store, modify, res.data);
-        if (res.redirect && exports.glob.modifies.length == 0)
+        if (getQs("n")) {
+            clearModifies();
+            load("/" + modify.ref + "/" + res.data._id.$oid, true);
+        }
+        else if (res.redirect && exports.glob.modifies.length == 0)
             return handleResponseRedirect(res);
         else
             dispatchRequestServerModify(store, done);

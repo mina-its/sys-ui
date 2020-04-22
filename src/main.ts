@@ -161,6 +161,7 @@ function vueResetFormData(res: WebResponse) {
     glob.data = res.data;
     glob.form = res.form as any;
     glob.headFuncs = [];
+    glob.newItemButton = null;
     commitReloadData(store, res.data);
 }
 
@@ -720,11 +721,14 @@ export function setPropertyEmbeddedError(doc: any, propName: string, error: stri
     (doc._[propName] as EmbeddedInfo).err = error;
 }
 
-export function load(href) {
+export function load(href: string, pushState = false) {
     if (glob.dirty) {
         notify($t('save-before'), LogType.Warning);
         return;
     }
+
+    if (pushState)
+        history.pushState(null, null, href);
 
     ajax(setQs('m', RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
@@ -825,6 +829,7 @@ function registerComponents(vue, components) {
     vue.component('check-box', require("@/components/CheckBox.vue").default);
     vue.component('log-terminal', require("@/components/LogTerminal.vue").default);
     vue.component('api-doc', require("@/components/ApiDoc.vue").default);
+    vue.component('range-picker', require("@/components/RangePicker.vue").default);
 
     if (components) {
         for (let component in components) {
@@ -1021,10 +1026,19 @@ function _dispatchStoreModify(store, change: StateChange) {
     let ref = change.uri;
     switch (change.type) {
         case ChangeType.EditProp: {
-            let modify = glob.modifies.find(m => m.state == change.item && (m.type == ChangeType.InsertItem || m.type == ChangeType.EditProp));
-            if (!modify) {
-                modify = {ref, type: ChangeType.EditProp, data: {} as IData, state: change.item};
+            let modify: Modify;
+            if (getQs("n")) {
+                let data = {_id: change.item._id};
+                modify = glob.modifies.find(m => m.state == change.item);
+                if (!modify)
+                    modify = {ref, type: ChangeType.InsertItem, data, state: change.item};
                 glob.modifies.push(modify);
+            } else {
+                modify = glob.modifies.find(m => m.state == change.item && (m.type == ChangeType.InsertItem || m.type == ChangeType.EditProp));
+                if (!modify) {
+                    modify = {ref, type: ChangeType.EditProp, data: {} as IData, state: change.item};
+                    glob.modifies.push(modify);
+                }
             }
             modify.data[change.prop.name] = change.value;
             break;
@@ -1082,7 +1096,10 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
         res.data = flat2recursive(res.data);
         commitServerChangeResponse(store, modify, res.data);
 
-        if (res.redirect && glob.modifies.length == 0)
+        if (getQs("n")) {
+            clearModifies();
+            load("/" + modify.ref + "/" + res.data._id.$oid, true);
+        } else if (res.redirect && glob.modifies.length == 0)
             return handleResponseRedirect(res);
         else
             dispatchRequestServerModify(store, done);

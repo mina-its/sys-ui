@@ -1,7 +1,8 @@
+import {GlobalType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, EmbeddedInfo, GlobalType, ObjectViewType, Property, ElemType} from "../../../sys/src/types";
-    import {PropertyLabelMode, ItemEventArg, ItemChangeEventArg} from '../types';
+    import {Elem, ElemType, EmbeddedInfo, GlobalType, ObjectViewType, Property} from "../../../sys/src/types";
+    import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '../types';
     import PropBoolean from "@/components/PropBoolean.vue";
     import PropFile from "@/components/PropFile.vue";
     import PropLink from "@/components/PropLink.vue";
@@ -10,6 +11,7 @@
     import PropReference from "@/components/PropReference.vue";
     import PropText from "@/components/PropText.vue";
     import PropTextMultiline from "@/components/PropTextMultiline.vue";
+    import PropDocumentEditor from "@/components/PropDocumentEditor.vue";
     import PropTime from "@/components/PropTime.vue";
     import PropReferenceMultiple from "@/components/PropReferenceMultiple.vue";
     import * as main from '../main';
@@ -26,6 +28,7 @@
             PropLocation,
             PropLink,
             PropFile,
+            PropDocumentEditor,
             PropBoolean
         }
     })
@@ -41,6 +44,7 @@
                 console.error("error rendering 'ElemProp' component. prop is empty! item:", this.item);
                 return ce('div', '...');
             }
+            this.prop._ = this.prop._ || {gtype: GlobalType.string};
 
             if (this.prop.condition != null && !main.evalExpression(this.item, this.prop.condition)) {
                 this.item[this.prop.name] = null;
