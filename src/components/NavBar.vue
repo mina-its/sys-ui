@@ -2,7 +2,7 @@
     <nav :class="{'navbar navbar-expand-lg navbar-dark':true, 'container':containerStyle}">
         <a class="navbar-brand" href="/">
             <img v-if="glob.config.brandingLogo" alt="logo" class='branding-logo img-responsive'
-                 :src="glob.config.brandingLogo"/>
+                 :src="glob.config.brandingLogo" />
             <span class="app-title">{{glob.config.appTitle}}</span>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
