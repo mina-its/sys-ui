@@ -1,0 +1,27 @@
+html[dir='rtl'] {
+  body {
+    text-align: right;
+  }
+
+  .ml-auto {
+    margin-right: auto !important;
+    margin-left: 0 !important;
+  }
+
+  .mr-auto {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+
+  .text-right {
+    text-align: left !important;
+  }
+
+  .text-left {
+    text-align: right !important;
+  }
+
+  .side-nav.sidenav {
+    padding-right: 0;
+  }
+}

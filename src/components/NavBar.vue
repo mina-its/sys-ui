@@ -25,7 +25,8 @@
 
             <!--<master-search></master-search>-->
             <AppLocaleMenu/>
-            <a class="my-2 my-sm-0 text-light" :href="glob.config.loginRef">{{glob.config.loginTitle}}</a>
+            <AppUserLoginMenu />
+
         </div>
     </nav>
 </template>
@@ -33,8 +34,9 @@
 <script lang="ts">
     import {Component, Vue, Prop} from 'vue-property-decorator';
     import AppLocaleMenu from "@/components/AppLocaleMenu.vue";
+    import AppUserLoginMenu from "@/components/AppUserLoginMenu.vue";
 
-    @Component({components: {AppLocaleMenu}})
+    @Component({components: {AppLocaleMenu, AppUserLoginMenu}})
     export default class NavBar extends Vue {
         @Prop() private containerStyle: boolean;
 

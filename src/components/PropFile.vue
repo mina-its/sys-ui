@@ -1,24 +1,28 @@
 <template>
     <div :class="styles + ' border-0'">
         <div v-if="viewType==2" class="prop-file-box">
-            <div v-for="file in files">
-                <div @click="showMenu(file, $event)" style="cursor: pointer"
-                     class="prop-file-item d-flex px-2 py-1 mb-2 border border-bottom"><span class="flex-grow-1">{{title(file)}}</span><span
-                        class="property-file-size text-secondary text-nowrap mx-2">{{size(file)}}</span>
-                    <i @click="remove(file, $event)" class="text-black-50 fa fa-times float-right p-1 fa-xs"
-                       style="cursor:pointer"></i>
-                </div>
+            <div @click="showMenu(file, $event)" v-for="file in files">
                 <figure class="m-0" v-if="prop.file && prop.file.preview && file._">
                     <img class="figure-img img-fluid border" :src="file._.uri"
                          @load="resetFileInfo($event, file)"/>
                     <figcaption v-if="file._.dimensions">{{file._.dimensions}}</figcaption>
                 </figure>
+                <div v-else style="cursor: pointer"
+                     class="prop-file-item d-flex px-2 py-1 mb-2 border border-bottom"><span class="flex-grow-1">{{title(file)}}</span><span
+                        class="property-file-size text-secondary text-nowrap mx-2">({{size(file)}})</span>
+                    <i @click="remove(file, $event)" class="text-black-50 fa fa-times float-right p-1 fa-xs"
+                       style="cursor:pointer"></i>
+                </div>
             </div>
             <Function v-if="showBrowseButton" title="Browse file ..." styles="btn-secondary border"
                       @exec="selectFile"></Function>
         </div>
-        <div v-else :class="'p-1 '+(viewType==3 ? 'd-inline-block': '')" v-for="file in files">{{title(file)}}<span
-                class="text-secondary mx-2">{{size(file)}}</span></div>
+        <div v-else v-for="file in files" @click="showMenu(file, $event)">
+            <img v-if="prop.file && prop.file.preview && file._" class="thumbnail" :src="file._.uri"/>
+            <div v-else :class="{'p-1': true, 'd-inline-block': viewType==3}">
+                <div>{{title(file)}}<span class="text-secondary mx-2">{{size(file)}}</span></div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -43,8 +47,12 @@
         showMenu(file, e) {
             if (this.prop.file && this.prop.file.drive) {
                 let items: MenuItem[] = [
+                    {ref: "", title: file.name + "(" + this.size(file) + ")"},
+                    {title: '-'},
                     {ref: "select", title: $t('select')},
                     {ref: "download", title: $t('download')},
+                    {title: '-'},
+                    {ref: "remove", title: $t('remove')}
                 ];
                 main.showCmenu(file, items, e, this.selectMenu);
             }
@@ -57,6 +65,15 @@
                 case "download":
                     window.open(file._.uri + `?m=${RequestMode.download}`, '_blank');
                     break;
+
+                case "remove":
+                    main.dispatchFileAction(this, {
+                        prop: this.prop,
+                        item: this.doc,
+                        type: FileActionType.Delete
+                    } as FileAction);
+                    break;
+
                 case "select":
                     this.selectFile();
                     // let val = this.doc[this.prop.name] as mFile;
@@ -168,7 +185,7 @@
 
         size(file) {
             if (file.size)
-                return "(" + main.toFriendlyFileSizeString(file.size) + ")";
+                return main.toFriendlyFileSizeString(file.size);
             else
                 return null;
         }
@@ -209,6 +226,13 @@
 </script>
 
 <style lang="scss">
+    .prop-file {
+        .thumbnail {
+            height: 32px;
+            margin: -0.3rem;
+        }
+    }
+
     .prop-value.prop-file {
         width: var(--wide-props-width);
         overflow: hidden;

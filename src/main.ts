@@ -21,7 +21,19 @@ let index = {
 import {v4 as uuidv4} from 'uuid';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {Axios, ChangeType, Constants, FileAction, Global, JQuery, MenuItem, Modify, Socket, StateChange} from './types';
+import {
+    Axios,
+    ChangeType,
+    Constants,
+    FileAction,
+    Global,
+    JQuery,
+    MenuItem,
+    Modify,
+    Socket,
+    StateChange,
+    FileActionType
+} from './types';
 import {
     AjaxConfig,
     DirFile,
@@ -855,6 +867,7 @@ function startVue(res: WebResponse, app, components) {
             }
         });
 
+        if (glob.config.rtl) $("html").attr("dir", "rtl");
         registerComponents(Vue, components);
         new Vue({data: glob, store, render: h => h(app || App)}).$mount('#app');
     } catch (err) {
@@ -868,7 +881,7 @@ function commitFileAction(store, action: FileAction) {
 }
 
 function _commitFileAction(state, e: FileAction) {
-    e.item[e.prop.name] = e.val;
+    e.item[e.prop.name] = e.val || null;
     glob.dirty = true;
 }
 
@@ -878,6 +891,7 @@ export function dispatchFileAction(vue: Vue, e: FileAction) {
 
 function _dispatchFileAction(store, e: FileAction) {
     if (e.item._.ref == null) throw "ref is empty!";
+
     let modify = {
         ref: e.item._.ref,
         type: ChangeType.EditFileProp,
@@ -885,7 +899,8 @@ function _dispatchFileAction(store, e: FileAction) {
         state: e.item,
     } as Modify;
     glob.modifies.push(modify);
-    modify.data[e.prop.name] = e.val;
+    modify.data[e.prop.name] = e.val || null;
+
     commitFileAction(store, e);
 }
 
@@ -1141,6 +1156,8 @@ export function start(app?, components?) {
     else {
         let uri = setQs('m', RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
+        if (getQs(Constants.search_locale))
+            uri = setQs(Constants.search_locale, getQs(Constants.search_locale), false, uri);
         console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, {withCredentials: true}).then(res => {
             if (res.data)

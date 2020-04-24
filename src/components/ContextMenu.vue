@@ -2,7 +2,8 @@
     <div v-if="glob.cmenu.show" :style="style" class="dropdown-menu show overflow-auto context-menu">
         <template v-for="item in glob.cmenu.items">
             <div v-if="item.title==='-'" class="dropdown-divider"></div>
-            <a v-else :class="'dropdown-item' + (item.hover ? ' active' : '') " @click="click(item)"
+            <div v-else-if="!item.ref" class="dropdown-header" v-html="getTitle(item)"></div>
+            <a v-else :class="{'dropdown-item':true, 'active': item.hover}" @click="click(item)"
                href="javascript:;" v-html="getTitle(item)"></a>
         </template>
     </div>
@@ -11,6 +12,7 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {glob} from '@/main';
+
     declare let $: JQuery;
     import * as main from '../main';
     import {JQuery, MenuItem} from "@/types";

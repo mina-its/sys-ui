@@ -74,6 +74,7 @@
 
 <style lang="scss">
     @import '../node_modules/bootstrap/scss/bootstrap.scss';
+    @import '../src/css/rtl';
     @import url('https://fonts.googleapis.com/css?family=Roboto');
 
     :root {
@@ -114,10 +115,13 @@
         height: 100%;
     }
 
+    .rtl {
+        direction: rtl;
+    }
+
     body {
         height: 100%;
         overflow: hidden;
-        text-align: $left;
         font-family: Roboto, RobotoDraft, Calibri, Helvetica, Arial, sans-serif;
         font-size: 15px;
     }

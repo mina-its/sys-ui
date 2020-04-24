@@ -11,6 +11,7 @@ exports.Constants = {
     delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
     uniqueFilenameRegex: /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}__/,
+    search_locale: 'e',
 };
 exports.ChartColors = [
     'rgba(54, 162, 235, 0.8)',

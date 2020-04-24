@@ -233,9 +233,11 @@
 
         rowSelected(e: ItemEventArg) {
             this.mainChecked = false;
-            if (this.rowHeaderStyle == GridRowHeaderStyle.select)
+            if (this.rowHeaderStyle == GridRowHeaderStyle.select) {
                 e.item._.marked = !e.item._.marked;
-            else
+                if (!this.items.find(item => item._.marked))
+                    this.rowHeaderStyle = GridRowHeaderStyle.empty;
+            } else
                 this.deselectAll(e.item);
         }
 

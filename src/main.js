@@ -823,6 +823,8 @@ function startVue(res, app, components) {
                     el.focus();
             }
         });
+        if (exports.glob.config.rtl)
+            $("html").attr("dir", "rtl");
         registerComponents(vue_1.default, components);
         new vue_1.default({ data: exports.glob, store, render: h => h(app || App_vue_1.default) }).$mount('#app');
     }
@@ -835,7 +837,7 @@ function commitFileAction(store, action) {
     store.commit('_commitFileAction', action);
 }
 function _commitFileAction(state, e) {
-    e.item[e.prop.name] = e.val;
+    e.item[e.prop.name] = e.val || null;
     exports.glob.dirty = true;
 }
 function dispatchFileAction(vue, e) {
@@ -852,7 +854,7 @@ function _dispatchFileAction(store, e) {
         state: e.item,
     };
     exports.glob.modifies.push(modify);
-    modify.data[e.prop.name] = e.val;
+    modify.data[e.prop.name] = e.val || null;
     commitFileAction(store, e);
 }
 function commitReloadData(store, data) {
@@ -1084,6 +1086,8 @@ function start(app, components) {
     else {
         let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : types_1.Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
+        if (getQs(types_1.Constants.search_locale))
+            uri = setQs(types_1.Constants.search_locale, getQs(types_1.Constants.search_locale), false, uri);
         console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
