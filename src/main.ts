@@ -841,7 +841,6 @@ function registerComponents(vue, components) {
     vue.component('check-box', require("@/components/CheckBox.vue").default);
     vue.component('log-terminal', require("@/components/LogTerminal.vue").default);
     vue.component('api-doc', require("@/components/ApiDoc.vue").default);
-    vue.component('range-picker', require("@/components/RangePicker.vue").default);
     vue.component('sys-dashboard', require("@/components/SysDashboard.vue").default);
 
     if (components) {
