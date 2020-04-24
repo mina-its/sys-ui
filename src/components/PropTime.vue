@@ -1,21 +1,15 @@
 <template>
     <div class="prop-time">
         <div class="d-flex">
+            <input @focus="$emit('focus', $event)" type="text" :value="value"
+                   :name="viewType!=1 ? prop.name : null"
+                   @blur="update" class="flex-grow-1 border-0 mx-2">
             <div class="dropdown">
-                <button class="icon dropdown-toggle" id="dropdownProfileBrief" data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false">
-                    <i class="fa fa-calendar"></i>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right text-center profile-brief"
-                     aria-labelledby="dropdownProfileBrief">
+                <i class="fa fa-calendar" @click="click"></i>
+                <div ref="picker" class="dropdown-menu dropdown-menu-right p-0 mt-1">
                     <DateTimePicker></DateTimePicker>
                 </div>
             </div>
-
-            <input @focus="$emit('focus', $event)" type="text" :value="value"
-                   :name="viewType!=1 ? prop.name : null"
-                   @blur="update" class="border-0 prop-time-date mx-2">
         </div>
     </div>
 </template>
@@ -26,11 +20,10 @@
     import {Property, LogType, Keys} from "../../../sys/src/types";
     import * as main from '../main';
     import DateTimePicker from "@/components/DateTimePicker.vue";
-    import DatePicker from "@/components/DatePicker.vue";
 
     declare let $, moment: Moment;
     @Component({
-        components: {DatePicker, DateTimePicker}
+        components: {DateTimePicker}
     })
     export default class PropTime extends Vue {
         @Prop() private doc: any;
@@ -52,25 +45,18 @@
             return {prop: this.prop, val, vue: this};
         }
 
+        click() {
+             $(this.$refs.picker).toggleClass('show');
+        }
+
         get value() {
             let val = this.doc[this.prop.name];
+            console.log(val ? moment(val).format("YYYY/MM/DD") : "");
             return val ? moment(val).format("YYYY/MM/DD HH:mm") : "";
         }
     }
 </script>
 
 <style scoped lang="scss">
-    .prop-time-date, .prop-time-time {
-        width: 100px;
-    }
 
-    .icon {
-        background-color: transparent;
-        border: none;
-        outline: none;
-
-        &::after {
-            display: none;
-        }
-    }
 </style>

@@ -85,11 +85,11 @@
             }
 
             &.level1 {
-                color: #666;
+                color: #888;
             }
 
             &.level2 {
-                color: #ddd;
+                color: #e0e0e0;
                 font-size: smaller;
             }
         }
