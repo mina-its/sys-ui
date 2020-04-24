@@ -1,10 +1,11 @@
 <template>
-    <div>
+    <div class="sys-dashboard">
         <div class="d-flex">
             <DashboardInfoBox title="CPU Usage" :value="data.cpuUsage" icon="fa-gear" color="#00c0ef"
                               class="m-4"></DashboardInfoBox>
-            <DashboardInfoBox title="Objects" :value="data.objectsCount" icon="fa-gear" color="#00a65a" class="m-4"></DashboardInfoBox>
-            <DashboardInfoBox title="Functions" :value="data.functionsCount" icon="fa-gear" color="#dd4b39"
+            <DashboardInfoBox title="Objects" :value="data.objectsCount" icon="fa-anchor" color="#00a65a"
+                              class="m-4"></DashboardInfoBox>
+            <DashboardInfoBox title="Functions" :value="data.functionsCount" icon="fa-bell-slash" color="#dd4b39"
                               class="m-4"></DashboardInfoBox>
             <DashboardInfoBox title="Users" :value="data.usersCount" icon="fa-user-circle-o" color="#f39c12"
                               class="m-4"></DashboardInfoBox>
@@ -30,8 +31,12 @@
 </script>
 
 <style scoped lang="scss">
+    .sys-dashboard {
+        width: 100%;
+    }
+
     .world-map {
-        width: 1000px;
+        width: 100%;
         border-bottom: 1px solid #f4f4f4;
         box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
         border-top: 3px solid #00a65a;
