@@ -1,0 +1,44 @@
+<template>
+    <div>
+        <div class="d-flex">
+            <DashboardInfoBox title="CPU Usage" :value="data.cpuUsage" icon="fa-gear" color="#00c0ef"
+                              class="m-4"></DashboardInfoBox>
+            <DashboardInfoBox title="Objects" :value="data.objectsCount" icon="fa-gear" color="#00a65a" class="m-4"></DashboardInfoBox>
+            <DashboardInfoBox title="Functions" :value="data.functionsCount" icon="fa-gear" color="#dd4b39"
+                              class="m-4"></DashboardInfoBox>
+            <DashboardInfoBox title="Users" :value="data.usersCount" icon="fa-user-circle-o" color="#f39c12"
+                              class="m-4"></DashboardInfoBox>
+        </div>
+        <div class="world-map p-4 bg-white mx-4">
+            <img src="/images/world.svg">
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {ObjectViewType, SysDashboardInfo} from "../../../sys/src/types";
+    import DashboardInfoBox from "@/components/DashboardInfoBox.vue";
+
+    @Component({
+        components: {DashboardInfoBox}
+    })
+    export default class SysDashboard extends Vue {
+        @Prop() private data: SysDashboardInfo;
+
+    }
+</script>
+
+<style scoped lang="scss">
+    .world-map {
+        width: 1000px;
+        border-bottom: 1px solid #f4f4f4;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        border-top: 3px solid #00a65a;
+        border-radius: 3px;
+    }
+
+    .world-map img {
+        width: 100%;
+    }
+</style>

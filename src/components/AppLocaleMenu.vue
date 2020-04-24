@@ -2,7 +2,7 @@
     <span v-if="glob.config.locale" class="app-locale-menu dropdown">
         <a class="nav-link dropdown-toggle py-0 px-4 text-light" href="#" id="navbarDropdownLocale" role="button"
            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{glob.config.locale.toUpperCase()}}</a>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu dropdown-menu-right">
             <a v-for="item in glob.config.appLocales" class="dropdown-item" @click="changeLocale(item)"
                href="#">{{item.title}}</a>
         </div>

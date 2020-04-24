@@ -799,6 +799,7 @@ function registerComponents(vue, components) {
     vue.component('log-terminal', require("@/components/LogTerminal.vue").default);
     vue.component('api-doc', require("@/components/ApiDoc.vue").default);
     vue.component('range-picker', require("@/components/RangePicker.vue").default);
+    vue.component('sys-dashboard', require("@/components/SysDashboard.vue").default);
     if (components) {
         for (let component in components) {
             vue.component(component, components[component]);
