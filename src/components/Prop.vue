@@ -1,4 +1,3 @@
-import {GlobalType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {Elem, ElemType, EmbeddedInfo, GlobalType, ObjectViewType, Property} from "../../../sys/src/types";
@@ -17,7 +16,7 @@ import {GlobalType} from "../../../sys/src/types";
     import * as main from '../main';
 
     @Component({
-        name: 'prop',
+        name: 'ElemProp',
         components: {
             PropReferenceMultiple,
             PropTime,

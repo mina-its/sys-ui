@@ -15,10 +15,11 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Pair} from "../../../sys/src/types";
     import {MenuItem, ItemChangeEventArg, JQuery} from '../types';
+
     declare let $: JQuery;
     import * as main from '../main';
 
-    @Component
+    @Component({name: 'PropReferenceMultiple'})
     export default class PropReferenceMultiple extends Vue {
         @Prop() private type: string;
         @Prop() private doc: any;

@@ -6,10 +6,10 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
 
-	@Component
-	export default class FileDriveItem extends Vue {
-		@Prop() private file: any;
-	}
+    @Component({name: 'FileDriveItem'})
+    export default class FileDriveItem extends Vue {
+        @Prop() private file: any;
+    }
 </script>

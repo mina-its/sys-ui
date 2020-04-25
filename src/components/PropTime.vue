@@ -23,9 +23,7 @@
     import DateTimePicker from "@/components/DateTimePicker.vue";
 
     declare let $, moment: Moment;
-    @Component({
-        components: {DateTimePicker}
-    })
+    @Component({name: 'PropTime', components: {DateTimePicker}})
     export default class PropTime extends Vue {
         @Prop() private doc: any;
         @Prop() private prop: Property;

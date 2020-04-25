@@ -6,7 +6,7 @@
     declare let marked: any;
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
 
-    @Component
+    @Component({name: 'MarkdownEditable'})
     export default class MarkdownEditable extends Vue {
         @Prop() private content: string;
         @Prop() private styles: string;

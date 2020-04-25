@@ -6,7 +6,7 @@
     import * as main from '../main';
     import {ChangeType, ItemChangeEventArg, StateChange} from '@/types';
 
-    @Component({name: 'form-elem', components: {AppChart, Markdown}})
+    @Component({name: 'FormElem', components: {AppChart, Markdown}})
     export default class FormElem extends Vue {
         @ComProp() private elem: Elem;
 

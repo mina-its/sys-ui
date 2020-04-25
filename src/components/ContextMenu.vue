@@ -17,7 +17,7 @@
     import * as main from '../main';
     import {JQuery, MenuItem} from "@/types";
 
-    @Component
+    @Component({name: 'ContextMenu'})
     export default class ContextMenu extends Vue {
         click(item) {
             glob.cmenu.show = false;

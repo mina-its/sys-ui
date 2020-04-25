@@ -60,7 +60,7 @@
     import * as main from '../main';
     import Function from "@/components/Function.vue";
 
-    @Component({components: {Function}})
+    @Component({name: 'FileGallery', components: {Function}})
     export default class FileGallery extends Vue {
         get glob() {
             return glob;

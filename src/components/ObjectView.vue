@@ -5,7 +5,7 @@
     import pluralize = require('pluralize');
     import * as main from '../main';
 
-    @Component
+    @Component({name: 'ObjectView'})
     export default class ObjectView extends Vue {
         @Prop() private elem: Elem;
         @Prop() private root: boolean;

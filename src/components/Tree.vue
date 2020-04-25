@@ -11,7 +11,7 @@
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 
-	@Component
+	@Component({name:'Tree'})
 	export default class Tree extends Vue {
 		@Prop() private item: any[];
 	}

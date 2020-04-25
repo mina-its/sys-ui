@@ -7,7 +7,7 @@
     import {Property} from "../../../sys/src/types";
     import * as main from '../main';
 
-    @Component
+    @Component({name: 'PropLink'})
     export default class PropLink extends Vue {
         @Prop() private doc: any;
         @Prop() private prop: Property;

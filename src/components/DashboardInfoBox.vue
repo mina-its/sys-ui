@@ -15,7 +15,7 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {ObjectViewType} from "../../../sys/src/types";
 
-    @Component
+    @Component({name: 'DashboardInfoBox'})
     export default class DashboardInfoBox extends Vue {
         @Prop() private color: string;
         @Prop() private title: string;

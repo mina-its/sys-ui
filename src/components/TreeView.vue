@@ -13,10 +13,11 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {Property, Keys, GlobalType} from "../../../sys/src/types";
     import {TreeViewNode as Node, TreeViewLine, TreeViewAttribute, JQuery} from '../types';
+
     declare let $: JQuery;
     import * as main from '../main';
 
-    @Component({components: {TreeViewNode}})
+    @Component({name: 'TreeView', components: {TreeViewNode}})
     export default class TreeView extends Vue {
         @Prop() private uri: string;
         @Prop() private data: any;

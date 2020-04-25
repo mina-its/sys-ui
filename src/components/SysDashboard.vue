@@ -23,7 +23,7 @@
     import {ObjectViewType, SysDashboardInfo} from "../../../sys/src/types";
     import DashboardInfoBox from "@/components/DashboardInfoBox.vue";
 
-    @Component({
+    @Component({name: 'SysDashboard',
         components: {DashboardInfoBox}
     })
     export default class SysDashboard extends Vue {

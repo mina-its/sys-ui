@@ -15,11 +15,12 @@
     import {Component, Prop as ComProp, Vue, Emit} from 'vue-property-decorator';
     import {Property, EntityMeta, IData} from "../../../sys/src/types";
     import {ItemChangeEventArg, ItemEventArg, JQuery} from '@/types';
+
     declare let $: JQuery;
     import CheckBox from "@/components/CheckBox.vue";
     import Prop from "@/components/Prop.vue";
 
-    @Component({components: {Prop, CheckBox}})
+    @Component({name: 'GridViewRow', components: {Prop, CheckBox}})
     export default class GridViewRow extends Vue {
         @ComProp() private item: IData;
         @ComProp() private selectable: boolean;

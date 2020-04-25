@@ -14,7 +14,7 @@
     import {setQs} from '@/main';
     import {Pair} from '../../../sys/src/types';
 
-    @Component
+    @Component({name: 'AppLocaleMenu'})
     export default class AppLocaleMenu extends Vue {
         changeLocale(locale: Pair) {
             location.href = setQs('e', locale.ref, true);

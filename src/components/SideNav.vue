@@ -25,9 +25,9 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob} from '../main';;
+    import {glob} from '../main';
 
-    @Component
+    @Component({name: 'SideNav'})
     export default class SideNav extends Vue {
         get glob() {
             return glob;

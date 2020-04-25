@@ -9,7 +9,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
 
-    @Component
+    @Component({name: 'CheckBox'})
     export default class CheckBox extends Vue {
         @Prop() private checked: boolean;
         @Prop() private label?: string;

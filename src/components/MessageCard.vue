@@ -8,14 +8,14 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
 
-	@Component
-	export default class MessageCard extends Vue {
-		@Prop() private header: string;
-		@Prop() private message: string;
-		@Prop() private type: string;
-	}
+    @Component({name: 'MessageCard'})
+    export default class MessageCard extends Vue {
+        @Prop() private header: string;
+        @Prop() private message: string;
+        @Prop() private type: string;
+    }
 </script>
 
 <style scoped lang="scss">

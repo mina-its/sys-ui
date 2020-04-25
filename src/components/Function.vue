@@ -5,7 +5,7 @@
     import * as main from '../main';
     import {glob} from '@/main';
 
-    @Component({name: 'function'})
+    @Component({name: 'Function'})
     export default class Function extends Vue {
         @Prop() private title: string;
         @Prop() private name: string;

@@ -35,9 +35,7 @@
     import * as main from '../main';
     import Function from "@/components/Function.vue";
 
-    @Component({
-        components: {Function}
-    })
+    @Component({name: 'PropFile', components: {Function}})
     export default class PropFile extends Vue {
         @Prop() private prop: Property;
         @Prop() private doc: IData;

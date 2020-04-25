@@ -6,12 +6,12 @@
 </template>
 
 <script lang="ts">
-	import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
 
-	@Component
-	export default class TreeViewNode extends Vue {
-		@Prop() private node: any;
-	}
+    @Component({name: 'TreeViewNode'})
+    export default class TreeViewNode extends Vue {
+        @Prop() private node: any;
+    }
 </script>
 
 <style scoped lang="scss">

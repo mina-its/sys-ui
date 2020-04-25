@@ -5,9 +5,9 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob} from '../main';;
+    import {glob} from '../main';
 
-    @Component
+    @Component({name: 'BrowseFile'})
     export default class BrowseFile extends Vue {
         @Prop() private prop!: string;
 

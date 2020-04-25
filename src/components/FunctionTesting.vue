@@ -7,7 +7,7 @@
     import {FunctionDec} from "../../../sys/src/types";
     import * as main from '../main';
 
-    @Component
+    @Component({name: 'FunctionTesting'})
     export default class FunctionTesting extends Vue {
         @Prop() private dec: FunctionDec;
         message = "";

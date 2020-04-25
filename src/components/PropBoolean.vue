@@ -8,10 +8,7 @@
     import {ItemChangeEventArg} from '../types';
     import CheckBox from "@/components/CheckBox.vue";
 
-    @Component({
-        name: 'prop-boolean',
-        components: {CheckBox}
-    })
+    @Component({name: 'PropBoolean', components: {CheckBox}})
     export default class PropBoolean extends Vue {
         @Prop() private prop: Property;
         @Prop() private doc: any;

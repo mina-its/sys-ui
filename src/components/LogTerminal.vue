@@ -15,7 +15,7 @@
     import WebSocket from "@/components/WebSocket.vue";
     import * as main from '../main';
 
-    @Component
+    @Component({name: 'LogTerminal'})
     export default class LogTerminal extends Vue {
         @Prop() private prop!: string;
 

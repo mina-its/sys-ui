@@ -69,6 +69,7 @@
     import CheckBox from "@/components/CheckBox.vue";
 
     @Component({
+        name: 'GridView',
         components: {CheckBox, GridViewRow, FilterItem}
     })
     export default class GridView extends Vue {

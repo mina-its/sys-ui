@@ -7,7 +7,7 @@
     import {glob} from '@/main';
     import * as main from '../main';
 
-    @Component
+    @Component({name:'WebSocket'})
     export default class WebSocket extends Vue {
         get glob() {
             return glob;

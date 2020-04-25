@@ -10,7 +10,7 @@
     import {glob} from '@/main';
     import * as main from '../main';
 
-    @Component
+    @Component({name: 'PropText'})
     export default class PropText extends Vue {
         @Prop() private type: string;
         @Prop() private doc: any;

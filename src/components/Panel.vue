@@ -4,7 +4,7 @@
     import {glob} from '@/main';
     import Modal from "@/components/Modal.vue";
 
-    @Component({components: {Modal}})
+    @Component({name:'Panel', components: {Modal}})
     export default class Panel extends Vue {
         @Prop() private elem: Elem;
 

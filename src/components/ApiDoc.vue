@@ -70,7 +70,7 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
 
-    @Component
+    @Component({name: 'ApiDoc'})
     export default class ApiDoc extends Vue {
         @Prop() private data: any;
 

@@ -36,10 +36,7 @@
     import {glob} from '../main';
     import * as main from '../main';
 
-    @Component({
-        name: 'modal',
-        components: {FormElem}
-    })
+    @Component({name: 'Modal', components: {FormElem}})
     export default class Modal extends Vue {
         @Prop() private title: string;
         @Prop() private footerElems: any[];

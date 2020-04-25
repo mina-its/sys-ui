@@ -17,9 +17,10 @@
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+
     declare let $: any;
 
-    @Component
+    @Component({name: 'RollPicker'})
     export default class RollPicker extends Vue {
         @Prop() private items: string[];
         @Prop() private index: number;

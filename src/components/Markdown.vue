@@ -3,18 +3,18 @@
 </template>
 
 <script lang="ts">
-	declare let marked: any;
-	import {Component, Prop, Vue} from 'vue-property-decorator';
+    declare let marked: any;
+    import {Component, Prop, Vue} from 'vue-property-decorator';
 
-	@Component
-	export default class Markdown extends Vue {
-		@Prop() private content: string;
-		@Prop() private styles: string;
+    @Component({name: 'Markdown'})
+    export default class Markdown extends Vue {
+        @Prop() private content: string;
+        @Prop() private styles: string;
 
-		get html() {
-			return marked(this.content);
-		}
-	}
+        get html() {
+            return marked(this.content);
+        }
+    }
 </script>
 
 <style scoped lang="scss">

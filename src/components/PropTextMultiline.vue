@@ -6,9 +6,9 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
-    import {ItemChangeEventArg, PropEventArg} from '../types';;
+    import {ItemChangeEventArg, PropEventArg} from '../types';
 
-    @Component
+    @Component({name: 'PropTextMultiline'})
     export default class PropTextMultiline extends Vue {
         @Prop() private doc: any;
         @Prop() private prop: Property;

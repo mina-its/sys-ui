@@ -32,13 +32,12 @@
     import {Component, Prop as ComProp, Vue, Watch} from 'vue-property-decorator';
     import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
     import {glob} from '@/main';
+
     declare let $: JQuery;
     import * as main from '../main';
     import Prop from "@/components/Prop.vue";
 
-    @Component({
-        components: {Prop}
-    })
+    @Component({name: 'DetailsView', components: {Prop}})
     export default class DetailsView extends Vue {
         @ComProp() private uri: string;
         @ComProp() private root: boolean;

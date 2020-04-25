@@ -10,7 +10,7 @@
     import {glob} from '@/main';
     import {ItemChangeEventArg} from '@/types';
 
-    @Component
+    @Component({name: 'PropDocumentEditor'})
     export default class PropDocumentEditor extends Vue {
         @Prop() private doc: IData;
         @Prop() private prop: Property;

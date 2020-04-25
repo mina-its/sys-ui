@@ -10,7 +10,7 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
 
-    @Component
+    @Component({name: 'ProgressBar'})
     export default class ProgressBar extends Vue {
     }
 </script>

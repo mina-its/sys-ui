@@ -33,7 +33,7 @@ import {LogType} from "../../../sys/src/types";
 
     declare let $, moment: any;
 
-    @Component({components: {RollPicker, Function}})
+    @Component({name: 'DateTimePicker', components: {RollPicker, Function}})
     export default class DateTimePicker extends Vue {
         @Prop() private format: string;
         @Prop() private value: Date;

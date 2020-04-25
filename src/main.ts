@@ -835,23 +835,31 @@ function stopProgress() {
 }
 
 function registerComponents(vue, components) {
-    vue.component('function', require("@/components/Function.vue").default);
-    vue.component('panel', require("@/components/Panel.vue").default);
-    vue.component('modal', require("@/components/Modal.vue").default);
-    vue.component('prop', require("@/components/Prop.vue").default);
-    vue.component('object-view', require("@/components/ObjectView.vue").default);
-    vue.component('document-editor', require("@/components/DocumentEditor.vue").default);
-    vue.component('form-elem', require("@/components/FormElem.vue").default);
-    vue.component('grid-view', require("@/components/GridView.vue").default);
-    vue.component('details-view', require("@/components/DetailsView.vue").default);
-    vue.component('check-box', require("@/components/CheckBox.vue").default);
-    vue.component('log-terminal', require("@/components/LogTerminal.vue").default);
-    vue.component('api-doc', require("@/components/ApiDoc.vue").default);
-    vue.component('sys-dashboard', require("@/components/SysDashboard.vue").default);
+    const requireComponent = require.context('./components', false, /\.vue$/);
+    requireComponent.keys().forEach(fileName => {
+        const componentConfig = requireComponent(fileName);
+        const componentName = fileName.split('/').pop().replace(/\.\w+$/, '');
+        Vue.component(componentName, componentConfig.default || componentConfig)
+    });
+
+    // vue.component('Function', require("@/components/Function.vue").default);
+    // vue.component('Panel', require("@/components/Panel.vue").default);
+    // vue.component('Modal', require("@/components/Modal.vue").default);
+    // vue.component('Prop', require("@/components/Prop.vue").default);
+    // vue.component('ObjectView', require("@/components/ObjectView.vue").default);
+    // vue.component('DocumentEditor', require("@/components/DocumentEditor.vue").default);
+    // vue.component('FormElem', require("@/components/FormElem.vue").default);
+    // vue.component('GridView', require("@/components/GridView.vue").default);
+    // vue.component('DetailsView', require("@/components/DetailsView.vue").default);
+    // vue.component('CheckBox', require("@/components/CheckBox.vue").default);
+    // vue.component('LogTerminal', require("@/components/LogTerminal.vue").default);
+    // vue.component('ApiDoc', require("@/components/ApiDoc.vue").default);
+    // vue.component('SysDashboard', require("@/components/SysDashboard.vue").default);
+    // vue.component('FormView', require("@/components/FormView.vue").default);
 
     if (components) {
-        for (let component in components) {
-            vue.component(component, components[component]);
+        for (let name in components) {
+            vue.component(name, components[name]);
         }
     }
 }

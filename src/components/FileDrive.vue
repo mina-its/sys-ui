@@ -10,7 +10,7 @@
 	import {Component, Prop, Vue} from 'vue-property-decorator';
 	import FileDriveItem from "@/components/FileDriveItem.vue";
 
-	@Component({components: {FileDriveItem}})
+	@Component({components: {FileDriveItem}, name: 'FileDrive'})
 	export default class FileDrive extends Vue {
 		@Prop() private path: string;
 		@Prop() private files: any[];

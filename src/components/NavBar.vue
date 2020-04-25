@@ -2,7 +2,7 @@
     <nav :class="{'navbar navbar-expand-lg navbar-dark':true, 'container':containerStyle}">
         <a class="navbar-brand" href="/">
             <img v-if="glob.config.brandingLogo" alt="logo" class='branding-logo img-responsive'
-                 :src="glob.config.brandingLogo" />
+                 :src="glob.config.brandingLogo"/>
             <span class="app-title">{{glob.config.appTitle}}</span>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -25,7 +25,7 @@
 
             <!--<master-search></master-search>-->
             <AppLocaleMenu/>
-            <AppUserLoginMenu />
+            <AppUserLoginMenu/>
 
         </div>
     </nav>
@@ -36,7 +36,7 @@
     import AppLocaleMenu from "@/components/AppLocaleMenu.vue";
     import AppUserLoginMenu from "@/components/AppUserLoginMenu.vue";
 
-    @Component({components: {AppLocaleMenu, AppUserLoginMenu}})
+    @Component({name: 'NavBar', components: {AppLocaleMenu, AppUserLoginMenu}})
     export default class NavBar extends Vue {
         @Prop() private containerStyle: boolean;
 

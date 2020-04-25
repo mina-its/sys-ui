@@ -34,7 +34,7 @@
     import {FunctionExecEventArg} from '../types';
     import * as main from '../main';
 
-    @Component({components: {Function}})
+    @Component({name: 'Toolbar', components: {Function}})
     export default class Toolbar extends Vue {
         @Prop() private alwaysVisible: boolean;
 

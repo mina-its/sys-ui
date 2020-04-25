@@ -10,7 +10,7 @@
     import {Constants, MenuItem, ItemChangeEventArg, PropEventArg} from '../types';
     import * as main from '../main';
 
-    @Component
+    @Component({name:'PropReference'})
     export default class PropReference extends Vue {
         @Prop() private type: string;
         @Prop() private doc: any;

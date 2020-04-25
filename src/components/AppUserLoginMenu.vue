@@ -32,7 +32,7 @@
 
     declare let $: any;
 
-    @Component
+    @Component({name: 'AppUserLoginMenu'})
     export default class AppUserLoginMenu extends Vue {
         get profilePhoto(): string {
             return glob.config.user.photoUrl || 'https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5bed565…/5f7abfa5-a174-45b5-a5a5-68a91a876506/128';

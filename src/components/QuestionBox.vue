@@ -35,7 +35,7 @@
 
     declare let marked: any;
 
-    @Component({components: {Function}})
+    @Component({name: 'QuestionBox', components: {Function}})
     export default class QuestionBox extends Vue {
         close() {
             glob.question.show = false;
