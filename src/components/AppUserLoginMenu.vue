@@ -14,7 +14,7 @@
                 <img class="m-4 mx-5" :src="profilePhoto"/>
                 <h2>{{glob.config.user.title}}</h2>
                 <div>{{glob.config.user.email}}</div>
-                <a class="m-2 btn btn-outline-secondary" :href="glob.config.user.profileUrl">Profile</a>
+                <a class="m-2 btn btn-outline-secondary profile-button" :href="glob.config.user.profileUrl">Profile</a>
                 <hr>
                 <a class="m-2 btn btn-secondary" href="/logout?f=1">Sign out</a>
                 <hr>
@@ -89,5 +89,9 @@
         width: 100%;
         height: 100%;
         cursor: pointer;
+    }
+
+    .profile-button {
+        width: 200px;
     }
 </style>
