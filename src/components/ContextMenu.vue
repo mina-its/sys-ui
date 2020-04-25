@@ -2,7 +2,7 @@
     <div v-if="glob.cmenu.show" :style="style" class="dropdown-menu show overflow-auto context-menu">
         <template v-for="item in glob.cmenu.items">
             <div v-if="item.title==='-'" class="dropdown-divider"></div>
-            <div v-else-if="!item.ref" class="dropdown-header" v-html="getTitle(item)"></div>
+            <div v-else-if="!item.ref && item.title" class="dropdown-header" v-html="getTitle(item)"></div>
             <a v-else :class="{'dropdown-item':true, 'active': item.hover}" @click="click(item)"
                href="javascript:;" v-html="getTitle(item)"></a>
         </template>

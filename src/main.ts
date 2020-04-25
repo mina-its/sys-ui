@@ -399,6 +399,12 @@ function handleWindowEvents() {
             if (glob.cmenu.show)
                 handleCmenuKeys(e);
             glob.notify = null;
+
+            switch (e.which) {
+                case Keys.esc:
+                    $('.dropdown-menu').removeClass('show'); // date time picker
+                    break;
+            }
         })
         .on("click", (e: any) => {
             let el = e.target as HTMLAnchorElement;
@@ -841,7 +847,6 @@ function registerComponents(vue, components) {
     vue.component('check-box', require("@/components/CheckBox.vue").default);
     vue.component('log-terminal', require("@/components/LogTerminal.vue").default);
     vue.component('api-doc', require("@/components/ApiDoc.vue").default);
-    vue.component('range-picker', require("@/components/RangePicker.vue").default);
     vue.component('sys-dashboard', require("@/components/SysDashboard.vue").default);
 
     if (components) {
