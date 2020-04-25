@@ -29,7 +29,7 @@ export interface Socket {
 }
 
 export interface Moment {
-    (params: any): any;
+    (...params: any): any;
 
     utc;
 }

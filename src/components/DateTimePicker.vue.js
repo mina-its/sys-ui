@@ -7,12 +7,11 @@ const RollPicker_vue_1 = tslib_1.__importDefault(require("@/components/RollPicke
 let DateTimePicker = class DateTimePicker extends vue_property_decorator_1.Vue {
     constructor() {
         super(...arguments);
-        this.format = "YY/MMM/DD HH:mm:ss";
-        this.yearCaption = "";
-        this.monthCaption = "";
         this.years = [];
         this.months = [];
         this.days = [];
+        this.yearCaption = "";
+        this.monthCaption = "";
         this.hours = [];
         this.minutes = [];
         this.seconds = [];
@@ -20,14 +19,40 @@ let DateTimePicker = class DateTimePicker extends vue_property_decorator_1.Vue {
     }
     today() {
         this.date = moment();
+        this.makeParts();
+        this.$forceUpdate();
+    }
+    yearChanged(e) {
+        this.date = this.date.year(e.index + 1900);
+        this.makeDays();
+        this.$forceUpdate();
+    }
+    monthChanged(e) {
+        this.date = this.date.month(e.index);
+        this.monthCaption = moment.months()[e.index];
+        this.makeDays();
+        this.$forceUpdate();
     }
     dayChanged(e) {
-        if (e.index != this.date.date()) {
-            console.log(this.date.toString());
-            this.date = this.date.date(e.index);
-            console.log(this.date.toString());
-            this.dayLabel = moment.weekdays()[this.date.day()];
-        }
+        this.date = this.date.date(e.index + 1);
+        this.dayCaption = moment.weekdays()[this.date.day()];
+        this.$forceUpdate();
+    }
+    hourChanged(e) {
+        this.date = this.date.hour(e.index);
+        this.$forceUpdate();
+    }
+    minuteChanged(e) {
+        this.date = this.date.minute(e.index);
+        this.$forceUpdate();
+    }
+    secondChanged(e) {
+        this.date = this.date.second(e.index);
+        this.$forceUpdate();
+    }
+    ampmChanged(e) {
+        this.date = this.date.hour(e.index == 0 ? this.date.hour % 12 : 12 + this.date.hour % 12);
+        this.$forceUpdate();
     }
     makeYears() {
         let start, end;
@@ -46,13 +71,8 @@ let DateTimePicker = class DateTimePicker extends vue_property_decorator_1.Vue {
         }
     }
     makeMonths() {
-        if (/MMM/.test(this.format)) {
-            this.monthCaption = "";
-            this.months = moment.monthsShort();
-        }
-        else if (/M/.test(this.format)) {
-            this.yearCaption = "Year";
-            this.monthCaption = "Month";
+        if (/M/.test(this.format)) {
+            this.monthCaption = moment.months()[this.date.month()];
             this.months = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
         }
         else {
@@ -63,10 +83,10 @@ let DateTimePicker = class DateTimePicker extends vue_property_decorator_1.Vue {
     makeDays() {
         if (/D/.test(this.format)) {
             this.days = [];
-            for (let i = 1; i < this.date.daysInMonth(); i++) {
+            for (let i = 1; i <= this.date.daysInMonth(); i++) {
                 this.days.push(i.toString());
             }
-            this.dayLabel = moment.weekdays()[this.date.day()];
+            this.dayCaption = moment.weekdays()[this.date.day()];
         }
         else {
             this.days = null;
@@ -91,7 +111,7 @@ let DateTimePicker = class DateTimePicker extends vue_property_decorator_1.Vue {
         }
     }
     makeMinutes() {
-        if (/m/i.test(this.format)) {
+        if (/m/.test(this.format)) {
             this.minutes = [];
             for (let i = 0; i < 60; i++) {
                 this.minutes.push(this.addZero(i.toString()));
@@ -116,7 +136,10 @@ let DateTimePicker = class DateTimePicker extends vue_property_decorator_1.Vue {
         return num < 10 ? '0' + num : num;
     }
     created() {
-        this.date = this.value ? moment(this.value) : moment();
+        this.date = this.value ? moment(this.value, this.format) : moment();
+        this.makeParts();
+    }
+    makeParts() {
         this.makeYears();
         this.makeMonths();
         this.makeDays();
@@ -125,12 +148,15 @@ let DateTimePicker = class DateTimePicker extends vue_property_decorator_1.Vue {
         this.makeSeconds();
     }
     changed() {
-        return { value: this.date };
+        return { value: this.date.toDate() };
     }
     cancel() {
         return {};
     }
 };
+tslib_1.__decorate([
+    vue_property_decorator_1.Prop()
+], DateTimePicker.prototype, "format", void 0);
 tslib_1.__decorate([
     vue_property_decorator_1.Prop()
 ], DateTimePicker.prototype, "value", void 0);

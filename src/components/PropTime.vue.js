@@ -11,18 +11,19 @@ let PropTime = class PropTime extends vue_property_decorator_1.Vue {
         this.showPicker = false;
     }
     update(e) {
-        let val = e.target.value ? moment.utc(e.target.value) : null;
+        console.log(1);
+        let val = e.target.value ? moment(e.target.value, this.format) : null;
         let date = val && val.isValid() ? val.toDate() : null;
         if (!date && e.target.value) {
             main.notify('invalid-date' + ": " + e.target.value, types_1.LogType.Error);
             this.$forceUpdate();
         }
         else
-            this.changed({ date });
+            this.changed({ value: date });
     }
     changed(val) {
         this.showPicker = false;
-        return { prop: this.prop, val: val.date, vue: this };
+        return { prop: this.prop, val: val.value, vue: this };
     }
     canceled() {
         this.showPicker = false;
@@ -30,9 +31,26 @@ let PropTime = class PropTime extends vue_property_decorator_1.Vue {
     click() {
         this.showPicker = true;
     }
+    get format() {
+        if (this.prop.time) {
+            if (this.prop.time.customFormat)
+                return this.prop.time.customFormat;
+            else if (this.prop.time.format) {
+                switch (this.prop.time.format) {
+                    case types_1.TimeFormat.YearMonthDayHourMinute:
+                        return "YYYY/MM/DD - HH:mm";
+                    case types_1.TimeFormat.DateWithDayOfWeek:
+                        return "YYYY/MM/DD";
+                    case types_1.TimeFormat.HourMinute:
+                        return "HH:mm";
+                }
+            }
+        }
+        return "YYYY/MM/DD";
+    }
     get value() {
         let val = this.doc[this.prop.name];
-        return val ? moment(val).format("YYYY/MM/DD HH:mm") : "";
+        return val ? moment(val).format(this.format) : "";
     }
 };
 tslib_1.__decorate([

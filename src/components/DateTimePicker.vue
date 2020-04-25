@@ -1,3 +1,4 @@
+import {LogType} from "../../../sys/src/types";
 <template>
     <div class="date-time-picker">
         <div class="d-flex p-3">
@@ -18,15 +19,15 @@
             <RollPicker v-if="amPm" caption="" :index="0" :items="amPm" @changed="ampmChanged"></RollPicker>
         </div>
         <div class="d-flex w-100">
-            <button @click="changed" class="flex-fill p-2 border">Set</button>
-            <button @click="today" class="flex-fill p-2 border">Today</button>
             <button @click="cancel" class="flex-fill p-2 border">Cancel</button>
+            <!--            <button @click="today" class="flex-fill p-2 border">Today</button>-->
+            <button @click="changed" class="flex-fill p-2 border">Set</button>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import Function from "@/components/Function.vue";
     import RollPicker from "@/components/RollPicker.vue";
 
@@ -34,7 +35,7 @@
 
     @Component({components: {RollPicker, Function}})
     export default class DateTimePicker extends Vue {
-        private format: string = "YY/MMM/DD HH:mm:ss";
+        @Prop() private format: string;
         @Prop() private value: Date;
 
         today() {
@@ -51,6 +52,7 @@
 
         monthChanged(e: { index: number, item }) {
             this.date = this.date.month(e.index);
+            this.monthCaption = moment.months()[e.index];
             this.makeDays();
             this.$forceUpdate();
         }
@@ -111,12 +113,8 @@
         }
 
         makeMonths() {
-            if (/MMM/.test(this.format)) {
-                this.monthCaption = "";
-                this.months = moment.monthsShort();
-            } else if (/M/.test(this.format)) {
-                this.yearCaption = "Year";
-                this.monthCaption = "Month";
+            if (/M/.test(this.format)) {
+                this.monthCaption = moment.months()[this.date.month()];
                 this.months = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
             } else {
                 this.months = null;
@@ -154,7 +152,7 @@
         }
 
         makeMinutes() {
-            if (/m/i.test(this.format)) {
+            if (/m/.test(this.format)) {
                 this.minutes = [];
                 for (let i = 0; i < 60; i++) {
                     this.minutes.push(this.addZero(i.toString()));
@@ -180,7 +178,7 @@
         }
 
         created() {
-            this.date = this.value ? moment(this.value) : moment();
+            this.date = this.value ? moment(this.value, this.format) : moment();
             this.makeParts();
         }
 
@@ -195,7 +193,7 @@
 
         @Emit('changed')
         changed() {
-            return {value: this.date};
+            return {value: this.date.toDate()};
         }
 
         @Emit('canceled')
