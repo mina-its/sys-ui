@@ -399,6 +399,12 @@ function handleWindowEvents() {
             if (glob.cmenu.show)
                 handleCmenuKeys(e);
             glob.notify = null;
+
+            switch (e.which) {
+                case Keys.esc:
+                    $('.dropdown-menu').removeClass('show'); // date time picker
+                    break;
+            }
         })
         .on("click", (e: any) => {
             let el = e.target as HTMLAnchorElement;

@@ -16,8 +16,7 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
-
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     declare let $: any;
 
     @Component
@@ -30,7 +29,8 @@
         private scrollTop = 0;
 
         mounted() {
-            this.click(this.index);
+            this.$refs.sc.scrollTop = this.index * this.itemHeight;
+            $(this.$refs.sc).css("scroll-behavior", "smooth");
         }
 
         $refs: {
@@ -43,12 +43,19 @@
         }
 
         click(index) {
-            this.index = index;
             this.$refs.sc.scrollTop = index * this.itemHeight;
+        }
+
+        @Emit('changed')
+        change(index) {
+            return {index, item: this.items[index]};
         }
 
         scroll() {
             this.scrollTop = this.$refs.sc.scrollTop;
+            let index = Math.round(this.scrollTop / this.itemHeight);
+            if (this.index != index)
+                this.change(index);
         }
     }
 </script>
@@ -71,7 +78,7 @@
         -ms-overflow-style: none;
         font-size: 24px;
         height: 250px;
-        scroll-behavior: smooth;
+
 
         &::-webkit-scrollbar {
             display: none;

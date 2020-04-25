@@ -1,101 +1,206 @@
 <template>
     <div class="date-time-picker">
         <div class="d-flex p-3">
-            <RollPicker caption="Year" :index="yearIndex" :items="years"></RollPicker>
-            <RollPicker caption="Month" :index="monthIndex" :items="months"></RollPicker>
-            <RollPicker caption="Day" :index="dayIndex" :items="days"></RollPicker>
-            <div class="p-2">&nbsp;</div>
-            <RollPicker caption="Hour" :index="hourIndex" :items="hours"></RollPicker>
-            <RollPicker caption="Minute" :index="minuteIndex" :items="minutes"></RollPicker>
-            <RollPicker caption="Second" :index="secondIndex" :items="seconds"></RollPicker>
+            <RollPicker v-if="years" :caption="yearCaption" @changed="yearChanged" :index="date.year()-1900"
+                        :items="years"></RollPicker>
+            <RollPicker v-if="months" :caption="monthCaption" @changed="monthChanged" :index="date.month()"
+                        :items="months"></RollPicker>
+            <RollPicker v-if="days" :caption="dayCaption" @changed="dayChanged" :index="date.date()-1"
+                        :items="days"></RollPicker>
+            <div v-if="hours" class="p-2">&nbsp;</div>
+            <RollPicker v-if="hours" caption="" :index="date.hour()" :items="hours" @changed="hourChanged"></RollPicker>
+            <div v-if="hours && minutes" class="p-2 align-self-center">:</div>
+            <RollPicker v-if="minutes" caption="" :index="date.minute()" :items="minutes"
+                        @changed="minuteChanged"></RollPicker>
+            <div v-if="minutes && seconds" class="p-2 align-self-center">:</div>
+            <RollPicker v-if="seconds" caption="" :index="date.second()" :items="seconds"
+                        @changed="secondChanged"></RollPicker>
+            <RollPicker v-if="amPm" caption="" :index="0" :items="amPm" @changed="ampmChanged"></RollPicker>
         </div>
         <div class="d-flex w-100">
-            <button @click="set" class="flex-fill text-center p-2 border">Set</button>
-            <button @click="today" class="flex-fill text-center p-2 border">Today</button>
-            <button @click="cancel" class="flex-fill text-center p-2 border">Cancel</button>
+            <button @click="changed" class="flex-fill p-2 border">Set</button>
+            <button @click="today" class="flex-fill p-2 border">Today</button>
+            <button @click="cancel" class="flex-fill p-2 border">Cancel</button>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import Function from "@/components/Function.vue";
     import RollPicker from "@/components/RollPicker.vue";
 
-    declare let $: any;
+    declare let $, moment: any;
 
     @Component({components: {RollPicker, Function}})
     export default class DateTimePicker extends Vue {
-        @Prop() private format: string;
-        @Prop() private value: string;
+        private format: string = "YY/MMM/DD HH:mm:ss";
+        @Prop() private value: Date;
 
-        set(){
-            $('.dropdown-menu').removeClass('show');
+        today() {
+            this.date = moment();
+            this.makeParts();
+            this.$forceUpdate();
         }
 
-        today(){
-            $('.dropdown-menu').removeClass('show');
+        yearChanged(e: { index: number, item }) {
+            this.date = this.date.year(e.index + 1900);
+            this.makeDays();
+            this.$forceUpdate();
         }
 
-        cancel(){
-            $('.dropdown-menu').removeClass('show');
+        monthChanged(e: { index: number, item }) {
+            this.date = this.date.month(e.index);
+            this.makeDays();
+            this.$forceUpdate();
         }
 
+        dayChanged(e: { index: number, item }) {
+            this.date = this.date.date(e.index + 1);
+            this.dayCaption = moment.weekdays()[this.date.day()];
+            this.$forceUpdate();
+        }
+
+        hourChanged(e: { index: number, item }) {
+            this.date = this.date.hour(e.index);
+            this.$forceUpdate();
+        }
+
+        minuteChanged(e: { index: number, item }) {
+            this.date = this.date.minute(e.index);
+            this.$forceUpdate();
+        }
+
+        secondChanged(e: { index: number, item }) {
+            this.date = this.date.second(e.index);
+            this.$forceUpdate();
+        }
+
+        ampmChanged(e: { index: number, item }) {
+            this.date = this.date.hour(e.index == 0 ? this.date.hour % 12 : 12 + this.date.hour % 12);
+            this.$forceUpdate();
+        }
+
+        private date;
         private years = [];
-        private yearIndex = 0;
         private months = [];
-        private monthIndex = 0;
         private days = [];
-        private dayIndex = 0;
+        private yearCaption = "";
+        private monthCaption = "";
+        private dayCaption;
         private hours = [];
-        private hourIndex = 0;
         private minutes = [];
-        private minuteIndex = 0;
         private seconds = [];
-        private secondIndex = 0;
+        private amPm = [];
 
-        created() {
+        makeYears() {
+            let start, end;
+            if (/YY/.test(this.format)) {
+                this.yearCaption = "";
+                start = 1900;
+                end = 2050;
+            } else {
+                this.years = null;
+                return;
+            }
+
             this.years = [];
-            this.yearIndex = 120;
-            for (let i = 1900; i < 2050; i++) {
-                this.years.push(i.toString());
+            for (let i = start; i < end; i++) {
+                this.years.push(this.addZero(i.toString()));
             }
-
-            this.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            this.monthIndex = 0;
-
-            this.resetDays();
-
-            this.hours = [];
-            this.hourIndex = 0;
-            for (let i = 0; i < 24; i++) {
-                this.hours.push(this.addZero(i.toString()));
-            }
-
-            this.minutes = [];
-            this.minuteIndex = 0;
-            for (let i = 0; i < 60; i++) {
-                this.minutes.push(this.addZero(i.toString()));
-            }
-
-            this.seconds = [];
-            this.secondIndex = 0;
-            for (let i = 0; i < 60; i++) {
-                this.seconds.push(this.addZero(i.toString()));
-            }
-
         }
 
-        resetDays() {
-            this.days = [];
-            this.dayIndex = 0;
-            for (let i = 1; i < 31; i++) {
-                this.days.push(i.toString());
+        makeMonths() {
+            if (/MMM/.test(this.format)) {
+                this.monthCaption = "";
+                this.months = moment.monthsShort();
+            } else if (/M/.test(this.format)) {
+                this.yearCaption = "Year";
+                this.monthCaption = "Month";
+                this.months = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+            } else {
+                this.months = null;
+                return;
+            }
+        }
+
+        makeDays() {
+            if (/D/.test(this.format)) {
+                this.days = [];
+                for (let i = 1; i <= this.date.daysInMonth(); i++) {
+                    this.days.push(i.toString());
+                }
+                this.dayCaption = moment.weekdays()[this.date.day()];
+            } else {
+                this.days = null;
+            }
+        }
+
+        makeHours() {
+            if (/H/.test(this.format)) {
+                this.hours = [];
+                for (let i = 0; i < 24; i++) {
+                    this.hours.push(this.addZero(i.toString()));
+                }
+            } else if (/h/.test(this.format)) {
+                this.hours = [];
+                for (let i = 0; i < 12; i++) {
+                    this.hours.push(this.addZero(i.toString()));
+                }
+                this.amPm = ["AM", "PM"];
+            } else {
+                this.hours = null;
+            }
+        }
+
+        makeMinutes() {
+            if (/m/i.test(this.format)) {
+                this.minutes = [];
+                for (let i = 0; i < 60; i++) {
+                    this.minutes.push(this.addZero(i.toString()));
+                }
+            } else {
+                this.minutes = null;
+            }
+        }
+
+        makeSeconds() {
+            if (/s/i.test(this.format)) {
+                this.seconds = [];
+                for (let i = 0; i < 60; i++) {
+                    this.seconds.push(this.addZero(i.toString()));
+                }
+            } else {
+                this.seconds = null;
             }
         }
 
         addZero(num) {
             return num < 10 ? '0' + num : num;
+        }
+
+        created() {
+            this.date = this.value ? moment(this.value) : moment();
+            this.makeParts();
+        }
+
+        makeParts() {
+            this.makeYears();
+            this.makeMonths();
+            this.makeDays();
+            this.makeHours();
+            this.makeMinutes();
+            this.makeSeconds();
+        }
+
+        @Emit('changed')
+        changed() {
+            return {value: this.date};
+        }
+
+        @Emit('canceled')
+        cancel() {
+            return {};
         }
     }
 </script>

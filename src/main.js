@@ -363,6 +363,11 @@ function handleWindowEvents() {
         if (exports.glob.cmenu.show)
             handleCmenuKeys(e);
         exports.glob.notify = null;
+        switch (e.which) {
+            case types_2.Keys.esc:
+                $('.dropdown-menu').removeClass('show'); // date time picker
+                break;
+        }
     })
         .on("click", (e) => {
         let el = e.target;
