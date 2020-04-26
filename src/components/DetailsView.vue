@@ -106,7 +106,9 @@
                 glob.headFuncs = [
                     {
                         title: $t("new-item"), name: "string", exec: () => {
-                            let newItem = {_id: uuidv4(), _: {marked: false, dec: this.dec} as EntityMeta};
+                            let uri = this.uri + "/" + props[0].name;
+                            let dec = glob.form.declarations[uri];
+                            let newItem = {_id: uuidv4(), _: {marked: false, dec} as EntityMeta};
                             this.dec.properties.forEach(prop => newItem[prop.name] = null);
                             // if (this.dec.reorderable)
                             //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;
@@ -114,7 +116,7 @@
                             main.dispatchStoreModify(this, {
                                 type: ChangeType.InsertItem,
                                 item: newItem,
-                                uri: this.uri + "/" + props[0].name,
+                                uri,
                                 vue: this
                             } as StateChange);
                         }
