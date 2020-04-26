@@ -87,6 +87,7 @@
 
         li {
             cursor: pointer;
+            white-space: nowrap;
 
             &.level0 {
                 font-weight: bold;

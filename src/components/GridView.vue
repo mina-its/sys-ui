@@ -1,9 +1,9 @@
 <template>
-    <div :class="'grid-view' + (root?' p-4':'')" @scroll="onScroll()">
+    <div :class="{'grid-view':true, 'p-4':root}" @scroll="onScroll()">
         <!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->
         <!--            <filter-item :item="item" :key="item.id" v-for="item in dec.filter.items" :dec="dec"></filter-item>-->
         <!--        </div>-->
-        <table :class="{'table table-sm':true, 'table-box':root}">
+        <table :class="{'table table-sm':true, 'grid-view-box':root}">
             <thead>
             <tr>
                 <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
@@ -311,8 +311,8 @@
         }
 
         rowMove(up: boolean, uri: string) {
-            console.log(1);
-            main.commitReorderItems(this.$store, this.items, up, uri);
+            let item = this.items.find(item => item._.marked);
+            main.commitReorderItems(this.$store, this.items, up, uri, item);
         }
     }
 </script>
@@ -321,16 +321,16 @@
     $left: var(--left);
     $right: var(--right);
 
+    .grid-view-box {
+        border-radius: 2px;
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    }
+
     .grid-view {
 
         table {
             background: #fff;
             /*color: rgba(0, 0, 0, 0.54);*/
-        }
-
-        .table-box {
-            border-radius: 2px;
-            box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
         }
 
         td, th {

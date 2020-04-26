@@ -994,13 +994,26 @@ function _commitServerChangeResponse(store, arg: { modify: Modify, res: any }) {
     }
 }
 
-export function commitReorderItems(store, items: IData[], up: boolean, uri: string) {
-    store.commit('_commitReorderItems', {items, up, uri});
+export function sort(array: any[], prop: string): void {
+    function compare(a, b) {
+        if (a[prop] < b[prop]) {
+            return -1;
+        }
+        if (a[prop] > b[prop]) {
+            return 1;
+        }
+        return 0;
+    }
+
+    array.sort(compare);
+}
+
+export function commitReorderItems(store, items: IData[], up: boolean, uri: string, item: any) {
+    store.commit('_commitReorderItems', {items, up, uri, item});
 }
 
 function _commitReorderItems(store, arg) {
-    let {items, up, uri} = arg as { items: IData[], up: boolean, uri: string };
-    let item = items.find(item => item._.marked);
+    let {items, up, uri, item} = arg as { items: IData[], up: boolean, uri: string, item: any };
     let index = items.indexOf(item);
     if ((up && index == 0) || (!up && index == items.length - 1)) return;
     glob.dirty = true;

@@ -935,13 +935,25 @@ function _commitServerChangeResponse(store, arg) {
             break;
     }
 }
-function commitReorderItems(store, items, up, uri) {
-    store.commit('_commitReorderItems', { items, up, uri });
+function sort(array, prop) {
+    function compare(a, b) {
+        if (a[prop] < b[prop]) {
+            return -1;
+        }
+        if (a[prop] > b[prop]) {
+            return 1;
+        }
+        return 0;
+    }
+    array.sort(compare);
+}
+exports.sort = sort;
+function commitReorderItems(store, items, up, uri, item) {
+    store.commit('_commitReorderItems', { items, up, uri, item });
 }
 exports.commitReorderItems = commitReorderItems;
 function _commitReorderItems(store, arg) {
-    let { items, up, uri } = arg;
-    let item = items.find(item => item._.marked);
+    let { items, up, uri, item } = arg;
     let index = items.indexOf(item);
     if ((up && index == 0) || (!up && index == items.length - 1))
         return;

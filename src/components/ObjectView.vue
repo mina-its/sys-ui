@@ -1,5 +1,3 @@
-import {ObjectDetailsViewType} from "../../../sys/src/types";
-import {ObjectListsViewType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {
@@ -7,10 +5,9 @@ import {ObjectListsViewType} from "../../../sys/src/types";
         NewItemMode,
         ObjectDec,
         ObjectListsViewType,
-        ObjectViewType,
         ObjectDetailsViewType
     } from "../../../sys/src/types";
-    import {glob} from '../main';
+    import {glob} from '@/main';
     import pluralize = require('pluralize');
 
     @Component({name: 'ObjectView'})
@@ -39,23 +36,17 @@ import {ObjectListsViewType} from "../../../sys/src/types";
                 switch (viewType) {
                     default:
                     case ObjectListsViewType.Grid:
-                        ce('grid-view', {props: {uri: e.obj.ref, root: rt, dec}});
-                        break;
+                        return ce('grid-view', {props: {uri: e.obj.ref, root: rt, dec}});
 
                     case ObjectListsViewType.Card:
-                        ce('card-view', {props: {uri: e.obj.ref, root: rt, dec}});
-                        break;
+                        return ce('card-view', {props: {uri: e.obj.ref, root: rt, dec}});
                 }
             } else {
                 let viewType = (dec as ObjectDec).detailsViewType || ObjectDetailsViewType.Tabular;
-                switch (viewType) {
-                    default:
-                        ce('details-view', {props: {uri: e.obj.ref, root: rt, dec}});
-                        break;
-
-                    case ObjectDetailsViewType.Tree:
-                        return ce('tree-view', {props: {uri: e.obj.ref}});
-                }
+                if (viewType === ObjectDetailsViewType.Tree)
+                    return ce('tree-view', {props: {uri: e.obj.ref}});
+                else
+                    return ce('details-view', {props: {uri: e.obj.ref, root: rt, dec}});
             }
         }
     }

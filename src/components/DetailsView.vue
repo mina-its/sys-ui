@@ -10,7 +10,8 @@
             </ul>
         </aside>
         <div :class="{'p-4':root, 'border rounded': !root && dec.detailsViewType===2}">
-            <div v-if="groupVisible(group)" :class="{'py-4':dec.detailsViewType===2, 'gp':root}" v-for="group in groups"
+            <div v-if="groupVisible(group)" :class="groupPanelStyle(group)"
+                 v-for="group in groups"
                  :id="getGroupId(group)">
                 <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
                 <div class="group">
@@ -28,14 +29,15 @@
 </template>
 
 <script lang="ts">
-    import {ItemChangeEventArg, StateChange, ChangeType, JQuery} from '@/types';
+    import {ChangeType, ItemChangeEventArg, JQuery, StateChange} from '@/types';
     import {Component, Prop as ComProp, Vue, Watch} from 'vue-property-decorator';
-    import {ObjectDetailsViewType, ObjectDec, Context} from "../../../sys/src/types";
-    import {glob} from '@/main';
-
-    declare let $: JQuery;
+    import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta} from "../../../sys/src/types";
+    import {$t, glob} from '@/main';
     import * as main from '../main';
     import Prop from "@/components/Prop.vue";
+    import {v4 as uuidv4} from 'uuid';
+
+    declare let $: JQuery;
 
     @Component({name: 'DetailsView', components: {Prop}})
     export default class DetailsView extends Vue {
@@ -44,6 +46,23 @@
         @ComProp() private dec: ObjectDec;
 
         currentGroup: string = this.groups[0];
+
+        groupPanelStyle(group: string): string {
+            let style = this.dec.detailsViewType === ObjectDetailsViewType.Tabular ? 'py-4' : "";
+            let props = this.getProps(group);
+            if (props && props.length == 1) {
+                let theProp = props[0];
+                if (theProp.isList) {
+                    if (theProp.listsViewType == ObjectListsViewType.Card)
+                        return "";
+                    else if (this.root)
+                        return "grid-view-box";
+                }
+            }
+
+            if (this.root) style += " gp";
+            return style;
+        }
 
         mounted() {
             if (this.root) {
@@ -81,6 +100,28 @@
                     }, 0
                 );
             }
+
+            let props = this.getProps(this.currentGroup);
+            if (props && props.length == 1 && props[0].isList) {
+                glob.headFuncs = [
+                    {
+                        title: $t("new-item"), name: "string", exec: () => {
+                            let newItem = {_id: uuidv4(), _: {marked: false, dec: this.dec} as EntityMeta};
+                            this.dec.properties.forEach(prop => newItem[prop.name] = null);
+                            // if (this.dec.reorderable)
+                            //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;
+
+                            main.dispatchStoreModify(this, {
+                                type: ChangeType.InsertItem,
+                                item: newItem,
+                                uri: this.uri + "/" + props[0].name,
+                                vue: this
+                            } as StateChange);
+                        }
+                    }
+                ];
+            } else
+                glob.headFuncs = [];
         }
 
         nonGroupVisible() {
@@ -96,6 +137,8 @@
         }
 
         groupHeadVisible(group) {
+            let props = this.getProps(group);
+            // if (props && props.length == 1 && props[0].isList) return true;
             return this.root && this.dec.detailsViewType == ObjectDetailsViewType.Tabular;
         }
 
@@ -162,6 +205,7 @@
 </script>
 
 <style lang="scss">
+
     .details-view {
         scroll-behavior: smooth;
         min-width: 100%;
