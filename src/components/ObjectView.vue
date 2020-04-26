@@ -1,9 +1,17 @@
+import {ObjectDetailsViewType} from "../../../sys/src/types";
+import {ObjectListsViewType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, LogType, ObjectViewType, ObjectDec, NewItemMode} from "../../../sys/src/types";
+    import {
+        Elem,
+        NewItemMode,
+        ObjectDec,
+        ObjectListsViewType,
+        ObjectViewType,
+        ObjectDetailsViewType
+    } from "../../../sys/src/types";
     import {glob} from '../main';
     import pluralize = require('pluralize');
-    import * as main from '../main';
 
     @Component({name: 'ObjectView'})
     export default class ObjectView extends Vue {
@@ -24,13 +32,30 @@
             if (!dec) throw `dec is empty for ref '${e.obj.ref}'`;
             glob.form.toolbar = true;
             let rt = this.root == null ? true : this.root;
-            if (e.obj && e.obj.type == ObjectViewType.TreeView)
-                return ce('tree-view', {props: {uri: e.obj.ref}});
-            else {
-                glob.newItemButton = Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
-                return Array.isArray(data) ?
-                    ce('grid-view', {props: {uri: e.obj.ref, root: rt, dec}}) :
-                    ce('details-view', {props: {uri: e.obj.ref, root: rt, dec}});
+            glob.newItemButton = Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
+
+            if (Array.isArray(data)) {
+                let viewType = (dec as ObjectDec).listsViewType || ObjectListsViewType.Grid;
+                switch (viewType) {
+                    default:
+                    case ObjectListsViewType.Grid:
+                        ce('grid-view', {props: {uri: e.obj.ref, root: rt, dec}});
+                        break;
+
+                    case ObjectListsViewType.Card:
+                        ce('card-view', {props: {uri: e.obj.ref, root: rt, dec}});
+                        break;
+                }
+            } else {
+                let viewType = (dec as ObjectDec).detailsViewType || ObjectDetailsViewType.Tabular;
+                switch (viewType) {
+                    default:
+                        ce('details-view', {props: {uri: e.obj.ref, root: rt, dec}});
+                        break;
+
+                    case ObjectDetailsViewType.Tree:
+                        return ce('tree-view', {props: {uri: e.obj.ref}});
+                }
             }
         }
     }

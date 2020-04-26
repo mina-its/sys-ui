@@ -251,8 +251,6 @@
             ];
 
             if (e.item._id && main.getBsonId(e.item)) {
-                if (this.root)
-                    items.unshift({ref: 'tree', title: $t('tree-view')});
                 items.unshift({ref: 'details', title: $t('details')});
             }
 
