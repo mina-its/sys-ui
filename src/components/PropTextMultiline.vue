@@ -7,6 +7,7 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
     import {ItemChangeEventArg, PropEventArg} from '../types';
+    import {glob} from "@/main";
 
     @Component({name: 'PropTextMultiline'})
     export default class PropTextMultiline extends Vue {
@@ -15,8 +16,36 @@
 
         @Emit('changed')
         update(e): ItemChangeEventArg {
-            let val = e.target.value;
-            if (val === "") val = null;
+            let text = e.target.value;
+            if (text === "") text = null;
+            let val = this.doc[this.prop.name];
+
+            if (this.prop.text && this.prop.text.multiLanguage) {
+                if (val == null)
+                    this.$set(this.doc, this.prop.name, {});
+
+                if (glob.config.locale) {
+                    if (typeof val == 'string') {
+                        let oldValue = val;
+                        val = {};
+                        val[glob.config.defaultLocale] = oldValue;
+                        val[glob.config.locale] = text;
+                        this.$set(this.doc, this.prop.name, val);
+                    } else
+                        val = val || {};
+
+                    this.$set(this.doc[this.prop.name], glob.config.locale, text);
+                    val[glob.config.locale] = text;
+                } else {
+                    if (val && typeof val == 'object' && glob.config.defaultLocale) {
+                        this.$set(this.doc[this.prop.name], glob.config.defaultLocale, text);
+                        val[glob.config.defaultLocale] = text;
+                    } else
+                        val = text;
+                }
+            } else
+                val = text;
+
             return {prop: this.prop, val, vue: this};
         }
 
