@@ -76,6 +76,8 @@
                         });
                     }
             }
+
+            this.reloadLastGroup();
         }
 
         getGroupId(group: string) {
@@ -90,8 +92,22 @@
             this.currentGroup = this.groups[0];
         }
 
+        saveLastGroup(item) {
+            if (typeof (Storage) === "undefined") return;
+            localStorage.setItem("_gp" + location.pathname, JSON.stringify(item));
+        }
+
+        reloadLastGroup() {
+            if (typeof (Storage) === "undefined") return;
+            let item = localStorage.getItem("_gp" + location.pathname);
+            if (item)
+                this.selectGroup(JSON.parse(item));
+        }
+
         selectGroup(item) {
             this.currentGroup = item.title;
+            this.saveLastGroup(item);
+
             history.pushState(null, null, item.ref);
             if (this.dec.detailsViewType == ObjectDetailsViewType.Tabular) {
                 let $dv = $(".details-view");
