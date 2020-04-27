@@ -36,6 +36,7 @@ export interface Moment {
 
 export const Constants = {
     redirectBack: '_back',
+    errorEmbedProperty: 'e',
     redirectSelf: '_self',
     notifyEvent: 'notify',
     defaultAddress: '/_default',

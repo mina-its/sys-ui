@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("../../sys/src/types");
 exports.Constants = {
     redirectBack: '_back',
+    errorEmbedProperty: 'e',
     redirectSelf: '_self',
     notifyEvent: 'notify',
     defaultAddress: '/_default',

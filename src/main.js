@@ -694,12 +694,23 @@ function del_link(href) {
 }
 exports.del_link = del_link;
 function setPropertyEmbeddedError(doc, propName, error) {
-    console.assert(doc, `setPropertyEmbeddedError doc is empty, prop:${propName}!`);
-    doc._ = doc._ || {};
-    doc._[propName] = doc._[propName] || {};
-    doc._[propName].err = error;
+    if (error) {
+        doc._ = doc._ || {};
+        doc._[types_1.Constants.errorEmbedProperty] = doc._[types_1.Constants.errorEmbedProperty] || {};
+        doc._[types_1.Constants.errorEmbedProperty][propName] = error;
+    }
+    else if (doc && doc._ && doc._[types_1.Constants.errorEmbedProperty]) {
+        delete doc._[types_1.Constants.errorEmbedProperty][propName];
+    }
 }
 exports.setPropertyEmbeddedError = setPropertyEmbeddedError;
+function getPropertyEmbedError(doc, propName) {
+    if (doc && doc._ && doc._[types_1.Constants.errorEmbedProperty])
+        return doc._[types_1.Constants.errorEmbedProperty][propName];
+    else
+        return null;
+}
+exports.getPropertyEmbedError = getPropertyEmbedError;
 function load(href, pushState = false) {
     if (exports.glob.dirty) {
         notify($t('save-before'), types_2.LogType.Warning);

@@ -1,6 +1,6 @@
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, ElemType, EmbeddedInfo, GlobalType, ObjectViewType, Property} from "../../../sys/src/types";
+    import {Elem, ElemType, GlobalType, ObjectViewType, Property} from "../../../sys/src/types";
     import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '../types';
     import PropBoolean from "@/components/PropBoolean.vue";
     import PropFile from "@/components/PropFile.vue";
@@ -14,6 +14,7 @@
     import PropTime from "@/components/PropTime.vue";
     import PropReferenceMultiple from "@/components/PropReferenceMultiple.vue";
     import * as main from '../main';
+    import {getPropertyEmbedError} from '../main';
 
     @Component({
         name: 'ElemProp',
@@ -91,9 +92,9 @@
             }
 
             let vl = this.renderValue(ce, valueClass);
-            let embed: EmbeddedInfo = this.item && this.item._ && this.item._[this.prop.name];
+            let embedErr = getPropertyEmbedError(this.item, this.prop.name);
             let msg = null;
-            if (embed) msg = ce('prop-message', {props: {message: embed.err}});
+            if (embedErr) msg = ce('prop-message', {props: {message: embedErr}});
             let cmt = this.prop.comment ? ce('p', {attrs: {"class": "prop-comment mt-3 p-2"}}, [
                 ce('i', {attrs: {"class": "fa fa-info-circle m-1 fa-lg"}},),
                 ce('span', {attrs: {"class": "ml-3"}, domProps: {'innerHTML': main.markDown(this.prop.comment)}}),

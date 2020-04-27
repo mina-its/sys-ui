@@ -38,7 +38,6 @@ import {
     AjaxConfig,
     DirFile,
     Drive,
-    EmbeddedInfo,
     FunctionDec,
     IData,
     IError,
@@ -733,10 +732,21 @@ export function del_link(href) {
 }
 
 export function setPropertyEmbeddedError(doc: any, propName: string, error: string) {
-    console.assert(doc, `setPropertyEmbeddedError doc is empty, prop:${propName}!`);
-    doc._ = doc._ || {};
-    doc._[propName] = doc._[propName] || {};
-    (doc._[propName] as EmbeddedInfo).err = error;
+    if (error) {
+        doc._ = doc._ || {};
+        doc._[Constants.errorEmbedProperty] = doc._[Constants.errorEmbedProperty] || {};
+        doc._[Constants.errorEmbedProperty][propName] = error;
+    } else if (doc && doc._ && doc._[Constants.errorEmbedProperty]) {
+        delete doc._[Constants.errorEmbedProperty][propName];
+    }
+}
+
+export function getPropertyEmbedError(doc: any, propName: string): string {
+    if (doc && doc._ && doc._[Constants.errorEmbedProperty])
+        return doc._[Constants.errorEmbedProperty][propName];
+    else
+        return null;
+
 }
 
 export function load(href: string, pushState = false) {
