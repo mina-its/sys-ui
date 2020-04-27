@@ -1,62 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
-;
-class {
-}
-"{'card-view w-100':true,'p-2':root}" >
-    class {
-    };
-"d-flex flex-wrap" >
-    class {
-    };
-"";
-v - ;
-for ( = "item in items" >
-    class {
-    };  = "card m-2"; style = "width: 540px;")
-    tabindex = "0" >
-    ;
-"clickMenu($event, item)";
-class {
-}
-"card-header" >
-    {};
-{
-    getTitle(item);
-}
-/span>
-    < i;
-class {
-}
-"fa fa-cog fa-lg text-muted float-right mt-1" > /i>
-    < /div>
-    < div;
-class {
-}
-"card-body details-view" >
-    v - ;
-for ( = "prop in dec.properties"; ; )
-    : key = "prop.name";
-item = "item";
-prop = "prop";
-"changed";
-viewType = "2" > /Prop>
-    < /div>
-    < /div>
-    < /div>
-    < /div>
-    < /div>
-    < /template>
-    < script;
-lang = "ts" >
-;
 const types_1 = require("@/types");
 const vue_property_decorator_1 = require("vue-property-decorator");
 const types_2 = require("../../../sys/src/types");
 const main_1 = require("@/main");
 const main = tslib_1.__importStar(require("../main"));
-const Prop_vue_1 = tslib_1.__importDefault(require("@/components/Prop.vue"));
+const ElemProp_vue_1 = tslib_1.__importDefault(require("@/components/ElemProp.vue"));
 let CardView = class CardView extends vue_property_decorator_1.Vue {
     get items() {
         let _items = this.$store.state.data[this.uri] || [];
@@ -130,22 +80,7 @@ tslib_1.__decorate([
     vue_property_decorator_1.Prop()
 ], CardView.prototype, "dec", void 0);
 CardView = tslib_1.__decorate([
-    vue_property_decorator_1.Component({ name: 'CardView', components: { Prop: Prop_vue_1.default } })
+    vue_property_decorator_1.Component({ name: 'CardView', components: { ElemProp: ElemProp_vue_1.default } })
 ], CardView);
 exports.default = CardView;
-/script>
-    < style;
-scoped;
-lang = "scss" >
-        .card - view;
-figure;
-{
-    text - align;
-    right;
-}
-card - view.card;
-{
-    outline: none;
-}
-/style>;
 //# sourceMappingURL=CardView.vue.js.map

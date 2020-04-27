@@ -8,8 +8,8 @@
                         <i class="fa fa-cog fa-lg text-muted float-right mt-1"></i>
                     </div>
                     <div class="card-body details-view">
-                        <Prop v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
-                              @changed="changed" :viewType="2"></Prop>
+                        <ElemProp v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
+                                  @changed="changed" :viewType="2"></ElemProp>
                     </div>
                 </div>
             </div>
@@ -19,17 +19,17 @@
 
 <script lang="ts">
     import {ItemChangeEventArg, StateChange, ChangeType, JQuery, MenuItem} from '@/types';
-    import {Component, Prop as ComProp, Vue, Watch} from 'vue-property-decorator';
+    import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import {ObjectDec, Context, IData, LogType} from "../../../sys/src/types";
     import {glob, $t, showCmenu, someProps} from '@/main';
     import * as main from '../main';
-    import Prop from "@/components/Prop.vue";
+    import ElemProp from "@/components/ElemProp.vue";
 
-    @Component({name: 'CardView', components: {Prop}})
+    @Component({name: 'CardView', components: {ElemProp}})
     export default class CardView extends Vue {
-        @ComProp() private uri: string;
-        @ComProp() private root: boolean;
-        @ComProp() private dec: ObjectDec;
+        @Prop() private uri: string;
+        @Prop() private root: boolean;
+        @Prop() private dec: ObjectDec;
 
         get items(): IData[] {
             let _items = this.$store.state.data[this.uri] || [];

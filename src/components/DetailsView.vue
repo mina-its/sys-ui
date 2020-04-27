@@ -30,20 +30,20 @@
 
 <script lang="ts">
     import {ChangeType, ItemChangeEventArg, JQuery, StateChange} from '@/types';
-    import {Component, Prop as ComProp, Vue, Watch} from 'vue-property-decorator';
+    import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta} from "../../../sys/src/types";
     import {$t, glob} from '@/main';
     import * as main from '../main';
-    import Prop from "@/components/Prop.vue";
+    import ElemProp from "@/components/ElemProp.vue";
     import {v4 as uuidv4} from 'uuid';
 
     declare let $: JQuery;
 
-    @Component({name: 'DetailsView', components: {Prop}})
+    @Component({name: 'DetailsView', components: {ElemProp}})
     export default class DetailsView extends Vue {
-        @ComProp() private uri: string;
-        @ComProp() private root: boolean;
-        @ComProp() private dec: ObjectDec;
+        @Prop() private uri: string;
+        @Prop() private root: boolean;
+        @Prop() private dec: ObjectDec;
 
         currentGroup: string = this.groups[0];
 

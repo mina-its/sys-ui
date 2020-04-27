@@ -5,25 +5,22 @@
         </th>
         <th v-else @click="headerClick" class="text-center"></th>
         <td v-for="(pMeta, index) in item._.dec.properties">
-            <Prop @focus="focused" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
-                  :viewType="1" :indexInGrid="index"></Prop>
+            <ElemProp @focus="focused" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
+                  :viewType="1" :indexInGrid="index"></ElemProp>
         </td>
     </tr>
 </template>
 
 <script lang="ts">
-    import {Component, Prop as ComProp, Vue, Emit} from 'vue-property-decorator';
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, EntityMeta, IData} from "../../../sys/src/types";
     import {ItemChangeEventArg, ItemEventArg, JQuery} from '@/types';
 
     declare let $: JQuery;
-    import CheckBox from "@/components/CheckBox.vue";
-    import Prop from "@/components/Prop.vue";
-
-    @Component({name: 'GridViewRow', components: {Prop, CheckBox}})
+    @Component({name: 'GridViewRow', components: {}})
     export default class GridViewRow extends Vue {
-        @ComProp() private item: IData;
-        @ComProp() private selectable: boolean;
+        @Prop() private item: IData;
+        @Prop() private selectable: boolean;
 
         focused(e, prop: Property) {
             $(".prop-focused").removeClass("prop-focused");

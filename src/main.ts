@@ -852,21 +852,6 @@ function registerComponents(vue, components) {
         Vue.component(componentName, componentConfig.default || componentConfig)
     });
 
-    // vue.component('Function', require("@/components/Function.vue").default);
-    // vue.component('Panel', require("@/components/Panel.vue").default);
-    // vue.component('Modal', require("@/components/Modal.vue").default);
-    // vue.component('Prop', require("@/components/Prop.vue").default);
-    // vue.component('ObjectView', require("@/components/ObjectView.vue").default);
-    // vue.component('DocumentEditor', require("@/components/DocumentEditor.vue").default);
-    // vue.component('FormElem', require("@/components/FormElem.vue").default);
-    // vue.component('GridView', require("@/components/GridView.vue").default);
-    // vue.component('DetailsView', require("@/components/DetailsView.vue").default);
-    // vue.component('CheckBox', require("@/components/CheckBox.vue").default);
-    // vue.component('LogTerminal', require("@/components/LogTerminal.vue").default);
-    // vue.component('ApiDoc', require("@/components/ApiDoc.vue").default);
-    // vue.component('SysDashboard', require("@/components/SysDashboard.vue").default);
-    // vue.component('FormView', require("@/components/FormView.vue").default);
-
     if (components) {
         for (let name in components) {
             vue.component(name, components[name]);

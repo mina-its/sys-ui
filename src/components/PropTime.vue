@@ -5,7 +5,7 @@
                    :name="viewType!=1 ? prop.name : null"
                    @blur="update" class="flex-grow-1 border-0 mx-2">
             <div class="dropdown">
-                <i class="fa fa-calendar" @click="click"></i>
+                <i :class="{'fa':true, 'fa-clock-o': !datePick, 'fa-calendar': datePick}" @click="click"></i>
                 <div v-if="showPicker" class="dropdown-menu dropdown-menu-right p-0 mt-1 show">
                     <DateTimePicker :format="format" :value="value" @changed="changed"
                                     @canceled="canceled"></DateTimePicker>
@@ -45,6 +45,10 @@
         changed(val): ItemChangeEventArg {
             this.showPicker = false;
             return {prop: this.prop, val: val.value, vue: this};
+        }
+
+        get datePick() {
+            return /D/.test(this.format) || /Y/.test(this.format);
         }
 
         canceled() {

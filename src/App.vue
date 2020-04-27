@@ -37,11 +37,10 @@
     import ProgressBar from "@/components/ProgressBar.vue";
     import BrowseFile from "@/components/BrowseFile.vue";
     import {Component, Vue} from 'vue-property-decorator';
-    import {$t, hideCmenu, load, notify, glob} from "./main";
-    import {Constants, JQuery} from "./types";
+    import {glob} from "./main";
+    import {JQuery} from "./types";
 
     declare let $: JQuery;
-    import * as main from './main';
     import FormView from "@/components/FormView.vue";
 
     @Component({
