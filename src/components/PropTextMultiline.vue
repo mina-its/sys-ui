@@ -8,6 +8,7 @@
     import {Property} from "../../../sys/src/types";
     import {ItemChangeEventArg, PropEventArg} from '../types';
     import {glob} from "@/main";
+    import * as main from '../main';
 
     @Component({name: 'PropTextMultiline'})
     export default class PropTextMultiline extends Vue {
@@ -55,7 +56,7 @@
         }
 
         get value() {
-            return this.doc[this.prop.name];
+            return main.getPropTextValue(this.prop, this.doc);
         }
     }
 </script>
