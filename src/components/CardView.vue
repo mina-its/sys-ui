@@ -8,8 +8,8 @@
                         <i class="fa fa-cog fa-lg text-muted float-right mt-1"></i>
                     </div>
                     <div class="card-body details-view">
-                        <ElemProp v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
-                                  @changed="changed" :viewType="2"></ElemProp>
+                        <Property v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
+                                  @changed="changed" :viewType="2"></Property>
                     </div>
                 </div>
             </div>

@@ -5,8 +5,8 @@
         </th>
         <th v-else @click="headerClick" class="text-center"></th>
         <td v-for="(pMeta, index) in item._.dec.properties">
-            <ElemProp @focus="focused" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
-                  :viewType="1" :indexInGrid="index"></ElemProp>
+            <Property @focus="focused" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
+                  :viewType="1" :indexInGrid="index"></Property>
         </td>
     </tr>
 </template>

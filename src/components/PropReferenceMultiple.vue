@@ -46,7 +46,7 @@
         @Emit('changed')
         remove(item: Pair) {
             let val = this.doc[this.prop.name];
-            val = val.filter(v => !main.equalRef(v, item.ref));
+            val = val.filter(v => !main.equalID(v, item.ref));
             return {prop: this.prop, val, vue: this};
         }
 
@@ -80,7 +80,7 @@
         get items(): Pair[] {
             let items: Pair[] = [];
             for (const v of this.value) {
-                let item = this.prop._.items.find(i => main.equalRef(v, i.ref));
+                let item = this.prop._.items.find(i => main.equalID(v, i.ref));
                 if (item)
                     items.push(item);
                 else

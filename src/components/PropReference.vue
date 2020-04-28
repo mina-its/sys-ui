@@ -52,7 +52,7 @@
                     this.refreshText();
                     return;
                 }
-                if (!main.equalRef(this.doc[this.prop.name], item.ref)) {
+                if (!main.equalID(this.doc[this.prop.name], item.ref)) {
                     this.selectItem(item.ref);
                 }
             });

@@ -281,15 +281,15 @@ export function getPropTextValue(meta: Property, data): any {
         return val;
 }
 
-export function equalRef(ref1: any, ref2: any): boolean {
-    if (!ref1 && !ref2) {
+export function equalID(id1: any, id2: any): boolean {
+    if (!id1 && !id2) {
         return true;
-    } else if (!ref1 || !ref2) {
+    } else if (!id1 || !id2) {
         return false;
-    } else if (ref1.$oid) {
-        return ref1.$oid == ref2.$oid;
+    } else if (id1.$oid) {
+        return id1.$oid == id2.$oid;
     } else {
-        return ref1 == ref2;
+        return id1 == id2;
     }
 }
 
@@ -304,7 +304,7 @@ export function getPropReferenceValue(prop: Property, data: any): string {
 
         let values = [];
         for (const valItem of val) {
-            let item = prop._.items.find(i => equalRef(i.ref, valItem));
+            let item = prop._.items.find(i => equalID(i.ref, valItem));
             if (!item)
                 values.push('...');
             else
@@ -312,7 +312,7 @@ export function getPropReferenceValue(prop: Property, data: any): string {
         }
         return values.join(', ');
     } else {
-        let item = prop._.items.find(i => equalRef(i.ref, val));
+        let item = prop._.items.find(i => equalID(i.ref, val));
         if (!item) return '...';
         return item.title;
     }

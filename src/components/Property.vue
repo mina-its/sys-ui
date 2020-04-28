@@ -1,24 +1,24 @@
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, ElemType, GlobalType, ObjectViewType, Property} from "../../../sys/src/types";
+    import {Elem, ElemType, GlobalType, ObjectViewType, Property as ObjectProperty} from "../../../sys/src/types";
     import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
     import * as main from '../main';
     import {getPropertyEmbedError} from '@/main';
 
     @Component({
-        name: 'ElemProp',
+        name: 'Property',
         components: {}
     })
-    export default class ElemProp extends Vue {
+    export default class Property extends Vue {
         @Prop() private item: any;
-        @Prop() private prop: Property;
+        @Prop() private prop: ObjectProperty;
         @Prop() private viewType: any;
         @Prop() private labelMode: any;
         @Prop() private indexInGrid: any;
 
         render(ce) {
             if (!this.prop) {
-                console.error("error rendering 'ElemProp' component. prop is empty! item:", this.item);
+                console.error("error rendering 'Property' component. prop is empty! item:", this.item);
                 return ce('div', '...');
             }
             this.prop._ = this.prop._ || {gtype: GlobalType.string};
@@ -169,7 +169,7 @@
                     if (this.viewType == ObjectViewType.TreeView)
                         return null;
 
-                    if (this.viewType == ObjectViewType.DetailsView)
+                    if (this.viewType != ObjectViewType.GridView)
                         pr["label"] = this.prop.title;
 
                     return ce('prop-boolean', {
