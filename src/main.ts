@@ -749,6 +749,10 @@ export function getPropertyEmbedError(doc: any, propName: string): string {
 
 }
 
+export function call(funcName: string, data: any, done: (err, data?) => void) {
+    ajax("/" + funcName, data, null, res => done(null, res.data), err => done(err));
+}
+
 export function load(href: string, pushState = false) {
     if (glob.dirty) {
         notify($t('save-before'), LogType.Warning);

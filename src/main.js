@@ -711,6 +711,10 @@ function getPropertyEmbedError(doc, propName) {
         return null;
 }
 exports.getPropertyEmbedError = getPropertyEmbedError;
+function call(funcName, data, done) {
+    ajax("/" + funcName, data, null, res => done(null, res.data), err => done(err));
+}
+exports.call = call;
 function load(href, pushState = false) {
     if (exports.glob.dirty) {
         notify($t('save-before'), types_2.LogType.Warning);
