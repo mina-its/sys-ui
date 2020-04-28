@@ -255,7 +255,7 @@ function getPropReferenceValue(prop, data) {
     if (!data)
         return '';
     let val = data[prop.name];
-    if (!val)
+    if (val == null)
         return '';
     if (prop.isList) {
         if (!Array.isArray(val))

@@ -6,11 +6,13 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
-    import {glob} from '../main';;
+    import {glob} from '../main';
+
+    ;
     import {Constants, MenuItem, ItemChangeEventArg, PropEventArg} from '../types';
     import * as main from '../main';
 
-    @Component({name:'PropReference'})
+    @Component({name: 'PropReference'})
     export default class PropReference extends Vue {
         @Prop() private type: string;
         @Prop() private doc: any;
@@ -28,7 +30,7 @@
 
         update(e) {
             let val = (e.target as any).value;
-            let items = !val || (this.prop._.items.length < Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
+            let items = val == null || (this.prop._.items.length < Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
             items.forEach(item => (item as MenuItem).hover = val == item.title);
             this.showDropDown(items);
         }

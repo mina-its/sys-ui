@@ -294,7 +294,7 @@ export function equalRef(ref1: any, ref2: any): boolean {
 export function getPropReferenceValue(prop: Property, data: any): string {
     if (!data) return '';
     let val = data[prop.name];
-    if (!val) return '';
+    if (val == null) return '';
 
     if (prop.isList) {
         if (!Array.isArray(val))
