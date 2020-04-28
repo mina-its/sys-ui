@@ -48,11 +48,7 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {$t, glob} from '@/main';
     import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType, JQuery} from '@/types';
-    import GridViewRow from "@/components/GridViewRow.vue";
-    import FilterItem from "@/components/FilterItem.vue";
     import {v4 as uuidv4} from 'uuid';
-
-    declare let $: JQuery;
     import * as main from '../main';
     import {
         EntityMeta,
@@ -66,11 +62,11 @@
         ReqParams,
         IData
     } from '../../../sys/src/types';
-    import CheckBox from "@/components/CheckBox.vue";
+    declare let $: JQuery;
 
     @Component({
         name: 'GridView',
-        components: {CheckBox, GridViewRow, FilterItem}
+        components: {}
     })
     export default class GridView extends Vue {
         @Prop() private uri: string;

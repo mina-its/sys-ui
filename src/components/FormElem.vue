@@ -1,12 +1,10 @@
 <script lang="ts">
-    import Markdown from "@/components/Markdown.vue";
-    import AppChart from "@/components/AppChart.vue";
     import {Component, Prop as ComProp, Vue} from 'vue-property-decorator';
     import {Elem, ElemType, ObjectViewType, FunctionDec} from "../../../sys/src/types";
     import * as main from '../main';
     import {ChangeType, ItemChangeEventArg, StateChange} from '@/types';
 
-    @Component({name: 'FormElem', components: {AppChart, Markdown}})
+    @Component({name: 'FormElem', components: {}})
     export default class FormElem extends Vue {
         @ComProp() private elem: Elem;
 

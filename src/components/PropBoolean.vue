@@ -5,10 +5,9 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
-    import {ItemChangeEventArg} from '../types';
-    import CheckBox from "@/components/CheckBox.vue";
+    import {ItemChangeEventArg} from '@/types';
 
-    @Component({name: 'PropBoolean', components: {CheckBox}})
+    @Component({name: 'PropBoolean', components: {}})
     export default class PropBoolean extends Vue {
         @Prop() private prop: Property;
         @Prop() private doc: any;

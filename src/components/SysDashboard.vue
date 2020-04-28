@@ -20,11 +20,11 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {ObjectViewType, SysDashboardInfo} from "../../../sys/src/types";
-    import DashboardInfoBox from "@/components/DashboardInfoBox.vue";
+    import {SysDashboardInfo} from "../../../sys/src/types";
 
-    @Component({name: 'SysDashboard',
-        components: {DashboardInfoBox}
+    @Component({
+        name: 'SysDashboard',
+        components: {}
     })
     export default class SysDashboard extends Vue {
         @Prop() private data: SysDashboardInfo;

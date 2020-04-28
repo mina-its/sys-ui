@@ -1,1 +1,0 @@
-//# sourceMappingURL=MessageCard.vue.js.map

@@ -8,9 +8,8 @@
 
 <script lang="ts">
 	import {Component, Prop, Vue} from 'vue-property-decorator';
-	import FileDriveItem from "@/components/FileDriveItem.vue";
 
-	@Component({components: {FileDriveItem}, name: 'FileDrive'})
+	@Component({components: {}, name: 'FileDrive'})
 	export default class FileDrive extends Vue {
 		@Prop() private path: string;
 		@Prop() private files: any[];

@@ -58,9 +58,8 @@
     import {DirFile, LogType, DirFileType, YesNo, Pair, AjaxConfig} from '../../../sys/src/types';
     import {MenuItem, FunctionExecEventArg, Constants} from '@/types';
     import * as main from '../main';
-    import Function from "@/components/Function.vue";
 
-    @Component({name: 'FileGallery', components: {Function}})
+    @Component({name: 'FileGallery', components: {}})
     export default class FileGallery extends Vue {
         get glob() {
             return glob;

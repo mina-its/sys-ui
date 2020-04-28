@@ -31,12 +31,11 @@
 </template>
 
 <script lang="ts">
-    import FormElem from "@/components/FormElem.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob} from '../main';
+    import {glob} from '@/main';
     import * as main from '../main';
 
-    @Component({name: 'Modal', components: {FormElem}})
+    @Component({name: 'Modal', components: {}})
     export default class Modal extends Vue {
         @Prop() private title: string;
         @Prop() private footerElems: any[];

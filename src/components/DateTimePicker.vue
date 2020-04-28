@@ -27,12 +27,10 @@
 
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import Function from "@/components/Function.vue";
-    import RollPicker from "@/components/RollPicker.vue";
 
     declare let $, moment: any;
 
-    @Component({name: 'DateTimePicker', components: {RollPicker, Function}})
+    @Component({name: 'DateTimePicker', components: {}})
     export default class DateTimePicker extends Vue {
         @Prop() private format: string;
         @Prop() private value: Date;

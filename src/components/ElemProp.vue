@@ -1,36 +1,13 @@
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {Elem, ElemType, GlobalType, ObjectViewType, Property} from "../../../sys/src/types";
-    import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '../types';
-    import PropBoolean from "@/components/PropBoolean.vue";
-    import PropFile from "@/components/PropFile.vue";
-    import PropLink from "@/components/PropLink.vue";
-    import PropLocation from "@/components/PropLocation.vue";
-    import PropMessage from "@/components/PropMessage.vue";
-    import PropReference from "@/components/PropReference.vue";
-    import PropText from "@/components/PropText.vue";
-    import PropTextMultiline from "@/components/PropTextMultiline.vue";
-    import PropDocumentEditor from "@/components/PropDocumentEditor.vue";
-    import PropTime from "@/components/PropTime.vue";
-    import PropReferenceMultiple from "@/components/PropReferenceMultiple.vue";
+    import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
     import * as main from '../main';
-    import {getPropertyEmbedError} from '../main';
+    import {getPropertyEmbedError} from '@/main';
 
     @Component({
         name: 'ElemProp',
-        components: {
-            PropReferenceMultiple,
-            PropTime,
-            PropTextMultiline,
-            PropText,
-            PropReference,
-            PropMessage,
-            PropLocation,
-            PropLink,
-            PropFile,
-            PropDocumentEditor,
-            PropBoolean
-        }
+        components: {}
     })
     export default class ElemProp extends Vue {
         @Prop() private item: any;

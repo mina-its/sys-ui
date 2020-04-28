@@ -25,40 +25,13 @@
 </template>
 
 <script lang="ts">
-    import SideNav from "@/components/SideNav.vue";
-    import NavBar from '@/components/NavBar.vue';
-    import FormElem from "@/components/FormElem.vue";
-    import FileGallery from "@/components/FileGallery.vue";
-    import NotifyBox from "@/components/NotifyBox.vue";
-    import WebSocket from "@/components/WebSocket.vue";
-    import QuestionBox from "@/components/QuestionBox.vue";
-    import ContextMenu from "@/components/ContextMenu.vue";
-    import Toolbar from "@/components/Toolbar.vue";
-    import ProgressBar from "@/components/ProgressBar.vue";
-    import BrowseFile from "@/components/BrowseFile.vue";
     import {Component, Vue} from 'vue-property-decorator';
     import {glob} from "./main";
     import {JQuery} from "./types";
 
     declare let $: JQuery;
-    import FormView from "@/components/FormView.vue";
 
-    @Component({
-        components: {
-            FormView,
-            BrowseFile,
-            ProgressBar,
-            ContextMenu,
-            QuestionBox,
-            WebSocket,
-            NotifyBox,
-            FileGallery,
-            FormElem,
-            Toolbar,
-            SideNav,
-            NavBar
-        }
-    })
+    @Component({components: {}})
     export default class App extends Vue {
         mounted() {
             console.log(

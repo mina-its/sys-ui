@@ -19,13 +19,12 @@
 
 <script lang="ts">
     import {ItemChangeEventArg, StateChange, ChangeType, JQuery, MenuItem} from '@/types';
-    import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {ObjectDec, Context, IData, LogType} from "../../../sys/src/types";
-    import {glob, $t, showCmenu, someProps} from '@/main';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {ObjectDec, IData, LogType} from "../../../sys/src/types";
+    import {$t, showCmenu} from '@/main';
     import * as main from '../main';
-    import ElemProp from "@/components/ElemProp.vue";
 
-    @Component({name: 'CardView', components: {ElemProp}})
+    @Component({name: 'CardView', components: {}})
     export default class CardView extends Vue {
         @Prop() private uri: string;
         @Prop() private root: boolean;

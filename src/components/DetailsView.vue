@@ -34,12 +34,11 @@
     import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta} from "../../../sys/src/types";
     import {$t, glob} from '@/main';
     import * as main from '../main';
-    import ElemProp from "@/components/ElemProp.vue";
     import {v4 as uuidv4} from 'uuid';
 
     declare let $: JQuery;
 
-    @Component({name: 'DetailsView', components: {ElemProp}})
+    @Component({name: 'DetailsView', components: {}})
     export default class DetailsView extends Vue {
         @Prop() private uri: string;
         @Prop() private root: boolean;

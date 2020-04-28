@@ -33,10 +33,8 @@
 
 <script lang="ts">
     import {Component, Vue, Prop} from 'vue-property-decorator';
-    import AppLocaleMenu from "@/components/AppLocaleMenu.vue";
-    import AppUserLoginMenu from "@/components/AppUserLoginMenu.vue";
 
-    @Component({name: 'NavBar', components: {AppLocaleMenu, AppUserLoginMenu}})
+    @Component({name: 'NavBar', components: {}})
     export default class NavBar extends Vue {
         @Prop() private containerStyle: boolean;
 

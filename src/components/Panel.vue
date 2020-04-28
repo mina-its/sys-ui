@@ -2,9 +2,8 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {ElemType, Elem, PanelType, Orientation} from "../../../sys/src/types";
     import {glob} from '@/main';
-    import Modal from "@/components/Modal.vue";
 
-    @Component({name:'Panel', components: {Modal}})
+    @Component({name:'Panel', components: {}})
     export default class Panel extends Vue {
         @Prop() private elem: Elem;
 

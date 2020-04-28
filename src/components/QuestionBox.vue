@@ -28,14 +28,13 @@
 
 <script lang="ts">
     import {FunctionExecEventArg} from '@/types';
-    import Function from "@/components/Function.vue";
     import {Component, Vue} from 'vue-property-decorator';
     import {glob} from '@/main';
     import {Pair} from '../../../sys/src/types';
 
     declare let marked: any;
 
-    @Component({name: 'QuestionBox', components: {Function}})
+    @Component({name: 'QuestionBox', components: {}})
     export default class QuestionBox extends Vue {
         close() {
             glob.question.show = false;

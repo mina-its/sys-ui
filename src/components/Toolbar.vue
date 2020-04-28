@@ -27,14 +27,13 @@
 </template>
 
 <script lang="ts">
-    import Function from "@/components/Function.vue";
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob} from '../main';
+    import {glob} from '@/main';
     import {Keys} from '../../../sys/src/types';
-    import {FunctionExecEventArg} from '../types';
+    import {FunctionExecEventArg} from '@/types';
     import * as main from '../main';
 
-    @Component({name: 'Toolbar', components: {Function}})
+    @Component({name: 'Toolbar', components: {}})
     export default class Toolbar extends Vue {
         @Prop() private alwaysVisible: boolean;
 
