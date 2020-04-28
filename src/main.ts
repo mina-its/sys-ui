@@ -989,7 +989,7 @@ function _commitServerChangeResponse(store, arg: { modify: Modify, res: any }) {
     }
 }
 
-export function sort(array: any[], prop: string): void {
+export function sort(array: any[], prop: string = "_z"): any[] {
     function compare(a, b) {
         if (a[prop] < b[prop]) {
             return -1;
@@ -1001,6 +1001,7 @@ export function sort(array: any[], prop: string): void {
     }
 
     array.sort(compare);
+    return array;
 }
 
 export function commitReorderItems(store, items: IData[], up: boolean, uri: string, item: any) {

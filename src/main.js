@@ -932,7 +932,7 @@ function _commitServerChangeResponse(store, arg) {
             break;
     }
 }
-function sort(array, prop) {
+function sort(array, prop = "_z") {
     function compare(a, b) {
         if (a[prop] < b[prop]) {
             return -1;
@@ -943,6 +943,7 @@ function sort(array, prop) {
         return 0;
     }
     array.sort(compare);
+    return array;
 }
 exports.sort = sort;
 function commitReorderItems(store, items, up, uri, item) {
