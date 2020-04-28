@@ -14,7 +14,7 @@
         @Prop() private data: any;
 
         mounted() {
-            console.log(1);
+            console.log(2);
             let chartData = {labels: [], datasets: []};
             chartData.labels = this.data.series.map(s => s.x);
 
