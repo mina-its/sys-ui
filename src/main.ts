@@ -67,10 +67,12 @@ export function getText(text: string | MultilangText, useDictionary?: boolean): 
     if (typeof text == "string") {
         if (!useDictionary) return text;
         if (glob.texts[text]) return glob.texts[text];
+
         if (text.indexOf('.') == -1) {
             return glob.texts["sys." + text] || text.replace(/-/g, " ");
+        } else {
+            return text.replace(/^.+\./, "").replace(/-/g, " ");
         }
-        return text.replace(/-/g, " ");
     }
 
     let localeName = Locale[glob.config.locale];
@@ -750,7 +752,7 @@ export function getPropertyEmbedError(doc: any, propName: string): string {
 }
 
 export function call(funcName: string, data: any, done: (err, data?) => void) {
-    ajax("/" + funcName, data, null, res => done(null, res.data), err => done(err));
+    ajax(setQs('m', RequestMode.inline, false, funcName), data, null, res => done(null, flat2recursive(res.data)), err => done(err));
 }
 
 export function load(href: string, pushState = false) {

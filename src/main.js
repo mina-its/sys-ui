@@ -36,7 +36,9 @@ function getText(text, useDictionary) {
         if (text.indexOf('.') == -1) {
             return exports.glob.texts["sys." + text] || text.replace(/-/g, " ");
         }
-        return text.replace(/-/g, " ");
+        else {
+            return text.replace(/^.+\./, "").replace(/-/g, " ");
+        }
     }
     let localeName = types_2.Locale[exports.glob.config.locale];
     if (text[localeName])
@@ -712,7 +714,7 @@ function getPropertyEmbedError(doc, propName) {
 }
 exports.getPropertyEmbedError = getPropertyEmbedError;
 function call(funcName, data, done) {
-    ajax("/" + funcName, data, null, res => done(null, res.data), err => done(err));
+    ajax(setQs('m', types_2.RequestMode.inline, false, funcName), data, null, res => done(null, flat2recursive(res.data)), err => done(err));
 }
 exports.call = call;
 function load(href, pushState = false) {
