@@ -15,13 +15,13 @@
                  :id="getGroupId(group)">
                 <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
                 <div class="group">
-                    <Prop v-for="prop in getProps(group)" :key="prop.name" :item="item" :prop="prop" @changed="changed"
-                          :viewType="2"></Prop>
+                    <Property v-for="prop in getProps(group)" :key="prop.name" :item="item" :prop="prop" @changed="changed"
+                          :viewType="2"></Property>
                 </div>
             </div>
             <div v-if="nonGroupVisible()" :class="{'gp':root}">
-                <Prop v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
-                      @changed="changed" :viewType="2"></Prop>
+                <Property v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
+                      @changed="changed" :viewType="2"></Property>
             </div>
             <div v-if="root" class="h-25"></div>
         </div>

@@ -182,7 +182,7 @@
                         return ce('span', {attrs: {"class": styles + " text-success"}}, this.item[this.prop.name]);
 
                     return ce('prop-time', {
-                        attrs: {"class": "prop-time " + styles},
+                        attrs: {"class": "prop-time bg-white " + styles},
                         on: {changed: this.changed, keydown: this.keydown, focus: this.focused},
                         props: pr,
                     });
