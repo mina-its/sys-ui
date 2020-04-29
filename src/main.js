@@ -640,7 +640,7 @@ function getBsonId(item) {
     }
 }
 exports.getBsonId = getBsonId;
-function head_script(src) {
+function loadHeadScript(src) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
     }
@@ -649,8 +649,8 @@ function head_script(src) {
     script.setAttribute('type', 'text/javascript');
     document.head.appendChild(script);
 }
-exports.head_script = head_script;
-function body_script(src) {
+exports.loadHeadScript = loadHeadScript;
+function loadBodyScript(src) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
     }
@@ -659,15 +659,15 @@ function body_script(src) {
     script.setAttribute('type', 'text/javascript');
     document.body.appendChild(script);
 }
-exports.body_script = body_script;
-function del_script(src) {
+exports.loadBodyScript = loadBodyScript;
+function delScript(src) {
     const el = document.querySelector('script[src=\'' + src + '\']');
     if (el) {
         el.remove();
     }
 }
-exports.del_script = del_script;
-function head_link(href) {
+exports.delScript = delScript;
+function addHeadLink(href) {
     if (document.querySelector('link[href=\'' + href + '\']'))
         return;
     const link = document.createElement('link');
@@ -676,8 +676,8 @@ function head_link(href) {
     link.setAttribute('type', 'text/css');
     document.head.appendChild(link);
 }
-exports.head_link = head_link;
-function body_link(href) {
+exports.addHeadLink = addHeadLink;
+function loadBodyLink(href) {
     if (document.querySelector('link[href=\'' + href + '\']')) {
         return;
     }
@@ -687,14 +687,14 @@ function body_link(href) {
     link.setAttribute('type', 'text/css');
     document.body.appendChild(link);
 }
-exports.body_link = body_link;
-function del_link(href) {
+exports.loadBodyLink = loadBodyLink;
+function delLink(href) {
     const el = document.querySelector('link[href="' + href + '"]');
     if (el) {
         el.remove();
     }
 }
-exports.del_link = del_link;
+exports.delLink = delLink;
 function setPropertyEmbeddedError(doc, propName, error) {
     if (error) {
         doc._ = doc._ || {};

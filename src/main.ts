@@ -675,7 +675,7 @@ export function getBsonId(item: IData): string {
     }
 }
 
-export function head_script(src) {
+export function loadHeadScript(src) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
     }
@@ -685,7 +685,7 @@ export function head_script(src) {
     document.head.appendChild(script);
 }
 
-export function body_script(src) {
+export function loadBodyScript(src) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
     }
@@ -695,14 +695,14 @@ export function body_script(src) {
     document.body.appendChild(script);
 }
 
-export function del_script(src) {
+export function delScript(src) {
     const el = document.querySelector('script[src=\'' + src + '\']');
     if (el) {
         el.remove();
     }
 }
 
-export function head_link(href) {
+export function addHeadLink(href) {
     if (document.querySelector('link[href=\'' + href + '\']'))
         return;
 
@@ -713,7 +713,7 @@ export function head_link(href) {
     document.head.appendChild(link);
 }
 
-export function body_link(href) {
+export function loadBodyLink(href) {
     if (document.querySelector('link[href=\'' + href + '\']')) {
         return;
     }
@@ -725,7 +725,7 @@ export function body_link(href) {
     document.body.appendChild(link);
 }
 
-export function del_link(href) {
+export function delLink(href) {
     const el = document.querySelector('link[href="' + href + '"]');
 
     if (el) {
