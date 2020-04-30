@@ -819,6 +819,7 @@ function registerComponents(vue, components) {
             vue.component(name, components[name]);
         }
     }
+    vue.component("SysApp", App_vue_1.default);
 }
 function startVue(res, app, components) {
     try {

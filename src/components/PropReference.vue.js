@@ -1,6 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+;
+"$emit('focus', $event)";
+ref = "ctrl";
+v - bind;
+type = "type";
+"keydown";
+value = "value";
+"refreshText";
+"update";
+"update";
+class {
+}
+"form-control" >
+    /template>
+    < script;
+lang = "ts" >
+;
 const vue_property_decorator_1 = require("vue-property-decorator");
 const types_1 = require("../../../sys/src/types");
 const main_1 = require("../main");
@@ -63,4 +80,19 @@ PropReference = tslib_1.__decorate([
     vue_property_decorator_1.Component({ name: 'PropReference' })
 ], PropReference);
 exports.default = PropReference;
+/script>
+    < style;
+lang = "scss" >
+    $right;
+right;
+prop - reference;
+hover;
+{
+    background: url("/@sys-ui/images/updown.png");
+    no - repeat;
+    $right;
+    0;
+    center;
+}
+/style>;
 //# sourceMappingURL=PropReference.vue.js.map

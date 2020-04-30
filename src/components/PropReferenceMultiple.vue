@@ -95,6 +95,7 @@
     .prop-reference.ref-multi {
         outline: none;
         white-space: nowrap;
+        overflow: auto;
 
         textarea {
             outline: none;
