@@ -44,7 +44,7 @@
         showMenu(file, e) {
             if (this.prop.file && this.prop.file.drive) {
                 let items: MenuItem[] = [
-                    {ref: "", title: file.name + "(" + this.size(file) + ")"},
+                    {title: this.title(file) + "(" + this.size(file) + ")"},
                     {title: '-'},
                     {ref: "select", title: $t('select')},
                     {ref: "download", title: $t('download')},

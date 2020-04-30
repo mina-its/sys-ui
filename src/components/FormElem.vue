@@ -43,7 +43,7 @@
                     let prop = dec.properties.find(prop => prop.name == this.elem.property.name);
                     if (!prop) throw `error rendering property elem. property '${this.elem.property.name}' dec not found!`;
 
-                    let propElem = ce('prop', {
+                    let propElem = ce('Property', {
                         props: {
                             item,
                             prop,

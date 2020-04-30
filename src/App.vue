@@ -31,7 +31,7 @@
 
     declare let $: JQuery;
 
-    @Component({components: {}})
+    @Component({name: "App", components: {}})
     export default class App extends Vue {
         mounted() {
             console.log(
