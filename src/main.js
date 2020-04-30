@@ -154,7 +154,7 @@ function validateData(data, ref) {
     let requiredProps = meta.dec.properties.filter(p => p.required);
     for (const prop of requiredProps) {
         if (data[prop.name] == null) {
-            notify(`Property '${prop.name}' is required.`, types_2.LogType.Warning);
+            notify(`Property '${prop.title}' is required.`, types_2.LogType.Warning);
             // if (!Array.isArray(glob.glob.form.dataset[ref]))
             // 	data._error = `Property '${prop.name}' is required.`;
             return false;

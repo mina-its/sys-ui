@@ -94,8 +94,8 @@
 <style lang="scss">
     .prop-reference.ref-multi {
         outline: none;
-        white-space: nowrap;
-        overflow: auto;
+        /*white-space: nowrap;*/
+        /*overflow: hidden;*/
 
         textarea {
             outline: none;
