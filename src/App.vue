@@ -83,6 +83,22 @@
     $left: var(--left);
     $right: var(--right);
 
+    .cs- {
+        &obj {
+
+        }
+
+        &form {
+            color: green;
+            font-weight: 600;
+        }
+
+        &func {
+            color: purple;
+            font-weight: 600;
+        }
+    }
+
     html {
         height: 100%;
     }
