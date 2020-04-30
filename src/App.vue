@@ -11,15 +11,15 @@
             </div>
         </main>
         <section class="helpers-section">
-            <FileGallery></FileGallery>
             <div id="snackbar"></div>
-            <BrowseFile></BrowseFile>
-            <NotifyBox></NotifyBox>
-            <WebSocket></WebSocket>
-            <QuestionBox></QuestionBox>
-            <ContextMenu></ContextMenu>
-            <ProgressBar></ProgressBar>
-            <!--  <geo-map></geo-map>-->
+            <FileGallery />
+            <BrowseFile />
+            <NotifyBox />
+            <WebSocket />
+            <QuestionBox />
+            <ContextMenu />
+            <ProgressBar />
+            <GeoMap />
         </section>
     </div>
 </template>

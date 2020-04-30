@@ -115,6 +115,7 @@ export class FunctionExecEventArg {
     stopProgress?: () => void;
     data?: any;
     name?: string;
+    event?: any;
 }
 
 export class ItemChangeEventArg {

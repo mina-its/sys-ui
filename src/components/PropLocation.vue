@@ -1,6 +1,6 @@
 <template>
-    <div :class="'prop-location text-center ' + (value ? 'has-data': '')" @click="changing">
-        <i class="fa fa-map-marker-alt"></i>
+    <div :class="{'prop-location prop-value fa-lg': true, 'has-data':value}" @click="changing">
+        <i class="fa fa-map-marker text-dark"></i>
     </div>
 </template>
 
@@ -37,7 +37,11 @@
 </script>
 
 <style lang="scss">
-    .prop-location:not(.has-data) {
-        opacity: .2;
+    .prop-location {
+        cursor: pointer;
+
+        &:not(.has-data) {
+            opacity: .2;
+        }
     }
 </style>

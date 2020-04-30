@@ -66,7 +66,7 @@
                 try {
                     let $this = this;
                     let arg: FunctionExecEventArg = {
-                        name: this.name, data: this.$store.state.data, stopProgress() {
+                        name: this.name, event: e, data: this.$store.state.data, stopProgress() {
                             $this.showProgress = false;
                         }
                     };

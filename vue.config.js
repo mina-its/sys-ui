@@ -1,3 +1,5 @@
+process.env.GOOGLE_API_KEY = "XX";
+
 module.exports = {
 
     devServer: {

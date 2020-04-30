@@ -2,9 +2,9 @@
     <div v-if="glob.geoMap.show" class="position-fixed fixed-top w-100 h-100 geo-map bg-light">
         <div class="w-100 h-100" ref="map"></div>
         <div class="position-fixed m-2 p-2 btn-group bg-light" style="bottom: 0">
-            <button type="button" class="btn btn-success px-5" @click="select()">${$t('select')}</button>
-            <button type="button" class="btn btn-secondary px-5" @click="hideGeoMap()">${$t('close')}</button>
-            <button type="button" class="btn btn-warning px-5" @click="clear()">${$t('clear')}</button>
+            <button type="button" class="btn btn-success px-5" @click="select()">{{$t('select')}}</button>
+            <button type="button" class="btn btn-secondary px-5" @click="hideGeoMap()">{{$t('close')}}</button>
+            <button type="button" class="btn btn-warning px-5" @click="clear()">{{$t('clear')}}</button>
         </div>
     </div>
 </template>

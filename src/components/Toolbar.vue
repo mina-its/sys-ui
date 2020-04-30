@@ -28,9 +28,9 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob} from '@/main';
+    import {$t, glob} from '@/main';
     import {Keys} from '../../../sys/src/types';
-    import {FunctionExecEventArg} from '@/types';
+    import {FunctionExecEventArg, MenuItem} from '@/types';
     import * as main from '../main';
 
     @Component({name: 'Toolbar', components: {}})
@@ -60,7 +60,28 @@
         }
 
         clickTitlePin(e: FunctionExecEventArg) {
-            console.log('clickTitlePin');
+            let items: MenuItem[] = [
+                {ref: "export-excel", title: $t('export-excel')},
+                {ref: "export-csv", title: $t('export-csv')},
+                {ref: "export-pdf", title: $t('export-pdf')},
+                {title: "-"},
+                {ref: "import", title: $t('import')},
+                {title: "-"},
+                {ref: "print", title: $t('print')},
+            ];
+            main.showCmenu(null, items, e.event, (state, item: MenuItem) => {
+                switch (item.ref) {
+                    case "export-excel":
+                        break;
+
+                    case "export-csv":
+                        break;
+
+                    case "print":
+                        window.print();
+                        break;
+                }
+            });
         }
 
         apply(e: FunctionExecEventArg) {
