@@ -260,6 +260,7 @@ export function handleResponse(res: WebResponse) {
         vueResetFormData(res);
         document.title = glob.form.title as string;
         $('.details-view').scrollTop(0);
+        $(window).scrollTop(0);
     } else {
         notify("WHAT should I do now?", LogType.Warning);
         console.log(res);
@@ -752,7 +753,7 @@ export function getPropertyEmbedError(doc: any, propName: string): string {
 }
 
 export function call(funcName: string, data: any, done: (err, data?) => void) {
-    ajax(setQs('m', RequestMode.inline, false, funcName), data, null, res => done(null, flat2recursive(res.data)), err => done(err));
+    ajax(setQs('m', RequestMode.inline, false, "/" + funcName), data, null, res => done(null, flat2recursive(res.data)), err => done(err));
 }
 
 export function load(href: string, pushState = false) {

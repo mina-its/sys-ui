@@ -215,6 +215,7 @@ function handleResponse(res) {
         vueResetFormData(res);
         document.title = exports.glob.form.title;
         $('.details-view').scrollTop(0);
+        $(window).scrollTop(0);
     }
     else {
         notify("WHAT should I do now?", types_2.LogType.Warning);
@@ -714,7 +715,7 @@ function getPropertyEmbedError(doc, propName) {
 }
 exports.getPropertyEmbedError = getPropertyEmbedError;
 function call(funcName, data, done) {
-    ajax(setQs('m', types_2.RequestMode.inline, false, funcName), data, null, res => done(null, flat2recursive(res.data)), err => done(err));
+    ajax(setQs('m', types_2.RequestMode.inline, false, "/" + funcName), data, null, res => done(null, flat2recursive(res.data)), err => done(err));
 }
 exports.call = call;
 function load(href, pushState = false) {
