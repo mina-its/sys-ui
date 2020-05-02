@@ -1,22 +1,21 @@
 <template>
-    <input @focus="$emit('focus', $event)" ref="ctrl" v-bind:type="type" @keydown="keydown"
+    <input @focus="$emit('focus', $event)" ref="ctrl" v-bind:type="type" @keydown="keydown" :readonly="readOnly"
            :value="value" @blur="refreshText" @input="update" @click="update" class="form-control">
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {Property, Keys} from "../../../sys/src/types";
-    import {glob} from '../main';
-
-    ;
-    import {Constants, MenuItem, ItemChangeEventArg, PropEventArg} from '../types';
+    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+    import {Keys, Property, PropertyEditMode} from "../../../sys/src/types";
     import * as main from '../main';
+    import {glob} from '@/main';
+    import {Constants, ItemChangeEventArg, MenuItem, PropEventArg} from '../types';
 
     @Component({name: 'PropReference'})
     export default class PropReference extends Vue {
         @Prop() private type: string;
         @Prop() private doc: any;
         @Prop() private prop: Property;
+        @Prop() private readOnly: boolean;
 
         @Emit('keydown')
         keydown(e): PropEventArg {
@@ -29,8 +28,9 @@
         }
 
         update(e) {
+            if (this.readOnly) return;
             let val = (e.target as any).value;
-            let items = val == null || (this.prop._.items.length < Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
+            let items = val == null || (this.prop._.items.length < Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
             items.forEach(item => (item as MenuItem).hover = val == item.title);
             this.showDropDown(items);
         }
@@ -72,7 +72,7 @@
 <style lang="scss">
     $right: right;
 
-    .prop-reference:hover {
+    .prop-reference:not([readonly]):hover {
         background: url("/@sys-ui/images/updown.png") no-repeat $right 0 center;
     }
 </style>

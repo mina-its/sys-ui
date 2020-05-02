@@ -6,7 +6,7 @@
         <th v-else @click="headerClick" class="text-center"></th>
         <td v-for="(pMeta, index) in item._.dec.properties">
             <Property @focus="focused" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
-                  :viewType="1" :indexInGrid="index"></Property>
+                  :viewType="1" :indexInGrid="index" :readonly="readonly" />
         </td>
     </tr>
 </template>
@@ -21,6 +21,7 @@
     export default class GridViewRow extends Vue {
         @Prop() private item: IData;
         @Prop() private selectable: boolean;
+        @Prop() private readonly : boolean;
 
         focused(e, prop: Property) {
             $(".prop-focused").removeClass("prop-focused");

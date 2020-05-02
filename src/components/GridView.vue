@@ -18,16 +18,17 @@
             </thead>
             <tbody>
             <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown"
-                         @headerClick="showRowMenu" v-for="item in items" :item="item"
+                         @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)"
                          @changed="changed"></GridViewRow>
             </tbody>
             <tfoot>
             <tr>
                 <td class="border-0" colspan="100">
                     <div class="align-items-center d-flex">
-                        <function styles="m-2 fa-plus" @exec="insert" name="newItem" :title="$t('add')"></function>
-                        <function v-if="rowHeaderStyle===2" styles="fa-trash" @exec="deleteItems" name="deleteItems"
-                                  :title="$t('delete')"></function>
+                        <Function v-if="dec.access & 4" styles="m-2 fa-plus" @exec="insert" name="newItem"
+                                  :title="$t('add')"></Function>
+                        <Function v-if="rowHeaderStyle===2" styles="fa-trash" @exec="deleteItems" name="deleteItems"
+                                  :title="$t('delete')"></Function>
                         <ul v-if="dec.pages > 1" class="m-2 pagination flex-grow-1">
                             <li class="page-item"><a @click="goBack" href="javascript:;" class="page-link"><i
                                     class="fa fa-chevron-left"></i></a></li>
@@ -62,6 +63,7 @@
         ReqParams,
         IData
     } from '../../../sys/src/types';
+
     declare let $: JQuery;
 
     @Component({

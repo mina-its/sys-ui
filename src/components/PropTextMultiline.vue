@@ -1,5 +1,5 @@
 <template>
-    <textarea @focus="focus" :value="value" @input="update"
+    <textarea @focus="focus" :value="value" @input="update" :readonly="readOnly"
               class="text-nowrap form-control"></textarea>
 </template>
 
@@ -14,6 +14,7 @@
     export default class PropTextMultiline extends Vue {
         @Prop() private doc: any;
         @Prop() private prop: Property;
+        @Prop() private readOnly: boolean;
 
         @Emit('changed')
         update(e): ItemChangeEventArg {

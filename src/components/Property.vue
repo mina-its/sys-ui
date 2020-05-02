@@ -1,6 +1,13 @@
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, ElemType, GlobalType, ObjectViewType, Property as ObjectProperty} from "../../../sys/src/types";
+    import {
+        Elem,
+        ElemType,
+        GlobalType,
+        ObjectViewType,
+        Property as ObjectProperty,
+        PropertyEditMode
+    } from "../../../sys/src/types";
     import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
     import * as main from '../main';
     import {getPropertyEmbedError} from '@/main';
@@ -15,6 +22,7 @@
         @Prop() private viewType: any;
         @Prop() private labelMode: any;
         @Prop() private indexInGrid: any;
+        @Prop() private readonly: boolean;
 
         render(ce) {
             if (!this.prop) {
@@ -41,8 +49,13 @@
             }
         }
 
+        changed(e: ItemChangeEventArg) {
+            if (!this.readonly)
+                this.raiseChanged(e);
+        }
+
         @Emit("changed")
-        changed(e: ItemChangeEventArg): ItemChangeEventArg {
+        raiseChanged(e: ItemChangeEventArg): ItemChangeEventArg {
             main.setPropertyEmbeddedError(this.item, e.prop.name, null);
             return {prop: e.prop, item: this.item, val: e.val, vue: e.vue};
         }
@@ -102,7 +115,11 @@
         }
 
         renderValue(ce, styles: string) {
-            let pr = {doc: this.item, name: this.prop.name, prop: this.prop, viewType: this.viewType, styles};
+            let pr = {
+                doc: this.item, name: this.prop.name, prop: this.prop, viewType: this.viewType,
+                styles,
+                readOnly: this.readonly || this.prop.editMode == PropertyEditMode.Readonly || (this.prop.editMode == PropertyEditMode.OnceOnly && this.item[this.prop.name] != null)
+            };
 
             if (this.prop._.isRef) {
                 if (this.viewType == ObjectViewType.TreeView)

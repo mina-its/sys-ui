@@ -27,10 +27,10 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {DirFile, DriveMode, LogType, Property, RequestMode, IData, mFile} from "../../../sys/src/types";
+    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {DirFile, DriveMode, IData, LogType, mFile, Property, RequestMode} from "../../../sys/src/types";
     import {Constants, FileAction, FileActionType, FunctionExecEventArg, MenuItem} from '@/types';
-    import {$t, joinUri} from '@/main';
+    import {$t, joinUri, notify} from '@/main';
     import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
 
@@ -40,6 +40,13 @@
         @Prop() private doc: IData;
         @Prop() private viewType: any;
         @Prop() private styles: string;
+        @Prop() private readOnly: boolean;
+
+        mounted() {
+            if (!this.prop.file) {
+                notify(`Drive must be configured for property '${this.prop.title}'`, LogType.Error);
+            }
+        }
 
         showMenu(file, e) {
             if (this.prop.file && this.prop.file.drive) {
@@ -202,7 +209,7 @@
         }
 
         get showBrowseButton() {
-            return !this.files || this.prop.isList || !this.prop.file;
+            return (!this.files || this.prop.isList || !this.prop.file) && !this.readOnly;
         }
 
         get files() {
@@ -252,11 +259,12 @@
             }
 
             figcaption {
-                margin-top: -45px;
+                position: absolute;
+                margin-top: -35px;
                 margin-left: 10px;
                 font-weight: 500;
                 text-shadow: 1px 1px 1px #666;
-                color: #FFF;
+                color: #fff;
             }
         }
     }

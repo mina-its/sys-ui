@@ -12,6 +12,7 @@
         @Prop() private prop: Property;
         @Prop() private doc: any;
         @Prop() private label?: string;
+        @Prop() private readOnly: boolean;
 
         @Emit('keydown')
         keydown(e) {
@@ -24,6 +25,7 @@
         }
 
         get checked(): boolean {
+            if (this.readOnly) return;
             return !!this.doc[this.prop.name];
         }
     }

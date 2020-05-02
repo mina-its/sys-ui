@@ -14,6 +14,7 @@
     export default class PropLocation extends Vue {
         @Prop() private prop: Property;
         @Prop() private doc: any;
+        @Prop() private readOnly: boolean;
 
         @Emit('changed')
         changed(val): ItemChangeEventArg {
@@ -21,6 +22,7 @@
         }
 
         changing() {
+            if (this.readOnly) return;
             let doc = this.doc;
             let changed = this.changed;
             glob.geoMap = {

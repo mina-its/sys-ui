@@ -4,10 +4,11 @@
             <i @click="remove(item)" class="text-black-50 rmD fa fa-times" style="cursor:pointer"></i>
             <span class="rmV">{{item.title}}</span>
         </div>
-        <textarea @click="showDropDown(prop._.items)" @blur="refreshText" @input="update()"
+        <textarea @click="showDropDown(prop._.items)" @blur="refreshText" @input="update()" v-if="!readOnly"
                   class="w-100 bg-transparent align-middle rmT d-inline border-0"
                   rows="1" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
                   tabindex="1"></textarea>
+        <div v-else class="pt-2 pb-3">&nbsp;</div>
     </div>
 </template>
 
@@ -25,6 +26,7 @@
         @Prop() private doc: any;
         @Prop() private prop: Property;
         @Prop() private styles: string;
+        @Prop() private readOnly: boolean;
 
         update() {
             let val = (event.target as any).value;
@@ -96,6 +98,7 @@
         outline: none;
 
         textarea {
+            width: 40px!important;
             outline: none;
             resize: none;
             overflow: hidden;

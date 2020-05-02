@@ -2,9 +2,9 @@
     <div class="prop-time">
         <div class="d-flex">
             <input @focus="$emit('focus', $event)" type="text" :value="value"
-                   :name="viewType!=1 ? prop.name : null"
+                   :name="viewType!=1 ? prop.name : null" :readonly="readOnly"
                    @blur="update" class="flex-grow-1 border-0">
-            <div class="dropdown">
+            <div class="dropdown" v-if="!readOnly">
                 <i :class="{'fa':true, 'fa-clock-o': !datePick, 'fa-calendar': datePick}" @click="click"></i>
                 <div v-if="showPicker" class="dropdown-menu dropdown-menu-right p-0 mt-1 show">
                     <DateTimePicker :format="format" :value="value" @changed="changed"
@@ -27,7 +27,7 @@
         @Prop() private doc: any;
         @Prop() private prop: Property;
         @Prop() private viewType: string;
-
+        @Prop() private readOnly: boolean;
         private showPicker = false;
 
         update(e) {
@@ -64,17 +64,17 @@
                 else if (this.prop.time.format) {
                     switch (this.prop.time.format) {
                         case TimeFormat.YearMonthDayHourMinute:
-                            return "YYYY/MM/DD - HH:mm";
+                            return "DD/MM/YYYY - HH:mm";
 
                         case TimeFormat.DateWithDayOfWeek:
-                            return "YYYY/MM/DD";
+                            return "DD/MM/YYYY";
 
                         case TimeFormat.HourMinute:
                             return "HH:mm";
                     }
                 }
             }
-            return "YYYY/MM/DD";
+            return "DD/MM/YYYY";
         }
 
         get value() {
