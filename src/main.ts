@@ -557,16 +557,20 @@ export function flat2recursive(flatJson: any): any {
 
         for (const key in obj) {
             let val = obj[key];
-            if (!val) {
-                continue;
-            }
-            if (typeof val === 'object' && !val.$oid) {
-                if (val._$ == '') {
-                    obj[key] = flatJson;
-                } else if (val._$) {
-                    obj[key] = eval('flatJson' + val._$);
+            if (!val) continue;
+
+            if (typeof val === 'object') {
+                if (val.$date) {
+                    obj[key] = new Date(val.$date);
                 }
-                replaceRef(val);
+                else if (!val.$oid) {
+                    if (val._$ == '') {
+                        obj[key] = flatJson;
+                    } else if (val._$) {
+                        obj[key] = eval('flatJson' + val._$);
+                    }
+                    replaceRef(val);
+                }
             }
         }
     };
