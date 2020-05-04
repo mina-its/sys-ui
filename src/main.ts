@@ -32,7 +32,8 @@ import {
     Modify,
     Socket,
     StateChange,
-    FileActionType
+    FileActionType,
+    StartParams
 } from './types';
 import {
     AjaxConfig,
@@ -562,8 +563,7 @@ export function flat2recursive(flatJson: any): any {
             if (typeof val === 'object') {
                 if (val.$date) {
                     obj[key] = new Date(val.$date);
-                }
-                else if (!val.$oid) {
+                } else if (!val.$oid) {
                     if (val._$ == '') {
                         obj[key] = flatJson;
                     } else if (val._$) {
@@ -872,7 +872,7 @@ function registerComponents(vue, components) {
     vue.component("SysApp", App);
 }
 
-function startVue(res: WebResponse, app, components) {
+function startVue(res: WebResponse, params?: StartParams) {
     try {
         handleWindowEvents();
         Vue.use(Vuex);
@@ -890,8 +890,8 @@ function startVue(res: WebResponse, app, components) {
         });
 
         if (glob.config.rtl) $("html").attr("dir", "rtl");
-        registerComponents(Vue, components);
-        new Vue({data: glob, store, render: h => h(app || App)}).$mount('#app');
+        registerComponents(Vue, params ? params.components : null);
+        new Vue({data: glob, store, render: h => h((params ? params.app : null) || App)}).$mount('#app');
     } catch (err) {
         console.error(err);
         notify("<strong>Starting Vue failed:</strong> " + err.message, LogType.Fatal);
@@ -1182,13 +1182,13 @@ function createStore() {
     });
 }
 
-export function start(app?, components?) {
+export function start(params?: StartParams) {
     // console.log('starting ...');
     const mainState = $('#main-state').html();
     const res: WebResponse = parse(mainState);
 
     if (res)
-        startVue(res, app, components);
+        startVue(res, params);
     else {
         let uri = setQs('m', RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
@@ -1197,7 +1197,7 @@ export function start(app?, components?) {
         console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, {withCredentials: true}).then(res => {
             if (res.data)
-                startVue(res.data, app, components);
+                startVue(res.data, params);
             else
                 console.error(res);
         }).catch(err => {
@@ -1205,6 +1205,7 @@ export function start(app?, components?) {
             notify("Connecting to proxy server failed! " + err.message, LogType.Fatal);
         });
     }
+    return glob;
 }
 
 window["start"] = start;

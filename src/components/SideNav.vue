@@ -11,8 +11,8 @@
         <ul class="pl-0 list-unstyled">
             <li v-for="item of glob.config.navmenu" class="mr-2 nav-item">
                 <a v-if="item.title=='-'" class="d-block my-2 border-bottom border-secondary"></a>
-                <a v-else-if="!item.ref" class="nav-link font-weight-bold">{{item.title}}</a>
-                <a v-else :href="item.ref" :class="getStyle(item)">{{item.title}}</a>
+                <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
+                <a v-else :href="item.ref" :class="getStyle(item)"><i :class="item._cs"></i>{{item.title}}</a>
                 <ul class="list-unstyled">
                     <li v-for="subitem of item.items" class="mr-2 nav-item"><a :href="subitem.ref"
                                                                                :class="getStyle(subitem)">{{subitem.title}}</a>
@@ -31,6 +31,10 @@
     export default class SideNav extends Vue {
         get glob() {
             return glob;
+        }
+
+        mounted() {
+            console.log(glob.config.navmenu);
         }
 
         getStyle(item) {
@@ -57,6 +61,14 @@
             &:hover {
                 text-decoration: underline;
                 color: var(--side-nav-color);
+            }
+        }
+
+        .nav-link {
+            padding-left: 0.2rem;
+
+            i {
+                width: 30px;
             }
         }
 

@@ -826,7 +826,7 @@ function registerComponents(vue, components) {
     }
     vue.component("SysApp", App_vue_1.default);
 }
-function startVue(res, app, components) {
+function startVue(res, params) {
     try {
         handleWindowEvents();
         vue_1.default.use(vuex_1.default);
@@ -846,8 +846,8 @@ function startVue(res, app, components) {
         });
         if (exports.glob.config.rtl)
             $("html").attr("dir", "rtl");
-        registerComponents(vue_1.default, components);
-        new vue_1.default({ data: exports.glob, store, render: h => h(app || App_vue_1.default) }).$mount('#app');
+        registerComponents(vue_1.default, params ? params.components : null);
+        new vue_1.default({ data: exports.glob, store, render: h => h((params ? params.app : null) || App_vue_1.default) }).$mount('#app');
     }
     catch (err) {
         console.error(err);
@@ -1111,12 +1111,12 @@ function createStore() {
         }
     });
 }
-function start(app, components) {
+function start(params) {
     // console.log('starting ...');
     const mainState = $('#main-state').html();
     const res = parse(mainState);
     if (res)
-        startVue(res, app, components);
+        startVue(res, params);
     else {
         let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : types_1.Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
@@ -1125,7 +1125,7 @@ function start(app, components) {
         console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
-                startVue(res.data, app, components);
+                startVue(res.data, params);
             else
                 console.error(res);
         }).catch(err => {
@@ -1133,6 +1133,7 @@ function start(app, components) {
             notify("Connecting to proxy server failed! " + err.message, types_2.LogType.Fatal);
         });
     }
+    return exports.glob;
 }
 exports.start = start;
 window["start"] = start;

@@ -5,7 +5,7 @@
                    :name="viewType!=1 ? prop.name : null" :readonly="readOnly"
                    @blur="update" class="flex-grow-1 border-0">
             <div class="dropdown" v-if="!readOnly">
-                <i :class="{'fa':true, 'fa-clock-o': !datePick, 'fa-calendar': datePick}" @click="click"></i>
+                <i :class="{'fa text-muted':true, 'fa-clock': !datePick, 'fa-calendar-alt': datePick}" @click="click"></i>
                 <div v-if="showPicker" class="dropdown-menu dropdown-menu-right p-0 mt-1 show">
                     <DateTimePicker :format="format" :value="value" @changed="changed"
                                     @canceled="canceled"></DateTimePicker>
@@ -64,17 +64,17 @@
                 else if (this.prop.time.format) {
                     switch (this.prop.time.format) {
                         case TimeFormat.YearMonthDayHourMinute:
-                            return "DD/MM/YYYY - HH:mm";
+                            return "YYYY/MM/DD - HH:mm";
 
                         case TimeFormat.DateWithDayOfWeek:
-                            return "DD/MM/YYYY";
+                            return "YYYY/MM/DD";
 
                         case TimeFormat.HourMinute:
                             return "HH:mm";
                     }
                 }
             }
-            return "DD/MM/YYYY";
+            return "YYYY/MM/DD";
         }
 
         get value() {

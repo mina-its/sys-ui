@@ -69,7 +69,6 @@ export class MenuItem {
     ref?: any;
     title: string;
     hover?: boolean;
-    icon?: string;
     _cs?: string;
 }
 
@@ -98,6 +97,11 @@ export class AppStateGeoMap {
     constructor() {
         this.show = false;
     }
+}
+
+export class StartParams {
+    app?: {};
+    components?: { [name: string]: any; } = {};
 }
 
 export class PropEventArg {
@@ -182,6 +186,7 @@ export class Global {
     geoMap = new AppStateGeoMap();
     modifies: Modify[] = [];
     socket: Socket;
+    packageGlobal: any;
     progress: number = null;
     newItemButton: string = null;
 }

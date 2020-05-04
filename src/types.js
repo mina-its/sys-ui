@@ -45,6 +45,12 @@ class AppStateGeoMap {
     }
 }
 exports.AppStateGeoMap = AppStateGeoMap;
+class StartParams {
+    constructor() {
+        this.components = {};
+    }
+}
+exports.StartParams = StartParams;
 class PropEventArg {
 }
 exports.PropEventArg = PropEventArg;
