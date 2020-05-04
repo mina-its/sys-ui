@@ -1,6 +1,6 @@
 {
   "name": "sys-ui",
-  "version": "5.2.27",
+  "version": "5.2.30",
   "description": "sys-ui",
   "main": "./public/js/sys.main.js",
   "scripts": {
