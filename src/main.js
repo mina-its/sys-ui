@@ -205,6 +205,10 @@ function handleResponse(res) {
         exports.glob.config = res.config;
         if (res.config.style)
             addHeadStyle(res.config.style);
+        if (exports.glob.config.host && /^https?:/.test(exports.glob.config.host)) {
+            let currentProtocol = location.protocol;
+            exports.glob.config.host = exports.glob.config.host.replace(/^https?:/, currentProtocol);
+        }
     }
     if (res.redirect)
         handleResponseRedirect(res);
