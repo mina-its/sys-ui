@@ -76,7 +76,7 @@
                 return ce('object-view', {
                     props: {
                         root: false,
-                        elem: {type: ElemType.Object, obj: {ref: this.prop._.ref}} as Elem
+                        elem: {type: ElemType.Object, obj: {_: {ref: this.prop._.ref}}} as Elem
                     },
                 });
             }
