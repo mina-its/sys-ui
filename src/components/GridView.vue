@@ -1,3 +1,4 @@
+import {LogType} from "../../../sys/src/types";
 <template>
     <div :class="{'grid-view':true, 'p-4':root}" @scroll="onScroll()">
         <!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->
@@ -47,21 +48,21 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {$t, glob} from '@/main';
-    import {ItemEventArg, ItemChangeEventArg, MenuItem, StateChange, ChangeType, JQuery} from '@/types';
+    import {$t, getQs, notify} from '@/main';
+    import {ChangeType, Constants, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '@/types';
     import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
     import {
         EntityMeta,
         GridRowHeaderStyle,
+        IData,
         Keys,
         LogType,
         NewItemMode,
         ObjectDec,
         ObjectViewType,
         Pair,
-        ReqParams,
-        IData
+        ReqParams
     } from '../../../sys/src/types';
 
     declare let $: JQuery;
@@ -147,6 +148,10 @@
                     break;
 
                 default:
+                    if (getQs(Constants.QUERY_NEW)) {
+                        notify("Please save your changes before!", LogType.Warning);
+                        return;
+                    }
                     let newItem = {_id: uuidv4(), _: {marked: false, dec: this.dec} as EntityMeta};
                     this.dec.properties.forEach(prop => newItem[prop.name] = null);
                     if (this.dec.reorderable)

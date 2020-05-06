@@ -30,7 +30,7 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {$t, glob} from '@/main';
     import {Keys} from '../../../sys/src/types';
-    import {FunctionExecEventArg, MenuItem} from '@/types';
+    import {Constants, FunctionExecEventArg, MenuItem} from '@/types';
     import * as main from '../main';
 
     @Component({name: 'Toolbar', components: {}})
@@ -52,11 +52,7 @@
 
         cancel(e: FunctionExecEventArg) {
             main.clearModifies();
-            if (main.getQs("n") == "true")
-                location.href = location.pathname;
-            else {
-                main.load(location.pathname);
-            }
+            main.load(location.pathname, !!main.getQs(Constants.QUERY_NEW));
         }
 
         clickTitlePin(e: FunctionExecEventArg) {

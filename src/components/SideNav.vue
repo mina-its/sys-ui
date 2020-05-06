@@ -33,10 +33,6 @@
             return glob;
         }
 
-        mounted() {
-            console.log(glob.config.navmenu);
-        }
-
         getStyle(item) {
             let style = "text-nowrap nav-link";
             if (location.hostname == item.ref)

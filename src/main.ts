@@ -264,6 +264,9 @@ export function handleResponse(res: WebResponse) {
     else if (res.form) {
         // WARNING: never change these orders:
         vueResetFormData(res);
+        if (getQs(Constants.QUERY_NEW))
+            initializeModifyForQueryNew(res);
+
         document.title = glob.form.title as string;
         $('.details-view').scrollTop(0);
         $(window).scrollTop(0);
@@ -274,6 +277,24 @@ export function handleResponse(res: WebResponse) {
 
     // must be set after binding to Vue
     glob.texts = glob.texts || res.texts || {};
+}
+
+function initializeModifyForQueryNew(res: WebResponse) {
+    glob.dirty = true;
+    let ref = location.pathname.replace(/\//g, "");
+    let data = res.data[ref];
+    let modifyData = {_id: -1};
+    for (let prop in data) {
+        if (data.hasOwnProperty(prop) && data[prop] != null)
+            modifyData[prop] = data[prop];
+    }
+
+    glob.modifies.push({
+        ref,
+        type: ChangeType.InsertItem,
+        data: modifyData,
+        state: data
+    });
 }
 
 export function getPropTextValue(meta: Property, data): any {
@@ -1083,18 +1104,10 @@ function _dispatchStoreModify(store, change: StateChange) {
     switch (change.type) {
         case ChangeType.EditProp: {
             let modify: Modify;
-            if (getQs("n")) {
-                let data = {_id: change.item._id};
-                modify = glob.modifies.find(m => m.state == change.item);
-                if (!modify)
-                    modify = {ref, type: ChangeType.InsertItem, data, state: change.item};
+            modify = glob.modifies.find(m => m.state == change.item && (m.type == ChangeType.InsertItem || m.type == ChangeType.EditProp));
+            if (!modify) {
+                modify = {ref, type: ChangeType.EditProp, data: {} as IData, state: change.item};
                 glob.modifies.push(modify);
-            } else {
-                modify = glob.modifies.find(m => m.state == change.item && (m.type == ChangeType.InsertItem || m.type == ChangeType.EditProp));
-                if (!modify) {
-                    modify = {ref, type: ChangeType.EditProp, data: {} as IData, state: change.item};
-                    glob.modifies.push(modify);
-                }
             }
             modify.data[change.prop.name] = change.value;
             break;
@@ -1195,10 +1208,10 @@ export function start(params?: StartParams) {
     if (res)
         startVue(res, params);
     else {
-        let uri = setQs('m', RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : Constants.defaultAddress);
+        let uri = setQs('m', RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname + location.search : Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
-        if (getQs(Constants.search_locale))
-            uri = setQs(Constants.search_locale, getQs(Constants.search_locale), false, uri);
+        if (getQs(Constants.QUERY_LOCALE))
+            uri = setQs(Constants.QUERY_LOCALE, getQs(Constants.QUERY_LOCALE), false, uri);
         console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, {withCredentials: true}).then(res => {
             if (res.data)

@@ -217,6 +217,8 @@ function handleResponse(res) {
     else if (res.form) {
         // WARNING: never change these orders:
         vueResetFormData(res);
+        if (getQs(types_1.Constants.QUERY_NEW))
+            initializeModifyForQueryNew(res);
         document.title = exports.glob.form.title;
         $('.details-view').scrollTop(0);
         $(window).scrollTop(0);
@@ -229,6 +231,22 @@ function handleResponse(res) {
     exports.glob.texts = exports.glob.texts || res.texts || {};
 }
 exports.handleResponse = handleResponse;
+function initializeModifyForQueryNew(res) {
+    exports.glob.dirty = true;
+    let ref = location.pathname.replace(/\//g, "");
+    let data = res.data[ref];
+    let modifyData = { _id: -1 };
+    for (let prop in data) {
+        if (data.hasOwnProperty(prop) && data[prop] != null)
+            modifyData[prop] = data[prop];
+    }
+    exports.glob.modifies.push({
+        ref,
+        type: types_1.ChangeType.InsertItem,
+        data: modifyData,
+        state: data
+    });
+}
 function getPropTextValue(meta, data) {
     if (meta.formula)
         return evalExpression(this.doc, meta.formula);
@@ -1017,19 +1035,10 @@ function _dispatchStoreModify(store, change) {
     switch (change.type) {
         case types_1.ChangeType.EditProp: {
             let modify;
-            if (getQs("n")) {
-                let data = { _id: change.item._id };
-                modify = exports.glob.modifies.find(m => m.state == change.item);
-                if (!modify)
-                    modify = { ref, type: types_1.ChangeType.InsertItem, data, state: change.item };
+            modify = exports.glob.modifies.find(m => m.state == change.item && (m.type == types_1.ChangeType.InsertItem || m.type == types_1.ChangeType.EditProp));
+            if (!modify) {
+                modify = { ref, type: types_1.ChangeType.EditProp, data: {}, state: change.item };
                 exports.glob.modifies.push(modify);
-            }
-            else {
-                modify = exports.glob.modifies.find(m => m.state == change.item && (m.type == types_1.ChangeType.InsertItem || m.type == types_1.ChangeType.EditProp));
-                if (!modify) {
-                    modify = { ref, type: types_1.ChangeType.EditProp, data: {}, state: change.item };
-                    exports.glob.modifies.push(modify);
-                }
             }
             modify.data[change.prop.name] = change.value;
             break;
@@ -1122,10 +1131,10 @@ function start(params) {
     if (res)
         startVue(res, params);
     else {
-        let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname : types_1.Constants.defaultAddress);
+        let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname + location.search : types_1.Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
-        if (getQs(types_1.Constants.search_locale))
-            uri = setQs(types_1.Constants.search_locale, getQs(types_1.Constants.search_locale), false, uri);
+        if (getQs(types_1.Constants.QUERY_LOCALE))
+            uri = setQs(types_1.Constants.QUERY_LOCALE, getQs(types_1.Constants.QUERY_LOCALE), false, uri);
         console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, { withCredentials: true }).then(res => {
             if (res.data)
