@@ -1,6 +1,6 @@
 <template>
     <span v-if="glob.config.locale" class="app-locale-menu dropdown">
-        <a class="nav-link dropdown-toggle py-0 px-3 text-light" href="#" id="navbarDropdownLocale"
+        <a class="nav-link dropdown-toggle py-0 px-4 text-light" href="#" id="navbarDropdownLocale"
            role="button"
            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
                 style="font-size: 16px"
