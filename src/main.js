@@ -403,6 +403,11 @@ function handleWindowEvents() {
             if (href.match(/^javascript/) || /^#/.test(href))
                 return; // if (/^#/.test(href)) return false;
             e.preventDefault();
+            if (/^http/.test(href)) {
+                e.stopPropagation();
+                window.open(href);
+                return;
+            }
             if (/\bf=\d/.test(href)) { // function link
             }
             else

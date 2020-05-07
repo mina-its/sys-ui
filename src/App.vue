@@ -12,14 +12,14 @@
         </main>
         <section class="helpers-section">
             <div id="snackbar"></div>
-            <FileGallery />
-            <BrowseFile />
-            <NotifyBox />
-            <WebSocket />
-            <QuestionBox />
-            <ContextMenu />
-            <ProgressBar />
-            <GeoMap />
+            <FileGallery/>
+            <BrowseFile/>
+            <NotifyBox/>
+            <WebSocket/>
+            <QuestionBox/>
+            <ContextMenu/>
+            <ProgressBar/>
+            <GeoMap/>
         </section>
     </div>
 </template>
@@ -326,6 +326,34 @@
 
     .modal-wrapper {
         display: table-cell;
+    }
+
+    .user-profile-title {
+        color: red;
+
+        a {
+            color: #5a6268;
+            display: inline-block;
+            font-weight: 400;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            border: 1px solid #5a6268;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+
+            &:hover {
+                text-decoration: none;
+                color: white;
+                background-color: #5a6268;
+            }
+        }
     }
 
 </style>

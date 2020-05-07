@@ -32,7 +32,7 @@
 
         getTitle(item: MenuItem) {
             let title = item.title || '&nbsp;';
-            title = title.replace(/\((.+)\)/, "<span class='float-right ml-3 text-dark'>($1)</span>");
+            //title = title.replace(/\((.+)\)/, "<span class='float-right ml-3 text-dark'>($1)</span>"); // timeZones list problem
             return title;
         }
 

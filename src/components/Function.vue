@@ -43,7 +43,7 @@
                 let error = "";
                 for (const prop of requiredProps) {
                     if (data[prop.name] === null || data[prop.name] === "") {
-                        error = error || `value is required for property '${prop.title}'`;
+                        error = error || `Value is required for property '${prop.title}'`;
                         main.setPropertyEmbeddedError(data, prop.name, `* mandatory`);
                     }
                 }

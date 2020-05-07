@@ -6,7 +6,8 @@
         GlobalType,
         ObjectViewType,
         Property as ObjectProperty,
-        PropertyEditMode
+        PropertyEditMode,
+        CommentStyle
     } from "../../../sys/src/types";
     import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
     import * as main from '../main';
@@ -85,10 +86,23 @@
             let embedErr = getPropertyEmbedError(this.item, this.prop.name);
             let msg = null;
             if (embedErr) msg = ce('prop-message', {props: {message: embedErr}});
-            let cmt = this.prop.comment ? ce('p', {attrs: {"class": "prop-comment mt-3 p-2"}}, [
-                ce('i', {attrs: {"class": "fa fa-info-circle m-1 fa-lg"}},),
-                ce('span', {attrs: {"class": "ml-3"}, domProps: {'innerHTML': main.markDown(this.prop.comment)}}),
-            ]) : null;
+            let cmt = null;
+            if (this.prop.comment) {
+                if (this.prop.commentStyle) {
+                    cmt = ce('span', {
+                        attrs: {"class": "prop-comment " + this.prop.commentStyle},
+                        domProps: {'innerHTML': main.markDown(this.prop.comment)}
+                    });
+                } else {
+                    cmt = ce('p', {attrs: {"class": "prop-comment prop-comment-default mt-3 p-2"}}, [
+                        ce('i', {attrs: {"class": "fa fa-info-circle m-1 fa-lg"}},),
+                        ce('span', {
+                            attrs: {"class": "ml-3"},
+                            domProps: {'innerHTML': main.markDown(this.prop.comment)}
+                        }),
+                    ]);
+                }
+            }
             let title = this.prop.title || this.prop.name;
             let lbl = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top pt-2"}}, title);
 
@@ -257,7 +271,7 @@
             font-weight: 500;
         }
 
-        &comment {
+        &comment.prop-comment-default {
             background-color: #fef6e0;
             border: 1px solid #FFDE80;
             border-radius: 6px;

@@ -443,12 +443,19 @@ function handleWindowEvents() {
             if (href) {
                 if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
                 e.preventDefault();
+
+                if (/^http/.test(href)) {
+                    e.stopPropagation();
+                    window.open(href);
+                    return;
+                }
+
                 if (/\bf=\d/.test(href)) { // function link
 
                 } else
                     history.pushState(null, null, href);
                 load(href);
-                e.stopPropagation()
+                e.stopPropagation();
             }
         })
         .on("mouseup", (e: any) => {
