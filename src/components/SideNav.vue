@@ -8,8 +8,8 @@
 		        </span>
             </span>
         </div>
-        <ul class="pl-0 list-unstyled">
-            <li v-for="item of glob.config.navmenu" class="mr-2 nav-item">
+        <ul class="px-0 list-unstyled">
+            <li v-for="item of glob.config.navmenu" :class="{'nav-item':1, 'mr-2':ltr, 'ml-2':rtl}">
                 <a v-if="item.title=='-'" class="d-block my-2 border-bottom border-secondary"></a>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
                 <a v-else :href="item.ref" :class="getStyle(item)"><i :class="item._cs"></i>{{item.title}}</a>
@@ -45,6 +45,10 @@
 </script>
 
 <style lang="scss">
+
+    $left: left;
+    $right: right;
+
     .side-nav {
         overflow-y: scroll;
         -ms-overflow-style: none;
@@ -61,7 +65,7 @@
         }
 
         .nav-link {
-            padding-left: 0.2rem;
+            padding-#{$left}: 0.2rem;
 
             i {
                 width: 30px;

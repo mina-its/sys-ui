@@ -1,10 +1,10 @@
 <template>
     <div class="d-flex overflow-auto details-view" @scroll="onScroll()">
         <aside v-if="sideMenuVisible" class="border-right separator-line sidenav p-2 py-4 d-none d-md-block">
-            <ul class="nav flex-column tree pr-5" id="menus">
+            <ul :class="{'nav flex-column tree':1, 'pr-5':ltr, 'pl-5':rtl}" id="menus">
                 <li v-for="item in sideMenu" class="nav-item">
                     <a @click="selectGroup(item)"
-                       :class="{'pr-5 text-nowrap text-secondary nav-link': true, 'active': $data.currentGroup===item.title}"
+                       :class="{'text-nowrap text-secondary nav-link': 1, 'pr-5':ltr, 'pl-5':rtl, 'active': $data.currentGroup===item.title}"
                        href="javascript:void(0);">{{item.title}}</a>
                 </li>
             </ul>
@@ -106,7 +106,7 @@
             this.currentGroup = item.title;
             this.saveLastGroup(item);
 
-            history.pushState(null, null, item.ref);
+            // history.pushState(null, null, item.ref);
             if (this.dec.detailsViewType == ObjectDetailsViewType.Tabular) {
                 let $dv = $(".details-view");
                 $dv.animate({

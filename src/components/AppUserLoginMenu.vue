@@ -18,9 +18,9 @@
                 <hr>
                 <a class="m-2 btn btn-secondary" href="/logout?f=1">Sign out</a>
                 <hr>
-                <a class="m-2 text-secondary small" href="#">Privacy Policy</a>
+                <a class="m-2 text-secondary small" href="/privacy-policy">Privacy Policy</a>
                 -
-                <a class="m-2 text-secondary small" href="#">Terms of Service</a>
+                <a class="m-2 text-secondary small" href="/terms-of-service">Terms of Service</a>
             </div>
         </div>
     </div>

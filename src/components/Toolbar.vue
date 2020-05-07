@@ -1,14 +1,14 @@
 <template>
     <div v-if="alwaysVisible || glob.form.toolbar"
-         class="d-flex p-2 pl-4 btn-toolbar separator-line toolbar"
+         :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}"
          role="toolbar" aria-label="Toolbar with button groups">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb pt-2 p-0 m-0 bg-transparent">
                 <li v-for="item in glob.form.breadcrumb" class="breadcrumb-item">
                     <a :href="item.ref">{{item.title}}</a>
-                    <i class="fa fa-chevron-right ml-2"></i>
+                    <i :class="{'fa':1 ,'fa-chevron-right ml-2':ltr, 'fa-chevron-left mr-2':rtl}"></i>
                 </li>
-                <li class="breadcrumb-item active" aria-current="page">{{glob.form.title}}</li>
+                <li class="breadcrumb-item active" aria-current="page">{{glob.form.breadcrumbLast}}</li>
             </ol>
         </nav>
         <div v-if="glob.dirty" class="mx-2" role="group">

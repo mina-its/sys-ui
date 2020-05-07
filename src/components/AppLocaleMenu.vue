@@ -1,7 +1,10 @@
 <template>
     <span v-if="glob.config.locale" class="app-locale-menu dropdown">
-        <a class="nav-link dropdown-toggle py-0 px-4 text-light" href="#" id="navbarDropdownLocale" role="button"
-           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{glob.config.locale.toUpperCase()}}</a>
+        <a class="nav-link dropdown-toggle py-0 px-3 text-light" href="#" id="navbarDropdownLocale"
+           role="button"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
+                style="font-size: 16px"
+                class="fas fa-globe text-white pr-1"></i>{{glob.config.localeTitle.toUpperCase()}}</a>
         <div class="dropdown-menu dropdown-menu-right">
             <a v-for="item in glob.config.appLocales" class="dropdown-item" @click="changeLocale(item)"
                href="#">{{item.title}}</a>
@@ -22,6 +25,5 @@
     }
 </script>
 
-<style scoped lang="scss">
-
+<style lang="scss">
 </style>

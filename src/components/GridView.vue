@@ -31,12 +31,14 @@ import {LogType} from "../../../sys/src/types";
                         <Function v-if="rowHeaderStyle===2" styles="fa-trash" @exec="deleteItems" name="deleteItems"
                                   :title="$t('delete')"></Function>
                         <ul v-if="dec.pages > 1" class="m-2 pagination flex-grow-1">
-                            <li class="page-item"><a @click="goBack" href="javascript:;" class="page-link"><i
-                                    class="fa fa-chevron-left"></i></a></li>
+                            <li class="page-item"><a @click="goBack" href="javascript:;" class="page-link">
+                                <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i>
+                            </a></li>
                             <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') "><a
                                     class="page-link" :href="page.ref">{{page.title}}</a></li>
-                            <li class="page-item"><a href="javascript:;" class="page-link" @click="goForward"><i
-                                    class="fa fa-chevron-right"></i></a></li>
+                            <li class="page-item"><a href="javascript:;" class="page-link" @click="goForward">
+                                <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i>
+                            </a></li>
                         </ul>
                     </div>
                 </td>

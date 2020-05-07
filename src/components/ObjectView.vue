@@ -1,4 +1,3 @@
-import {AccessPermission} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {Elem, NewItemMode, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, AccessPermission} from "../../../sys/src/types";
@@ -19,10 +18,8 @@ import {AccessPermission} from "../../../sys/src/types";
             }
 
             let data = this.$store.state.data[e.obj._.ref];
-            // if (!data) data = this.$store.state.data[e.obj.ref] = {};
             const dec = glob.form.declarations[e.obj._.ref];
             if (!dec) throw `dec is empty for ref '${e.obj._.ref}'`;
-            glob.form.toolbar = true;
             let rt = this.root == null ? true : this.root;
             glob.newItemButton = ((dec as ObjectDec).access & AccessPermission.NewItem) &&
                     Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;

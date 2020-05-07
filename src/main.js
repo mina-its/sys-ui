@@ -403,10 +403,6 @@ function handleWindowEvents() {
             if (href.match(/^javascript/) || /^#/.test(href))
                 return; // if (/^#/.test(href)) return false;
             e.preventDefault();
-            if (exports.glob.dirty) {
-                notify($t('save-before'), types_2.LogType.Warning);
-                return;
-            } // dirty page
             if (/\bf=\d/.test(href)) { // function link
             }
             else
@@ -746,11 +742,18 @@ function call(funcName, data, done) {
 exports.call = call;
 function load(href, pushState = false) {
     if (exports.glob.dirty) {
-        notify($t('save-before'), types_2.LogType.Warning);
-        return;
+        if (exports.glob.form.toolbar) {
+            notify($t('save-before'), types_2.LogType.Warning);
+            return;
+        }
+        else {
+            exports.glob.modifies = [];
+            exports.glob.dirty = false;
+        }
     }
-    if (pushState)
+    if (pushState && location.href != href) {
         history.pushState(null, null, href);
+    }
     ajax(setQs('m', types_2.RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
 exports.load = load;
@@ -859,6 +862,8 @@ function startVue(res, params) {
         Object.assign(vue_1.default.config, { productionTip: false, devtools: true });
         vue_1.default.prototype.glob = exports.glob;
         vue_1.default.prototype.$t = $t;
+        vue_1.default.prototype.rtl = exports.glob.config.rtl;
+        vue_1.default.prototype.ltr = !exports.glob.config.rtl;
         vue_1.default.config.productionTip = false;
         vue_1.default.directive('focus', {
             inserted(el, binding) {

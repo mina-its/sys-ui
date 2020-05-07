@@ -255,7 +255,7 @@
             img {
                 max-height: 350px;
                 object-fit: cover;
-                max-width: 100%;
+                max-width: 320px;
             }
 
             figcaption {

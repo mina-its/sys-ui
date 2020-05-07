@@ -2,7 +2,7 @@
     <div :class="{'card-view w-100':true,'p-2':root}">
         <div class="d-flex flex-wrap">
             <div class="" v-for="item in items">
-                <div class="card m-2" style="width: 540px;" tabindex="0">
+                <div class="card mr-4 mb-4" style="width: 540px;" tabindex="0">
                     <div @click="clickMenu($event, item)" class="card-header">
                         <span>{{getTitle(item)}}</span>
                         <i class="fa fa-cog fa-lg text-muted float-right mt-1"></i>
