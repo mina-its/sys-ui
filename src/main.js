@@ -247,9 +247,17 @@ function initializeModifyForQueryNew(res) {
         state: data
     });
 }
+function digitGroup(num) {
+    if (num == null)
+        return "";
+    let numParts = num.toString().split('.');
+    numParts[0] = numParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return numParts.join('.');
+}
+exports.digitGroup = digitGroup;
 function getPropTextValue(meta, data) {
     if (meta.formula)
-        return evalExpression(this.doc, meta.formula);
+        return evalExpression(data, meta.formula);
     if (!data)
         throw 'prop-text doc is null!';
     let val = data[meta.name];
@@ -759,6 +767,7 @@ function load(href, pushState = false) {
     if (pushState && location.href != href) {
         history.pushState(null, null, href);
     }
+    exports.glob.notify = null;
     ajax(setQs('m', types_2.RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
 exports.load = load;
@@ -1074,6 +1083,7 @@ function _dispatchStoreModify(store, change) {
         }
     }
     exports.glob.dirty = exports.glob.modifies.length > 0;
+    exports.glob.notify = null;
     commitStoreChange(store, change);
 }
 function dispatchRequestServerModify(store, done) {

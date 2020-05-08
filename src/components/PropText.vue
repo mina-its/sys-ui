@@ -1,5 +1,5 @@
 <template>
-    <input @focus="focus" :type="type" :value="value" :placeholder="placeholder"
+    <input @focus="focus" @blur="blur" :type="inputType" :value="value" :placeholder="placeholder"
            :name="viewType!=1 ? prop.name : null" @input="update" @keydown="keydown" :readonly="readOnly">
 </template>
 
@@ -7,7 +7,7 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
     import {ItemChangeEventArg, PropEventArg} from '@/types';
-    import {glob} from '@/main';
+    import {digitGroup, glob} from '@/main';
     import * as main from '../main';
 
     @Component({name: 'PropText'})
@@ -17,6 +17,7 @@
         @Prop() private viewType: string;
         @Prop() private prop: Property;
         @Prop() private readOnly: boolean;
+        private focused: boolean = false;
 
         @Emit("keydown")
         keydown(e): PropEventArg {
@@ -24,14 +25,25 @@
             return {prop: this.prop, event: e};
         }
 
+        get inputType(): string {
+            if (this.prop.number && this.prop.number.digitGrouping)
+                return "text";
+            return this.type;
+        }
+
+        blur() {
+            this.focused = false;
+        }
+
         @Emit('focus')
         focus(e): PropEventArg {
+            this.focused = true;
             return {prop: this.prop, event: e};
         }
 
         @Emit("changed")
         update(e): ItemChangeEventArg {
-            let text = this.type == "number" ? (e.target as any).valueAsNumber : (e.target as any).value;
+            let text = this.inputType == "number" ? (e.target as any).valueAsNumber : (e.target as any).value;
             if (text === "") text = null;
             let val = this.doc[this.prop.name];
 
@@ -69,7 +81,12 @@
         }
 
         get value() {
-            return main.getPropTextValue(this.prop, this.doc);
+            let val = main.getPropTextValue(this.prop, this.doc);
+
+            if (this.prop.number && this.prop.number.digitGrouping && !this.focused)
+                return digitGroup(val);
+
+            return val;
         }
 
         get placeholder() {

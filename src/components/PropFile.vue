@@ -2,7 +2,7 @@
     <div :class="styles + ' border-0'">
         <div v-if="viewType==2" class="prop-file-box">
             <div @click="showMenu(file, $event)" v-for="file in files">
-                <figure class="m-0" v-if="prop.file && prop.file.preview && file._">
+                <figure v-if="prop.file && prop.file.preview && file._">
                     <img class="figure-img img-fluid border" :src="file._.uri"
                          @load="resetFileInfo($event, file)"/>
                     <figcaption v-if="file._.dimensions">{{file._.dimensions}}</figcaption>
@@ -252,6 +252,8 @@
         }
 
         figure {
+            margin: 0rem -0.5rem;
+
             img {
                 max-height: 350px;
                 object-fit: cover;

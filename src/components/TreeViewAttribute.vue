@@ -12,7 +12,7 @@
     export default class TreeViewAttribute extends Vue {
         @Prop() private attr: any;
 
-        get alue() {
+        get value() {
             let prop = this.attr.prop;
             let val = this.attr.item ? this.attr.item[prop.name] : null;
             if (prop.text && prop.text.multiLanguage) {

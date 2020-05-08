@@ -1,6 +1,7 @@
 <template>
     <div @focus="focus" tabindex="1" ref="ctrl" :class="styles + ' prop-reference ref-multi pr-3'">
-        <div v-for="item in items" class="rounded-lg rmI d-inline-block mr-1 my-1 px-1 border text-nowrap">
+        <div v-for="item in items"
+             class="ref-multi-item rounded-lg rmI d-inline-block mr-1 my-1 px-1 border text-nowrap">
             <i @click="remove(item)" class="text-black-50 mr-1 rmD fa fa-times" style="cursor:pointer"></i>
             <span class="rmV">{{item.title}}</span>
         </div>
@@ -96,13 +97,17 @@
 <style lang="scss">
     .prop-reference.ref-multi {
         outline: none;
-        margin: -.25rem;
+        padding: 0 0.25rem!important;
 
         textarea {
             width: 40px !important;
             outline: none;
             resize: none;
             overflow: hidden;
+        }
+
+        .ref-multi-item {
+            background-color: whitesmoke;
         }
     }
 

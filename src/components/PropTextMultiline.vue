@@ -56,7 +56,7 @@
             return {prop: this.prop, event: e};
         }
 
-        get value() {
+        get value(): string {
             return main.getPropTextValue(this.prop, this.doc);
         }
     }

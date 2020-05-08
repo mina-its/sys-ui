@@ -38,7 +38,7 @@
 
             switch (this.viewType) {
                 case ObjectViewType.GridView:
-                    return this.renderValue(ce, "px-1");
+                    return this.renderValue(ce, "px-2 py-1");
 
                 default:
                 case ObjectViewType.DetailsView:
@@ -71,7 +71,7 @@
         }
 
         renderDetailsView(ce) {
-            let valueClass = `prop-value border mx-2`;
+            let valueClass = `prop-value border`;
             if (this.prop._.gtype == GlobalType.object && !this.prop.documentView) {
                 return ce('object-view', {
                     props: {
@@ -138,13 +138,13 @@
                 if (this.viewType == ObjectViewType.TreeView)
                     return ce('span', {attrs: {"class": styles + " text-success"}}, main.getPropReferenceValue(this.prop, this.item));
 
-                if (this.prop.isList)
+                if (this.prop.isList) {
                     return ce('prop-reference-multiple', {
                         attrs: {styles},
                         on: {changed: this.changed, focus: this.focused},
                         props: pr,
                     });
-                else
+                } else
                     return ce('prop-reference', {
                         attrs: {"class": "prop-reference " + styles},
                         on: {changed: this.changed, keydown: this.keydown, focus: this.focused},
@@ -256,7 +256,6 @@
         &value {
             display: inline-block;
             width: 320px;
-            margin-left: 0.5rem;
             padding: 0.25rem 0.5rem;
 
             &-wide {

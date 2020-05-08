@@ -328,6 +328,13 @@
         display: table-cell;
     }
 
+    .user-forget-password-comment {
+        display: block;
+        color: gray;
+        font-size: smaller;
+        padding-top: 0.3rem;
+    }
+
     .user-profile-title {
         color: red;
 
@@ -353,6 +360,16 @@
                 color: white;
                 background-color: #5a6268;
             }
+        }
+    }
+
+    .function-login-comment {
+        color: gray;
+        font-size: smaller;
+        padding-top: 0.3rem;
+
+        a {
+            font-size: larger;
         }
     }
 

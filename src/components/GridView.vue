@@ -4,7 +4,7 @@ import {LogType} from "../../../sys/src/types";
         <!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->
         <!--            <filter-item :item="item" :key="item.id" v-for="item in dec.filter.items" :dec="dec"></filter-item>-->
         <!--        </div>-->
-        <table :class="{'table table-sm':true, 'grid-view-box':root}">
+        <table :class="{'grid-view-box':root}">
             <thead>
             <tr>
                 <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
@@ -338,6 +338,10 @@ import {LogType} from "../../../sys/src/types";
             /*color: rgba(0, 0, 0, 0.54);*/
         }
 
+        td {
+            padding: 0;
+        }
+
         td, th {
             border: 1px solid var(--grid-border);
             // border-left: none;
@@ -349,6 +353,9 @@ import {LogType} from "../../../sys/src/types";
 
         th {
             background-color: var(--grid-head);
+            padding: .25rem .5rem;
+            user-select: none;
+            -webkit-user-select: none;
 
             &:first-child {
                 min-width: 3rem;

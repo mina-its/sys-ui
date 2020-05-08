@@ -31,15 +31,15 @@ import {
     MenuItem,
     Modify,
     Socket,
-    StateChange,
-    FileActionType,
-    StartParams
+    StartParams,
+    StateChange
 } from './types';
 import {
     AjaxConfig,
     DirFile,
     Drive,
     FunctionDec,
+    GlobalType,
     IData,
     IError,
     Keys,
@@ -297,8 +297,15 @@ function initializeModifyForQueryNew(res: WebResponse) {
     });
 }
 
-export function getPropTextValue(meta: Property, data): any {
-    if (meta.formula) return evalExpression(this.doc, meta.formula);
+export function digitGroup(num: number): string {
+    if (num == null) return "";
+    let numParts = num.toString().split('.');
+    numParts[0] = numParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return numParts.join('.');
+}
+
+export function getPropTextValue(meta: Property, data) {
+    if (meta.formula) return evalExpression(data, meta.formula);
     if (!data) throw 'prop-text doc is null!';
 
     let val = data[meta.name];
@@ -804,6 +811,7 @@ export function load(href: string, pushState = false) {
         history.pushState(null, null, href);
     }
 
+    glob.notify = null;
     ajax(setQs('m', RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
 
@@ -1146,6 +1154,7 @@ function _dispatchStoreModify(store, change: StateChange) {
     }
 
     glob.dirty = glob.modifies.length > 0;
+    glob.notify = null;
     commitStoreChange(store, change);
 }
 
