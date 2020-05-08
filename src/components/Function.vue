@@ -12,7 +12,6 @@
         @Prop() private data: any;
         @Prop() private styles: string;
         private showProgress = false;
-        private spinnerTimer = null;
 
         render(ce) {
             if (this.styles && this.styles.indexOf('fa-') > -1)
@@ -74,6 +73,9 @@
                 } catch (ex) {
                     this.showProgress = false;
                     console.error(`function '${this.name}' click error.`, ex);
+                }
+                finally {
+                    this.showProgress = false;
                 }
             } else {
                 let functionName = this.name;

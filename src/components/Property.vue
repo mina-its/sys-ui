@@ -6,8 +6,7 @@
         GlobalType,
         ObjectViewType,
         Property as ObjectProperty,
-        PropertyEditMode,
-        CommentStyle
+        PropertyEditMode
     } from "../../../sys/src/types";
     import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
     import * as main from '../main';
