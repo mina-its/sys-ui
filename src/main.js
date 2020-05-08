@@ -13,8 +13,8 @@ let index = {
     "Reset Form Data                ": vueResetFormData,
     "Start Vue                      ": startVue,
     // Global
-    "Load                           ": load,
     "Handle Response                ": handleResponse,
+    "Load                           ": load,
     "Ajax                           ": ajax,
 };
 const uuid_1 = require("uuid");

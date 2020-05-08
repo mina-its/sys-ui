@@ -12,8 +12,8 @@ let index = {
     "Start Vue                      ": startVue,
 
     // Global
-    "Load                           ": load,
     "Handle Response                ": handleResponse,
+    "Load                           ": load,
     "Ajax                           ": ajax,
 };
 
