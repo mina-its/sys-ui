@@ -7,7 +7,8 @@ import {
     NotificationInfo,
     AppStateConfig,
     FormDto,
-    IData
+    IData,
+    ObjectDec
 } from '../../sys/src/types';
 
 export interface JQuery {
@@ -178,7 +179,6 @@ export class Global {
     fileGallery = new AppStateFileGallery();
     logs: AppStateLog[] = [];
     modal: boolean = false;
-    headFuncs: HeadFunc[] = [];
     config = new AppStateConfig();
     texts: { [key: string]: string };
     dirty: boolean = false;
@@ -197,6 +197,28 @@ export class Modify {
     ref: string;
     data?: any;
     state: any;
+}
+
+export enum FilterOperator {
+    eq = "eq",
+    ne = "ne",
+    ys = "ys",
+    no = "no",
+    nn = "nn",
+    nl = "nl",
+    nr = "nr",
+    gt = "gt",
+    gte = "gte",
+    lt = "lt",
+    dge = "dge",
+    dle = "dle",
+    lte = "lte",
+    lk = "lk",
+    sw = "sw",
+    ew = "ew",
+    mt = "mt",
+    in = "in",
+    nin = "nin"
 }
 
 export class AppStateFileGallery {

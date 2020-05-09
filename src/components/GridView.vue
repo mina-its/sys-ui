@@ -1,57 +1,105 @@
-import {LogType} from "../../../sys/src/types";
 <template>
-    <div :class="{'grid-view':true, 'p-4':root}" @scroll="onScroll()">
-        <!--        <div v-if="dec.filter && dec.filter.items" class="p-2 btn-toolbar">-->
-        <!--            <filter-item :item="item" :key="item.id" v-for="item in dec.filter.items" :dec="dec"></filter-item>-->
-        <!--        </div>-->
-        <table :class="{'grid-view-box':root}">
-            <thead>
-            <tr>
-                <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
-                    <CheckBox :checked="mainChecked" @changed="mainCheckChange"></CheckBox>
-                </th>
-                <th scope="col" v-else></th>
-                <th scope="col" class="text-nowrap" @click="showColumnMenu(prop, $event)"
-                    v-for="prop in dec.properties">
-                    {{prop.title || prop.name}}
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown"
-                         @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)"
-                         @changed="changed"></GridViewRow>
-            </tbody>
-            <tfoot>
-            <tr>
-                <td class="border-0" colspan="100">
-                    <div class="align-items-center d-flex">
-                        <Function v-if="dec.access & 4" styles="m-2 fa-plus" @exec="insert" name="newItem"
-                                  :title="$t('add')"></Function>
-                        <Function v-if="rowHeaderStyle===2" styles="fa-trash" @exec="deleteItems" name="deleteItems"
-                                  :title="$t('delete')"></Function>
-                        <ul v-if="dec.pages > 1" class="m-2 pagination flex-grow-1">
-                            <li class="page-item"><a @click="goBack" href="javascript:;" class="page-link">
-                                <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i>
-                            </a></li>
-                            <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') "><a
-                                    class="page-link" :href="page.ref">{{page.title}}</a></li>
-                            <li class="page-item"><a href="javascript:;" class="page-link" @click="goForward">
-                                <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i>
-                            </a></li>
-                        </ul>
+    <div class="h-100 d-flex flex-column flex-fill overflow-auto">
+        <!-- Toolbar -->
+        <div :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}"
+             role="toolbar" aria-label="Toolbar with button groups">
+            <Breadcrumb/>
+
+            <ToolbarModifyButtons/>
+            <div class="mr-auto"></div>
+            <!-- Filter -->
+            <div v-if="filterProp"
+                 class="filter-box mx-2 px-1 bg-light border rounded text-muted align-self-center d-flex">
+                <Property @keydown="filterKeyDown" @filterTitleClick="filterTitleClick" :prop="filterProp"
+                          :viewType="4"
+                          :item="filterPropItem"/>
+                <i class="fa fa-filter m-1 p-1 d-inline-block"></i>
+            </div>
+            <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name"
+                      @exec="func.exec" :title="func.title"></Function>
+            <Function v-if="glob.newItemButton" styles="btn-primary" @exec="newItem"
+                      :title="glob.newItemButton"></Function>
+            <Function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></Function>
+        </div>
+
+        <!-- Table -->
+        <div class="main-body w-100 h-100 overflow-auto d-flex">
+            <div :class="{'grid-view':true, 'p-4':root}" @scroll="onScroll()">
+
+                <!-- Filter Items -->
+                <div v-if="filterProp" class="pb-2 d-flex">
+                    <div v-for="item of filterItems" class="filter-chip border d-flex py-2 px-3 bg-white mr-2">
+                        <div>{{item.prop.title}}</div>
+                        <div class="filter-opr px-1 text-muted">{{$t(`opr-${item.oper}`)}}</div>
+                        <div class="filter-value text-muted">{{item.value}}</div>
+                        <i @click="removeFilter(item)" class="fas fa-times py-1 pl-3 text-dark"></i>
                     </div>
-                </td>
-            </tr>
-            </tfoot>
-        </table>
+                </div>
+
+                <!-- Grid View -->
+                <table :class="{'grid-view-box mb-5':root}">
+                    <thead>
+                    <tr>
+                        <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
+                            <CheckBox :checked="mainChecked" @changed="mainCheckChange"></CheckBox>
+                        </th>
+                        <th scope="col" v-else></th>
+                        <th scope="col" class="text-nowrap" @click="showColumnMenu(prop, $event)"
+                            v-for="prop in dec.properties">
+                            {{prop.title || prop.name}}
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown"
+                                 @headerClick="showRowMenu" v-for="item in items" :item="item"
+                                 :readonly="!(dec.access&2)"
+                                 @changed="changed"></GridViewRow>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td class="border-0" colspan="100">
+                            <div class="align-items-center d-flex">
+                                <Function v-if="dec.access & 4" styles="m-2 fa-plus" @exec="insert" name="newItem"
+                                          :title="$t('add')"></Function>
+                                <Function v-if="rowHeaderStyle===2" styles="fa-trash" @exec="deleteItems"
+                                          name="deleteItems"
+                                          :title="$t('delete')"></Function>
+                                <ul v-if="dec.pages > 1" class="m-2 pagination flex-grow-1">
+                                    <li class="page-item"><a @click="goBack" href="javascript:;" class="page-link">
+                                        <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i>
+                                    </a></li>
+                                    <li v-for="page in dec.pageLinks"
+                                        :class="'page-item' + (page.active ? ' active':'') ">
+                                        <a
+                                                class="page-link" :href="page.ref">{{page.title}}</a></li>
+                                    <li class="page-item"><a href="javascript:;" class="page-link" @click="goForward">
+                                        <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i>
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {$t, getQs, notify} from '@/main';
-    import {ChangeType, Constants, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '@/types';
+    import {$t, getQs, glob, load, notify, setQs, showCmenu} from '@/main';
+    import {
+        ChangeType,
+        Constants, FilterOperator,
+        FunctionExecEventArg, HeadFunc,
+        ItemChangeEventArg,
+        ItemEventArg,
+        JQuery,
+        MenuItem,
+        StateChange
+    } from '@/types';
     import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
     import {
@@ -64,15 +112,14 @@ import {LogType} from "../../../sys/src/types";
         ObjectDec,
         ObjectViewType,
         Pair,
-        ReqParams
+        ReqParams,
+        Property,
+        GlobalType
     } from '../../../sys/src/types';
 
     declare let $: JQuery;
 
-    @Component({
-        name: 'GridView',
-        components: {}
-    })
+    @Component({name: 'GridView', components: {}})
     export default class GridView extends Vue {
         @Prop() private uri: string;
         @Prop() private root: boolean;
@@ -80,9 +127,106 @@ import {LogType} from "../../../sys/src/types";
 
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainChecked = false;
+        private filterProp: Property = null;
+        private filterPropItem = {};
+        private filterItems: {
+            prop: Property;
+            oper: FilterOperator;
+            value: any;
+        }[] = [];
+        private headFuncs: HeadFunc[] = [];
+
+        mounted() {
+            this.refreshFilterItems();
+        }
+
+        updated() {
+            // this.refreshFilterItems();
+        }
+
+        refreshFilterItems() {
+            this.filterProp = this.dec.properties[0];
+            this.filterItems = [];
+            if (!getQs(ReqParams.query)) return;
+            let query = JSON.parse(getQs(ReqParams.query));
+            for (let key in query) {
+                if (query.hasOwnProperty(key)) {
+                    let prop = this.dec.properties.find(p => p.name == key);
+                    if (prop)
+                        this.filterItems.push({prop, oper: FilterOperator.eq, value: query[key]});
+                    else
+                        console.error(`Property '${key}' not found.`);
+                }
+            }
+        }
+
+        refreshQueryByFilter() {
+            let query;
+            if (this.filterItems.length == 0) {
+                query = null;
+                load(setQs(ReqParams.query, null, true), true);
+            } else {
+                query = {};
+                for (const item of this.filterItems) {
+                    query[item.prop.name] = item.value;
+                }
+                this.$store.state.data[this.uri] = [];
+                load(setQs(ReqParams.query, JSON.stringify(query), true), true);
+            }
+        }
+
+        removeFilter(item) {
+            this.filterItems.splice(this.filterItems.indexOf(item), 1);
+            this.refreshQueryByFilter();
+        }
+
+        filterKeyDown(e: ItemEventArg) {
+            if (this.filterProp._.gtype == GlobalType.string && e.event.keyCode == Keys.enter) {
+                this.filterItems.push({prop: this.filterProp, oper: FilterOperator.eq, value: e.event.target.value});
+                this.refreshQueryByFilter();
+            }
+        }
+
+        filterTitleClick(e) {
+            let items = this.dec.properties.map(p => {
+                return {ref: p, title: p.title} as MenuItem
+            });
+            showCmenu(this, items, e, (state, item: MenuItem) => {
+                if (item) state.filterProp = item.ref;
+            });
+        }
 
         get items(): IData[] {
             return this.$store.state.data[this.uri] || [];
+        }
+
+        newItem() {
+            main.load(location.pathname + '?n=1', true);
+        }
+
+        clickTitlePin(e: FunctionExecEventArg) {
+            let items: MenuItem[] = [
+                {ref: "export-excel", title: $t('export-excel')},
+                {ref: "export-csv", title: $t('export-csv')},
+                {ref: "export-pdf", title: $t('export-pdf')},
+                {title: "-"},
+                {ref: "import", title: $t('import')},
+                {title: "-"},
+                {ref: "print", title: $t('print')},
+            ];
+            main.showCmenu(null, items, e.event, (state, item: MenuItem) => {
+                switch (item.ref) {
+                    case "export-excel":
+                        break;
+
+                    case "export-csv":
+                        break;
+
+                    case "print":
+                        window.print();
+                        break;
+                }
+            });
         }
 
         mainCheckChange(e) {
@@ -173,14 +317,14 @@ import {LogType} from "../../../sys/src/types";
         goBack() {
             if (this.dec.page > 1) {
                 let href = main.setQs(ReqParams.page, this.dec.page - 1, true);
-                main.load(href);
+                main.load(href, true);
             }
         }
 
         goForward() {
             if (this.dec.page < this.dec.pages) {
                 let href = main.setQs(ReqParams.page, this.dec.page + 1, true);
-                main.load(href);
+                main.load(href, true);
             }
         }
 
@@ -377,6 +521,11 @@ import {LogType} from "../../../sys/src/types";
             &:hover {
                 opacity: .9;
             }
+        }
+
+        .filter-chip {
+            border-radius: 18px;
+            margin-top: -.5rem;
         }
 
         .page-item {

@@ -130,7 +130,6 @@ function vueResetFormData(res) {
     }
     exports.glob.data = res.data;
     exports.glob.form = res.form;
-    exports.glob.headFuncs = [];
     exports.glob.newItemButton = null;
     commitReloadData(store, res.data);
 }
@@ -501,12 +500,12 @@ function setQs(key, value, fullPath, href) {
     else {
         query.set(key, value.toString());
     }
-    if (href) {
-        return el.pathname + '?' + query;
-    }
-    else {
-        return fullPath ? (location.pathname + '?' + query) : query.toString();
-    }
+    let url;
+    if (href)
+        url = [el.pathname, query].join("?");
+    else
+        url = fullPath ? [location.pathname, query].join("?") : query.toString();
+    return url.replace(/\?$/, "");
 }
 exports.setQs = setQs;
 function checkPropDependencyOnChange(dec, prop, instance) {
@@ -755,14 +754,13 @@ function call(funcName, data, done) {
 exports.call = call;
 function load(href, pushState = false) {
     if (exports.glob.dirty) {
-        if (exports.glob.form.toolbar) {
-            notify($t('save-before'), types_2.LogType.Warning);
-            return;
-        }
-        else {
-            exports.glob.modifies = [];
-            exports.glob.dirty = false;
-        }
+        // if (glob.form.toolbar) {
+        notify($t('save-before'), types_2.LogType.Warning);
+        return;
+        // } else {
+        //     glob.modifies = [];
+        //     glob.dirty = false;
+        // }
     }
     if (pushState && location.href != href) {
         history.pushState(null, null, href);
@@ -903,7 +901,7 @@ function _commitFileAction(state, e) {
     exports.glob.dirty = true;
 }
 function dispatchFileAction(vue, e) {
-    vue.$store.dispatch('_dispatchFileAction', e);
+    vue["$store"].dispatch('_dispatchFileAction', e); // .$store had problem in other packages
 }
 exports.dispatchFileAction = dispatchFileAction;
 function _dispatchFileAction(store, e) {
@@ -1046,7 +1044,7 @@ function modifyOrder(item, uri) {
     modify.data._z = item._z;
 }
 function dispatchStoreModify(vue, change) {
-    vue.$store.dispatch('_dispatchStoreModify', change);
+    vue["$store"].dispatch('_dispatchStoreModify', change);
 }
 exports.dispatchStoreModify = dispatchStoreModify;
 function _dispatchStoreModify(store, change) {

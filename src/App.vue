@@ -1,14 +1,12 @@
 <template>
     <div class="d-flex h-100 flex-column">
         <header>
-            <NavBar></NavBar>
+            <NavBar/>
         </header>
         <main class="d-flex align-items-stretch overflow-auto">
-            <SideNav></SideNav>
-            <div class="d-flex flex-column flex-fill overflow-auto">
-                <Toolbar></Toolbar>
-                <FormView></FormView>
-            </div>
+            <SideNav/>
+            <ObjectView v-if="objectElem" :elem="objectElem"/>
+            <FormView v-else/>
         </main>
         <section class="helpers-section">
             <div id="snackbar"></div>
@@ -28,6 +26,7 @@
     import {Component, Vue} from 'vue-property-decorator';
     import {glob} from "./main";
     import {JQuery} from "./types";
+    import {ElemType} from '../../sys/src/types';
 
     declare let $: JQuery;
 
@@ -40,6 +39,13 @@
                 'background:#0072C6 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
                 'background:transparent'
             );
+        }
+
+        get objectElem() {
+            if (glob.form.elems && glob.form.elems.length == 1 && glob.form.elems[0].type == ElemType.Object)
+                return glob.form.elems[0];
+            else
+                return null;
         }
     }
 </script>
@@ -208,6 +214,11 @@
             bottom: 0;
             opacity: 0;
         }
+    }
+
+    .toolbar {
+        z-index: 1;
+        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 2px 6px 2px rgba(60, 64, 67, .15);
     }
 
     .separator-line {

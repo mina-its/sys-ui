@@ -93,7 +93,6 @@ class Global {
         this.fileGallery = new AppStateFileGallery();
         this.logs = [];
         this.modal = false;
-        this.headFuncs = [];
         this.config = new types_1.AppStateConfig();
         this.dirty = false;
         this.notify = null;
@@ -108,6 +107,28 @@ exports.Global = Global;
 class Modify {
 }
 exports.Modify = Modify;
+var FilterOperator;
+(function (FilterOperator) {
+    FilterOperator["eq"] = "eq";
+    FilterOperator["ne"] = "ne";
+    FilterOperator["ys"] = "ys";
+    FilterOperator["no"] = "no";
+    FilterOperator["nn"] = "nn";
+    FilterOperator["nl"] = "nl";
+    FilterOperator["nr"] = "nr";
+    FilterOperator["gt"] = "gt";
+    FilterOperator["gte"] = "gte";
+    FilterOperator["lt"] = "lt";
+    FilterOperator["dge"] = "dge";
+    FilterOperator["dle"] = "dle";
+    FilterOperator["lte"] = "lte";
+    FilterOperator["lk"] = "lk";
+    FilterOperator["sw"] = "sw";
+    FilterOperator["ew"] = "ew";
+    FilterOperator["mt"] = "mt";
+    FilterOperator["in"] = "in";
+    FilterOperator["nin"] = "nin";
+})(FilterOperator = exports.FilterOperator || (exports.FilterOperator = {}));
 class AppStateFileGallery {
     constructor() {
         this.path = '';

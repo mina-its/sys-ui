@@ -32,7 +32,8 @@ import {
     Modify,
     Socket,
     StartParams,
-    StateChange
+    StateChange,
+    FilterOperator
 } from './types';
 import {
     AjaxConfig,
@@ -136,7 +137,6 @@ function addHeadStyle(css: string) {
 function vueResetFormData(res: WebResponse) {
     // console.log(res);
     let dataset = res.data;
-
     if (!dataset) return;
 
     if (res.form && res.form.declarations) {
@@ -174,7 +174,6 @@ function vueResetFormData(res: WebResponse) {
 
     glob.data = res.data;
     glob.form = res.form as any;
-    glob.headFuncs = [];
     glob.newItemButton = null;
     commitReloadData(store, res.data);
 }
@@ -543,11 +542,12 @@ export function setQs(key: string, value: any, fullPath: boolean, href?: string)
         query.set(key, value.toString());
     }
 
-    if (href) {
-        return el.pathname + '?' + query;
-    } else {
-        return fullPath ? (location.pathname + '?' + query) : query.toString();
-    }
+    let url;
+    if (href)
+        url = [el.pathname, query].join("?");
+    else
+        url = fullPath ? [location.pathname, query].join("?") : query.toString();
+    return url.replace(/\?$/, "");
 }
 
 export function checkPropDependencyOnChange(dec: ObjectDec | FunctionDec, prop, instance: any) {
@@ -798,13 +798,13 @@ export function call(funcName: string, data: any, done: (err, data?) => void) {
 
 export function load(href: string, pushState = false) {
     if (glob.dirty) {
-        if (glob.form.toolbar) {
-            notify($t('save-before'), LogType.Warning);
-            return;
-        } else {
-            glob.modifies = [];
-            glob.dirty = false;
-        }
+        // if (glob.form.toolbar) {
+        notify($t('save-before'), LogType.Warning);
+        return;
+        // } else {
+        //     glob.modifies = [];
+        //     glob.dirty = false;
+        // }
     }
 
     if (pushState && location.href != href) {
@@ -953,7 +953,7 @@ function _commitFileAction(state, e: FileAction) {
 }
 
 export function dispatchFileAction(vue: Vue, e: FileAction) {
-    vue.$store.dispatch('_dispatchFileAction', e);
+    vue["$store"].dispatch('_dispatchFileAction', e); // .$store had problem in other packages
 }
 
 function _dispatchFileAction(store, e: FileAction) {
@@ -1115,7 +1115,7 @@ function modifyOrder(item: any, uri: string) {
 }
 
 export function dispatchStoreModify(vue: Vue, change: StateChange) {
-    vue.$store.dispatch('_dispatchStoreModify', change);
+    vue["$store"].dispatch('_dispatchStoreModify', change);
 }
 
 function _dispatchStoreModify(store, change: StateChange) {

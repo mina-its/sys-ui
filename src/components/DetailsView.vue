@@ -1,29 +1,47 @@
 <template>
-    <div class="d-flex overflow-auto details-view" @scroll="onScroll()">
-        <aside v-if="sideMenuVisible" class="border-right separator-line sidenav p-2 py-4 d-none d-md-block">
-            <ul :class="{'nav flex-column tree':1, 'pr-5':ltr, 'pl-5':rtl}" id="menus">
-                <li v-for="item in sideMenu" class="nav-item">
-                    <a @click="selectGroup(item)"
-                       :class="{'text-nowrap text-secondary nav-link': 1, 'pr-5':ltr, 'pl-5':rtl, 'active': $data.currentGroup===item.title}"
-                       href="javascript:void(0);">{{item.title}}</a>
-                </li>
-            </ul>
-        </aside>
-        <div :class="{'p-4':root, 'border rounded': !root && dec.detailsViewType===2}">
-            <div v-if="groupVisible(group)" :class="groupPanelStyle(group)"
-                 v-for="group in groups"
-                 :id="getGroupId(group)">
-                <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
-                <div class="group">
-                    <Property :readonly="!(dec.access&2)" v-for="prop in getProps(group)" :key="prop.name" :item="item" :prop="prop" @changed="changed"
-                          :viewType="2"></Property>
+    <div class="h-100 d-flex flex-column flex-fill overflow-auto">
+        <div :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}"
+             role="toolbar" aria-label="Toolbar with button groups">
+            <Breadcrumb/>
+
+            <ToolbarModifyButtons/>
+            <div class="mr-auto"></div>
+            <div class="mx-2" role="group">
+                <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name"
+                          @exec="func.exec" :title="func.title"/>
+            </div>
+            <Function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"/>
+        </div>
+        <div class="main-body w-100 h-100 overflow-auto d-flex">
+            <div class="d-flex overflow-auto details-view" @scroll="onScroll()">
+
+                <aside v-if="sideMenuVisible" class="border-right separator-line sidenav p-2 py-4 d-none d-md-block">
+                    <ul :class="{'nav flex-column tree':1, 'pr-5':ltr, 'pl-5':rtl}" id="menus">
+                        <li v-for="item in sideMenu" class="nav-item">
+                            <a @click="selectGroup(item)"
+                               :class="{'text-nowrap text-secondary nav-link': 1, 'pr-5':ltr, 'pl-5':rtl, 'active': $data.currentGroup===item.title}"
+                               href="javascript:void(0);">{{item.title}}</a>
+                        </li>
+                    </ul>
+                </aside>
+                <div :class="{'p-4':root, 'border rounded': !root && dec.detailsViewType===2}">
+                    <div v-if="groupVisible(group)" :class="groupPanelStyle(group)"
+                         v-for="group in groups"
+                         :id="getGroupId(group)">
+                        <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
+                        <div class="group">
+                            <Property :readonly="!(dec.access&2)" v-for="prop in getProps(group)" :key="prop.name"
+                                      :item="item" :prop="prop" @changed="changed"
+                                      :viewType="2"></Property>
+                        </div>
+                    </div>
+                    <div v-if="nonGroupVisible()" :class="{'gp':root}">
+                        <Property v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
+                                  @changed="changed" :viewType="2"></Property>
+                    </div>
+                    <div v-if="root" class="h-25"></div>
                 </div>
             </div>
-            <div v-if="nonGroupVisible()" :class="{'gp':root}">
-                <Property v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
-                      @changed="changed" :viewType="2"></Property>
-            </div>
-            <div v-if="root" class="h-25"></div>
         </div>
     </div>
 </template>
@@ -43,7 +61,8 @@
         @Prop() private uri: string;
         @Prop() private root: boolean;
         @Prop() private dec: ObjectDec;
-        currentGroup: string = this.groups[0];
+        private currentGroup: string = this.groups[0];
+        private headFuncs: any[];
 
         groupPanelStyle(group: string): string {
             let style = this.dec.detailsViewType === ObjectDetailsViewType.Tabular ? 'py-4' : "";
@@ -64,10 +83,10 @@
 
         mounted() {
             if (this.root) {
-                glob.headFuncs = [];
+                this.headFuncs = [];
                 if (this.dec.links)
                     for (const link of this.dec.links) {
-                        glob.headFuncs.push({
+                        this.headFuncs.push({
                             title: link.title as string,
                             name: link.address["$oid"],
                             exec: this.execLink
@@ -117,7 +136,7 @@
 
             let props = this.getProps(this.currentGroup);
             if (props && props.length == 1 && props[0].isList) {
-                glob.headFuncs = [
+                this.headFuncs = [
                     {
                         title: $t("new-item"), name: "string", exec: () => {
                             let uri = this.uri + "/" + props[0].name;
@@ -137,7 +156,7 @@
                     }
                 ];
             } else
-                glob.headFuncs = [];
+                this.headFuncs = [];
         }
 
         nonGroupVisible() {

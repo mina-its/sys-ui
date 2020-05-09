@@ -1,6 +1,13 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, NewItemMode, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, AccessPermission} from "../../../sys/src/types";
+    import {
+        Elem,
+        NewItemMode,
+        ObjectDec,
+        ObjectDetailsViewType,
+        ObjectListsViewType,
+        AccessPermission
+    } from "../../../sys/src/types";
     import {glob} from '@/main';
     import pluralize = require('pluralize');
 
@@ -22,7 +29,7 @@
             if (!dec) throw `dec is empty for ref '${e.obj._.ref}'`;
             let rt = this.root == null ? true : this.root;
             glob.newItemButton = ((dec as ObjectDec).access & AccessPermission.NewItem) &&
-                    Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
+            Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
 
             if (Array.isArray(data)) {
                 let viewType = (dec as ObjectDec).listsViewType || ObjectListsViewType.Grid;
