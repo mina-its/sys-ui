@@ -173,7 +173,7 @@ export class TreeViewAttribute {
 }
 
 export class Global {
-    data: any;
+    data: any = {};
     form: FormDto;
     question = new AppStateQuestion();
     fileGallery = new AppStateFileGallery();
@@ -189,7 +189,6 @@ export class Global {
     socket: Socket;
     packageGlobal: any;
     progress: number = null;
-    newItemButton: string = null;
 }
 
 export class Modify {

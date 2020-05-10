@@ -17,11 +17,14 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
         this.filterItems = [];
         this.headFuncs = [];
     }
+    get items() {
+        return this.$store.state.data[this.uri] || [];
+    }
     mounted() {
         this.refreshFilterItems();
     }
     updated() {
-        this.refreshFilterItems();
+        // this.refreshFilterItems();
     }
     refreshFilterItems() {
         this.filterProp = this.dec.properties[0];
@@ -39,8 +42,7 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
             }
         }
     }
-    removeFilter(item) {
-        this.filterItems.splice(this.filterItems.indexOf(item), 1);
+    refreshQueryByFilter() {
         let query;
         if (this.filterItems.length == 0) {
             query = null;
@@ -51,14 +53,19 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
             for (const item of this.filterItems) {
                 query[item.prop.name] = item.value;
             }
+            this.$store.state.data[this.uri] = [];
             main_1.load(main_1.setQs(types_2.ReqParams.query, JSON.stringify(query), true), true);
         }
     }
+    removeFilter(item) {
+        this.filterItems.splice(this.filterItems.indexOf(item), 1);
+        this.refreshQueryByFilter();
+    }
     filterKeyDown(e) {
-        // if (this.filterProp._.gtype == GlobalType.string && e.event.keyCode == Keys.enter) {
-        //     glob.filter.query = glob.filter.query || {};
-        //     if (Object.keys(glob.filter.query).length) glob.filter.query = {$and: [glob.filter.query]};
-        // }
+        if (this.filterProp._.gtype == types_2.GlobalType.string && e.event.keyCode == types_2.Keys.enter) {
+            this.filterItems.push({ prop: this.filterProp, oper: types_1.FilterOperator.eq, value: e.event.target.value });
+            this.refreshQueryByFilter();
+        }
     }
     filterTitleClick(e) {
         let items = this.dec.properties.map(p => {
@@ -69,10 +76,7 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
                 state.filterProp = item.ref;
         });
     }
-    get items() {
-        return this.$store.state.data[this.uri] || [];
-    }
-    newItem() {
+    clickNewItem() {
         main.load(location.pathname + '?n=1', true);
     }
     clickTitlePin(e) {
@@ -174,13 +178,13 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
     goBack() {
         if (this.dec.page > 1) {
             let href = main.setQs(types_2.ReqParams.page, this.dec.page - 1, true);
-            main.load(href);
+            main.load(href, true);
         }
     }
     goForward() {
         if (this.dec.page < this.dec.pages) {
             let href = main.setQs(types_2.ReqParams.page, this.dec.page + 1, true);
-            main.load(href);
+            main.load(href, true);
         }
     }
     showColumnMenu(prop, e) {
@@ -311,6 +315,9 @@ tslib_1.__decorate([
 tslib_1.__decorate([
     vue_property_decorator_1.Prop()
 ], GridView.prototype, "dec", void 0);
+tslib_1.__decorate([
+    vue_property_decorator_1.Prop()
+], GridView.prototype, "newItem", void 0);
 GridView = tslib_1.__decorate([
     vue_property_decorator_1.Component({ name: 'GridView', components: {} })
 ], GridView);

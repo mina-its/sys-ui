@@ -1,6 +1,139 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+class {
+};
+"h-100 d-flex flex-column flex-fill overflow-auto" >
+    v - ;
+if ( = "root")
+    : class {
+    }
+"{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}";
+role = "toolbar";
+aria - label;
+"Toolbar with button groups" >
+    />
+    < ToolbarModifyButtons /  >
+    class {
+    };
+"mr-auto" > /div>
+    < div;
+class {
+}
+"mx-2";
+role = "group" >
+    v - ;
+for ( = "func in headFuncs"; ; )
+    : key = "func._id";
+styles = "btn-primary";
+name = "func.name";
+"func.exec";
+title = "func.title" /  >
+    /div>
+    < Function;
+styles = "text-secondary fa-cog fa-lg";
+name = "clickTitlePin";
+"clickTitlePin" /  >
+    /div>
+    < div;
+class {
+}
+"main-body w-100 h-100 overflow-auto d-flex" >
+;
+class {
+}
+"{'d-flex overflow-auto details-view':true, 'bg-white':!root}";
+"onScroll()" >
+    v - ;
+if ( = "sideMenuVisible")
+    class {
+    }
+"border-right separator-line sidenav p-2 py-4 d-none d-md-block" >
+;
+class {
+}
+"{'nav flex-column tree':1, 'pr-5':ltr, 'pl-5':rtl}";
+id = "menus" >
+    v - ;
+for ( = "item in sideMenu"; class {
+} = "nav-item" >
+; )
+"selectGroup(item)";
+class {
+}
+"{'text-nowrap text-secondary nav-link': 1, 'pr-5':ltr, 'pl-5':rtl, 'active': $data.currentGroup===item.title}";
+href = "javascript:void(0);" > {};
+{
+    item.title;
+}
+/a>
+    < /li>
+    < /ul>
+    < /aside>
+    < div;
+class {
+}
+"{'p-4':root, 'border rounded': !root && dec.detailsViewType===2}" >
+    v - ;
+if ( = "groupVisible(group)")
+    : class {
+    }
+"groupPanelStyle(group)";
+v - ;
+for ( = "group in groups"; ; )
+    : id = "getGroupId(group)" >
+        v - ;
+if ( = "groupHeadVisible(group)")
+    class {
+    }
+"text-secondary mb-4" > {};
+{
+    group;
+}
+/h3>
+    < div;
+class {
+}
+"group" >
+;
+readonly = "!(dec.access&2)";
+v - ;
+for ( = "prop in getProps(group)"; ; )
+    : key = "prop.name";
+item = "item";
+prop = "prop";
+"changed";
+viewType = "2" > /Property>
+    < /div>
+    < /div>
+    < div;
+v - ;
+if ( = "nonGroupVisible()")
+    : class {
+    }
+"{'gp':root}" >
+    v - ;
+for ( = "prop in dec.properties"; ; )
+    : key = "prop.name";
+item = "item";
+prop = "prop";
+"changed";
+viewType = "2" > /Property>
+    < /div>
+    < div;
+v - ;
+if ( = "root")
+    class {
+    }
+"h-25" > /div>
+    < /div>
+    < /div>
+    < /div>
+    < /div>
+    < /template>
+    < script;
+lang = "ts" >
+;
 const types_1 = require("@/types");
 const vue_property_decorator_1 = require("vue-property-decorator");
 const types_2 = require("../../../sys/src/types");
@@ -11,6 +144,7 @@ let DetailsView = class DetailsView extends vue_property_decorator_1.Vue {
     constructor() {
         super(...arguments);
         this.currentGroup = this.groups[0];
+        this.headFuncs = [];
     }
     groupPanelStyle(group) {
         let style = this.dec.detailsViewType === types_2.ObjectDetailsViewType.Tabular ? 'py-4' : "";
@@ -41,6 +175,18 @@ let DetailsView = class DetailsView extends vue_property_decorator_1.Vue {
                 }
         }
         this.reloadLastGroup();
+    }
+    clickTitlePin(e) {
+        let items = [
+            { ref: "print", title: main_1.$t('print') }
+        ];
+        main.showCmenu(null, items, e.event, (state, item) => {
+            switch (item.ref) {
+                case "print":
+                    window.print();
+                    break;
+            }
+        });
     }
     getGroupId(group) {
         if (this.root)
@@ -182,4 +328,88 @@ DetailsView = tslib_1.__decorate([
     vue_property_decorator_1.Component({ name: 'DetailsView', components: {} })
 ], DetailsView);
 exports.default = DetailsView;
+/script>
+    < style;
+lang = "scss" >
+        .details - view;
+{
+    scroll - behavior;
+    smooth;
+    min - width;
+    100 % ;
+    sidenav;
+    {
+        background - color;
+        white;
+    }
+    label;
+    {
+        color: var ;
+        (--form - label);
+        font - weight;
+        600;
+    }
+    input;
+    {
+        border - color;
+        var ;
+        (--grid - border);
+    }
+    gp;
+    {
+        background: #fff;
+        border - radius;
+        2;
+        px;
+        box - shadow;
+        0;
+        1;
+        px;
+        1;
+        px;
+        0;
+        rgba(0, 0, 0, 0.14), 0;
+        2;
+        px;
+        1;
+        px - 1;
+        px;
+        rgba(0, 0, 0, 0.12), 0;
+        1;
+        px;
+        3;
+        px;
+        0;
+        rgba(0, 0, 0, 0.2);
+        /*color: rgba(0, 0, 0, 0.54);*/
+        margin - bottom;
+        12;
+        px;
+        margin - left;
+        auto;
+        margin - right;
+        auto;
+        outline: none;
+        position: relative;
+        padding: 30;
+        px;
+    }
+    active;
+    {
+        font - weight;
+        500;
+        background - color;
+        #eee;
+        border - left;
+        3;
+        px;
+        solid;
+        var ;
+        (--link - color);
+        margin - left;
+        -3;
+        px;
+    }
+}
+/style>;
 //# sourceMappingURL=DetailsView.vue.js.map

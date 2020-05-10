@@ -89,6 +89,7 @@ class TreeViewAttribute {
 exports.TreeViewAttribute = TreeViewAttribute;
 class Global {
     constructor() {
+        this.data = {};
         this.question = new AppStateQuestion();
         this.fileGallery = new AppStateFileGallery();
         this.logs = [];
@@ -100,7 +101,6 @@ class Global {
         this.geoMap = new AppStateGeoMap();
         this.modifies = [];
         this.progress = null;
-        this.newItemButton = null;
     }
 }
 exports.Global = Global;

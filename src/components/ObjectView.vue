@@ -28,18 +28,19 @@
             const dec = glob.form.declarations[e.obj._.ref];
             if (!dec) throw `dec is empty for ref '${e.obj._.ref}'`;
             let rt = this.root == null ? true : this.root;
-            glob.newItemButton = ((dec as ObjectDec).access & AccessPermission.NewItem) &&
-            Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
 
             if (Array.isArray(data)) {
                 let viewType = (dec as ObjectDec).listsViewType || ObjectListsViewType.Grid;
+                let newItem = ((dec as ObjectDec).access & AccessPermission.NewItem) &&
+                Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
+                let props = {uri: e.obj._.ref, root: rt, dec, newItem};
                 switch (viewType) {
                     default:
                     case ObjectListsViewType.Grid:
-                        return ce('grid-view', {props: {uri: e.obj._.ref, root: rt, dec}});
+                        return ce('grid-view', {props});
 
                     case ObjectListsViewType.Card:
-                        return ce('card-view', {props: {uri: e.obj._.ref, root: rt, dec}});
+                        return ce('card-view', {props});
                 }
             } else {
                 let viewType = (dec as ObjectDec).detailsViewType || ObjectDetailsViewType.Tabular;

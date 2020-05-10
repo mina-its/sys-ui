@@ -174,8 +174,7 @@ function vueResetFormData(res: WebResponse) {
 
     glob.data = res.data;
     glob.form = res.form as any;
-    glob.newItemButton = null;
-    commitReloadData(store, res.data);
+    store.commit('_commitReloadData', glob.data);
 }
 
 function setUndefinedToNull(item, prop: Property) {
@@ -918,8 +917,24 @@ function registerComponents(vue, components) {
 function startVue(res: WebResponse, params?: StartParams) {
     try {
         handleWindowEvents();
+
         Vue.use(Vuex);
-        store = createStore();
+        store = new Vuex.Store({
+            state: {data: null},
+            mutations: {
+                _commitStoreChange,
+                _commitServerChangeResponse,
+                _commitReloadData,
+                _commitFileAction,
+                _commitReorderItems,
+            },
+            actions: {
+                _dispatchStoreModify,
+                _dispatchFileAction,
+                _dispatchRequestServerModify,
+            }
+        });
+
         handleResponse(res);
         if (typeof io != "undefined") glob.socket = io();
         Object.assign(Vue.config, {productionTip: false, devtools: true});
@@ -936,6 +951,7 @@ function startVue(res: WebResponse, params?: StartParams) {
 
         if (glob.config.rtl) $("html").attr("dir", "rtl");
         registerComponents(Vue, params ? params.components : null);
+
         new Vue({data: glob, store, render: h => h((params ? params.app : null) || App)}).$mount('#app');
     } catch (err) {
         console.error(err);
@@ -969,10 +985,6 @@ function _dispatchFileAction(store, e: FileAction) {
     modify.data[e.prop.name] = e.val || null;
 
     commitFileAction(store, e);
-}
-
-function commitReloadData(store, data: any) {
-    store.commit('_commitReloadData', data);
 }
 
 function _commitReloadData(state, data: any) {
@@ -1200,23 +1212,6 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
         glob.modifies.unshift(modify);
         done(err);
         notify(err);
-    });
-}
-
-function createStore() {
-    return new Vuex.Store({
-        mutations: {
-            _commitStoreChange,
-            _commitServerChangeResponse,
-            _commitReloadData,
-            _commitFileAction,
-            _commitReorderItems,
-        },
-        actions: {
-            _dispatchStoreModify,
-            _dispatchFileAction,
-            _dispatchRequestServerModify,
-        }
     });
 }
 

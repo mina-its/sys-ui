@@ -130,8 +130,7 @@ function vueResetFormData(res) {
     }
     exports.glob.data = res.data;
     exports.glob.form = res.form;
-    exports.glob.newItemButton = null;
-    commitReloadData(store, res.data);
+    store.commit('_commitReloadData', exports.glob.data);
 }
 function setUndefinedToNull(item, prop) {
     if (!item) {
@@ -867,7 +866,21 @@ function startVue(res, params) {
     try {
         handleWindowEvents();
         vue_1.default.use(vuex_1.default);
-        store = createStore();
+        store = new vuex_1.default.Store({
+            state: { data: null },
+            mutations: {
+                _commitStoreChange,
+                _commitServerChangeResponse,
+                _commitReloadData,
+                _commitFileAction,
+                _commitReorderItems,
+            },
+            actions: {
+                _dispatchStoreModify,
+                _dispatchFileAction,
+                _dispatchRequestServerModify,
+            }
+        });
         handleResponse(res);
         if (typeof io != "undefined")
             exports.glob.socket = io();
@@ -916,9 +929,6 @@ function _dispatchFileAction(store, e) {
     exports.glob.modifies.push(modify);
     modify.data[e.prop.name] = e.val || null;
     commitFileAction(store, e);
-}
-function commitReloadData(store, data) {
-    store.commit('_commitReloadData', data);
 }
 function _commitReloadData(state, data) {
     state.data = data;
@@ -1124,22 +1134,6 @@ function _dispatchRequestServerModify(store, done) {
         exports.glob.modifies.unshift(modify);
         done(err);
         notify(err);
-    });
-}
-function createStore() {
-    return new vuex_1.default.Store({
-        mutations: {
-            _commitStoreChange,
-            _commitServerChangeResponse,
-            _commitReloadData,
-            _commitFileAction,
-            _commitReorderItems,
-        },
-        actions: {
-            _dispatchStoreModify,
-            _dispatchFileAction,
-            _dispatchRequestServerModify,
-        }
     });
 }
 function start(params) {

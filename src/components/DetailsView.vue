@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 d-flex flex-column flex-fill overflow-auto">
-        <div :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}"
+        <div v-if="root" :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}"
              role="toolbar" aria-label="Toolbar with button groups">
             <Breadcrumb/>
 
@@ -13,7 +13,7 @@
             <Function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"/>
         </div>
         <div class="main-body w-100 h-100 overflow-auto d-flex">
-            <div class="d-flex overflow-auto details-view" @scroll="onScroll()">
+            <div :class="{'d-flex overflow-auto details-view':true, 'bg-white':!root}" @scroll="onScroll()">
 
                 <aside v-if="sideMenuVisible" class="border-right separator-line sidenav p-2 py-4 d-none d-md-block">
                     <ul :class="{'nav flex-column tree':1, 'pr-5':ltr, 'pl-5':rtl}" id="menus">
@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-    import {ChangeType, ItemChangeEventArg, JQuery, StateChange} from '@/types';
+    import {ChangeType, FunctionExecEventArg, HeadFunc, ItemChangeEventArg, JQuery, MenuItem, StateChange} from '@/types';
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta} from "../../../sys/src/types";
     import {$t, glob} from '@/main';
@@ -62,7 +62,7 @@
         @Prop() private root: boolean;
         @Prop() private dec: ObjectDec;
         private currentGroup: string = this.groups[0];
-        private headFuncs: any[];
+        private headFuncs: HeadFunc[] = [];
 
         groupPanelStyle(group: string): string {
             let style = this.dec.detailsViewType === ObjectDetailsViewType.Tabular ? 'py-4' : "";
@@ -95,6 +95,19 @@
             }
 
             this.reloadLastGroup();
+        }
+
+        clickTitlePin(e: FunctionExecEventArg) {
+            let items: MenuItem[] = [
+                {ref: "print", title: $t('print')}
+            ];
+            main.showCmenu(null, items, e.event, (state, item: MenuItem) => {
+                switch (item.ref) {
+                    case "print":
+                        window.print();
+                        break;
+                }
+            });
         }
 
         getGroupId(group: string) {
