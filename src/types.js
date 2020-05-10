@@ -64,6 +64,9 @@ exports.FunctionExecEventArg = FunctionExecEventArg;
 class ItemChangeEventArg {
 }
 exports.ItemChangeEventArg = ItemChangeEventArg;
+class FilterChangeEventArg {
+}
+exports.FilterChangeEventArg = FilterChangeEventArg;
 class AppStateCmenu {
     constructor() {
         this.show = false;
@@ -109,12 +112,12 @@ class Modify {
 exports.Modify = Modify;
 var FilterOperator;
 (function (FilterOperator) {
-    FilterOperator["eq"] = "eq";
-    FilterOperator["ne"] = "ne";
-    FilterOperator["ys"] = "ys";
-    FilterOperator["no"] = "no";
-    FilterOperator["nn"] = "nn";
-    FilterOperator["nl"] = "nl";
+    FilterOperator["Equal"] = "eq";
+    FilterOperator["NotEqual"] = "ne";
+    FilterOperator["Yes"] = "ye";
+    FilterOperator["No"] = "no";
+    FilterOperator["NotNull"] = "nn";
+    FilterOperator["Null"] = "nl";
     FilterOperator["nr"] = "nr";
     FilterOperator["gt"] = "gt";
     FilterOperator["gte"] = "gte";
@@ -122,7 +125,7 @@ var FilterOperator;
     FilterOperator["dge"] = "dge";
     FilterOperator["dle"] = "dle";
     FilterOperator["lte"] = "lte";
-    FilterOperator["lk"] = "lk";
+    FilterOperator["Like"] = "lk";
     FilterOperator["sw"] = "sw";
     FilterOperator["ew"] = "ew";
     FilterOperator["mt"] = "mt";

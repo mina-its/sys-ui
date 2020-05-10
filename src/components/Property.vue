@@ -8,16 +8,11 @@
         Property as ObjectProperty,
         PropertyEditMode
     } from "../../../sys/src/types";
-    import {ItemChangeEventArg, ItemEventArg, MenuItem, PropertyLabelMode} from '@/types';
-    import * as main from '../main';
+    import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
     import {getPropertyEmbedError} from '@/main';
-    import {$t, glob} from "../main";
-    import {showCmenu} from "../main";
+    import * as main from '../main';
 
-    @Component({
-        name: 'Property',
-        components: {}
-    })
+    @Component({name: 'Property', components: {}})
     export default class Property extends Vue {
         @Prop() private item: any;
         @Prop() private prop: ObjectProperty;
@@ -41,9 +36,6 @@
             switch (this.viewType) {
                 case ObjectViewType.GridView:
                     return this.renderValue(ce, "px-2 py-1");
-
-                case ObjectViewType.Filter:
-                    return this.renderFilterView(ce);
 
                 case ObjectViewType.DetailsView:
                     return this.renderDetailsView(ce);
@@ -72,49 +64,6 @@
         @Emit('keydown')
         keydown(e: ItemEventArg) {
             return e;
-        }
-
-        @Emit('filterTitleClick')
-        filterTitleClick(e) {
-            return e;
-        }
-
-        filterOperClick(e) {
-            let oprs = ["nn", "nl"];
-            switch (this.prop._.gtype) {
-                case GlobalType.string:
-                    oprs = ["lk", "eq", "ne", "nn", "nl"];
-                    break;
-
-                case GlobalType.number:
-                    oprs = ["eq", "ne", "gt", "gte", "lt", "lte", "nn", "nl"];
-                    break;
-
-                case GlobalType.time:
-                    oprs = ["eq", "ne", "dge", "dle", "gt", "gte", "lt", "lte", "nn", "nl"];
-                    break;
-            }
-            let items: MenuItem[] = oprs.map(opr => {
-                return {ref: opr, title: $t(`opr-${opr}`)} as MenuItem;
-            });
-            showCmenu(this, items, e, (state, item: MenuItem) => {
-                if (item) state.filterProp = item.ref;
-            });
-        }
-
-        renderFilterView(ce) {
-            let $this = this;
-            let propTitle = ce('div', {
-                attrs: {"class": "filter-prop-title p-1"},
-                on: {click: $this.filterTitleClick}
-            }, this.prop.title || this.prop.name);
-
-            let propOper = ce('div', {
-                attrs: {"class": "filter-prop-oper mx-1 py-1 px-2 border-left font-weight-bold"},
-                on: {click: $this.filterOperClick}
-            }, ":");
-            let propValue = this.renderValue(ce, `filter-prop-value px-1 border border-top-0 border-bottom-0`);
-            return ce('div', {attrs: {"class": "d-flex align-self-center"}}, [propTitle, propOper, propValue]);
         }
 
         renderDetailsView(ce) {
@@ -246,7 +195,7 @@
                     if (this.viewType == ObjectViewType.TreeView)
                         return null;
 
-                    if (this.viewType != ObjectViewType.GridView)
+                    if (this.viewType == ObjectViewType.DetailsView)
                         pr["label"] = this.prop.title;
 
                     return ce('prop-boolean', {
@@ -340,19 +289,6 @@
             display: block;
             width: 100%;
             max-width: 420px;
-        }
-    }
-
-    .filter-prop-title {
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .filter-prop-oper {
-        cursor: pointer;
-
-        &:hover {
-            background-color: white;
         }
     }
 

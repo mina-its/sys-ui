@@ -12,68 +12,86 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
         super(...arguments);
         this.rowHeaderStyle = types_2.GridRowHeaderStyle.empty;
         this.mainChecked = false;
-        this.filterProp = null;
-        this.filterPropItem = {};
-        this.filterItems = [];
+        this.filter = {};
+        this.filterDoc = {};
+        this.filteringProp = null;
+        this.filteredProps = [];
         this.headFuncs = [];
     }
     get items() {
         return this.$store.state.data[this.uri] || [];
     }
     mounted() {
-        this.refreshFilterItems();
+        this.filteringProp = this.dec.properties[0];
+        for (let prop of this.dec.properties) {
+            this.filterDoc[prop.name] = null;
+        }
+        this.extractFilteredProps();
     }
-    updated() {
-        // this.refreshFilterItems();
+    filterValueChanged(e) {
+        // if (e.prop._.isRef) {
+        //     this.filteringProp = e.prop;
+        //     // this.filteringProp = null;
+        //     // this.$nextTick(() => {
+        //     //     this.filteringProp = e.prop;
+        //     // });
+        //
+        //     // let value = {};
+        //     // value[e.prop.name] = e.val;
+        // }
+        this.filterDoc[e.prop.name] = e.val;
+        this.filter[e.prop.name] = e.filterVal;
+        let alreadyProp = this.filteredProps.find(prop => prop == e.prop);
+        if (!alreadyProp)
+            this.filteredProps.push(e.prop);
+        else if (e.val == null)
+            this.filteredProps.splice(this.filteredProps.indexOf(alreadyProp), 1);
+        this.refreshQueryByFilter();
     }
-    refreshFilterItems() {
-        this.filterProp = this.dec.properties[0];
-        this.filterItems = [];
-        if (!main_1.getQs(types_2.ReqParams.query))
-            return;
-        let query = JSON.parse(main_1.getQs(types_2.ReqParams.query));
-        for (let key in query) {
-            if (query.hasOwnProperty(key)) {
+    extractFilteredProps() {
+        this.filteredProps = [];
+        if (main_1.getQs(types_2.ReqParams.query))
+            this.filter = JSON.parse(main_1.getQs(types_2.ReqParams.query));
+        else
+            this.filter = {};
+        for (let key in this.filter) {
+            if (this.filter.hasOwnProperty(key) && this.filter[key] != null) {
                 let prop = this.dec.properties.find(p => p.name == key);
-                if (prop)
-                    this.filterItems.push({ prop, oper: types_1.FilterOperator.eq, value: query[key] });
+                if (prop) {
+                    this.filteredProps.push(prop);
+                }
                 else
                     console.error(`Property '${key}' not found.`);
             }
         }
     }
     refreshQueryByFilter() {
-        let query;
-        if (this.filterItems.length == 0) {
-            query = null;
-            main_1.load(main_1.setQs(types_2.ReqParams.query, null, true), true);
-        }
-        else {
-            query = {};
-            for (const item of this.filterItems) {
-                query[item.prop.name] = item.value;
+        let query = null;
+        for (let key in this.filter) {
+            if (this.filter[key] != null) {
+                query = query || {};
+                query[key] = this.filter[key];
             }
-            this.$store.state.data[this.uri] = [];
-            main_1.load(main_1.setQs(types_2.ReqParams.query, JSON.stringify(query), true), true);
         }
+        main_1.load(main_1.setQs(types_2.ReqParams.query, query ? JSON.stringify(query) : null, true), true);
     }
-    removeFilter(item) {
-        this.filterItems.splice(this.filterItems.indexOf(item), 1);
+    removeFilter(prop) {
+        this.filteredProps.splice(this.filteredProps.indexOf(prop), 1);
         this.refreshQueryByFilter();
     }
     filterKeyDown(e) {
-        if (this.filterProp._.gtype == types_2.GlobalType.string && e.event.keyCode == types_2.Keys.enter) {
-            this.filterItems.push({ prop: this.filterProp, oper: types_1.FilterOperator.eq, value: e.event.target.value });
+        if (e.event.keyCode == types_2.Keys.enter) {
+            this.filteredProps.push(this.filteringProp);
             this.refreshQueryByFilter();
         }
     }
-    filterTitleClick(e) {
-        let items = this.dec.properties.map(p => {
-            return { ref: p, title: p.title };
+    changeFilterProp(e) {
+        let items = this.dec.properties.map(prop => {
+            return { ref: prop, title: prop.title };
         });
         main_1.showCmenu(this, items, e, (state, item) => {
             if (item)
-                state.filterProp = item.ref;
+                state.filteringProp = item.ref;
         });
     }
     clickNewItem() {

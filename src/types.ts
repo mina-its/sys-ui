@@ -131,6 +131,12 @@ export class ItemChangeEventArg {
     vue?: Vue;
 }
 
+export class FilterChangeEventArg {
+    prop: Property;
+    val: any;
+    filterVal?: any;
+}
+
 export class AppStateCmenu {
     state: any;
     show: boolean;
@@ -199,12 +205,12 @@ export class Modify {
 }
 
 export enum FilterOperator {
-    eq = "eq",
-    ne = "ne",
-    ys = "ys",
-    no = "no",
-    nn = "nn",
-    nl = "nl",
+    Equal = "eq",
+    NotEqual = "ne",
+    Yes = "ye",
+    No = "no",
+    NotNull = "nn",
+    Null = "nl",
     nr = "nr",
     gt = "gt",
     gte = "gte",
@@ -212,7 +218,7 @@ export enum FilterOperator {
     dge = "dge",
     dle = "dle",
     lte = "lte",
-    lk = "lk",
+    Like = "lk",
     sw = "sw",
     ew = "ew",
     mt = "mt",

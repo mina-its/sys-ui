@@ -1,16 +1,16 @@
+import {FilterOperator} from "@/types";
 <template>
     <div class="h-100 d-flex flex-column flex-fill overflow-auto">
         <!-- Toolbar -->
-        <div v-if="root" :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}"
-             role="toolbar" aria-label="Toolbar with button groups">
+        <div v-if="root" :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
             <Breadcrumb/>
 
             <ToolbarModifyButtons/>
             <div class="mr-auto"></div>
             <!-- Filter -->
-            <div v-if="filterProp" class="filter-box mx-2 px-1 bg-light border rounded text-muted align-self-center d-flex">
-                <Property @keydown="filterKeyDown" @filterTitleClick="filterTitleClick" :prop="filterProp" :viewType="4" :item="filterPropItem"/>
-                <i class="fa fa-filter m-1 p-1 d-inline-block"></i>
+            <div v-if="filter && filteringProp" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mr-2 rounded">
+                <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
+                <i class="fa fa-filter p-1 d-inline-block"></i>
             </div>
             <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name" @exec="func.exec" :title="func.title"></Function>
             <Function v-if="newItem" styles="btn-primary" @exec="clickNewItem" :title="newItem"></Function>
@@ -22,12 +22,10 @@
             <div :class="{'grid-view':true, 'p-4':root}" @scroll="onScroll()">
 
                 <!-- Filter Items -->
-                <div v-if="root & filterProp" class="pb-2 d-flex">
-                    <div v-for="item of filterItems" class="filter-chip border d-flex py-2 px-3 bg-white mr-2">
-                        <div>{{item.prop.title}}</div>
-                        <div class="filter-opr px-1 text-muted">{{$t(`opr-${item.oper}`)}}</div>
-                        <div class="filter-value text-muted">{{item.value}}</div>
-                        <i @click="removeFilter(item)" class="fas fa-times py-1 pl-3 text-dark"></i>
+                <div v-if="filter && filteringProp" class="pb-2 d-flex">
+                    <div v-for="prop of filteredProps" class="filter-chip border d-flex align-items-center py-1 px-2 bg-white mr-2">
+                        <PropertyFilter :allowPropChange="true" :prop="prop" :filter="filter" @changed="filterValueChanged" :filterDoc="filterDoc"/>
+                        <i @click="removeFilter(prop)" class="fas fa-times p-1 text-dark"></i>
                     </div>
                 </div>
 
@@ -73,33 +71,11 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {$t, getQs, glob, load, notify, setQs, showCmenu} from '@/main';
-    import {
-        ChangeType,
-        Constants, FilterOperator,
-        FunctionExecEventArg, HeadFunc,
-        ItemChangeEventArg,
-        ItemEventArg,
-        JQuery,
-        MenuItem,
-        StateChange
-    } from '@/types';
+    import {$t, getQs, load, notify, setQs, showCmenu} from '@/main';
+    import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, FunctionExecEventArg, HeadFunc, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '@/types';
     import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
-    import {
-        EntityMeta,
-        GridRowHeaderStyle,
-        IData,
-        Keys,
-        LogType,
-        NewItemMode,
-        ObjectDec,
-        ObjectViewType,
-        Pair,
-        ReqParams,
-        Property,
-        GlobalType
-    } from '../../../sys/src/types';
+    import {EntityMeta, GridRowHeaderStyle, IData, Keys, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, ReqParams, Property} from '../../../sys/src/types';
 
     declare let $: JQuery;
 
@@ -111,13 +87,10 @@
         @Prop() private newItem: string;
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainChecked = false;
-        private filterProp: Property = null;
-        private filterPropItem = {};
-        private filterItems: {
-            prop: Property;
-            oper: FilterOperator;
-            value: any;
-        }[] = [];
+        private filter = {};
+        private filterDoc = {};
+        private filteringProp: Property = null;
+        private filteredProps: Property[] = [];
         private headFuncs: HeadFunc[] = [];
 
         get items(): IData[] {
@@ -125,62 +98,80 @@
         }
 
         mounted() {
-            this.refreshFilterItems();
+            this.filteringProp = this.dec.properties[0];
+            for (let prop of this.dec.properties) {
+                this.filterDoc[prop.name] = null;
+            }
+            this.extractFilteredProps();
         }
 
-        updated() {
-            // this.refreshFilterItems();
+        filterValueChanged(e: FilterChangeEventArg) {
+            this.filterDoc[e.prop.name] = e.val;
+            this.filter[e.prop.name] = e.filterVal;
+            let props = this.filteredProps;
+            let alreadyProp = props.find(prop => prop == e.prop);
+            if (!alreadyProp)
+                props.push(e.prop);
+            else if (e.val == null)
+                props.splice(props.indexOf(alreadyProp), 1);
+
+            this.filteredProps = null;
+            this.$nextTick(() => {
+                this.filteredProps = [...props];
+            });
+
+            this.refreshQueryByFilter();
         }
 
-        refreshFilterItems() {
-            this.filterProp = this.dec.properties[0];
-            this.filterItems = [];
-            if (!getQs(ReqParams.query)) return;
-            let query = JSON.parse(getQs(ReqParams.query));
-            for (let key in query) {
-                if (query.hasOwnProperty(key)) {
+        extractFilteredProps() {
+            this.filteredProps = [];
+            if (getQs(ReqParams.query))
+                this.filter = JSON.parse(getQs(ReqParams.query));
+            else
+                this.filter = {};
+
+            for (let key in this.filter) {
+                if (this.filter.hasOwnProperty(key) && this.filter[key] != null) {
                     let prop = this.dec.properties.find(p => p.name == key);
-                    if (prop)
-                        this.filterItems.push({prop, oper: FilterOperator.eq, value: query[key]});
-                    else
+                    if (prop) {
+                        this.filteredProps.push(prop);
+                    } else
                         console.error(`Property '${key}' not found.`);
                 }
             }
         }
 
         refreshQueryByFilter() {
-            let query;
-            if (this.filterItems.length == 0) {
-                query = null;
-                load(setQs(ReqParams.query, null, true), true);
-            } else {
-                query = {};
-                for (const item of this.filterItems) {
-                    query[item.prop.name] = item.value;
+            let query = null;
+            for (let key in this.filter) {
+                if (this.filter[key] != null) {
+                    query = query || {};
+                    query[key] = this.filter[key];
                 }
-                this.$store.state.data[this.uri] = [];
-                load(setQs(ReqParams.query, JSON.stringify(query), true), true);
             }
+            load(setQs(ReqParams.query, query ? JSON.stringify(query) : null, true), true);
         }
 
-        removeFilter(item) {
-            this.filterItems.splice(this.filterItems.indexOf(item), 1);
+        removeFilter(prop) {
+            this.filter[prop.name] = null;
+            this.filterDoc[prop.name] = null;
+            this.filteredProps.splice(this.filteredProps.indexOf(prop), 1);
             this.refreshQueryByFilter();
         }
 
         filterKeyDown(e: ItemEventArg) {
-            if (this.filterProp._.gtype == GlobalType.string && e.event.keyCode == Keys.enter) {
-                this.filterItems.push({prop: this.filterProp, oper: FilterOperator.eq, value: e.event.target.value});
+            if (e.event.keyCode == Keys.enter) {
+                this.filteredProps.push(this.filteringProp);
                 this.refreshQueryByFilter();
             }
         }
 
-        filterTitleClick(e) {
-            let items = this.dec.properties.map(p => {
-                return {ref: p, title: p.title} as MenuItem
+        changeFilterProp(e) {
+            let items = this.dec.properties.map(prop => {
+                return {ref: prop, title: prop.title} as MenuItem
             });
             showCmenu(this, items, e, (state, item: MenuItem) => {
-                if (item) state.filterProp = item.ref;
+                if (item) state.filteringProp = item.ref;
             });
         }
 
@@ -509,7 +500,7 @@
 
         .filter-chip {
             border-radius: 18px;
-            margin-top: -.5rem;
+            margin-top: -.7rem;
         }
 
         .page-item {

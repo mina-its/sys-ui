@@ -1227,7 +1227,7 @@ export function start(params?: StartParams) {
         uri = setQs('t', Math.random(), false, uri);
         if (getQs(Constants.QUERY_LOCALE))
             uri = setQs(Constants.QUERY_LOCALE, getQs(Constants.QUERY_LOCALE), false, uri);
-        console.log(`loading main-state async from '${uri}' ...`);
+        // console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, {withCredentials: true}).then(res => {
             if (res.data)
                 startVue(res.data, params);
