@@ -3,17 +3,17 @@ import {FilterOperator} from "@/types";
     <div class="h-100 d-flex flex-column flex-fill overflow-auto">
         <!-- Toolbar -->
         <div v-if="root" :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
-            <Breadcrumb/>
+            <Breadcrumb :count="dec.count"/>
 
             <ToolbarModifyButtons/>
             <div class="mr-auto"></div>
             <!-- Filter -->
             <div v-if="filter && filteringProp" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mr-2 rounded">
                 <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
-                <i class="fa fa-filter p-1 d-inline-block"></i>
+                <i class="fa fa-filter p-1 d-inline-block text-muted"></i>
             </div>
             <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name" @exec="func.exec" :title="func.title"></Function>
-            <Function v-if="newItem" styles="btn-primary" @exec="clickNewItem" :title="newItem"></Function>
+            <Function v-if="newItem" styles="btn-success" @exec="clickNewItem" :title="newItem"></Function>
             <Function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></Function>
         </div>
 
@@ -60,7 +60,6 @@ import {FilterOperator} from "@/types";
                                             <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i> </a>
                                         </li>
                                     </ul>
-                                    <div class="p-2 text-muted small">{{countTitle}}</div>
                                 </div>
                             </div>
                         </td>
@@ -73,8 +72,8 @@ import {FilterOperator} from "@/types";
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {$t, getQs, load, notify, setQs, showCmenu} from '@/main';
+    import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
+    import {$t, getQs, glob, load, notify, setQs, showCmenu} from '@/main';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, FunctionExecEventArg, HeadFunc, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '@/types';
     import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
@@ -100,16 +99,16 @@ import {FilterOperator} from "@/types";
             return this.$store.state.data[this.uri] || [];
         }
 
-        get countTitle() {
-            if (this.dec.count == 0)
-                return "(Empty)";
-            else if (this.dec.count == 1)
-                return "(1 item)";
-            else
-                return `(${this.dec.count} items)`;
+        @Watch('uri') // Switching between forms
+        onUriReset() {
+            this.filteredProps = [];
+            this.filterDoc = {};
+            this.filter = {};
+            this.filteringProp = this.dec.properties[0];
         }
 
         mounted() {
+            this.filterDoc = {};
             this.filteringProp = this.dec.properties[0];
             for (let prop of this.dec.properties) {
                 this.filterDoc[prop.name] = null;
@@ -118,10 +117,10 @@ import {FilterOperator} from "@/types";
         }
 
         filterValueChanged(e: FilterChangeEventArg) {
-            this.filterDoc[e.prop.name] = e.val;
-            this.filter[e.prop.name] = e.filterVal;
+            this.filterDoc[this.propLocaleName(e.prop)] = e.val;
+            this.filter[this.propLocaleName(e.prop)] = e.filterVal;
 
-            console.log('filter:', this.filter);
+            // console.log('filter:', this.filter);
 
             let props = this.filteredProps;
             let alreadyProp = props.find(prop => prop.name == e.prop.name);
@@ -131,8 +130,11 @@ import {FilterOperator} from "@/types";
                 props.splice(props.indexOf(alreadyProp), 1);
 
             this.filteredProps = null;
+            let doc = this.filterDoc;
+            this.filterDoc = null;
             this.$nextTick(() => {
                 this.filteredProps = [...props];
+                this.filterDoc = doc;
             });
 
             this.refreshQueryByFilter();
@@ -145,7 +147,7 @@ import {FilterOperator} from "@/types";
                 if (filterVal.$reg) {
                     if (/^\/\^/.test(filterVal.$reg)) return filterVal.$reg.replace(/^\/\^(.+)\/.+/, "$1");
                     else if (/\$\/i?$/.test(filterVal.$reg)) return filterVal.$reg.replace(/^\/(.+)\$\/.+/, "$1");
-                    else return filterVal.$reg.replace(/^\/(.+)\//, "$1");
+                    else return filterVal.$reg.replace(/^\/(.+)\/.+/, "$1");
                 } else if (filterVal.$gt) return filterVal.$gt;
                 else if (filterVal.$gte) return filterVal.$gte;
                 else if (filterVal.$lt) return filterVal.$lt;
@@ -169,10 +171,10 @@ import {FilterOperator} from "@/types";
                 this.filter = {};
 
             for (let key in this.filter) {
-                let prop = this.dec.properties.find(p => p.name == key);
+                let prop = this.dec.properties.find(p => p.name == key.replace(/\..+/, ""));
                 if (prop) {
                     this.filteredProps.push(prop);
-                    this.filterDoc[key] = this.getFilterDocValue(this.filter[key]);
+                    this.filterDoc[key.replace(/\..+/, "")] = this.getFilterDocValue(this.filter[key]);
                 } else
                     console.error(`Property '${key}' not found.`);
             }
@@ -189,8 +191,15 @@ import {FilterOperator} from "@/types";
             load(setQs(ReqParams.query, query ? JSON.stringify(query) : null, true), true);
         }
 
+        propLocaleName(prop: Property): string {
+            if (prop.text && prop.text.multiLanguage)
+                return prop.name + "." + glob.config.locale;
+            else
+                return prop.name;
+        }
+
         removeFilter(prop) {
-            this.filter[prop.name] = null;
+            this.filter[this.propLocaleName(prop)] = null;
             this.filterDoc[prop.name] = null;
             this.filteredProps.splice(this.filteredProps.indexOf(prop), 1);
             this.refreshQueryByFilter();

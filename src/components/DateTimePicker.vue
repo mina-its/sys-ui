@@ -176,6 +176,12 @@
 
         created() {
             this.date = this.value ? moment(this.value, this.format) : moment();
+            if (!/s/i.test(this.format))
+                this.date.set({second: 0, millisecond: 0});
+            if (!/m/.test(this.format))
+                this.date.set({minute: 0});
+            if (!/H/.test(this.format))
+                this.date.set({hour: 0});
             this.makeParts();
         }
 

@@ -21,15 +21,14 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
     get items() {
         return this.$store.state.data[this.uri] || [];
     }
-    get countTitle() {
-        if (this.dec.count == 0)
-            return "(Empty)";
-        else if (this.dec.count == 1)
-            return "(1 item)";
-        else
-            return `(${this.dec.count} items)`;
+    onUriReset() {
+        this.filteredProps = [];
+        this.filterDoc = {};
+        this.filter = {};
+        this.filteringProp = this.dec.properties[0];
     }
     mounted() {
+        this.filterDoc = {};
         this.filteringProp = this.dec.properties[0];
         for (let prop of this.dec.properties) {
             this.filterDoc[prop.name] = null;
@@ -39,17 +38,58 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
     filterValueChanged(e) {
         this.filterDoc[e.prop.name] = e.val;
         this.filter[e.prop.name] = e.filterVal;
+        console.log('filter:', this.filter);
         let props = this.filteredProps;
-        let alreadyProp = props.find(prop => prop == e.prop);
+        let alreadyProp = props.find(prop => prop.name == e.prop.name);
         if (!alreadyProp && e.val != null)
             props.push(e.prop);
         else if (alreadyProp && e.val == null)
             props.splice(props.indexOf(alreadyProp), 1);
         this.filteredProps = null;
+        let doc = this.filterDoc;
+        this.filterDoc = null;
         this.$nextTick(() => {
             this.filteredProps = [...props];
+            this.filterDoc = doc;
         });
         this.refreshQueryByFilter();
+    }
+    getFilterDocValue(filterVal) {
+        if (typeof filterVal == "string" || typeof filterVal == "number")
+            return filterVal;
+        if (filterVal) {
+            if (filterVal.$reg) {
+                if (/^\/\^/.test(filterVal.$reg))
+                    return filterVal.$reg.replace(/^\/\^(.+)\/.+/, "$1");
+                else if (/\$\/i?$/.test(filterVal.$reg))
+                    return filterVal.$reg.replace(/^\/(.+)\$\/.+/, "$1");
+                else
+                    return filterVal.$reg.replace(/^\/(.+)\/.+/, "$1");
+            }
+            else if (filterVal.$gt)
+                return filterVal.$gt;
+            else if (filterVal.$gte)
+                return filterVal.$gte;
+            else if (filterVal.$lt)
+                return filterVal.$lt;
+            else if (filterVal.$lte)
+                return filterVal.$lte;
+            else if (filterVal.$in)
+                return filterVal.$in;
+            else if (filterVal.$ne === true)
+                return types_1.FilterOperator.No;
+            else if (filterVal.$ne)
+                return filterVal.$ne;
+            else if (filterVal.$nn)
+                return filterVal.$nn;
+            else if (filterVal.$none)
+                return filterVal.$none;
+            else if (filterVal.$exists)
+                return filterVal.$exists;
+            else if (filterVal.$nin)
+                return filterVal.$nin;
+        }
+        return null;
     }
     extractFilteredProps() {
         this.filteredProps = [];
@@ -58,14 +98,13 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
         else
             this.filter = {};
         for (let key in this.filter) {
-            if (this.filter.hasOwnProperty(key) && this.filter[key] != null) {
-                let prop = this.dec.properties.find(p => p.name == key);
-                if (prop) {
-                    this.filteredProps.push(prop);
-                }
-                else
-                    console.error(`Property '${key}' not found.`);
+            let prop = this.dec.properties.find(p => p.name == key);
+            if (prop) {
+                this.filteredProps.push(prop);
+                this.filterDoc[key] = this.getFilterDocValue(this.filter[key]);
             }
+            else
+                console.error(`Property '${key}' not found.`);
         }
     }
     refreshQueryByFilter() {
@@ -341,6 +380,9 @@ tslib_1.__decorate([
 tslib_1.__decorate([
     vue_property_decorator_1.Prop()
 ], GridView.prototype, "newItem", void 0);
+tslib_1.__decorate([
+    vue_property_decorator_1.Watch('uri') // Switching between forms
+], GridView.prototype, "onUriReset", null);
 GridView = tslib_1.__decorate([
     vue_property_decorator_1.Component({ name: 'GridView', components: {} })
 ], GridView);
