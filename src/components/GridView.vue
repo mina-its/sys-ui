@@ -24,7 +24,7 @@ import {FilterOperator} from "@/types";
                 <!-- Filter Items -->
                 <div v-if="filter && filteringProp" class="pb-2 d-flex">
                     <div v-for="prop of filteredProps" class="filter-chip border d-flex align-items-center py-1 px-2 bg-white mr-2">
-                        <PropertyFilter :allowPropChange="true" :prop="prop" :filter="filter" @changed="filterValueChanged" :filterDoc="filterDoc"/>
+                        <PropertyFilter :allowPropChange="false" :prop="prop" :filter="filter" @changed="filterValueChanged" :filterDoc="filterDoc"/>
                         <i @click="removeFilter(prop)" class="fas fa-times p-1 text-dark"></i>
                     </div>
                 </div>
@@ -49,16 +49,19 @@ import {FilterOperator} from "@/types";
                             <div class="align-items-center d-flex">
                                 <Function v-if="dec.access & 4" styles="m-2 fa-plus" @exec="insert" name="newItem" :title="$t('add')"></Function>
                                 <Function v-if="rowHeaderStyle===2" styles="fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
-                                <ul v-if="dec.pages > 1" class="m-2 pagination flex-grow-1">
-                                    <li class="page-item">
-                                        <a @click="goBack" href="javascript:;" class="page-link"> <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i> </a>
-                                    </li>
-                                    <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') ">
-                                        <a class="page-link" :href="page.ref">{{page.title}}</a></li>
-                                    <li class="page-item">
-                                        <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i> </a>
-                                    </li>
-                                </ul>
+                                <div class="flex-grow-1 d-flex align-items-center">
+                                    <ul v-if="dec.pages > 1" class="m-2 pagination ">
+                                        <li class="page-item">
+                                            <a @click="goBack" href="javascript:;" class="page-link"> <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i> </a>
+                                        </li>
+                                        <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') ">
+                                            <a class="page-link" :href="page.ref">{{page.title}}</a></li>
+                                        <li class="page-item">
+                                            <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i> </a>
+                                        </li>
+                                    </ul>
+                                    <div class="p-2 text-muted small">{{countTitle}}</div>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -97,6 +100,15 @@ import {FilterOperator} from "@/types";
             return this.$store.state.data[this.uri] || [];
         }
 
+        get countTitle() {
+            if (this.dec.count == 0)
+                return "(Empty)";
+            else if (this.dec.count == 1)
+                return "(1 item)";
+            else
+                return `(${this.dec.count} items)`;
+        }
+
         mounted() {
             this.filteringProp = this.dec.properties[0];
             for (let prop of this.dec.properties) {
@@ -108,11 +120,14 @@ import {FilterOperator} from "@/types";
         filterValueChanged(e: FilterChangeEventArg) {
             this.filterDoc[e.prop.name] = e.val;
             this.filter[e.prop.name] = e.filterVal;
+
+            console.log('filter:', this.filter);
+
             let props = this.filteredProps;
-            let alreadyProp = props.find(prop => prop == e.prop);
-            if (!alreadyProp)
+            let alreadyProp = props.find(prop => prop.name == e.prop.name);
+            if (!alreadyProp && e.val != null)
                 props.push(e.prop);
-            else if (e.val == null)
+            else if (alreadyProp && e.val == null)
                 props.splice(props.indexOf(alreadyProp), 1);
 
             this.filteredProps = null;
@@ -123,6 +138,29 @@ import {FilterOperator} from "@/types";
             this.refreshQueryByFilter();
         }
 
+        getFilterDocValue(filterVal: any): any {
+            if (typeof filterVal == "string" || typeof filterVal == "number") return filterVal;
+
+            if (filterVal) {
+                if (filterVal.$reg) {
+                    if (/^\/\^/.test(filterVal.$reg)) return filterVal.$reg.replace(/^\/\^(.+)\/.+/, "$1");
+                    else if (/\$\/i?$/.test(filterVal.$reg)) return filterVal.$reg.replace(/^\/(.+)\$\/.+/, "$1");
+                    else return filterVal.$reg.replace(/^\/(.+)\//, "$1");
+                } else if (filterVal.$gt) return filterVal.$gt;
+                else if (filterVal.$gte) return filterVal.$gte;
+                else if (filterVal.$lt) return filterVal.$lt;
+                else if (filterVal.$lte) return filterVal.$lte;
+                else if (filterVal.$in) return filterVal.$in;
+                else if (filterVal.$ne === true) return FilterOperator.No;
+                else if (filterVal.$ne) return filterVal.$ne;
+                else if (filterVal.$nn) return filterVal.$nn;
+                else if (filterVal.$none) return filterVal.$none;
+                else if (filterVal.$exists) return filterVal.$exists;
+                else if (filterVal.$nin) return filterVal.$nin;
+            }
+            return null;
+        }
+
         extractFilteredProps() {
             this.filteredProps = [];
             if (getQs(ReqParams.query))
@@ -131,13 +169,12 @@ import {FilterOperator} from "@/types";
                 this.filter = {};
 
             for (let key in this.filter) {
-                if (this.filter.hasOwnProperty(key) && this.filter[key] != null) {
-                    let prop = this.dec.properties.find(p => p.name == key);
-                    if (prop) {
-                        this.filteredProps.push(prop);
-                    } else
-                        console.error(`Property '${key}' not found.`);
-                }
+                let prop = this.dec.properties.find(p => p.name == key);
+                if (prop) {
+                    this.filteredProps.push(prop);
+                    this.filterDoc[key] = this.getFilterDocValue(this.filter[key]);
+                } else
+                    console.error(`Property '${key}' not found.`);
             }
         }
 

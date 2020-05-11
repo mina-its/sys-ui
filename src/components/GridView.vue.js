@@ -21,6 +21,14 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
     get items() {
         return this.$store.state.data[this.uri] || [];
     }
+    get countTitle() {
+        if (this.dec.count == 0)
+            return "(Empty)";
+        else if (this.dec.count == 1)
+            return "(1 item)";
+        else
+            return `(${this.dec.count} items)`;
+    }
     mounted() {
         this.filteringProp = this.dec.properties[0];
         for (let prop of this.dec.properties) {
@@ -29,23 +37,18 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
         this.extractFilteredProps();
     }
     filterValueChanged(e) {
-        // if (e.prop._.isRef) {
-        //     this.filteringProp = e.prop;
-        //     // this.filteringProp = null;
-        //     // this.$nextTick(() => {
-        //     //     this.filteringProp = e.prop;
-        //     // });
-        //
-        //     // let value = {};
-        //     // value[e.prop.name] = e.val;
-        // }
         this.filterDoc[e.prop.name] = e.val;
         this.filter[e.prop.name] = e.filterVal;
-        let alreadyProp = this.filteredProps.find(prop => prop == e.prop);
-        if (!alreadyProp)
-            this.filteredProps.push(e.prop);
-        else if (e.val == null)
-            this.filteredProps.splice(this.filteredProps.indexOf(alreadyProp), 1);
+        let props = this.filteredProps;
+        let alreadyProp = props.find(prop => prop == e.prop);
+        if (!alreadyProp && e.val != null)
+            props.push(e.prop);
+        else if (alreadyProp && e.val == null)
+            props.splice(props.indexOf(alreadyProp), 1);
+        this.filteredProps = null;
+        this.$nextTick(() => {
+            this.filteredProps = [...props];
+        });
         this.refreshQueryByFilter();
     }
     extractFilteredProps() {
@@ -76,6 +79,8 @@ let GridView = class GridView extends vue_property_decorator_1.Vue {
         main_1.load(main_1.setQs(types_2.ReqParams.query, query ? JSON.stringify(query) : null, true), true);
     }
     removeFilter(prop) {
+        this.filter[prop.name] = null;
+        this.filterDoc[prop.name] = null;
         this.filteredProps.splice(this.filteredProps.indexOf(prop), 1);
         this.refreshQueryByFilter();
     }

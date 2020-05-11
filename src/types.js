@@ -112,25 +112,24 @@ class Modify {
 exports.Modify = Modify;
 var FilterOperator;
 (function (FilterOperator) {
+    FilterOperator["Select"] = "[select]";
     FilterOperator["Equal"] = "eq";
     FilterOperator["NotEqual"] = "ne";
     FilterOperator["Yes"] = "ye";
     FilterOperator["No"] = "no";
     FilterOperator["NotNull"] = "nn";
     FilterOperator["Null"] = "nl";
-    FilterOperator["nr"] = "nr";
-    FilterOperator["gt"] = "gt";
-    FilterOperator["gte"] = "gte";
-    FilterOperator["lt"] = "lt";
-    FilterOperator["dge"] = "dge";
-    FilterOperator["dle"] = "dle";
-    FilterOperator["lte"] = "lte";
+    FilterOperator["GreaterThan"] = "gt";
+    FilterOperator["GreaterThanEqual"] = "gte";
+    FilterOperator["LessThan"] = "lt";
+    FilterOperator["LessThanEqual"] = "lte";
     FilterOperator["Like"] = "lk";
-    FilterOperator["sw"] = "sw";
-    FilterOperator["ew"] = "ew";
-    FilterOperator["mt"] = "mt";
-    FilterOperator["in"] = "in";
-    FilterOperator["nin"] = "nin";
+    FilterOperator["In"] = "in";
+    FilterOperator["NotIn"] = "nin";
+    FilterOperator["StartWith"] = "sw";
+    FilterOperator["EndWith"] = "ew";
+    FilterOperator["None"] = "none";
+    FilterOperator["Exist"] = "exists";
 })(FilterOperator = exports.FilterOperator || (exports.FilterOperator = {}));
 class AppStateFileGallery {
     constructor() {

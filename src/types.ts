@@ -205,25 +205,24 @@ export class Modify {
 }
 
 export enum FilterOperator {
+    Select = "[select]",
     Equal = "eq",
     NotEqual = "ne",
     Yes = "ye",
     No = "no",
     NotNull = "nn",
     Null = "nl",
-    nr = "nr",
-    gt = "gt",
-    gte = "gte",
-    lt = "lt",
-    dge = "dge",
-    dle = "dle",
-    lte = "lte",
+    GreaterThan = "gt",
+    GreaterThanEqual = "gte",
+    LessThan = "lt",
+    LessThanEqual = "lte",
     Like = "lk",
-    sw = "sw",
-    ew = "ew",
-    mt = "mt",
-    in = "in",
-    nin = "nin"
+    In = "in",
+    NotIn = "nin",
+    StartWith = "sw",
+    EndWith = "ew",
+    None = "none",
+    Exist = "exists"
 }
 
 export class AppStateFileGallery {
