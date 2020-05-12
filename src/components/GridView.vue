@@ -188,7 +188,9 @@ import {FilterOperator} from "@/types";
                     query[key] = this.filter[key];
                 }
             }
-            load(setQs(ReqParams.query, query ? JSON.stringify(query) : null, true), true);
+            let ref = setQs(ReqParams.query, query ? JSON.stringify(query) : null, true);
+            ref = setQs(ReqParams.page, null, true, ref);
+            load(ref, true);
         }
 
         propLocaleName(prop: Property): string {
@@ -352,7 +354,7 @@ import {FilterOperator} from "@/types";
         showColumnMenu(prop, e) {
             let items: MenuItem[] = [
                 {ref: 'sort', title: $t('sort')},
-                // {ref: "filter", title: $t('filter')},
+                {ref: "filter", title: $t('filter')},
             ];
             main.showCmenu(prop, items, e, (state, item: MenuItem) => {
                 main.hideCmenu();
@@ -368,7 +370,7 @@ import {FilterOperator} from "@/types";
                         break;
 
                     case 'filter':
-                        // this.meta.filter.items.push({title: state.title, id: Math.random()});
+                        this.filteringProp = state;
                         break;
                 }
             });
