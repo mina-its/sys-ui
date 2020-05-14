@@ -6,5 +6,7 @@ import AppLocaleMenu from "./components/AppLocaleMenu.vue";
 import AppUserLoginMenu from "./components/AppUserLoginMenu.vue";
 import CheckBox from "./components/CheckBox.vue";
 import Property from "./components/Property.vue";
+import BrowseFile from "./components/BrowseFile.vue";
+import ContextMenu from "./components/ContextMenu.vue";
 
-export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu};
+export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu};
