@@ -8,5 +8,6 @@ import CheckBox from "./components/CheckBox.vue";
 import Property from "./components/Property.vue";
 import BrowseFile from "./components/BrowseFile.vue";
 import ContextMenu from "./components/ContextMenu.vue";
+import ToolbarModifyButtons from "./components/ToolbarModifyButtons.vue";
 
-export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu};
+export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons};
