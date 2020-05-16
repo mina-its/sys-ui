@@ -26,7 +26,10 @@
 
             let data = this.$store.state.data[e.obj._.ref];
             const dec = glob.form.declarations[e.obj._.ref];
-            if (!dec) throw `dec is empty for ref '${e.obj._.ref}'`;
+            if (!dec) {
+                console.log("glob.form.declarations", glob.form.declarations);
+                throw `dec is empty for ref '${e.obj._.ref}'`;
+            }
             let root = this.root == null ? true : this.root;
 
             if (Array.isArray(data)) {

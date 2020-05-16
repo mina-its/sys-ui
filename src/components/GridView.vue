@@ -5,13 +5,14 @@
             <Breadcrumb :count="dec.count"/>
 
             <ToolbarModifyButtons/>
-            <div class="mr-auto"></div>
 
             <!-- Filter -->
-            <div v-if="root && filter && filteringProp" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mr-2 rounded">
+            <div v-if="root && filter && filteringProp" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mx-5 rounded">
                 <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
                 <i class="fal fa-filter p-1 d-inline-block text-muted"></i>
             </div>
+
+            <div class="mr-auto"></div>
 
             <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name" @exec="func.exec" :title="func.title"></Function>
             <button v-if="newItem" class="btn btn-success" @click="clickNewItem"><i class="fal fa-plus-circle pr-2"></i>{{newItem}}</button>
