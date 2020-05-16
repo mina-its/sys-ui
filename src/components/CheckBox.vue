@@ -73,7 +73,7 @@
     }
 
     .checkbox:checked + .checkbox-label:before {
-        font-family: "Font Awesome 5 Free";
+        font-family: "Font Awesome 5 Pro";
         font-weight: 600;
         content: "\f00c";
         color: #666;

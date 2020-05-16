@@ -4,7 +4,7 @@
            role="button"
            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
                 style="font-size: 16px"
-                class="fas fa-globe text-white pr-1"></i>{{glob.config.localeTitle.toUpperCase()}}</a>
+                class="fal fa-globe text-white pr-1"></i>{{glob.config.localeTitle.toUpperCase()}}</a>
         <div class="dropdown-menu dropdown-menu-right">
             <a v-for="item in glob.config.appLocales" class="dropdown-item" @click="changeLocale(item)"
                href="#">{{item.title}}</a>

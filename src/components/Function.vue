@@ -20,7 +20,7 @@
                         attrs: {"class": "btn"},
                         on: {click: this.click},
                     }, [
-                        ce('i', {attrs: {"class": "fa " + this.styles}})
+                        ce('i', {attrs: {"class": this.styles}})
                     ])
                 ]);
             else

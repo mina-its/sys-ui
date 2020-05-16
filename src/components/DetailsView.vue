@@ -10,7 +10,7 @@
                 <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name"
                           @exec="func.exec" :title="func.title"/>
             </div>
-            <Function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"/>
+            <Function styles="text-secondary fal fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"/>
         </div>
         <div class="w-100 h-100 overflow-auto d-flex">
             <div :class="{'d-flex overflow-auto details-view':true, 'bg-white':!root}" @scroll="onScroll()">

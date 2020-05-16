@@ -4,7 +4,7 @@
             <input type="text" class="form-control border-right-0" placeholder="Search">
             <span class="input-group-append bg-white rounded border-left-0">
      	        <span class="input-group-text bg-transparent">
-                    <span class="fa fa-search text-muted"></span>
+                    <span class="fal fa-search text-muted"></span>
 		        </span>
             </span>
         </div>
@@ -57,10 +57,12 @@
 
         a {
             color: var(--side-nav-color);
+            border-left: 4px solid transparent;
 
             &:hover {
-                text-decoration: underline;
                 color: var(--side-nav-color);
+                background-color: #222;
+                border-left-color: var(--link-color);
             }
         }
 

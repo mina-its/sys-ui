@@ -14,7 +14,7 @@ import {FilterOperator} from "@/types";
             </div>
             <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name" @exec="func.exec" :title="func.title"></Function>
             <Function v-if="newItem" styles="btn-success" @exec="clickNewItem" :title="newItem"></Function>
-            <Function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></Function>
+            <Function styles="text-secondary fal fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></Function>
         </div>
 
         <!-- Table -->
@@ -47,8 +47,8 @@ import {FilterOperator} from "@/types";
                     <tr>
                         <td class="border-0" colspan="100">
                             <div class="align-items-center d-flex">
-                                <Function v-if="dec.access & 4" styles="m-2 fa-plus" @exec="insert" name="newItem" :title="$t('add')"></Function>
-                                <Function v-if="rowHeaderStyle===2" styles="fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
+                                <Function v-if="dec.access & 4" styles="m-2 fas fa-plus" @exec="insert" name="newItem" :title="$t('add')"></Function>
+                                <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
                                 <div class="flex-grow-1 d-flex align-items-center">
                                     <ul v-if="dec.pages > 1" class="m-2 pagination ">
                                         <li class="page-item">
