@@ -1,4 +1,3 @@
-import {FilterOperator} from "@/types";
 <template>
     <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': root}">
         <!-- Toolbar -->
@@ -7,13 +6,15 @@ import {FilterOperator} from "@/types";
 
             <ToolbarModifyButtons/>
             <div class="mr-auto"></div>
+
             <!-- Filter -->
-            <div v-if="filter && filteringProp" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mr-2 rounded">
+            <div v-if="root && filter && filteringProp" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mr-2 rounded">
                 <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
-                <i class="fa fa-filter p-1 d-inline-block text-muted"></i>
+                <i class="fal fa-filter p-1 d-inline-block text-muted"></i>
             </div>
+
             <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name" @exec="func.exec" :title="func.title"></Function>
-            <Function v-if="newItem" styles="btn-success" @exec="clickNewItem" :title="newItem"></Function>
+            <button v-if="newItem" class="btn btn-success" @click="clickNewItem"><i class="fal fa-plus-circle pr-2"></i>{{newItem}}</button>
             <Function styles="text-secondary fal fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></Function>
         </div>
 
@@ -22,7 +23,7 @@ import {FilterOperator} from "@/types";
             <div :class="{'grid-view':true, 'p-4':root}" @scroll="onScroll()">
 
                 <!-- Filter Items -->
-                <div v-if="filter && filteringProp && root" class="pb-2 d-flex">
+                <div v-if="filter && filteringProp && filteredProps.length" class="pb-2 d-flex">
                     <div v-for="prop of filteredProps" class="filter-chip border d-flex align-items-center py-1 px-2 bg-white mr-2">
                         <PropertyFilter :allowPropChange="false" :prop="prop" :filter="filter" @changed="filterValueChanged" :filterDoc="filterDoc"/>
                         <i @click="removeFilter(prop)" class="fas fa-times p-1 text-dark"></i>
@@ -47,7 +48,7 @@ import {FilterOperator} from "@/types";
                     <tr>
                         <td class="border-0" colspan="100">
                             <div class="align-items-center d-flex">
-                                <Function v-if="dec.access & 4" styles="m-2 fas fa-plus" @exec="insert" name="newItem" :title="$t('add')"></Function>
+                                <Function v-if="dec.access & 4" styles="m-1 fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"></Function>
                                 <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
                                 <div class="flex-grow-1 d-flex align-items-center">
                                     <ul v-if="dec.pages > 1" class="m-2 pagination ">

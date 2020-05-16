@@ -1,7 +1,7 @@
 <template>
     <div class="info-box d-flex">
         <span class="info-box-icon flex-column" :style="{'background-color': color}">
-            <i :class="`fa ${icon}`"></i>
+            <i :class="`fad ${icon}`"></i>
         </span>
 
         <div class="p-2 flex-column">

@@ -9,5 +9,8 @@ import Property from "./components/Property.vue";
 import BrowseFile from "./components/BrowseFile.vue";
 import ContextMenu from "./components/ContextMenu.vue";
 import ToolbarModifyButtons from "./components/ToolbarModifyButtons.vue";
+import HelperObjects from "./components/HelperObjects.vue";
+import SideNav from "./components/SideNav.vue";
+import App from "./App.vue";
 
-export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons};
+export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons, HelperObjects, SideNav, App};

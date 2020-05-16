@@ -15,9 +15,3 @@
         }
     }
 </script>
-
-<style lang="scss">
-    .main-body.root {
-        background-color: var(--main-body-bg);
-    }
-</style>

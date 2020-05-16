@@ -5,20 +5,10 @@
         </header>
         <main class="d-flex align-items-stretch overflow-auto">
             <SideNav/>
-            <ObjectView v-if="objectElem" :elem="objectElem" :root="true" />
+            <ObjectView v-if="objectElem" :elem="objectElem" :root="true"/>
             <FormView v-else/>
         </main>
-        <section class="helpers-section">
-            <div id="snackbar"></div>
-            <FileGallery/>
-            <BrowseFile/>
-            <NotifyBox/>
-            <WebSocket/>
-            <QuestionBox/>
-            <ContextMenu/>
-            <ProgressBar/>
-            <GeoMap/>
-        </section>
+        <HelperObjects />
     </div>
 </template>
 
@@ -74,7 +64,7 @@
         --side-nav-color: #fff;
         --breadcrumb-separator: #aaa;
         --link-color: #4285f4;
-        --main-body-bg: #eee;
+        --main-bg: #eee;
 
         --font-size-base: 15px;
         --badge-padding-x: 0.25rem;
@@ -127,6 +117,7 @@
     main {
         flex: 1 1 auto;
         scroll-behavior: smooth;
+        background-color: var(--main-bg);
     }
 
     input {

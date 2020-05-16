@@ -1,4 +1,3 @@
-import {GlobalType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
     import {GlobalType, Keys, ObjectViewType, Property as ObjectProperty} from "../../../sys/src/types";
