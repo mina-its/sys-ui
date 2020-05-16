@@ -5,7 +5,7 @@
         </header>
         <main class="d-flex align-items-stretch overflow-auto">
             <SideNav/>
-            <ObjectView v-if="objectElem" :elem="objectElem"/>
+            <ObjectView v-if="objectElem" :elem="objectElem" :root="true" />
             <FormView v-else/>
         </main>
         <section class="helpers-section">
@@ -218,6 +218,7 @@
 
     .toolbar {
         z-index: 1;
+        background-color: white;
         box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 2px 6px 2px rgba(60, 64, 67, .15);
     }
 

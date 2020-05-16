@@ -27,13 +27,13 @@
             let data = this.$store.state.data[e.obj._.ref];
             const dec = glob.form.declarations[e.obj._.ref];
             if (!dec) throw `dec is empty for ref '${e.obj._.ref}'`;
-            let rt = this.root == null ? true : this.root;
+            let root = this.root == null ? true : this.root;
 
             if (Array.isArray(data)) {
                 let viewType = (dec as ObjectDec).listsViewType || ObjectListsViewType.Grid;
                 let newItem = ((dec as ObjectDec).access & AccessPermission.NewItem) &&
                 Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
-                let props = {uri: e.obj._.ref, root: rt, dec, newItem};
+                let props = {uri: e.obj._.ref, root, dec, newItem};
                 switch (viewType) {
                     default:
                     case ObjectListsViewType.Grid:
@@ -47,7 +47,7 @@
                 if (viewType === ObjectDetailsViewType.Tree)
                     return ce('tree-view', {props: {uri: e.obj._.ref}});
                 else
-                    return ce('details-view', {props: {uri: e.obj._.ref, root: rt, dec}});
+                    return ce('details-view', {props: {uri: e.obj._.ref, root: root, dec}});
             }
         }
     }

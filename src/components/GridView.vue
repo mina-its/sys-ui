@@ -1,6 +1,6 @@
 import {FilterOperator} from "@/types";
 <template>
-    <div class="h-100 d-flex flex-column flex-fill overflow-auto">
+    <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': root}">
         <!-- Toolbar -->
         <div v-if="root" :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
             <Breadcrumb :count="dec.count"/>
@@ -18,11 +18,11 @@ import {FilterOperator} from "@/types";
         </div>
 
         <!-- Table -->
-        <div class="main-body w-100 h-100 overflow-auto d-flex">
+        <div class="w-100 h-100 overflow-auto d-flex">
             <div :class="{'grid-view':true, 'p-4':root}" @scroll="onScroll()">
 
                 <!-- Filter Items -->
-                <div v-if="filter && filteringProp" class="pb-2 d-flex">
+                <div v-if="filter && filteringProp && root" class="pb-2 d-flex">
                     <div v-for="prop of filteredProps" class="filter-chip border d-flex align-items-center py-1 px-2 bg-white mr-2">
                         <PropertyFilter :allowPropChange="false" :prop="prop" :filter="filter" @changed="filterValueChanged" :filterDoc="filterDoc"/>
                         <i @click="removeFilter(prop)" class="fas fa-times p-1 text-dark"></i>

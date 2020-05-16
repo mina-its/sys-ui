@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 d-flex flex-column flex-fill overflow-auto">
+    <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': root}">
         <div v-if="root" :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}"
              role="toolbar" aria-label="Toolbar with button groups">
             <Breadcrumb/>
@@ -12,14 +12,14 @@
             </div>
             <Function styles="text-secondary fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"/>
         </div>
-        <div class="main-body w-100 h-100 overflow-auto d-flex">
+        <div class="w-100 h-100 overflow-auto d-flex">
             <div :class="{'d-flex overflow-auto details-view':true, 'bg-white':!root}" @scroll="onScroll()">
 
                 <aside v-if="sideMenuVisible" class="border-right separator-line sidenav p-2 py-4 d-none d-md-block">
-                    <ul :class="{'nav flex-column tree':1, 'pr-5':ltr, 'pl-5':rtl}" id="menus">
+                    <ul class="nav flex-column" id="menus">
                         <li v-for="item in sideMenu" class="nav-item">
                             <a @click="selectGroup(item)"
-                               :class="{'text-nowrap text-secondary nav-link': 1, 'pr-5':ltr, 'pl-5':rtl, 'active': $data.currentGroup===item.title}"
+                               :class="{'text-nowrap text-secondary nav-link': 1, 'active': $data.currentGroup===item.title}"
                                href="javascript:void(0);">{{item.title}}</a>
                         </li>
                     </ul>
@@ -260,6 +260,7 @@
 
         .sidenav {
             background-color: white;
+            min-width: 200px;
         }
 
         label {
