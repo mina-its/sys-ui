@@ -6,10 +6,14 @@
 
             <ToolbarModifyButtons/>
             <div class="mr-auto"></div>
-            <div class="mx-2" role="group">
-                <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name"
-                          @exec="func.exec" :title="func.title"/>
-            </div>
+            <template v-for="func in headFuncs">
+                <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-2'}`" v-if="func.ref">{{func.title}}</a>
+                <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
+            </template>
+            <!--            <div class="mx-2" role="group">-->
+            <!--                <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name"-->
+            <!--                          @exec="func.exec" :title="func.title"/>-->
+            <!--            </div>-->
             <Function styles="text-secondary fal fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"/>
         </div>
         <div class="w-100 h-100 overflow-auto d-flex">
@@ -81,19 +85,17 @@
             return style;
         }
 
-        mounted() {
-            if (this.root) {
-                this.headFuncs = [];
-                if (this.dec.links)
-                    for (const link of this.dec.links) {
-                        this.headFuncs.push({
-                            title: link.title as string,
-                            name: link.address["$oid"],
-                            exec: this.execLink
-                        });
-                    }
+        resetHeadFuncs() {
+            this.headFuncs = [];
+            if (this.dec.links) {
+                this.headFuncs = this.dec.links.filter(link => link.single).map(link => {
+                    return {title: link.title as string, ref: link.address};
+                });
             }
+        }
 
+        mounted() {
+            this.resetHeadFuncs();
             this.reloadLastGroup();
         }
 
@@ -148,28 +150,27 @@
             }
 
             let props = this.getProps(this.currentGroup);
+            let newItemLink = this.headFuncs.find(i => i.name == "new-item");
+            if (newItemLink) this.headFuncs.splice(this.headFuncs.indexOf(newItemLink), 1);
             if (props && props.length == 1 && props[0].isList) {
-                this.headFuncs = [
-                    {
-                        title: $t("new-item"), name: "string", exec: () => {
-                            let uri = this.uri + "/" + props[0].name;
-                            let dec = glob.form.declarations[uri];
-                            let newItem = {_id: uuidv4(), _: {marked: false, dec} as EntityMeta};
-                            this.dec.properties.forEach(prop => newItem[prop.name] = null);
-                            // if (this.dec.reorderable)
-                            //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;
+                this.headFuncs.push({
+                    title: $t("new-item"), name: "new-item", exec: () => {
+                        let uri = this.uri + "/" + props[0].name;
+                        let dec = glob.form.declarations[uri];
+                        let newItem = {_id: uuidv4(), _: {marked: false, dec} as EntityMeta};
+                        this.dec.properties.forEach(prop => newItem[prop.name] = null);
+                        // if (this.dec.reorderable)
+                        //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;
 
-                            main.dispatchStoreModify(this, {
-                                type: ChangeType.InsertItem,
-                                item: newItem,
-                                uri,
-                                vue: this
-                            } as StateChange);
-                        }
+                        main.dispatchStoreModify(this, {
+                            type: ChangeType.InsertItem,
+                            item: newItem,
+                            uri,
+                            vue: this
+                        } as StateChange);
                     }
-                ];
-            } else
-                this.headFuncs = [];
+                });
+            }
         }
 
         nonGroupVisible() {

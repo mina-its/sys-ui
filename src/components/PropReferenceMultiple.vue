@@ -97,7 +97,7 @@
 <style lang="scss">
     .prop-reference.ref-multi {
         outline: none;
-        padding: 0 0.25rem!important;
+        padding: 0 0.25rem !important;
 
         textarea {
             width: 40px !important;
@@ -108,6 +108,11 @@
 
         .ref-multi-item {
             background-color: whitesmoke;
+        }
+
+        .rmV {
+            font-size: smaller;
+            color: #666;
         }
     }
 

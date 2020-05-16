@@ -63,8 +63,9 @@ export const ChartColors = [
 
 export class HeadFunc {
     title: string;
-    name: string;
-    exec: (...args: any) => void;
+    name?: string;
+    ref?: string;
+    exec?: (...args: any) => void;
 }
 
 export class MenuItem {

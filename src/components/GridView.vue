@@ -14,8 +14,11 @@
 
             <div class="mr-auto"></div>
 
-            <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name" @exec="func.exec" :title="func.title"></Function>
-            <button v-if="newItem" class="btn btn-success" @click="clickNewItem"><i class="fal fa-plus-circle pr-2"></i>{{newItem}}</button>
+            <template v-for="func in headFuncs">
+                <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-2'}`" v-if="func.ref">{{func.title}}</a>
+                <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
+            </template>
+            <button v-if="newItem" class="btn btn-success mx-1" @click="clickNewItem"><i class="fal fa-plus-circle pr-2"></i>{{newItem}}</button>
             <Function styles="text-secondary fal fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></Function>
         </div>
 
@@ -109,7 +112,17 @@
             this.filteringProp = this.dec.properties[0];
         }
 
+        resetHeadFuncs() {
+            this.headFuncs = [];
+            if (this.dec.links) {
+                this.headFuncs = this.dec.links.filter(link => !link.single).map(link => {
+                    return {title: link.title as string, ref: link.address};
+                });
+            }
+        }
+
         mounted() {
+            this.resetHeadFuncs();
             this.filterDoc = {};
             this.filteringProp = this.dec.properties[0];
             for (let prop of this.dec.properties) {
