@@ -37,6 +37,7 @@
                 case ObjectViewType.GridView:
                     return this.renderValue(ce, "px-2 py-1");
 
+                default:
                 case ObjectViewType.DetailsView:
                     return this.renderDetailsView(ce);
 
