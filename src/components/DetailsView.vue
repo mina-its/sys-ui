@@ -88,7 +88,9 @@
         resetHeadFuncs() {
             this.headFuncs = [];
             if (this.dec.links) {
-                this.headFuncs = this.dec.links.filter(link => link.single).map(link => {
+                this.headFuncs = this.dec.links.filter(link => {
+                    return !link.disable && link.single;
+                }).map(link => {
                     return {title: link.title as string, ref: link.address};
                 });
             }
