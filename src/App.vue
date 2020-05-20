@@ -8,7 +8,7 @@
             <ObjectView v-if="objectElem" :elem="objectElem" :root="true"/>
             <FormView v-else/>
         </main>
-        <HelperObjects />
+        <HelperObjects/>
     </div>
 </template>
 
@@ -205,6 +205,12 @@
             bottom: 0;
             opacity: 0;
         }
+    }
+
+    .no-select {
+        user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
     }
 
     .toolbar {
