@@ -143,6 +143,9 @@ class AppStateFileGallery {
     }
 }
 exports.AppStateFileGallery = AppStateFileGallery;
+class QuestionOptions {
+}
+exports.QuestionOptions = QuestionOptions;
 class FileAction {
 }
 exports.FileAction = FileAction;
@@ -154,7 +157,7 @@ var FileActionType;
 })(FileActionType = exports.FileActionType || (exports.FileActionType = {}));
 class AppStateQuestion {
     constructor() {
-        this.options = [];
+        this.buttons = [];
         this.show = false;
     }
 }

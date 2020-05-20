@@ -241,6 +241,10 @@ export class AppStateFileGallery {
     fileBrowsed?: (files: FileList) => void;
 }
 
+export class QuestionOptions {
+    questionId: string;
+}
+
 export class FileAction {
     item: IData;
     val: any;
@@ -255,11 +259,12 @@ export enum FileActionType {
 }
 
 export class AppStateQuestion {
+    title: string;
     message: string;
-    options: [] = [];
+    buttons: Pair[] = [];
     show: boolean = false;
-    questionId: string;
-    select: (item: Pair) => void;
+    options: QuestionOptions;
+    select: (ref: string) => void;
 }
 
 export class AppStateLog {

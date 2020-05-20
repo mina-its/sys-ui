@@ -1,29 +1,26 @@
 <template>
-    <div v-if="glob.question.show" id="question-box">
-        <transition name="fade">
+    <transition name="fade">
+        <div v-if="glob.question.show" id="question-box">
             <div class="modal-mask">
                 <div class="modal-wrapper">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <i class="fa fa-question-circle fa-2x text-muted"></i>
-                                <span aria-hidden="true" @click="close">&times;</span>
+                            <div class="modal-header text-white bg-dark text-uppercase font-weight-bold">
+                                <h5 class="modal-title">{{glob.question.title}}</h5>
+                                <button type="button" @click="close" class="close"><span aria-hidden="true">×</span></button>
                             </div>
                             <div class="modal-body d-flex align-items-center">
                                 <div class="flex-grow-1 mx-2" v-html="message"></div>
                             </div>
                             <div class="modal-footer">
-                                <Function styles="btn-primary" :title="option.title"
-                                          @exec="select({...$event, data: option})"
-                                          :key="option.ref"
-                                          v-for="option in glob.question.options"></Function>
+                                <button @click="select(button.ref)" :class="button._cs || 'btn btn-primary'" v-for="button in glob.question.buttons">{{button.title}}</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </transition>
-    </div>
+        </div>
+    </transition>
 </template>
 
 <script lang="ts">
@@ -37,16 +34,14 @@
     @Component({name: 'QuestionBox', components: {}})
     export default class QuestionBox extends Vue {
         close() {
-            glob.question.show = false;
-            if (glob.question.options.length)
-                glob.question.select(null);
+            this.select(null);
         }
 
-        select(e: FunctionExecEventArg) {
-            let option = e.data as Pair;
-            glob.question.select(option);
-            glob.question.options = []; // to not send again null
+        select(ref: any) {
+            glob.question.select(ref);
+            glob.question.buttons = []; // to not send again null
             glob.question.show = false;
+            this.$forceUpdate();
         }
 
         get message() {
@@ -58,20 +53,14 @@
     }
 </script>
 
-<style lang="scss">
-    #question-box {
-        background-color: #5555;
-
-        .modal-header {
-            color: #ffc4c4 !important;
-        }
-
-        .modal-body {
-            font-weight: 500;
-        }
-
-        .btn {
-            min-width: 75px;
-        }
+<style scoped lang="scss">
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s;
     }
+
+    .fade-enter, .fade-leave-to
+    {
+        opacity: 0;
+    }
+
 </style>

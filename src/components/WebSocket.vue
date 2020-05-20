@@ -7,7 +7,7 @@
     import {glob} from '@/main';
     import * as main from '../main';
 
-    @Component({name:'WebSocket'})
+    @Component({name: 'WebSocket'})
     export default class WebSocket extends Vue {
         get glob() {
             return glob;
@@ -39,8 +39,8 @@
                     break;
 
                 case ClientCommand.Question:
-                    main.question(args[0] /*questionid*/, args[1] /*message*/, args[2] /*options*/, (item: Pair) => {
-                        glob.socket.emit('cmd', ClientCommand.Answer, args[0], item ? item.ref : null);
+                    main.question(args[0] /*title*/, args[1] /*message*/, args[2] /*buttons*/, {questionId: args[3]}, (ref: string) => {
+                        glob.socket.emit('cmd', ClientCommand.Answer, args[3], ref);
                     });
                     break;
 

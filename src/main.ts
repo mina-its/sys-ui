@@ -33,7 +33,8 @@ import {
     Socket,
     StartParams,
     StateChange,
-    FilterOperator
+    FilterOperator,
+    QuestionOptions
 } from './types';
 import {
     AjaxConfig,
@@ -698,8 +699,8 @@ export function notify(content: string | IError, type?: LogType, params?: Notifi
         window.dispatchEvent(new CustomEvent(Constants.notifyEvent, {detail: {message, type}}));
 }
 
-export function question(questionId: string, message: string, options: Pair[], select: (item: Pair) => void) {
-    window.dispatchEvent(new CustomEvent(Constants.questionEvent, {detail: {questionId, message, options, select}}));
+export function question(title: string, message: string, buttons: Pair[], options: QuestionOptions, select: (ref: any) => void) {
+    window.dispatchEvent(new CustomEvent(Constants.questionEvent, {detail: {title, message, buttons, options, select}}));
     glob.question.show = true;
 }
 

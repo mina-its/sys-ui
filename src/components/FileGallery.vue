@@ -105,10 +105,9 @@
         }
 
         removeFile(name: string) {
-            main.question(null,
-                `### Delete Confirm\n\nAre you sure you want to delete the file '${name}'`,
-                [{title: "YES", ref: YesNo.Yes}, {title: "NO", ref: YesNo.No}], (option: Pair) => {
-                    if (!option || option.ref == YesNo.No) return;
+            main.question("Delete Confirm", `Are you sure you want to delete the file '${name}'`,
+                [{title: "YES", ref: YesNo.Yes}, {title: "NO", ref: YesNo.No}], null, (ref: any) => {
+                    if (!ref || ref == YesNo.No) return;
                     main.ajax("/deleteFromFileGallery?m=1", {
                         drive: glob.fileGallery.drive._id,
                         pth: glob.fileGallery.path,

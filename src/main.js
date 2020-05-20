@@ -655,8 +655,8 @@ function notify(content, type, params) {
         window.dispatchEvent(new CustomEvent(types_1.Constants.notifyEvent, { detail: { message, type } }));
 }
 exports.notify = notify;
-function question(questionId, message, options, select) {
-    window.dispatchEvent(new CustomEvent(types_1.Constants.questionEvent, { detail: { questionId, message, options, select } }));
+function question(title, message, buttons, options, select) {
+    window.dispatchEvent(new CustomEvent(types_1.Constants.questionEvent, { detail: { title, message, buttons, options, select } }));
     exports.glob.question.show = true;
 }
 exports.question = question;
