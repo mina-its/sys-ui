@@ -565,12 +565,13 @@ export function checkPropDependencyOnChange(dec: ObjectDec | FunctionDec, prop, 
 
 function parse(str: string): any {
     if (!str) return null;
-    let flatJson = JSON.parse(str);
-    return flat2recursive(flatJson);
+    let json = JSON.parse(str);
+    return flat2recursive(json);
 }
 
-export function flat2recursive(flatJson: any): any {
-    if (!flatJson) return flatJson;
+export function flat2recursive(json: any | string): any {
+    json = typeof json == "string" ? JSON.parse(json) : json;
+    if (!json) return json;
     let keys = {};
     const findKeys = obj => {
         if (obj && obj._0) {
@@ -601,9 +602,9 @@ export function flat2recursive(flatJson: any): any {
                     obj[key] = new Date(val.$date);
                 } else if (!val.$oid) {
                     if (val._$ == '') {
-                        obj[key] = flatJson;
+                        obj[key] = json;
                     } else if (val._$) {
-                        obj[key] = eval('flatJson' + val._$);
+                        obj[key] = eval('json' + val._$);
                     }
                     replaceRef(val);
                 }
@@ -611,10 +612,10 @@ export function flat2recursive(flatJson: any): any {
         }
     };
 
-    delete flatJson._0;
-    findKeys(flatJson);
-    replaceRef(flatJson);
-    return flatJson;
+    delete json._0;
+    findKeys(json);
+    replaceRef(json);
+    return json;
 }
 
 export function browseFile(fileBrowsed?: (files: FileList) => void) {
@@ -855,7 +856,6 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
     fail = fail || notify;
-    console.log(params);
     startProgress();
     axios(params).then(res => {
         stopProgress();
@@ -863,6 +863,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
             fail({code: res.status, message: res.statusText});
         } else {
             try {
+                // console.log(res.data);
                 done(res.data);
             } catch (ex) {
                 notify(`error on handling ajax response: ${ex.message}`);

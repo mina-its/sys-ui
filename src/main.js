@@ -524,12 +524,13 @@ exports.checkPropDependencyOnChange = checkPropDependencyOnChange;
 function parse(str) {
     if (!str)
         return null;
-    let flatJson = JSON.parse(str);
-    return flat2recursive(flatJson);
+    let json = JSON.parse(str);
+    return flat2recursive(json);
 }
-function flat2recursive(flatJson) {
-    if (!flatJson)
-        return flatJson;
+function flat2recursive(json) {
+    json = typeof json == "string" ? JSON.parse(json) : json;
+    if (!json)
+        return json;
     let keys = {};
     const findKeys = obj => {
         if (obj && obj._0) {
@@ -558,20 +559,20 @@ function flat2recursive(flatJson) {
                 }
                 else if (!val.$oid) {
                     if (val._$ == '') {
-                        obj[key] = flatJson;
+                        obj[key] = json;
                     }
                     else if (val._$) {
-                        obj[key] = eval('flatJson' + val._$);
+                        obj[key] = eval('json' + val._$);
                     }
                     replaceRef(val);
                 }
             }
         }
     };
-    delete flatJson._0;
-    findKeys(flatJson);
-    replaceRef(flatJson);
-    return flatJson;
+    delete json._0;
+    findKeys(json);
+    replaceRef(json);
+    return json;
 }
 exports.flat2recursive = flat2recursive;
 function browseFile(fileBrowsed) {
@@ -804,7 +805,6 @@ function ajax(url, data, config, done, fail) {
     }
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     fail = fail || notify;
-    console.log(params);
     startProgress();
     axios(params).then(res => {
         stopProgress();
@@ -813,6 +813,7 @@ function ajax(url, data, config, done, fail) {
         }
         else {
             try {
+                // console.log(res.data);
                 done(res.data);
             }
             catch (ex) {
