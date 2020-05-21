@@ -20,6 +20,7 @@
         @Prop() private labelMode: any;
         @Prop() private indexInGrid: any;
         @Prop() private readonly: boolean;
+        @Prop() private level: number;
 
         render(ce) {
             if (!this.prop) {
@@ -73,6 +74,7 @@
                 return ce('object-view', {
                     props: {
                         root: false,
+                        level: this.level,
                         elem: {type: ElemType.Object, obj: {_: {ref: this.prop._.ref}}} as Elem
                     },
                 });

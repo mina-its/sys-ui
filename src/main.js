@@ -394,11 +394,6 @@ function handleWindowEvents() {
         if (exports.glob.cmenu.show)
             handleCmenuKeys(e);
         exports.glob.notify = null;
-        switch (e.which) {
-            case types_2.Keys.esc:
-                $('.dropdown-menu').removeClass('show'); // date time picker
-                break;
-        }
     })
         .on("click", (e) => {
         let el = e.target;
@@ -434,7 +429,6 @@ function handleCmenuKeys(e) {
     switch (e.which) {
         case types_2.Keys.tab:
         case types_2.Keys.esc:
-            exports.glob.cmenu.handler(exports.glob.cmenu.state, null);
             hideCmenu();
             break;
         case types_2.Keys.enter: {

@@ -1,13 +1,13 @@
 <template>
-    <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': root}">
+    <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level}">
         <!-- Toolbar -->
-        <div v-if="root" :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
+        <div v-if="!level" :class="{'d-flex align-items-center p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
             <Breadcrumb :count="dec.count"/>
 
             <ToolbarModifyButtons/>
 
             <!-- Filter -->
-            <div v-if="root && filter && filteringProp" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mx-5 rounded">
+            <div v-if="!level && filter && filteringProp && !dec.filterDec" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mx-5 rounded">
                 <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
                 <i class="fal fa-filter p-1 d-inline-block text-muted"></i>
             </div>
@@ -19,58 +19,68 @@
                 <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
             </template>
             <button v-if="newItem" class="btn btn-success mx-1" @click="clickNewItem"><i class="fal fa-plus-circle pr-2"></i>{{newItem}}</button>
-            <Function styles="text-secondary fal fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"></Function>
+
+            <a class="text-secondary px-2" href="javascript:void(0);" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></a>
         </div>
 
         <!-- Table -->
         <div class="w-100 h-100 overflow-auto d-flex">
-            <div :class="{'grid-view':true, 'p-4':root}" @scroll="onScroll()">
+            <div :class="{'d-flex w-100 overflow-auto':true, 'bg-white':level}" @scroll="onScroll()">
+                <!--  Side Menu -->
+                <aside v-if="!level && dec.filterDec" class="border-right separator-line bg-white sidenav p-3 d-none d-md-block">
+                    <label class="text-muted small"><i class="fal fa-filter p-1"></i>Filter {{glob.form.breadcrumbLast}}:</label>
+                    <DetailsView :dec="dec.filterDec" :data="dec.filterData" :level="level?level+1:1" @changed="objectFilterChanged"></DetailsView>
+                </aside>
 
-                <!-- Filter Items -->
-                <div v-if="filter && filteringProp && filteredProps.length" class="pb-2 d-flex">
-                    <div v-for="prop of filteredProps" class="filter-chip border d-flex align-items-center py-1 px-2 bg-white mr-2">
-                        <PropertyFilter :allowPropChange="false" :prop="prop" :filter="filter" @changed="filterValueChanged" :filterDoc="filterDoc"/>
-                        <i @click="removeFilter(prop)" class="fas fa-times p-1 text-dark"></i>
+                <!--  Main -->
+                <div :class="{'w-100 grid-view':true, 'p-4':!level}">
+
+                    <!-- Filter Items -->
+                    <div v-if="filter && filteringProp && (filteredProps || []).length" class="pb-2 d-flex">
+                        <div v-for="prop of filteredProps" class="filter-chip border d-flex align-items-center px-2 bg-white mr-2">
+                            <PropertyFilter :allowPropChange="false" :prop="prop" :filter="filter" @changed="filterValueChanged" :filterDoc="filterDoc"/>
+                            <i @click="removeFilter(prop)" class="fas fa-times p-1 text-dark"></i>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Grid View -->
-                <table :class="{'grid-view-box mb-5':root}">
-                    <thead>
-                    <tr>
-                        <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
-                            <CheckBox :checked="mainChecked" @changed="mainCheckChange"></CheckBox>
-                        </th>
-                        <th scope="col" v-else></th>
-                        <th scope="col" class="text-nowrap" @click="showColumnMenu(prop, $event)" v-for="prop in dec.properties"> {{prop.title || prop.name}}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown" @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)" @changed="changed"></GridViewRow>
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <td class="border-0" colspan="100">
-                            <div class="align-items-center d-flex">
-                                <Function v-if="dec.access & 4" styles="m-1 fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"></Function>
-                                <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
-                                <div class="flex-grow-1 d-flex align-items-center">
-                                    <ul v-if="dec.pages > 1" class="m-2 pagination ">
-                                        <li class="page-item">
-                                            <a @click="goBack" href="javascript:;" class="page-link"> <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i> </a>
-                                        </li>
-                                        <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') ">
-                                            <a class="page-link" :href="page.ref">{{page.title}}</a></li>
-                                        <li class="page-item">
-                                            <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i> </a>
-                                        </li>
-                                    </ul>
+                    <!-- Grid View -->
+                    <table :class="{'grid-view-box mb-5':!level}">
+                        <thead>
+                        <tr>
+                            <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
+                                <CheckBox :checked="mainChecked" @changed="mainCheckChange"></CheckBox>
+                            </th>
+                            <th scope="col" v-else></th>
+                            <th scope="col" class="text-nowrap" @click="showColumnMenu(prop, $event)" v-for="prop in dec.properties"> {{prop.title || prop.name}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown" @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)" @changed="changed"></GridViewRow>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td class="border-0" colspan="100">
+                                <div class="align-items-center d-flex">
+                                    <Function v-if="dec.access & 4" styles="m-1 fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"></Function>
+                                    <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
+                                    <div class="flex-grow-1 d-flex align-items-center">
+                                        <ul v-if="dec.pages > 1" class="m-2 pagination ">
+                                            <li class="page-item">
+                                                <a @click="goBack" href="javascript:;" class="page-link"> <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i> </a>
+                                            </li>
+                                            <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') ">
+                                                <a class="page-link" :href="page.ref">{{page.title}}</a></li>
+                                            <li class="page-item">
+                                                <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i> </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    </tfoot>
-                </table>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -89,9 +99,10 @@
     @Component({name: 'GridView', components: {}})
     export default class GridView extends Vue {
         @Prop() private uri: string;
-        @Prop() private root: boolean;
         @Prop() private dec: ObjectDec;
         @Prop() private newItem: string;
+        @Prop() private level: number;
+
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainChecked = false;
         private filter = {};
@@ -112,6 +123,13 @@
             this.filteringProp = this.dec.properties[0];
         }
 
+        objectFilterChanged(e: ItemChangeEventArg) {
+            console.log("this.dec.filterData", this.dec.filterData);
+            let ref = setQs(ReqParams.query, JSON.stringify(this.dec.filterData), true);
+            ref = setQs(ReqParams.page, null, true, ref);
+            load(ref, true);
+        }
+
         resetHeadFuncs() {
             this.headFuncs = [];
             if (this.dec.links) {
@@ -123,12 +141,15 @@
 
         mounted() {
             this.resetHeadFuncs();
-            this.filterDoc = {};
-            this.filteringProp = this.dec.properties[0];
-            for (let prop of this.dec.properties) {
-                this.filterDoc[prop.name] = null;
+
+            if (!this.dec.filterDec) {
+                this.filterDoc = {};
+                this.filteringProp = this.dec.properties[0];
+                for (let prop of this.dec.properties) {
+                    this.filterDoc[prop.name] = null;
+                }
+                this.extractFilteredProps();
             }
-            this.extractFilteredProps();
         }
 
         filterValueChanged(e: FilterChangeEventArg) {
@@ -242,7 +263,7 @@
             main.load(location.pathname + '?n=1', true);
         }
 
-        clickTitlePin(e: FunctionExecEventArg) {
+        clickObjectMenu(e: FunctionExecEventArg) {
             let items: MenuItem[] = [
                 {ref: "export-excel", title: $t('export-excel')},
                 {ref: "export-csv", title: $t('export-csv')},

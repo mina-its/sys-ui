@@ -14,7 +14,7 @@
     @Component({name: 'ObjectView'})
     export default class ObjectView extends Vue {
         @Prop() private elem: Elem;
-        @Prop() private root: boolean;
+        @Prop() private level: number;
 
         render(ce) {
             let e = this.elem as Elem;
@@ -30,13 +30,12 @@
                 console.log("glob.form.declarations", glob.form.declarations);
                 throw `dec is empty for ref '${e.obj._.ref}'`;
             }
-            let root = this.root == null ? true : this.root;
 
             if (Array.isArray(data)) {
                 let viewType = (dec as ObjectDec).listsViewType || ObjectListsViewType.Grid;
                 let newItem = ((dec as ObjectDec).access & AccessPermission.NewItem) &&
                 Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
-                let props = {uri: e.obj._.ref, root, dec, newItem};
+                let props = {uri: e.obj._.ref, dec, newItem, level: this.level};
                 switch (viewType) {
                     default:
                     case ObjectListsViewType.Grid:
@@ -48,9 +47,9 @@
             } else {
                 let viewType = (dec as ObjectDec).detailsViewType || ObjectDetailsViewType.Tabular;
                 if (viewType === ObjectDetailsViewType.Tree)
-                    return ce('tree-view', {props: {uri: e.obj._.ref}});
+                    return ce('tree-view', {props: {uri: e.obj._.ref, level: this.level}});
                 else
-                    return ce('details-view', {props: {uri: e.obj._.ref, root: root, dec}});
+                    return ce('details-view', {props: {uri: e.obj._.ref, dec, level: this.level}});
             }
         }
     }

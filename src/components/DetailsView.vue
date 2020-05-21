@@ -1,24 +1,30 @@
 <template>
-    <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': root}">
-        <div v-if="root" :class="{'d-flex p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}"
-             role="toolbar" aria-label="Toolbar with button groups">
+    <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level}">
+        <!--  Toolbar -->
+        <div v-if="!level" :class="{'d-flex p-2 align-items-center btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
+
+            <!--  Breadcrumb -->
             <Breadcrumb/>
 
+            <!--  Toolbar Apply/Cancel -->
             <ToolbarModifyButtons/>
+
+            <!--  Head Functions -->
             <div class="mr-auto"></div>
             <template v-for="func in headFuncs">
                 <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-2'}`" v-if="func.ref">{{func.title}}</a>
                 <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
             </template>
-            <!--            <div class="mx-2" role="group">-->
-            <!--                <Function v-for="func in headFuncs" :key="func._id" styles="btn-primary" :name="func.name"-->
-            <!--                          @exec="func.exec" :title="func.title"/>-->
-            <!--            </div>-->
-            <Function styles="text-secondary fal fa-cog fa-lg" name="clickTitlePin" @exec="clickTitlePin"/>
-        </div>
-        <div class="w-100 h-100 overflow-auto d-flex">
-            <div :class="{'d-flex overflow-auto details-view':true, 'bg-white':!root}" @scroll="onScroll()">
 
+            <!--  Object Menu -->
+            <a class="text-secondary px-2" href="javascript:void(0);" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></a>
+        </div>
+
+        <!--  Content -->
+        <div class="w-100 h-100 overflow-auto d-flex">
+            <div :class="{'d-flex overflow-auto details-view':true, 'bg-white':level}" @scroll="onScroll()">
+
+                <!--  Side Menu -->
                 <aside v-if="sideMenuVisible" class="border-right separator-line sidenav p-2 py-4 d-none d-md-block">
                     <ul class="nav flex-column" id="menus">
                         <li v-for="item in sideMenu" class="nav-item">
@@ -28,22 +34,22 @@
                         </li>
                     </ul>
                 </aside>
-                <div :class="{'p-4':root, 'border rounded': !root && dec.detailsViewType===2}">
-                    <div v-if="groupVisible(group)" :class="groupPanelStyle(group)"
-                         v-for="group in groups"
-                         :id="getGroupId(group)">
+
+                <!--  Main -->
+                <div :class="{'p-4':!level, 'border rounded': level && dec.detailsViewType===2}">
+                    <div v-if="groupVisible(group)" :class="groupPanelStyle(group)" v-for="group in groups" :id="getGroupId(group)">
                         <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
                         <div class="group">
-                            <Property :readonly="!(dec.access&2)" v-for="prop in getProps(group)" :key="prop.name"
-                                      :item="item" :prop="prop" @changed="changed"
-                                      :viewType="2"></Property>
+                            <template v-for="prop in getProps(group)">
+                                <label v-if="isNotAloneInlineDataGridProperty(group, prop, item)" class="prop-label from-outside-label pt-2">{{prop.title}}</label>
+                                <Property :level="level?level+1:1" :readonly="!(dec.access&2)" :item="item" :prop="prop" @changed="changed" :viewType="2"/>
+                            </template>
                         </div>
                     </div>
-                    <div v-if="nonGroupVisible()" :class="{'gp':root}">
-                        <Property v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop"
-                                  @changed="changed" :viewType="2"></Property>
+                    <div v-if="nonGroupVisible()" :class="{'gp':!level}">
+                        <Property :level="level?level+1:1" v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop" @changed="changed" :viewType="2"/>
                     </div>
-                    <div v-if="root" class="h-25"></div>
+                    <div v-if="!level" class="h-25"></div>
                 </div>
             </div>
         </div>
@@ -52,8 +58,8 @@
 
 <script lang="ts">
     import {ChangeType, FunctionExecEventArg, HeadFunc, ItemChangeEventArg, JQuery, MenuItem, StateChange} from '@/types';
-    import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta} from "../../../sys/src/types";
+    import {Component, Prop, Vue, Watch, Emit} from 'vue-property-decorator';
+    import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta, GlobalType} from "../../../sys/src/types";
     import {$t, glob} from '@/main';
     import * as main from '../main';
     import {v4 as uuidv4} from 'uuid';
@@ -63,10 +69,16 @@
     @Component({name: 'DetailsView', components: {}})
     export default class DetailsView extends Vue {
         @Prop() private uri: string;
-        @Prop() private root: boolean;
+        @Prop() private data: any;
         @Prop() private dec: ObjectDec;
+        @Prop() private level: number;
+
         private currentGroup: string = this.groups[0];
         private headFuncs: HeadFunc[] = [];
+
+        isNotAloneInlineDataGridProperty(group, prop) {
+            return prop._.gtype == GlobalType.object && prop.isList && (this.level > 0);
+        }
 
         groupPanelStyle(group: string): string {
             let style = this.dec.detailsViewType === ObjectDetailsViewType.Tabular ? 'py-4' : "";
@@ -76,12 +88,12 @@
                 if (theProp.isList) {
                     if (theProp.listsViewType == ObjectListsViewType.Card)
                         return "";
-                    else if (this.root)
+                    else if (!this.level)
                         return "grid-view-box";
                 }
             }
 
-            if (this.root) style += " gp";
+            if (!this.level) style += " gp";
             return style;
         }
 
@@ -99,11 +111,11 @@
             this.reloadLastGroup();
         }
 
-        clickTitlePin(e: FunctionExecEventArg) {
+        clickObjectMenu(e) {
             let items: MenuItem[] = [
                 {ref: "print", title: $t('print')}
             ];
-            main.showCmenu(null, items, e.event, (state, item: MenuItem) => {
+            main.showCmenu(null, items, e, (state, item: MenuItem) => {
                 switch (item.ref) {
                     case "print":
                         window.print();
@@ -113,7 +125,7 @@
         }
 
         getGroupId(group: string) {
-            if (this.root)
+            if (!this.level)
                 return 'gp-' + group.replace(/\s/g, '-');
             else
                 return undefined;
@@ -162,12 +174,15 @@
                         // if (this.dec.reorderable)
                         //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;
 
-                        main.dispatchStoreModify(this, {
-                            type: ChangeType.InsertItem,
-                            item: newItem,
-                            uri,
-                            vue: this
-                        } as StateChange);
+                        if (this.data) {
+                            this.data[uri].push(newItem);
+                        } else
+                            main.dispatchStoreModify(this, {
+                                type: ChangeType.InsertItem,
+                                item: newItem,
+                                uri,
+                                vue: this
+                            } as StateChange);
                     }
                 });
             }
@@ -179,7 +194,7 @@
 
         groupVisible(group) {
             if (this.groups.length <= 1) return false;
-            if (this.root)
+            if (!this.level)
                 return this.dec.detailsViewType == ObjectDetailsViewType.Tabular || this.currentGroup == group;
             else
                 return true;
@@ -188,7 +203,7 @@
         groupHeadVisible(group) {
             let props = this.getProps(group);
             // if (props && props.length == 1 && props[0].isList) return true;
-            return this.root && this.dec.detailsViewType == ObjectDetailsViewType.Tabular;
+            return !this.level && this.dec.detailsViewType == ObjectDetailsViewType.Tabular;
         }
 
         onScroll() {
@@ -203,15 +218,24 @@
             );
         }
 
+        @Emit('changed')
+        emitChanged(e: ItemChangeEventArg) {
+            return e;
+        }
+
         changed(e: ItemChangeEventArg) {
-            main.dispatchStoreModify(this, {
-                type: ChangeType.EditProp,
-                prop: e.prop,
-                value: e.val,
-                item: e.item,
-                uri: this.uri,
-                vue: e.vue
-            } as StateChange);
+            if (this.data) {
+                e.vue.$set(e.item, e.prop.name, e.val);
+                this.emitChanged(e);
+            } else
+                main.dispatchStoreModify(this, {
+                    type: ChangeType.EditProp,
+                    prop: e.prop,
+                    value: e.val,
+                    item: e.item,
+                    uri: this.uri,
+                    vue: e.vue
+                } as StateChange);
         }
 
         getProps(group: string) {
@@ -224,7 +248,7 @@
         }
 
         get sideMenuVisible() {
-            return this.sideMenu && this.root && (!this.dec.detailsViewType ||
+            return this.sideMenu && !this.level && (!this.dec.detailsViewType ||
                 this.dec.detailsViewType == ObjectDetailsViewType.Grouped ||
                 this.dec.detailsViewType == ObjectDetailsViewType.Tabular);
         }
@@ -239,7 +263,10 @@
         }
 
         get item() {
-            return this.$store.state.data[this.uri];
+            if (this.data) // when we explicitly specify the data
+                return this.data;
+            else
+                return this.$store.state.data[this.uri];
         }
 
         get groups() {
@@ -261,7 +288,7 @@
 
         .sidenav {
             background-color: white;
-            min-width: 200px;
+            min-width: 220px;
         }
 
         label {

@@ -142,6 +142,10 @@ export class AppStateCmenu {
     state: any;
     show: boolean;
     items: MenuItem[];
+    datePicker?: {
+        format: string;
+        value: any;
+    };
     top: number;
     bottom: number;
     left: number;

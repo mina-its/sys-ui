@@ -6,20 +6,17 @@
                    @blur="update" class="flex-grow-1 border-0">
             <div class="dropdown" v-if="!readOnly">
                 <i :class="{'fa text-muted':true, 'fa-clock': !datePick, 'fa-calendar-alt': datePick}" @click="click"></i>
-                <div v-if="showPicker" class="dropdown-menu dropdown-menu-right p-0 mt-1 show">
-                    <DateTimePicker :format="format" :value="value" @changed="changed"
-                                    @canceled="canceled"></DateTimePicker>
-                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-    import {ItemChangeEventArg, ItemEventArg, Moment} from '@/types';
+    import {AppStateCmenu, ItemChangeEventArg, ItemEventArg, MenuItem, Moment} from '@/types';
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, LogType, Keys, TimeFormat} from "../../../sys/src/types";
     import * as main from '../main';
+    import {glob} from "../main";
 
     declare let $, moment: Moment;
     @Component({name: 'PropTime', components: {}})
@@ -28,7 +25,6 @@
         @Prop() private prop: Property;
         @Prop() private viewType: string;
         @Prop() private readOnly: boolean;
-        private showPicker = false;
 
         update(e) {
             let val = e.target.value ? moment(e.target.value, this.format) : null;
@@ -42,20 +38,24 @@
 
         @Emit('changed')
         changed(val): ItemChangeEventArg {
-            this.showPicker = false;
-            return {prop: this.prop, val: val.value, vue: this};
+            return {prop: this.prop, val, vue: this};
         }
 
         get datePick() {
             return /D/.test(this.format) || /Y/.test(this.format);
         }
 
-        canceled() {
-            this.showPicker = false;
-        }
-
-        click() {
-            this.showPicker = true;
+        click(e) {
+            glob.cmenu = {
+                show: true,
+                datePicker: {
+                    value: this.value,
+                    format: this.format
+                },
+                state: this,
+                event: e,
+                handler: (state, val) => state.changed(val)
+            } as AppStateCmenu;
         }
 
         get format() {

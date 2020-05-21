@@ -82,6 +82,7 @@
 
     .sidenav {
         position: sticky;
+        overflow: hidden;
         top: 0;
     }
 </style>

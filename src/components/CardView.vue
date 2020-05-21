@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'card-view w-100':true,'p-2':root}">
+    <div :class="{'card-view w-100':true,'p-2':!level}">
         <div class="d-flex flex-wrap">
             <div class="" v-for="item in items">
                 <div class="card mr-4 mb-4" style="width: 540px;" tabindex="0">
@@ -27,8 +27,8 @@
     @Component({name: 'CardView', components: {}})
     export default class CardView extends Vue {
         @Prop() private uri: string;
-        @Prop() private root: boolean;
         @Prop() private dec: ObjectDec;
+        @Prop() private level: number;
 
         get items(): IData[] {
             let _items = this.$store.state.data[this.uri] || [];
