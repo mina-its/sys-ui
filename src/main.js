@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.getBsonId = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.evalExpression = exports.$t = exports.getText = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -18,6 +19,7 @@ let index = {
     "Ajax                           ": ajax,
 };
 const uuid_1 = require("uuid");
+const bson_util_1 = require("bson-util");
 const vue_1 = tslib_1.__importDefault(require("vue"));
 const vuex_1 = tslib_1.__importDefault(require("vuex"));
 const types_1 = require("./types");
@@ -194,11 +196,11 @@ exports.onlyUnique = onlyUnique;
 function handleResponse(res) {
     if (!res)
         throw "handleResponse: res is empty";
-    if (typeof res != "object") {
-        console.warn("handleResponse res", res);
-        throw "handleResponse: res must be object";
-    }
-    res = flat2recursive(res);
+    // if (typeof res != "object") {
+    //     console.warn("handleResponse res", res);
+    //     throw "handleResponse: res must be object";
+    // }
+    // console.log("res", res);
     if (res.config) {
         exports.glob.config = res.config;
         if (res.config.style)
@@ -515,60 +517,6 @@ function checkPropDependencyOnChange(dec, prop, instance) {
     }
 }
 exports.checkPropDependencyOnChange = checkPropDependencyOnChange;
-function parse(str) {
-    if (!str)
-        return null;
-    let json = JSON.parse(str);
-    return flat2recursive(json);
-}
-function flat2recursive(json) {
-    json = typeof json == "string" ? JSON.parse(json) : json;
-    if (!json)
-        return json;
-    let keys = {};
-    const findKeys = obj => {
-        if (obj && obj._0) {
-            keys[obj._0] = obj;
-            delete obj._0;
-        }
-        for (const key in obj) {
-            if (typeof obj[key] === 'object') {
-                findKeys(obj[key]);
-            }
-        }
-    };
-    const seen = new WeakSet();
-    const replaceRef = obj => {
-        if (seen.has(obj)) {
-            return;
-        }
-        seen.add(obj);
-        for (const key in obj) {
-            let val = obj[key];
-            if (!val)
-                continue;
-            if (typeof val === 'object') {
-                if (val.$date) {
-                    obj[key] = new Date(val.$date);
-                }
-                else if (!val.$oid) {
-                    if (val._$ == '') {
-                        obj[key] = json;
-                    }
-                    else if (val._$) {
-                        obj[key] = eval('json' + val._$);
-                    }
-                    replaceRef(val);
-                }
-            }
-        }
-    };
-    delete json._0;
-    findKeys(json);
-    replaceRef(json);
-    return json;
-}
-exports.flat2recursive = flat2recursive;
 function browseFile(fileBrowsed) {
     exports.glob.fileGallery.fileBrowsed = fileBrowsed;
     $('#file-browse').val('').click();
@@ -743,7 +691,7 @@ function getPropertyEmbedError(doc, propName) {
 }
 exports.getPropertyEmbedError = getPropertyEmbedError;
 function call(funcName, data, done) {
-    ajax(setQs('m', types_2.RequestMode.inline, false, "/" + funcName), data, null, res => done(null, flat2recursive(res.data)), err => done(err));
+    ajax(setQs('m', types_2.RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res.data), err => done(err));
 }
 exports.call = call;
 function load(href, pushState = false) {
@@ -764,19 +712,22 @@ function load(href, pushState = false) {
 }
 exports.load = load;
 function ajax(url, data, config, done, fail) {
+    startProgress();
     config = config || {};
-    let headers = {};
-    if (exports.glob.config.host) {
+    fail = fail || notify;
+    if (exports.glob.config.host)
         url = joinUri(exports.glob.config.host, url);
-    }
-    let params = { url, data, headers, withCredentials: true };
-    if (config.method) {
-        params.method = config.method;
-    }
-    else {
-        params.method = data ? types_2.WebMethod.post : types_2.WebMethod.get;
-    }
-    if (data) { // extract files raw data
+    // ajax params
+    let params = {
+        url,
+        data,
+        transformResponse: res => res,
+        method: config.method || (data ? types_2.WebMethod.post : types_2.WebMethod.get),
+        headers: {},
+        withCredentials: true
+    };
+    // extract files raw data
+    if (data) {
         let formData = null;
         for (let key in data) {
             if (!data[key])
@@ -797,9 +748,9 @@ function ajax(url, data, config, done, fail) {
             params.headers['Content-Type'] = 'multipart/form-data';
         }
     }
+    // Cross origin support
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-    fail = fail || notify;
-    startProgress();
+    // Ajax call
     axios(params).then(res => {
         stopProgress();
         if (res.status && res.status !== types_2.StatusCode.Ok) {
@@ -807,8 +758,9 @@ function ajax(url, data, config, done, fail) {
         }
         else {
             try {
-                // console.log(res.data);
-                done(res.data);
+                let result = bson_util_1.parse(res.data);
+                //console.log(result);
+                done(result);
             }
             catch (ex) {
                 notify(`error on handling ajax response: ${ex.message}`);
@@ -817,7 +769,8 @@ function ajax(url, data, config, done, fail) {
         }
     }).catch(err => {
         stopProgress();
-        console.error(`error on ajax '${url}'`, err);
+        console.info(`error on ajax '${url}'`);
+        console.error(err);
         if (err.response && err.response.data && err.response.data.message) {
             fail({ message: err.response.data.message, code: err.response.data.code });
         }
@@ -1115,7 +1068,7 @@ function _dispatchRequestServerModify(store, done) {
             break;
     }
     ajax(prepareServerUrl(modify.ref), modify.data, { method }, (res) => {
-        res.data = flat2recursive(res.data);
+        res.data = bson_util_1.parse(res.data);
         commitServerChangeResponse(store, modify, res.data);
         if (getQs("n")) {
             clearModifies();
@@ -1134,7 +1087,7 @@ function _dispatchRequestServerModify(store, done) {
 function start(params) {
     // console.log('starting ...');
     const mainState = $('#main-state').html();
-    const res = parse(mainState);
+    const res = bson_util_1.parse(mainState);
     if (res)
         startVue(res, params);
     else {

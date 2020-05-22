@@ -27,7 +27,7 @@
         <div class="w-100 h-100 overflow-auto d-flex">
             <div :class="{'d-flex w-100 overflow-auto':true, 'bg-white':level}" @scroll="onScroll()">
                 <!--  Side Menu -->
-                <aside v-if="!level && dec.filterDec" class="border-right separator-line bg-white sidenav p-3 d-none d-md-block">
+                <aside v-if="!level && dec.filterDec" class="border-right separator-line bg-white sidenav sidenav-filter p-3 d-none d-md-block">
                     <label class="text-muted small"><i class="fal fa-filter p-1"></i>Filter {{glob.form.breadcrumbLast}}:</label>
                     <DetailsView :dec="dec.filterDec" :data="dec.filterData" :level="level?level+1:1" @changed="objectFilterChanged"></DetailsView>
                 </aside>
@@ -603,5 +603,9 @@
                 border-bottom-#{$right}-radius: inherit;
             }
         }
+    }
+
+    .sidenav-filter {
+        min-width: 360px;
     }
 </style>

@@ -19,6 +19,7 @@ let index = {
 
 
 import {v4 as uuidv4} from 'uuid';
+import {parse} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import {
@@ -239,12 +240,12 @@ export function onlyUnique(value, index, self) {
 
 export function handleResponse(res: WebResponse) {
     if (!res) throw "handleResponse: res is empty";
-    if (typeof res != "object") {
-        console.warn("handleResponse res", res);
-        throw "handleResponse: res must be object";
-    }
+    // if (typeof res != "object") {
+    //     console.warn("handleResponse res", res);
+    //     throw "handleResponse: res must be object";
+    // }
 
-    res = flat2recursive(res);
+    // console.log("res", res);
 
     if (res.config) {
         glob.config = res.config;
@@ -556,61 +557,6 @@ export function checkPropDependencyOnChange(dec: ObjectDec | FunctionDec, prop, 
     }
 }
 
-function parse(str: string): any {
-    if (!str) return null;
-    let json = JSON.parse(str);
-    return flat2recursive(json);
-}
-
-export function flat2recursive(json: any | string): any {
-    json = typeof json == "string" ? JSON.parse(json) : json;
-    if (!json) return json;
-    let keys = {};
-    const findKeys = obj => {
-        if (obj && obj._0) {
-            keys[obj._0] = obj;
-            delete obj._0;
-        }
-
-        for (const key in obj) {
-            if (typeof obj[key] === 'object') {
-                findKeys(obj[key]);
-            }
-        }
-    };
-
-    const seen = new WeakSet();
-    const replaceRef = obj => {
-        if (seen.has(obj)) {
-            return;
-        }
-        seen.add(obj);
-
-        for (const key in obj) {
-            let val = obj[key];
-            if (!val) continue;
-
-            if (typeof val === 'object') {
-                if (val.$date) {
-                    obj[key] = new Date(val.$date);
-                } else if (!val.$oid) {
-                    if (val._$ == '') {
-                        obj[key] = json;
-                    } else if (val._$) {
-                        obj[key] = eval('json' + val._$);
-                    }
-                    replaceRef(val);
-                }
-            }
-        }
-    };
-
-    delete json._0;
-    findKeys(json);
-    replaceRef(json);
-    return json;
-}
-
 export function browseFile(fileBrowsed?: (files: FileList) => void) {
     glob.fileGallery.fileBrowsed = fileBrowsed;
     $('#file-browse').val('').click();
@@ -787,7 +733,7 @@ export function getPropertyEmbedError(doc: any, propName: string): string {
 }
 
 export function call(funcName: string, data: any, done: (err, data?) => void) {
-    ajax(setQs('m', RequestMode.inline, false, "/" + funcName), data, null, res => done(null, flat2recursive(res.data)), err => done(err));
+    ajax(setQs('m', RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res.data), err => done(err));
 }
 
 export function load(href: string, pushState = false) {
@@ -809,22 +755,24 @@ export function load(href: string, pushState = false) {
     ajax(setQs('m', RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
 }
 
-export function ajax(url: string, data, config: AjaxConfig, done: (res: WebResponse) => void,
-                     fail?: (err: { code: StatusCode, message: string }) => void) {
-
+export function ajax(url: string, data, config: AjaxConfig, done: (res: WebResponse) => void, fail?: (err: { code: StatusCode, message: string }) => void) {
+    startProgress();
     config = config || {};
-    let headers = {};
-    if (glob.config.host) {
-        url = joinUri(glob.config.host, url);
-    }
-    let params: any = {url, data, headers, withCredentials: true};
-    if (config.method) {
-        params.method = config.method;
-    } else {
-        params.method = data ? WebMethod.post : WebMethod.get;
-    }
+    fail = fail || notify;
+    if (glob.config.host) url = joinUri(glob.config.host, url);
 
-    if (data) { // extract files raw data
+    // ajax params
+    let params: any = {
+        url,
+        data,
+        transformResponse: res => res,
+        method: config.method || (data ? WebMethod.post : WebMethod.get),
+        headers: {},
+        withCredentials: true
+    };
+
+    // extract files raw data
+    if (data) {
         let formData: FormData = null;
         for (let key in data) {
             if (!data[key]) continue;
@@ -846,18 +794,19 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         }
     }
 
+    // Cross origin support
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
-    fail = fail || notify;
-    startProgress();
+    // Ajax call
     axios(params).then(res => {
         stopProgress();
         if (res.status && res.status !== StatusCode.Ok) {
             fail({code: res.status, message: res.statusText});
         } else {
             try {
-                // console.log(res.data);
-                done(res.data);
+                let result = parse(res.data);
+                //console.log(result);
+                done(result);
             } catch (ex) {
                 notify(`error on handling ajax response: ${ex.message}`);
                 console.error(res, ex);
@@ -865,7 +814,8 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         }
     }).catch(err => {
         stopProgress();
-        console.error(`error on ajax '${url}'`, err);
+        console.info(`error on ajax '${url}'`);
+        console.error(err);
 
         if (err.response && err.response.data && err.response.data.message) {
             fail({message: err.response.data.message, code: err.response.data.code});
@@ -1193,7 +1143,7 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
             break;
     }
     ajax(prepareServerUrl(modify.ref), modify.data, {method}, (res) => {
-        res.data = flat2recursive(res.data);
+        res.data = parse(res.data);
         commitServerChangeResponse(store, modify, res.data);
 
         if (getQs("n")) {
