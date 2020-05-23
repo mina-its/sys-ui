@@ -44,4 +44,13 @@ html[dir='rtl'] {
   .input-group > .input-group-append > .btn, .input-group > .input-group-append > .input-group-text, .input-group > .input-group-prepend:not(:first-child) > .btn, .input-group > .input-group-prepend:not(:first-child) > .input-group-text, .input-group > .input-group-prepend:first-child > .btn:not(:first-child), .input-group > .input-group-prepend:first-child > .input-group-text:not(:first-child) {
     border-radius: 4px 0px 0px 4px;
   }
+
+  .checkbox + .checkbox-label:before {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+
+  .details-view .active {
+    border-right: 3px solid var(--link-color);
+  }
 }

@@ -14,12 +14,14 @@
 
             <div class="mr-auto"></div>
 
+            <!-- Head functions -->
             <template v-for="func in headFuncs">
                 <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-2'}`" v-if="func.ref">{{func.title}}</a>
                 <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
             </template>
-            <button v-if="newItem" class="btn btn-success mx-1" @click="clickNewItem"><i class="fal fa-plus-circle pr-2"></i>{{newItem}}</button>
+            <button v-if="newItem" class="btn btn-success mx-1" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>{{newItem}}</button>
 
+            <!-- Object Menu -->
             <a class="text-secondary px-2" href="javascript:void(0);" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></a>
         </div>
 
@@ -65,12 +67,12 @@
                                     <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
                                     <div class="flex-grow-1 d-flex align-items-center">
                                         <ul v-if="dec.pages > 1" class="m-2 pagination ">
-                                            <li class="page-item">
+                                            <li class="page-item" data-toggle="tooltip" title="Previous Page">
                                                 <a @click="goBack" href="javascript:;" class="page-link"> <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i> </a>
                                             </li>
                                             <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') ">
                                                 <a class="page-link" :href="page.ref">{{page.title}}</a></li>
-                                            <li class="page-item">
+                                            <li class="page-item" data-toggle="tooltip" title="Next Page">
                                                 <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i> </a>
                                             </li>
                                         </ul>
@@ -150,6 +152,8 @@
                 }
                 this.extractFilteredProps();
             }
+
+            $('[data-toggle="tooltip"]').tooltip();
         }
 
         filterValueChanged(e: FilterChangeEventArg) {
@@ -263,7 +267,7 @@
             main.load(location.pathname + '?n=1', true);
         }
 
-        clickObjectMenu(e: FunctionExecEventArg) {
+        clickObjectMenu(e) {
             let items: MenuItem[] = [
                 {ref: "export-excel", title: $t('export-excel')},
                 {ref: "export-csv", title: $t('export-csv')},
@@ -273,7 +277,7 @@
                 {title: "-"},
                 {ref: "print", title: $t('print')},
             ];
-            main.showCmenu(null, items, e.event, (state, item: MenuItem) => {
+            main.showCmenu(null, items, e, (state, item: MenuItem) => {
                 switch (item.ref) {
                     case "export-excel":
                         break;

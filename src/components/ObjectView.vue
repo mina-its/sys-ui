@@ -8,7 +8,7 @@
         ObjectListsViewType,
         AccessPermission
     } from "../../../sys/src/types";
-    import {glob} from '@/main';
+    import {glob, getNewItemTitle} from '@/main';
     import pluralize = require('pluralize');
 
     @Component({name: 'ObjectView'})
@@ -34,7 +34,7 @@
             if (Array.isArray(data)) {
                 let viewType = (dec as ObjectDec).listsViewType || ObjectListsViewType.Grid;
                 let newItem = ((dec as ObjectDec).access & AccessPermission.NewItem) &&
-                Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? "New " + pluralize.singular(glob.form.title) : null;
+                Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? getNewItemTitle(glob.form.title) : null;
                 let props = {uri: e.obj._.ref, dec, newItem, level: this.level};
                 switch (viewType) {
                     default:

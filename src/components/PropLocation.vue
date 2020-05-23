@@ -1,6 +1,6 @@
 <template>
     <div :class="{'prop-location prop-value fa-lg': true, 'has-data':value}" @click="changing">
-        <i class="fa fa-map-marker text-dark"></i>
+        <i class="fal fa-map-marker text-dark"></i>
     </div>
 </template>
 

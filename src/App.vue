@@ -29,6 +29,7 @@
                 'background:#0072C6 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff',
                 'background:transparent'
             );
+            $('[data-toggle="tooltip"]').tooltip();
         }
 
         get objectElem() {
@@ -43,6 +44,7 @@
 <style lang="scss">
     @import '../node_modules/bootstrap/scss/bootstrap.scss';
     @import '../src/css/rtl';
+    @import '../src/css/fonts';
     @import url('https://fonts.googleapis.com/css?family=Roboto');
 
     :root {
@@ -106,7 +108,7 @@
     body {
         height: 100%;
         overflow: hidden;
-        font-family: Roboto, RobotoDraft, Calibri, Helvetica, Arial, sans-serif;
+        font-family: Roboto, IRANSans, RobotoDraft, Calibri, Helvetica, Arial, sans-serif;
         font-size: 15px;
     }
 
@@ -207,6 +209,10 @@
         }
     }
 
+    .nav {
+        padding: 0;
+    }
+
     .no-select {
         user-select: none;
         -webkit-user-select: none;
@@ -217,7 +223,7 @@
         z-index: 1;
         background-color: white;
         box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 2px 6px 2px rgba(60, 64, 67, .15);
-        min-height: 3.25rem;
+        min-height: 3.4rem;
     }
 
     .separator-line {
@@ -229,6 +235,10 @@
         z-index: 10000;
         #{$left}: 0;
         #{$right}: inherit;
+        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+        border-radius: 0 0 .25rem .25rem;
+        border: none !important;
+        margin-top: .55rem;
     }
 
     .breadcrumb-item {

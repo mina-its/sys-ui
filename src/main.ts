@@ -25,6 +25,7 @@ import Vuex from 'vuex';
 import {Axios, ChangeType, Constants, FileAction, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, Socket, StartParams, StateChange} from './types';
 import {AjaxConfig, DirFile, Drive, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
 import App from './App.vue';
+import pluralize = require('pluralize');
 
 declare let $: JQuery, axios: Axios, io: Socket, marked: any;
 export let glob = new Global();
@@ -334,7 +335,7 @@ export function handleResponseRedirect(res: WebResponse) {
 }
 
 export function isRtl() {
-    return $('body').attr('dir') == 'rtl';
+    return document.getElementsByTagName("html")[0].getAttribute("dir") == 'rtl';
 }
 
 export function showCmenu(state, items: MenuItem[], event, handler: (state, item: MenuItem) => void) {
@@ -355,6 +356,16 @@ export function showCmenu(state, items: MenuItem[], event, handler: (state, item
     }
 
     glob.cmenu = {show: true, items, handler, state, top: 0, left: 0, right: 0, bottom: 0, event};
+}
+
+export function getNewItemTitle(title: string) {
+    switch (getQs(Constants.QUERY_LOCALE)) {
+        case Locale[Locale.en]:
+            return "New " + pluralize.singular(glob.form.title);
+
+        default:
+            return $t("new-item");
+    }
 }
 
 export function hideCmenu() {
@@ -397,11 +408,12 @@ function handleWindowEvents() {
         })
         .on("click", (e: any) => {
             let el = e.target as HTMLAnchorElement;
-            if (el.tagName !== "A" || el.getAttribute('target')) return;   // especially _blank
+            if (el.tagName !== "A" || el.getAttribute('target') || el.getAttribute('data-toggle') == "tab") return;   // especially _blank
 
             let href = el.getAttribute('href');
             if (href) {
                 if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
+
                 e.preventDefault();
 
                 if (/^http/.test(href)) {

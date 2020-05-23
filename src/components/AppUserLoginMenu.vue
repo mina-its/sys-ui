@@ -1,16 +1,13 @@
 <template>
     <div class="app-user-login">
         <div v-if="glob.config.user.loginUrl">
-            <a class="dropdown-toggle my-2 my-sm-0 text-light"
-               :href="glob.config.user.loginUrl">{{glob.config.user.loginTitle}}</a>
+            <a class="dropdown-toggle my-2 my-sm-0 text-light" :href="glob.config.user.loginUrl">{{glob.config.user.loginTitle}}</a>
         </div>
         <div v-else class="dropdown">
-            <button class="avatar dropdown-toggle" id="dropdownProfileBrief" data-toggle="dropdown" aria-haspopup="true"
-                    aria-expanded="false">
+            <button class="avatar dropdown-toggle" id="dropdownProfileBrief" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span role="img" :style="{'background-image':`url(${profilePhoto})`}"></span>
             </button>
-            <div class="dropdown-menu dropdown-menu-right text-center profile-brief"
-                 aria-labelledby="dropdownProfileBrief">
+            <div :class="{'dropdown-menu text-center profile-brief':1,'dropdown-menu-right':ltr}" aria-labelledby="dropdownProfileBrief">
                 <img class="m-4 mx-5" :src="profilePhoto"/>
                 <h2>{{glob.config.user.title}}</h2>
                 <div>{{glob.config.user.email}}</div>
@@ -52,6 +49,12 @@
 </script>
 
 <style scoped lang="scss">
+    .app-user-login {
+        .dropdown-menu {
+            margin-top: .7rem;
+        }
+    }
+
     .profile-brief {
         width: 300px;
     }

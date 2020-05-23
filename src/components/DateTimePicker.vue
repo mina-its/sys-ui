@@ -90,7 +90,7 @@
         private hours = [];
         private minutes = [];
         private seconds = [];
-        private amPm = [];
+        private amPm = null;
 
         makeYears() {
             let start, end;
