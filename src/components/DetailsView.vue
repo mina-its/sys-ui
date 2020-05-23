@@ -270,12 +270,13 @@
         }
 
         get groups() {
-            let props = this.dec.properties.filter((p) => {
-                return p.condition == null || main.evalExpression(this.item, p.condition);
+            this.dec.properties.forEach( p => {
+               if (p.condition){
+                   console.log(p.condition);
+               }
             });
-            return props.map((p) => {
-                return p.group;
-            }).filter(main.onlyUnique);
+            let props = this.dec.properties.filter(p => p.condition == null || main.evalExpression(this.item, p.condition));
+            return props.map(p => p.group).filter(main.onlyUnique);
         }
     }
 </script>

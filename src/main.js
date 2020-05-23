@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.getBsonId = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.evalExpression = exports.$t = exports.getText = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.evalExpression = exports.$t = exports.getText = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -116,7 +116,7 @@ function vueResetFormData(res) {
                 continue;
             if (Array.isArray(data)) {
                 data.forEach((item) => {
-                    let meta = setDataMeta(ref + "/" + getBsonId(item), item, dec);
+                    let meta = setDataMeta(ref + "/" + item._id, item, dec);
                     meta.marked = null;
                 });
             }
@@ -270,18 +270,12 @@ function getPropTextValue(meta, data) {
 }
 exports.getPropTextValue = getPropTextValue;
 function equalID(id1, id2) {
-    if (!id1 && !id2) {
+    if (!id1 && !id2)
         return true;
-    }
-    else if (!id1 || !id2) {
+    else if (!id1 || !id2)
         return false;
-    }
-    else if (id1.$oid) {
-        return id1.$oid == id2.$oid;
-    }
-    else {
-        return id1 == id2;
-    }
+    else
+        return id1.toString() == id2.toString();
 }
 exports.equalID = equalID;
 function getPropReferenceValue(prop, data) {
@@ -603,20 +597,6 @@ function question(title, message, buttons, options, select) {
     exports.glob.question.show = true;
 }
 exports.question = question;
-function getBsonId(item) {
-    if (!item) {
-        throw 'Item is null';
-    }
-    else if (!item._id) {
-        console.error('Invalid item data, _id is expected:', item);
-        notify('Invalid data, please check the logs!', types_2.LogType.Error);
-        return null;
-    }
-    else {
-        return item._id.$oid;
-    }
-}
-exports.getBsonId = getBsonId;
 function loadHeadScript(src) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
@@ -720,10 +700,12 @@ function ajax(url, data, config, done, fail) {
     // ajax params
     let params = {
         url,
-        data,
+        dataType: "text",
         transformResponse: res => res,
         method: config.method || (data ? types_2.WebMethod.post : types_2.WebMethod.get),
-        headers: {},
+        headers: {
+            'Content-Type': "text/plain"
+        },
         withCredentials: true
     };
     // extract files raw data
@@ -744,12 +726,15 @@ function ajax(url, data, config, done, fail) {
         }
         if (formData) {
             params.data = formData;
-            params.data.append('data', JSON.stringify(data));
+            params.data.append('data', bson_util_1.stringify(data, true));
             params.headers['Content-Type'] = 'multipart/form-data';
         }
     }
     // Cross origin support
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+    // serialize data
+    params.data = bson_util_1.stringify(data, true);
+    // console.log(params.data);
     // Ajax call
     axios(params).then(res => {
         stopProgress();
@@ -758,8 +743,8 @@ function ajax(url, data, config, done, fail) {
         }
         else {
             try {
-                let result = bson_util_1.parse(res.data);
-                //console.log(result);
+                let result = bson_util_1.parse(res.data, true, types_1.ID);
+                // console.log(result);
                 done(result);
             }
             catch (ex) {
@@ -769,17 +754,13 @@ function ajax(url, data, config, done, fail) {
         }
     }).catch(err => {
         stopProgress();
-        console.info(`error on ajax '${url}'`);
-        console.error(err);
-        if (err.response && err.response.data && err.response.data.message) {
-            fail({ message: err.response.data.message, code: err.response.data.code });
+        console.error(`error on ajax '${url}'`, err);
+        if (err.response && err.response.data) {
+            let er = bson_util_1.parse(err.response.data);
+            fail(er);
         }
-        else if (err.response && err.response.data) {
-            fail({ message: err.response.data, code: err.response.status });
-        }
-        else {
+        else
             fail({ message: err.toString(), code: types_2.StatusCode.UnknownError });
-        }
     });
 }
 exports.ajax = ajax;
@@ -996,7 +977,7 @@ function _commitReorderItems(store, arg) {
 function modifyOrder(item, uri) {
     let modify = exports.glob.modifies.find(m => m.state == item && (m.type == types_1.ChangeType.InsertItem || m.type == types_1.ChangeType.EditProp));
     if (!modify) {
-        modify = { ref: uri + "/" + getBsonId(item), type: types_1.ChangeType.EditProp, data: {}, state: item };
+        modify = { ref: uri + "/" + item._id, type: types_1.ChangeType.EditProp, data: {}, state: item };
         exports.glob.modifies.push(modify);
     }
     modify.data._z = item._z;
@@ -1026,7 +1007,7 @@ function _dispatchStoreModify(store, change) {
             break;
         }
         case types_1.ChangeType.DeleteItem: {
-            ref = ref + "/" + getBsonId(change.item);
+            ref = ref + "/" + change.item._id;
             let modify = exports.glob.modifies.find(m => m.state == change.item);
             if (modify) {
                 exports.glob.modifies.splice(exports.glob.modifies.indexOf(modify), 1);
@@ -1067,21 +1048,27 @@ function _dispatchRequestServerModify(store, done) {
             method = types_2.WebMethod.del;
             break;
     }
+    console.log(modify.data);
+    console.log(bson_util_1.stringify(modify.data, true));
     ajax(prepareServerUrl(modify.ref), modify.data, { method }, (res) => {
-        res.data = bson_util_1.parse(res.data);
-        commitServerChangeResponse(store, modify, res.data);
+        commitServerChangeResponse(store, modify, res.modifyResult);
         if (getQs("n")) {
             clearModifies();
-            load("/" + modify.ref + "/" + res.data._id.$oid, true);
+            load("/" + modify.ref + "/" + res.modifyResult._id, true);
         }
         else if (res.redirect && exports.glob.modifies.length == 0)
             return handleResponseRedirect(res);
-        else
+        else if (res.modifyResult)
             dispatchRequestServerModify(store, done);
+        else {
+            exports.glob.modifies.unshift(modify); // insert the modify again
+            notify("A problem happened. Please refresh the page to check if your modifies have been saved or not!", types_2.LogType.Error);
+            done("A problem happened. Please refresh the page to check if your modifies have been saved or not!");
+        }
     }, (err) => {
         exports.glob.modifies.unshift(modify);
+        notify(err, types_2.LogType.Error);
         done(err);
-        notify(err);
     });
 }
 function start(params) {
@@ -1096,9 +1083,12 @@ function start(params) {
         if (getQs(types_1.Constants.QUERY_LOCALE))
             uri = setQs(types_1.Constants.QUERY_LOCALE, getQs(types_1.Constants.QUERY_LOCALE), false, uri);
         // console.log(`loading main-state async from '${uri}' ...`);
-        axios.get(uri, { withCredentials: true }).then(res => {
-            if (res.data)
-                startVue(res.data, params);
+        axios.get(uri, { transformResponse: res => res, withCredentials: true }).then(res => {
+            if (res.data) {
+                // console.log(res.data);
+                let data = bson_util_1.parse(res.data, true, types_1.ID);
+                startVue(data, params);
+            }
             else
                 console.error(res);
         }).catch(err => {

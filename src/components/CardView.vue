@@ -68,7 +68,7 @@
                             console.error(state);
                             return;
                         }
-                        let href = main.prepareServerUrl(`${this.dec.ref}/${main.getBsonId(state)}`);
+                        let href = main.prepareServerUrl(`${this.dec.ref}/${state._id}`);
                         main.load(href, true);
                         break;
                     }
@@ -95,7 +95,7 @@
                 prop: e.prop,
                 value: e.val,
                 item: e.item,
-                uri: this.uri + "/" + main.getBsonId(e.item),
+                uri: this.uri + "/" + e.item._id,
                 vue: e.vue
             } as StateChange);
         }

@@ -11,6 +11,9 @@ import {
     ObjectDec
 } from '../../sys/src/types';
 
+import {ID} from 'bson-util';
+import FormView from "@/components/FormView.vue";
+
 export interface JQuery {
     (selector: string | any): any;
 }
@@ -276,3 +279,22 @@ export class AppStateLog {
     ref?: string;
     type?: LogType;
 }
+
+// export class ID {
+//     constructor(id: string) {
+//         this.id = new Uint8Array(id.match(/[\da-f]{2}/gi).map(h => parseInt(h, 16)));
+//     }
+//
+//     equals(another: ID): boolean {
+//         return this.toString() == another.toString();
+//     }
+//
+//     toString(): string {
+//         return Array.from(this.id).map(i => ('0' + i.toString(16)).slice(-2)).join('');
+//     }
+//
+//     id: Uint8Array;
+//     _bsontype = 'ObjectID';
+// }
+
+export {ID};

@@ -180,10 +180,10 @@
             if (typeof filterVal == "string" || typeof filterVal == "number") return filterVal;
 
             if (filterVal) {
-                if (filterVal.$reg) {
-                    if (/^\/\^/.test(filterVal.$reg)) return filterVal.$reg.replace(/^\/\^(.+)\/.+/, "$1");
-                    else if (/\$\/i?$/.test(filterVal.$reg)) return filterVal.$reg.replace(/^\/(.+)\$\/.+/, "$1");
-                    else return filterVal.$reg.replace(/^\/(.+)\/.+/, "$1");
+                if (filterVal.$RegExp) {
+                    if (/^\/\^/.test(filterVal.$RegExp)) return filterVal.$RegExp.replace(/^\/\^(.+)\/.+/, "$1");
+                    else if (/\$\/i?$/.test(filterVal.$RegExp)) return filterVal.$RegExp.replace(/^\/(.+)\$\/.+/, "$1");
+                    else return filterVal.$RegExp.replace(/^\/(.+)\/.+/, "$1");
                 } else if (filterVal.$gt) return filterVal.$gt;
                 else if (filterVal.$gte) return filterVal.$gte;
                 else if (filterVal.$lt) return filterVal.$lt;
@@ -304,7 +304,7 @@
                 prop: e.prop,
                 value: e.val,
                 item: e.item,
-                uri: this.uri + "/" + main.getBsonId(e.item),
+                uri: this.uri + "/" + e.item._id,
                 vue: e.vue
             } as StateChange);
         }
@@ -458,7 +458,7 @@
                 {ref: 'delete', title: $t('delete')},
             ];
 
-            if (e.item._id && main.getBsonId(e.item)) {
+            if (e.item._id) {
                 items.unshift({ref: 'details', title: $t('details')});
             }
 
@@ -482,7 +482,7 @@
                             console.error(state);
                             return;
                         }
-                        let href = main.prepareServerUrl(`${this.dec.ref}/${main.getBsonId(state)}`);
+                        let href = main.prepareServerUrl(`${this.dec.ref}/${state._id}`);
                         main.load(href, true);
                         break;
                     }
@@ -493,7 +493,7 @@
                             console.error(state);
                             return;
                         }
-                        let href = main.prepareServerUrl(`${this.dec.ref}/${main.getBsonId(state)}?t=${ObjectViewType.TreeView}`);
+                        let href = main.prepareServerUrl(`${this.dec.ref}/${state._id}?t=${ObjectViewType.TreeView}`);
                         main.load(href, true);
                         break;
                     }

@@ -29,10 +29,10 @@
             }
             this.prop._ = this.prop._ || {gtype: GlobalType.string};
 
-            if (this.prop.condition != null && !main.evalExpression(this.item, this.prop.condition)) {
-                this.item[this.prop.name] = null;
-                return null;
-            }
+            // if (this.prop.condition && !main.evalExpression(this.item, this.prop.condition)) {
+            //     this.item[this.prop.name] = null;
+            //     return null;
+            // }
 
             switch (this.viewType) {
                 case ObjectViewType.GridView:
@@ -167,7 +167,7 @@
                             props: pr,
                         });
                     else {
-                        if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && main.getBsonId(this.item)) {
+                        if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && typeof this.item._id != "string") {
                             return ce('prop-link', {
                                 attrs: {"class": styles},
                                 on: {keydown: this.keydown, focus: this.focused},

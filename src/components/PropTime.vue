@@ -2,7 +2,7 @@
     <div class="prop-time">
         <div class="d-flex">
             <input @focus="$emit('focus', $event)" type="text" :value="value"
-                   :name="viewType!=1 ? prop.name : null" :readonly="readOnly"
+                   :name="viewType!=1 ? prop.name : null" :readonly="readOnly" @input="dirty=true"
                    @blur="update" class="flex-grow-1 border-0">
             <div class="dropdown" v-if="!readOnly">
                 <i :class="{'fa text-muted':true, 'fa-clock': !datePick, 'fa-calendar-alt': datePick}" @click="click"></i>
@@ -26,9 +26,14 @@
         @Prop() private viewType: string;
         @Prop() private readOnly: boolean;
 
+        private dirty = false;
+
         update(e) {
+            // Ignore if not change
+            if (!this.dirty) return;
+
             let val = e.target.value ? moment(e.target.value, this.format) : null;
-            let date = val && val.isValid() ? val.toDate() : null;
+            let date: Date = val && val.isValid() ? val.toDate() : null;
             if (!date && e.target.value) {
                 main.notify('invalid-date' + ": " + e.target.value, LogType.Error);
                 this.$forceUpdate();
@@ -37,8 +42,8 @@
         }
 
         @Emit('changed')
-        changed(val): ItemChangeEventArg {
-            return {prop: this.prop, val, vue: this};
+        changed(val: {value: Date}): ItemChangeEventArg {
+            return {prop: this.prop, val: val.value, vue: this};
         }
 
         get datePick() {
@@ -77,7 +82,7 @@
             return "YYYY/MM/DD";
         }
 
-        get value() {
+        get value(): string {
             let val = this.doc[this.prop.name];
             return val ? moment(val).format(this.format) : "";
         }

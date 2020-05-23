@@ -48,15 +48,15 @@
             if (e.val != null) {
                 switch (this.filterOperator) {
                     case FilterOperator.Like:
-                        filterVal = {"$reg": "/" + e.val + "/i"};
+                        filterVal = {"$RegExp": "/" + e.val + "/i"};
                         break;
 
                     case FilterOperator.StartWith:
-                        filterVal = {"$reg": "/^" + e.val + "/i"};
+                        filterVal = {"$RegExp": "/^" + e.val + "/i"};
                         break;
 
                     case FilterOperator.EndWith:
-                        filterVal = {"$reg": "/" + e.val + "$/i"};
+                        filterVal = {"$RegExp": "/" + e.val + "$/i"};
                         break;
 
                     case FilterOperator.Yes:
@@ -97,14 +97,14 @@
 
                     case FilterOperator.Exist:
                         if (this.prop._.gtype == GlobalType.string)
-                            filterVal = {"$reg": "/\\w/"};
+                            filterVal = {"$RegExp": "/\\w/"};
                         else
                             filterVal = {"$exists": true};
                         break;
 
                     case FilterOperator.None:
                         if (this.prop._.gtype == GlobalType.string)
-                            filterVal = {$not: {$reg: "/\\w/"}};
+                            filterVal = {$not: {$RegExp: "/\\w/"}};
                         else
                             filterVal = {$null: true};
                         break;
@@ -148,13 +148,13 @@
             let val = this.filterDoc[this.prop.name];
             let filterVal = this.propFilter;
             if (filterVal) {
-                if (filterVal.$reg) {
-                    if (/^\/\^/.test(filterVal.$reg)) return FilterOperator.StartWith;
-                    else if (/\$\/i?$/.test(filterVal.$reg)) return FilterOperator.EndWith;
-                    else if (/\/\\w\//.test(filterVal.$reg)) return FilterOperator.Exist;
+                if (filterVal.$RegExp) {
+                    if (/^\/\^/.test(filterVal.$RegExp)) return FilterOperator.StartWith;
+                    else if (/\$\/i?$/.test(filterVal.$RegExp)) return FilterOperator.EndWith;
+                    else if (/\/\\w\//.test(filterVal.$RegExp)) return FilterOperator.Exist;
                     else return FilterOperator.Like;
-                } else if (filterVal.$not && filterVal.$not.$reg) {
-                    if (/\/\\w\//.test(filterVal.$not.$reg)) return FilterOperator.None;
+                } else if (filterVal.$not && filterVal.$not.$RegExp) {
+                    if (/\/\\w\//.test(filterVal.$not.$RegExp)) return FilterOperator.None;
                 } else if (filterVal.$gt) return FilterOperator.GreaterThan;
                 else if (filterVal.$gte) return FilterOperator.GreaterThanEqual;
                 else if (filterVal.$lt) return FilterOperator.LessThan;

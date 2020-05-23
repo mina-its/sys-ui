@@ -3,7 +3,7 @@
         <ol class="breadcrumb p-0 m-0 bg-transparent">
             <li v-for="item in glob.form.breadcrumb" class="breadcrumb-item">
                 <a :href="item.ref">{{item.title}}</a>
-                <i :class="{'fa':1 ,'fa-chevron-right ml-2':ltr, 'fa-chevron-left mr-2':rtl}"></i>
+                <i :class="{'fa my-1':1 ,'fa-chevron-right ml-2':ltr, 'fa-chevron-left mr-2':rtl}"></i>
             </li>
             <li class="breadcrumb-item font-weight-bold active" aria-current="page">{{glob.form.breadcrumbLast}}<span class="text-muted px-2" v-if="count">({{countTitle}})</span></li>
         </ol>

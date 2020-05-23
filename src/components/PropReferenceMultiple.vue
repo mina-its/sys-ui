@@ -81,6 +81,7 @@
         }
 
         get items(): Pair[] {
+            console.log(this.value);
             let items: Pair[] = [];
             for (const v of this.value) {
                 let item = this.prop._.items.find(i => main.equalID(v, i.ref));

@@ -19,46 +19,11 @@ let index = {
 
 
 import {v4 as uuidv4} from 'uuid';
-import {parse} from 'bson-util';
+import {parse, stringify} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {
-    Axios,
-    ChangeType,
-    Constants,
-    FileAction,
-    Global,
-    JQuery,
-    MenuItem,
-    Modify,
-    Socket,
-    StartParams,
-    StateChange,
-    FilterOperator,
-    QuestionOptions
-} from './types';
-import {
-    AjaxConfig,
-    DirFile,
-    Drive,
-    FunctionDec,
-    GlobalType,
-    IData,
-    IError,
-    Keys,
-    Locale,
-    LogType,
-    mFile,
-    MultilangText,
-    NotificationInfo,
-    ObjectDec,
-    Pair,
-    Property,
-    RequestMode,
-    StatusCode,
-    WebMethod,
-    WebResponse
-} from '../../sys/src/types';
+import {Axios, ChangeType, Constants, FileAction, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, Socket, StartParams, StateChange} from './types';
+import {AjaxConfig, DirFile, Drive, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
 import App from './App.vue';
 
 declare let $: JQuery, axios: Axios, io: Socket, marked: any;
@@ -159,7 +124,7 @@ function vueResetFormData(res: WebResponse) {
 
             if (Array.isArray(data)) {
                 data.forEach((item: IData) => {
-                    let meta = setDataMeta(ref + "/" + getBsonId(item), item, dec);
+                    let meta = setDataMeta(ref + "/" + item._id, item, dec);
                     meta.marked = null;
                 });
             } else
@@ -317,15 +282,9 @@ export function getPropTextValue(meta: Property, data) {
 }
 
 export function equalID(id1: any, id2: any): boolean {
-    if (!id1 && !id2) {
-        return true;
-    } else if (!id1 || !id2) {
-        return false;
-    } else if (id1.$oid) {
-        return id1.$oid == id2.$oid;
-    } else {
-        return id1 == id2;
-    }
+    if (!id1 && !id2) return true;
+    else if (!id1 || !id2) return false;
+    else return id1.toString() == id2.toString();
 }
 
 export function getPropReferenceValue(prop: Property, data: any): string {
@@ -644,18 +603,6 @@ export function question(title: string, message: string, buttons: Pair[], option
     glob.question.show = true;
 }
 
-export function getBsonId(item: IData): string {
-    if (!item) {
-        throw 'Item is null';
-    } else if (!item._id) {
-        console.error('Invalid item data, _id is expected:', item);
-        notify('Invalid data, please check the logs!', LogType.Error);
-        return null;
-    } else {
-        return item._id.$oid;
-    }
-}
-
 export function loadHeadScript(src) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
@@ -764,10 +711,12 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
     // ajax params
     let params: any = {
         url,
-        data,
+        dataType: "text",
         transformResponse: res => res,
         method: config.method || (data ? WebMethod.post : WebMethod.get),
-        headers: {},
+        headers: {
+            'Content-Type': "text/plain"
+        },
         withCredentials: true
     };
 
@@ -789,13 +738,17 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
 
         if (formData) {
             params.data = formData;
-            params.data.append('data', JSON.stringify(data));
+            params.data.append('data', stringify(data, true));
             params.headers['Content-Type'] = 'multipart/form-data';
         }
     }
 
     // Cross origin support
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+
+    // serialize data
+    params.data = stringify(data, true);
+    // console.log(params.data);
 
     // Ajax call
     axios(params).then(res => {
@@ -804,8 +757,8 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
             fail({code: res.status, message: res.statusText});
         } else {
             try {
-                let result = parse(res.data);
-                //console.log(result);
+                let result = parse(res.data, true, ID);
+                // console.log(result);
                 done(result);
             } catch (ex) {
                 notify(`error on handling ajax response: ${ex.message}`);
@@ -814,16 +767,12 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         }
     }).catch(err => {
         stopProgress();
-        console.info(`error on ajax '${url}'`);
-        console.error(err);
-
-        if (err.response && err.response.data && err.response.data.message) {
-            fail({message: err.response.data.message, code: err.response.data.code});
-        } else if (err.response && err.response.data) {
-            fail({message: err.response.data, code: err.response.status});
-        } else {
+        console.error(`error on ajax '${url}'`, err);
+        if (err.response && err.response.data) {
+            let er = parse(err.response.data);
+            fail(er);
+        } else
             fail({message: err.toString(), code: StatusCode.UnknownError});
-        }
     });
 }
 
@@ -1065,7 +1014,7 @@ function _commitReorderItems(store, arg) {
 function modifyOrder(item: any, uri: string) {
     let modify = glob.modifies.find(m => m.state == item && (m.type == ChangeType.InsertItem || m.type == ChangeType.EditProp));
     if (!modify) {
-        modify = {ref: uri + "/" + getBsonId(item), type: ChangeType.EditProp, data: {} as IData, state: item};
+        modify = {ref: uri + "/" + item._id, type: ChangeType.EditProp, data: {} as IData, state: item};
         glob.modifies.push(modify);
     }
     modify.data._z = item._z;
@@ -1097,7 +1046,7 @@ function _dispatchStoreModify(store, change: StateChange) {
         }
 
         case ChangeType.DeleteItem: {
-            ref = ref + "/" + getBsonId(change.item);
+            ref = ref + "/" + change.item._id;
             let modify = glob.modifies.find(m => m.state == change.item);
             if (modify) {
                 glob.modifies.splice(glob.modifies.indexOf(modify), 1);
@@ -1142,21 +1091,28 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
             method = WebMethod.del;
             break;
     }
+    console.log(modify.data);
+    console.log(stringify(modify.data, true));
+
     ajax(prepareServerUrl(modify.ref), modify.data, {method}, (res) => {
-        res.data = parse(res.data);
-        commitServerChangeResponse(store, modify, res.data);
+        commitServerChangeResponse(store, modify, res.modifyResult);
 
         if (getQs("n")) {
             clearModifies();
-            load("/" + modify.ref + "/" + res.data._id.$oid, true);
+            load("/" + modify.ref + "/" + res.modifyResult._id, true);
         } else if (res.redirect && glob.modifies.length == 0)
             return handleResponseRedirect(res);
-        else
+        else if (res.modifyResult)
             dispatchRequestServerModify(store, done);
+        else {
+            glob.modifies.unshift(modify);  // insert the modify again
+            notify("A problem happened. Please refresh the page to check if your modifies have been saved or not!", LogType.Error);
+            done("A problem happened. Please refresh the page to check if your modifies have been saved or not!");
+        }
     }, (err) => {
         glob.modifies.unshift(modify);
+        notify(err, LogType.Error);
         done(err);
-        notify(err);
     });
 }
 
@@ -1173,10 +1129,12 @@ export function start(params?: StartParams) {
         if (getQs(Constants.QUERY_LOCALE))
             uri = setQs(Constants.QUERY_LOCALE, getQs(Constants.QUERY_LOCALE), false, uri);
         // console.log(`loading main-state async from '${uri}' ...`);
-        axios.get(uri, {withCredentials: true}).then(res => {
-            if (res.data)
-                startVue(res.data, params);
-            else
+        axios.get(uri, {transformResponse: res => res, withCredentials: true}).then(res => {
+            if (res.data) {
+                // console.log(res.data);
+                let data = parse(res.data, true, ID);
+                startVue(data, params);
+            } else
                 console.error(res);
         }).catch(err => {
             console.error(err);

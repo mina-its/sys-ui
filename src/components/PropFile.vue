@@ -14,7 +14,7 @@
                        style="cursor:pointer"></i>
                 </div>
             </div>
-            <Function v-if="showBrowseButton" title="Browse file ..." styles="btn-outline-dark py-1 px-2 border"
+            <Function v-if="showBrowseButton" title="Browse file ..." styles="btn-light py-1 px-2 border"
                       @exec="selectFile"></Function>
         </div>
         <div v-else v-for="file in files" @click="showMenu(file, $event)">
@@ -240,6 +240,7 @@
     .prop-value.prop-file {
         overflow: hidden;
         word-break: break-all;
+        padding: 0;
         margin-left: 0 !important;
         box-sizing: border-box;
         width: var(--wide-props-width);
@@ -252,8 +253,6 @@
         }
 
         figure {
-            margin: 0rem -0.5rem;
-
             img {
                 max-height: 350px;
                 object-fit: cover;
