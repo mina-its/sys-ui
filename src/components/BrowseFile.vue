@@ -9,19 +9,9 @@
 
     @Component({name: 'BrowseFile'})
     export default class BrowseFile extends Vue {
-        @Prop() private prop!: string;
-
         fileBrowsed(e: InputEvent) {
-            glob.fileGallery.fileBrowsed((e.target as HTMLInputElement).files);
-
-            // browseFile(fileBrowsed?: (files: any[]) => void) {
-            //     glob.fileGallery.fileBrowsed = fileBrowsed;
-            //     $('#file-browse').val('').click();
-            // }
+            glob.fileBrowsed((e.target as HTMLInputElement).files);
         }
+
     }
 </script>
-
-<style lang="scss">
-
-</style>

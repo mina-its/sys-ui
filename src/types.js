@@ -98,6 +98,7 @@ class Global {
         this.data = {};
         this.question = new AppStateQuestion();
         this.fileGallery = new AppStateFileGallery();
+        this.imagePreview = { show: false, url: null };
         this.logs = [];
         this.modal = false;
         this.config = new types_1.AppStateConfig();
@@ -107,6 +108,8 @@ class Global {
         this.geoMap = new AppStateGeoMap();
         this.modifies = [];
         this.progress = null;
+        console.log("Global constructor");
+        this.fileBrowsed = null;
     }
 }
 exports.Global = Global;

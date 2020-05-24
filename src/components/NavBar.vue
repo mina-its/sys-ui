@@ -25,7 +25,7 @@
             <!--<master-search></master-search>-->
             <AppLocaleMenu/>
             <AppUserLoginMenu/>
-
+            <!-- <AppChangeRegion/> -->
         </div>
     </nav>
 </template>

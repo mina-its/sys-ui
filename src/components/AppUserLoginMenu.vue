@@ -48,54 +48,54 @@
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
     .app-user-login {
         .dropdown-menu {
             margin-top: .7rem;
         }
-    }
 
-    .profile-brief {
-        width: 300px;
-    }
-
-    .profile-brief img {
-        width: 120px;
-        border-radius: 50%;
-    }
-
-    .profile-brief .box span {
-        width: 100px;
-        height: 100px;
-    }
-
-    .avatar {
-        width: 38px;
-        height: 28px;
-        background-color: transparent;
-        border: none;
-        outline: none;
-
-        &::after {
-            display: none;
+        .profile-brief {
+            width: 300px;
         }
-    }
 
-    .avatar span {
-        background-color: transparent;
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        border-radius: 50%;
-        display: flex;
-        flex: 1 1 100%;
-        width: 100%;
-        height: 100%;
-        border: 1px solid white;
-        cursor: pointer;
-    }
+        .profile-brief img {
+            width: 120px;
+            border-radius: 50%;
+        }
 
-    .profile-button {
-        width: 200px;
+        .profile-brief .box span {
+            width: 100px;
+            height: 100px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 28px;
+            background-color: transparent;
+            border: none;
+            outline: none;
+
+            &::after {
+                display: none;
+            }
+        }
+
+        .avatar span {
+            background-color: transparent;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            border-radius: 50%;
+            display: flex;
+            flex: 1 1 100%;
+            width: 100%;
+            height: 100%;
+            border: 1px solid white;
+            cursor: pointer;
+        }
+
+        .profile-button {
+            width: 200px;
+        }
     }
 </style>

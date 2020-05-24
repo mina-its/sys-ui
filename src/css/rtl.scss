@@ -53,4 +53,10 @@ html[dir='rtl'] {
   .details-view .active {
     border-right: 3px solid var(--link-color);
   }
+
+  .change-region {
+    .modal-header .close {
+      margin: -1rem auto -1rem -1rem;
+    }
+  }
 }

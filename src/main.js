@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.hideCmenu = exports.getNewItemTitle = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.evalExpression = exports.$t = exports.getText = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.getNewItemTitle = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.evalExpression = exports.$t = exports.getText = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -26,7 +26,8 @@ const types_1 = require("./types");
 const types_2 = require("../../sys/src/types");
 const App_vue_1 = tslib_1.__importDefault(require("./App.vue"));
 const pluralize = require("pluralize");
-exports.glob = new types_1.Global();
+exports.glob = window["__glob"] || new types_1.Global();
+window["__glob"] = exports.glob;
 let store;
 function getText(text, useDictionary) {
     if (!text)
@@ -431,6 +432,13 @@ function handleWindowEvents() {
             hideCmenu();
     });
 }
+function handleImagesPreview(selector) {
+    $(selector).on("mousedown", e => {
+        exports.glob.imagePreview.url = e.target.src;
+        exports.glob.imagePreview.show = true;
+    });
+}
+exports.handleImagesPreview = handleImagesPreview;
 function handleCmenuKeys(e) {
     switch (e.which) {
         case types_2.Keys.tab:
@@ -522,7 +530,7 @@ function checkPropDependencyOnChange(dec, prop, instance) {
 }
 exports.checkPropDependencyOnChange = checkPropDependencyOnChange;
 function browseFile(fileBrowsed) {
-    exports.glob.fileGallery.fileBrowsed = fileBrowsed;
+    exports.glob.fileBrowsed = fileBrowsed;
     $('#file-browse').val('').click();
 }
 exports.browseFile = browseFile;

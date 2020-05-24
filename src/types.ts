@@ -7,12 +7,10 @@ import {
     NotificationInfo,
     AppStateConfig,
     FormDto,
-    IData,
-    ObjectDec
+    IData
 } from '../../sys/src/types';
 
 import {ID} from 'bson-util';
-import FormView from "@/components/FormView.vue";
 
 export interface JQuery {
     (selector: string | any): any;
@@ -187,10 +185,17 @@ export class TreeViewAttribute {
 }
 
 export class Global {
+    constructor() {
+        console.log("Global constructor");
+        this.fileBrowsed = null;
+    }
+
     data: any = {};
     form: FormDto;
     question = new AppStateQuestion();
     fileGallery = new AppStateFileGallery();
+    fileBrowsed: (files: FileList) => void;
+    imagePreview = {show: false, url: null};
     logs: AppStateLog[] = [];
     modal: boolean = false;
     config = new AppStateConfig();
@@ -245,7 +250,6 @@ export class AppStateFileGallery {
     selected?: DirFile;
     uri?: string = '';
     fileSelectCallback: (path: string, item: DirFile) => void;
-    fileBrowsed?: (files: FileList) => void;
 }
 
 export class QuestionOptions {

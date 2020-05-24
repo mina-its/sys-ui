@@ -28,7 +28,8 @@ import App from './App.vue';
 import pluralize = require('pluralize');
 
 declare let $: JQuery, axios: Axios, io: Socket, marked: any;
-export let glob = new Global();
+export let glob = window["__glob"] || new Global();
+window["__glob"] = glob;
 let store;
 
 export function getText(text: string | MultilangText, useDictionary?: boolean): string {
@@ -439,6 +440,13 @@ function handleWindowEvents() {
         });
 }
 
+export function handleImagesPreview(selector: string) {
+    $(selector).on("mousedown", e => {
+        glob.imagePreview.url = e.target.src;
+        glob.imagePreview.show = true;
+    });
+}
+
 export function handleCmenuKeys(e) {
     switch (e.which) {
         case Keys.tab:
@@ -529,7 +537,7 @@ export function checkPropDependencyOnChange(dec: ObjectDec | FunctionDec, prop, 
 }
 
 export function browseFile(fileBrowsed?: (files: FileList) => void) {
-    glob.fileGallery.fileBrowsed = fileBrowsed;
+    glob.fileBrowsed = fileBrowsed;
     $('#file-browse').val('').click();
 }
 

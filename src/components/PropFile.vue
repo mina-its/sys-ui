@@ -30,7 +30,7 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {DirFile, DriveMode, IData, LogType, mFile, Property, RequestMode} from "../../../sys/src/types";
     import {Constants, FileAction, FileActionType, FunctionExecEventArg, MenuItem} from '@/types';
-    import {$t, joinUri, notify} from '@/main';
+    import {$t, glob, joinUri, notify} from '@/main';
     import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
 
@@ -52,6 +52,7 @@
             if (this.prop.file && this.prop.file.drive) {
                 let items: MenuItem[] = [
                     {title: this.title(file) + "(" + this.size(file) + ")"},
+                    {ref: "preview", title: $t('preview')},
                     {title: '-'},
                     {ref: "select", title: $t('select')},
                     {ref: "download", title: $t('download')},
@@ -66,6 +67,11 @@
             main.hideCmenu();
             if (!item) return;
             switch (item.ref) {
+                case "preview":
+                    glob.imagePreview.url = file._.uri;
+                    glob.imagePreview.show = true;
+                    break;
+
                 case "download":
                     window.open(file._.uri + `?m=${RequestMode.download}`, '_blank');
                     break;

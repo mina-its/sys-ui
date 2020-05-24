@@ -13,5 +13,7 @@ import HelperObjects from "./components/HelperObjects.vue";
 import SideNav from "./components/SideNav.vue";
 import App from "./App.vue";
 import DashboardInfoBox from "./components/DashboardInfoBox.vue";
+import AppChangeRegion from "./components/AppChangeRegion.vue";
+import ImagePreview from "./components/ImagePreview.vue";
 
-export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons, HelperObjects, SideNav, App, DashboardInfoBox};
+export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons, HelperObjects, SideNav, App, DashboardInfoBox, AppChangeRegion, ImagePreview};
