@@ -1,3 +1,4 @@
+import {LogType} from "../../../sys/src/types";
 <template>
     <div :class="styles + ' border-0'">
         <div v-if="viewType==2" class="prop-file-box">
@@ -28,7 +29,7 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {DirFile, DriveMode, IData, LogType, mFile, Property, RequestMode} from "../../../sys/src/types";
+    import {DirFile, IData, LogType, mFile, Property, RequestMode} from "../../../sys/src/types";
     import {Constants, FileAction, FileActionType, FunctionExecEventArg, MenuItem} from '@/types';
     import {$t, glob, joinUri, notify} from '@/main';
     import {v4 as uuidv4} from 'uuid';
@@ -121,8 +122,12 @@
         selectFile(e?: FunctionExecEventArg) {
             if (e) e.stopProgress();
             let val = this.getVal();
+            if (!this.prop.file || !this.prop.file.drive) {
+                notify(`Drive must be configured for the file.`, LogType.Error);
+                return;
+            }
 
-            if (this.prop.file && this.prop.file.drive && this.prop.file.drive.mode == DriveMode.Gallery) {
+            if (this.prop.file.gallery) {
                 let path = val && val.path ? val.path : this.prop.file.path;
                 main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
             } else {
@@ -140,22 +145,12 @@
         }
 
         browseFile(val: mFile | mFile[]) {
-            main.browseFile((fileList: FileList) => {
-                if (!fileList.length) return;
+            main.browseFile((files: mFile[]) => {
+                if (!files || !files.length) return;
 
-                let files: mFile[] = [];
-                for (const file of fileList) {
-                    files.push({
-                        name: uuidv4() + "__" + file.name,
-                        path: this.prop.file.path,
-                        size: file.size,
-                        lastModified: file.lastModified,
-                        type: file.type,
-                        _: {
-                            rawData: file as any,
-                            uri: URL.createObjectURL(file)
-                        }
-                    } as mFile);
+                for (let file of files) {
+                    file.path = this.prop.file.path;
+                    file.name = uuidv4() + "__" + file.name;
                 }
 
                 if (this.prop.file && this.prop.file.sizeLimit) {

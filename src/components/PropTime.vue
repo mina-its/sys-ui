@@ -1,11 +1,11 @@
 <template>
     <div class="prop-time">
         <div class="d-flex">
-            <input @focus="$emit('focus', $event)" type="text" :value="value"
+            <input ref="ctrl" @focus="$emit('focus', $event)" type="text" :value="value"
                    :name="viewType!=1 ? prop.name : null" :readonly="readOnly" @input="dirty=true"
                    @blur="update" class="flex-grow-1 border-0">
             <div class="dropdown" v-if="!readOnly">
-                <i :class="{'fa text-muted':true, 'fa-clock': !datePick, 'fa-calendar-alt': datePick}" @click="click"></i>
+                <i :class="{'fa text-muted':true, 'ml-1': ltr, 'mr-1':rtl, 'fa-clock': !datePick, 'fa-calendar-alt': datePick}" @click="click"></i>
             </div>
         </div>
     </div>
@@ -42,7 +42,7 @@
         }
 
         @Emit('changed')
-        changed(val: {value: Date}): ItemChangeEventArg {
+        changed(val: { value: Date }): ItemChangeEventArg {
             return {prop: this.prop, val: val.value, vue: this};
         }
 
@@ -58,7 +58,7 @@
                     format: this.format
                 },
                 state: this,
-                event: e,
+                event: {ctrl: this.$refs.ctrl},
                 handler: (state, val) => state.changed(val)
             } as AppStateCmenu;
         }

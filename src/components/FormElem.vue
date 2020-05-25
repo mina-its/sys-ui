@@ -9,6 +9,11 @@
         @ComProp() private elem: Elem;
 
         render(ce: (...args: any) => void) {
+            if (!this.$store) {
+                console.error('FormElem this.$store is empty, Maybe you need to call Vue.use(Vuex) before registering the components.');
+                return null;
+            }
+
             switch (this.elem.type) {
                 case ElemType.Object:
                     return ce('object-view', {props: {"elem": this.elem}});

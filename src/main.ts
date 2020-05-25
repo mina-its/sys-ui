@@ -407,30 +407,6 @@ function handleWindowEvents() {
                 handleCmenuKeys(e);
             glob.notify = null;
         })
-        .on("click", (e: any) => {
-            let el = e.target as HTMLAnchorElement;
-            if (el.tagName !== "A" || el.getAttribute('target') || el.getAttribute('data-toggle') == "tab") return;   // especially _blank
-
-            let href = el.getAttribute('href');
-            if (href) {
-                if (href.match(/^javascript/) || /^#/.test(href)) return; // if (/^#/.test(href)) return false;
-
-                e.preventDefault();
-
-                if (/^http/.test(href)) {
-                    e.stopPropagation();
-                    window.open(href);
-                    return;
-                }
-
-                if (/\bf=\d/.test(href)) { // function link
-
-                } else
-                    history.pushState(null, null, href);
-                load(href);
-                e.stopPropagation();
-            }
-        })
         .on("mouseup", (e: any) => {
             if (glob.cmenu.show &&
                 !$('.dropdown-item').is(e.target)
@@ -438,6 +414,17 @@ function handleWindowEvents() {
                 && $('.dropdown-menu.show').has(e.target).length === 0
             ) hideCmenu();
         });
+
+    $(document).on("click", "a[href]", e => {
+        let href = $(e.target).closest("a").attr("href");
+        if (!href || href.match(/^javascript/) || /^#/.test(href) || /^http/.test(href)) return; // if (/^#/.test(href)) return false;
+
+        e.preventDefault();
+        if (!/\bf=\d/.test(href)) // push state on not function link
+            history.pushState(null, null, href);
+        load(href);
+        // e.stopPropagation();
+    });
 }
 
 export function handleImagesPreview(selector: string) {
@@ -536,7 +523,7 @@ export function checkPropDependencyOnChange(dec: ObjectDec | FunctionDec, prop, 
     }
 }
 
-export function browseFile(fileBrowsed?: (files: FileList) => void) {
+export function browseFile(fileBrowsed?: (files: mFile[]) => void) {
     glob.fileBrowsed = fileBrowsed;
     $('#file-browse').val('').click();
 }
@@ -699,8 +686,8 @@ export function getPropertyEmbedError(doc: any, propName: string): string {
 
 }
 
-export function call(funcName: string, data: any, done: (err, data?) => void) {
-    ajax(setQs('m', RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res.data), err => done(err));
+export function call(funcName: string, data: any, done: (err, res?) => void) {
+    ajax(setQs('m', RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res), err => done(err));
 }
 
 export function load(href: string, pushState = false) {
@@ -768,7 +755,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
 
     // serialize data
     params.data = stringify(data, true);
-    // console.log(params.data);
+    console.log(params.data);
 
     // Ajax call
     axios(params).then(res => {

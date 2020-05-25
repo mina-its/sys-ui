@@ -15,5 +15,7 @@ import App from "./App.vue";
 import DashboardInfoBox from "./components/DashboardInfoBox.vue";
 import AppChangeRegion from "./components/AppChangeRegion.vue";
 import ImagePreview from "./components/ImagePreview.vue";
+import DetailsView from "./components/DetailsView.vue";
+import GridView from "./components/GridView.vue";
 
-export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons, HelperObjects, SideNav, App, DashboardInfoBox, AppChangeRegion, ImagePreview};
+export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons, HelperObjects, SideNav, App, DashboardInfoBox, AppChangeRegion, ImagePreview, DetailsView, GridView};

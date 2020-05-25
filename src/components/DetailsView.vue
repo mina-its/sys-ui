@@ -146,6 +146,8 @@
             let item = localStorage.getItem("_gp" + location.pathname);
             if (item)
                 this.selectGroup(JSON.parse(item));
+            else
+                this.currentGroup = this.groups[0];
         }
 
         selectGroup(item) {

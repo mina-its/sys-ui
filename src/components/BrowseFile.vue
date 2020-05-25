@@ -4,13 +4,32 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {glob} from '../main';
+    import {Component, Vue} from 'vue-property-decorator';
+    import {glob} from '@/main';
+    import { mFile } from '../../../sys/src/types';
+    import {v4 as uuidv4} from 'uuid';
 
     @Component({name: 'BrowseFile'})
     export default class BrowseFile extends Vue {
         fileBrowsed(e: InputEvent) {
-            glob.fileBrowsed((e.target as HTMLInputElement).files);
+            let inputFiles = (e.target as HTMLInputElement).files;
+            if (!inputFiles.length)
+                glob.fileBrowsed([]);
+
+            let files: mFile[] = [];
+            for (const file of inputFiles) {
+                files.push({
+                    name: file.name,
+                    size: file.size,
+                    lastModified: file.lastModified,
+                    type: file.type,
+                    _: {
+                        rawData: file as any,
+                        uri: URL.createObjectURL(file)
+                    }
+                } as mFile);
+            }
+            glob.fileBrowsed(files);
         }
 
     }

@@ -15,6 +15,7 @@ exports.Constants = {
     delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
     uniqueFilenameRegex: /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}__/,
+    commentBeforeTag: 'comment-before',
     QUERY_LOCALE: 'e',
     QUERY_NEW: 'n',
 };

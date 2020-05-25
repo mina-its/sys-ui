@@ -60,9 +60,9 @@
         }
 
         click(e) {
-            this.showProgress = true;
-            if (this.$listeners && this.$listeners.exec) {
-                try {
+            try {
+                this.showProgress = true;
+                if (this.$listeners && this.$listeners.exec) {
                     let $this = this;
                     let arg: FunctionExecEventArg = {
                         name: this.name, event: e, data: this.$store.state.data, stopProgress() {
@@ -70,37 +70,36 @@
                         }
                     };
                     this.$emit('exec', arg);
-                } catch (ex) {
-                    this.showProgress = false;
-                    console.error(`function '${this.name}' click error.`, ex);
-                }
-                finally {
-                    this.showProgress = false;
-                }
-            } else {
-                let functionName = this.name;
-                if (!this.data) throw `data must be set for 'Function' element '${functionName}'`;
+                } else {
+                    let functionName = this.name;
+                    if (!this.data) throw `data must be set for 'Function' element '${functionName}'`;
 
-                let dec = main.getDec(this.data) as FunctionDec;
-                if (!this.validate(this.data)) return;
+                    let dec = main.getDec(this.data) as FunctionDec;
+                    if (!this.validate(this.data)) return;
 
-                main.log(`calling '${this.name}' ...`, this.data);
-                main.ajax("/" + this.name, this.data, null, (res) => {
-                    this.showProgress = false;
-                    if (dec.interactive && res.code == StatusCode.Accepted)
-                        return;
-                    else if (res.code != StatusCode.Ok)
-                        main.notify(res.message, LogType.Error);
-                    else {
-                        glob.modal = false;
-                        setTimeout(() => {
-                            main.handleResponse(res);
-                        }, 100);
-                    }
-                }, (err) => {
-                    this.showProgress = false;
-                    main.notify(err);
-                });
+                    main.log(`calling '${this.name}' ...`, this.data);
+                    main.ajax("/" + this.name, this.data, null, (res) => {
+                        this.showProgress = false;
+                        if (dec.interactive && res.code == StatusCode.Accepted)
+                            return;
+                        else if (res.code != StatusCode.Ok)
+                            main.notify(res.message, LogType.Error);
+                        else {
+                            glob.modal = false;
+                            setTimeout(() => {
+                                main.handleResponse(res);
+                            }, 100);
+                        }
+                    }, (err) => {
+                        this.showProgress = false;
+                        main.notify(err);
+                    });
+                }
+            } catch (ex) {
+                this.showProgress = false;
+                console.error(`function '${this.name}' click error.`, ex);
+            } finally {
+                this.showProgress = false;
             }
         }
     }

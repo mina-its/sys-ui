@@ -383,6 +383,19 @@
         }
     }
 
+    .function-open-page {
+        margin: 4rem auto;
+        background-color: white;
+        padding: 2rem;
+        border: 1px solid #dddfe2;
+        border-radius: 3px;
+
+        button {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+    }
+
     .function-login-comment {
         color: gray;
         font-size: smaller;

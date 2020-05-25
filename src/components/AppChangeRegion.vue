@@ -1,7 +1,7 @@
 <template>
-    <div class="change-region">
+    <div class="change-region mx-2">
         <a class="nav-link py-0 px-0 text-light" href="#" id="navbarDropdownLocale" role="button" data-toggle="modal" data-target="#changeRegion">
-            <i style="font-size: 16px" class="fal fa-globe text-white px-1"></i>Change Region
+            <i style="font-size: 16px" class="fal fa-globe text-white px-1"></i>{{$t("change-region")}}
         </a>
 
         <div class="modal fade" id="changeRegion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -43,8 +43,8 @@
         private countries: Country[] = [];
 
         created() {
-            call("getRegionCountries", null, (err, data) => {
-                this.countries = data;
+            call("getRegionCountries", null, (err, res) => {
+                this.countries = res.data;
             });
         }
 
@@ -71,6 +71,7 @@
     .change-region {
         .modal-dialog {
             max-width: 50%;
+            margin: 10rem auto !important;
 
             .countries {
                 height: 200px;

@@ -8,7 +8,7 @@
         Property as ObjectProperty,
         PropertyEditMode
     } from "../../../sys/src/types";
-    import {ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
+    import {Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
     import {getPropertyEmbedError} from '@/main';
     import * as main from '../main';
 
@@ -84,31 +84,28 @@
             let embedErr = getPropertyEmbedError(this.item, this.prop.name);
             let msg = null;
             if (embedErr) msg = ce('prop-message', {props: {message: embedErr}});
-            let cmt = null;
-            if (this.prop.comment) {
-                if (this.prop.commentStyle) {
-                    cmt = ce('span', {
-                        attrs: {"class": "prop-comment " + this.prop.commentStyle},
-                        domProps: {'innerHTML': main.markDown(this.prop.comment)}
-                    });
-                } else {
-                    cmt = ce('p', {attrs: {"class": "prop-comment prop-comment-default mt-3 p-2"}}, [
-                        ce('i', {attrs: {"class": "fa fa-info-circle m-1 fa-lg"}},),
-                        ce('span', {
-                            attrs: {"class": "ml-3"},
-                            domProps: {'innerHTML': main.markDown(this.prop.comment)}
-                        }),
-                    ]);
-                }
-            }
+
             let title = this.prop.title || this.prop.name;
             let lbl = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top pt-2"}}, title);
+            let children = this.prop._.gtype == GlobalType.boolean ? [vl] : [lbl, vl, msg];
 
-            let styles = "form-group";
-            if (this.prop._.gtype == GlobalType.boolean)
-                return ce('div', {attrs: {"class": styles}}, [vl, cmt]); // + " form-check"
-            else
-                return ce('div', {attrs: {"class": styles}}, [lbl, vl, msg, cmt]);
+            // Property comment
+            if (this.prop.comment) {
+                let cmt = this.prop.commentStyle ?
+                    ce('span', {attrs: {"class": "prop-comment " + this.prop.commentStyle}, domProps: {'innerHTML': main.markDown(this.prop.comment)}})
+                    :
+                    ce('p', {attrs: {"class": "prop-comment prop-comment-default mt-3 p-2"}}, [
+                        ce('i', {attrs: {"class": "fa fa-info-circle m-1 fa-lg"}},),
+                        ce('span', {attrs: {"class": "ml-3"}, domProps: {'innerHTML': main.markDown(this.prop.comment)}}),
+                    ]);
+
+                if (this.prop.commentStyle && this.prop.commentStyle.indexOf(Constants.commentBeforeTag) > -1) // Comment before
+                    children.unshift(cmt);
+                else
+                    children.push(cmt);
+            }
+
+            return ce('div', {attrs: {"class": "form-group"}}, children);
         }
 
         renderTreeView(ce) {

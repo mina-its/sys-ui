@@ -1,19 +1,23 @@
 <template>
-    <div class="app-user-login">
+    <div class="app-user-login mx-2">
         <div v-if="glob.config.user.loginUrl">
-            <a class="dropdown-toggle my-2 my-sm-0 text-light" :href="glob.config.user.loginUrl">{{glob.config.user.loginTitle}}</a>
+            <a class="my-2 my-sm-0 text-light" :href="glob.config.user.loginUrl">
+                <span v-if="glob.config.user.loginTitle">{{glob.config.user.loginTitle}}</span>
+                <i v-else class="fal fa-user"></i>
+            </a>
         </div>
         <div v-else class="dropdown">
             <button class="avatar dropdown-toggle" id="dropdownProfileBrief" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span role="img" :style="{'background-image':`url(${profilePhoto})`}"></span>
+                <i v-if="buttonStyle" :class="buttonStyle"></i>
+                <span v-else role="img" :style="{'background-image':`url(${profilePhoto})`}" />
             </button>
             <div :class="{'dropdown-menu text-center profile-brief':1,'dropdown-menu-right':ltr}" aria-labelledby="dropdownProfileBrief">
                 <img class="m-4 mx-5" :src="profilePhoto"/>
                 <h2>{{glob.config.user.title}}</h2>
                 <div>{{glob.config.user.email}}</div>
-                <a class="m-2 btn btn-outline-secondary profile-button" :href="glob.config.user.profileUrl">Profile</a>
+                <a class="m-2 btn btn-outline-secondary profile-button" :href="glob.config.user.accountUrl">{{$t('your-account')}}</a>
                 <hr>
-                <a class="m-2 btn btn-secondary" href="/logout?f=1">Sign out</a>
+                <a class="m-2 btn btn-secondary" href="/signout?f=1">{{$t('sign-out')}}</a>
                 <hr>
                 <a class="m-2 text-secondary small" href="/privacy-policy">Privacy Policy</a>
                 -
@@ -24,13 +28,15 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
+    import {Component, Vue, Prop} from 'vue-property-decorator';
     import {glob} from "@/main";
 
     declare let $: any;
 
     @Component({name: 'AppUserLoginMenu'})
     export default class AppUserLoginMenu extends Vue {
+        @Prop() private buttonStyle?: string;
+
         get profilePhoto(): string {
             return glob.config.user.photoUrl || 'https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5bed565…/5f7abfa5-a174-45b5-a5a5-68a91a876506/128';
         }

@@ -55,7 +55,7 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {glob, $t} from '@/main';
-    import {DirFile, LogType, DirFileType, YesNo, Pair, AjaxConfig} from '../../../sys/src/types';
+    import {DirFile, LogType, DirFileType, YesNo, Pair, AjaxConfig, mFile} from '../../../sys/src/types';
     import {MenuItem, FunctionExecEventArg, Constants} from '@/types';
     import * as main from '../main';
 
@@ -91,11 +91,12 @@
         }
 
         upload() {
-            main.browseFile((files) => {
-                main.ajax('/uploadToFileGallery?m=1', {
+            main.browseFile((files: mFile[]) => {
+                main.call('uploadToFileGallery', {
                         drive: glob.fileGallery.drive._id,
-                        path: glob.fileGallery.path
-                    } as any, {files} as AjaxConfig, res => {
+                        path: glob.fileGallery.path,
+                        files
+                    }, res => {
                         main.refreshFileGallery();
                         main.notify('upload done!', LogType.Debug);
                     }

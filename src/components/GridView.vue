@@ -59,6 +59,8 @@
                         <tbody>
                         <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown" @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)" @changed="changed"></GridViewRow>
                         </tbody>
+
+                        <!-- Footer -->
                         <tfoot>
                         <tr>
                             <td class="border-0" colspan="100">
@@ -102,6 +104,7 @@
     @Component({name: 'GridView', components: {}})
     export default class GridView extends Vue {
         @Prop() private uri: string;
+        @Prop() private data: IData[];
         @Prop() private dec: ObjectDec;
         @Prop() private newItem: string;
         @Prop() private level: number;
@@ -115,7 +118,10 @@
         private headFuncs: HeadFunc[] = [];
 
         get items(): IData[] {
-            return this.$store.state.data[this.uri] || [];
+            if (this.data) // when we explicitly specify the data
+                return this.data;
+            else
+                return this.$store.state.data[this.uri] || [];
         }
 
         @Watch('uri') // Switching between forms

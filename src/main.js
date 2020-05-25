@@ -402,34 +402,22 @@ function handleWindowEvents() {
             handleCmenuKeys(e);
         exports.glob.notify = null;
     })
-        .on("click", (e) => {
-        let el = e.target;
-        if (el.tagName !== "A" || el.getAttribute('target') || el.getAttribute('data-toggle') == "tab")
-            return; // especially _blank
-        let href = el.getAttribute('href');
-        if (href) {
-            if (href.match(/^javascript/) || /^#/.test(href))
-                return; // if (/^#/.test(href)) return false;
-            e.preventDefault();
-            if (/^http/.test(href)) {
-                e.stopPropagation();
-                window.open(href);
-                return;
-            }
-            if (/\bf=\d/.test(href)) { // function link
-            }
-            else
-                history.pushState(null, null, href);
-            load(href);
-            e.stopPropagation();
-        }
-    })
         .on("mouseup", (e) => {
         if (exports.glob.cmenu.show &&
             !$('.dropdown-item').is(e.target)
             && $('.dropdown-item').has(e.target).length === 0
             && $('.dropdown-menu.show').has(e.target).length === 0)
             hideCmenu();
+    });
+    $(document).on("click", "a[href]", e => {
+        let href = $(e.target).closest("a").attr("href");
+        if (!href || href.match(/^javascript/) || /^#/.test(href) || /^http/.test(href))
+            return; // if (/^#/.test(href)) return false;
+        e.preventDefault();
+        if (!/\bf=\d/.test(href)) // push state on not function link
+            history.pushState(null, null, href);
+        load(href);
+        // e.stopPropagation();
     });
 }
 function handleImagesPreview(selector) {
@@ -689,7 +677,7 @@ function getPropertyEmbedError(doc, propName) {
 }
 exports.getPropertyEmbedError = getPropertyEmbedError;
 function call(funcName, data, done) {
-    ajax(setQs('m', types_2.RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res.data), err => done(err));
+    ajax(setQs('m', types_2.RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res), err => done(err));
 }
 exports.call = call;
 function load(href, pushState = false) {
@@ -752,7 +740,7 @@ function ajax(url, data, config, done, fail) {
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     // serialize data
     params.data = bson_util_1.stringify(data, true);
-    // console.log(params.data);
+    console.log(params.data);
     // Ajax call
     axios(params).then(res => {
         stopProgress();
