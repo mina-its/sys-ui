@@ -755,7 +755,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
 
     // serialize data
     params.data = stringify(data, true);
-    console.log(params.data);
+    if (params.data) console.log(params.data);
 
     // Ajax call
     axios(params).then(res => {
@@ -765,7 +765,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         } else {
             try {
                 let result = parse(res.data, true, ID);
-                // console.log(result);
+                console.log("ajax result :", result);
                 done(result);
             } catch (ex) {
                 notify(`error on handling ajax response: ${ex.message}`);
@@ -1126,7 +1126,7 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
 export function start(params?: StartParams) {
     // console.log('starting ...');
     const mainState = $('#main-state').html();
-    const res: WebResponse = parse(mainState);
+    const res: WebResponse = parse(mainState, true, ID);
 
     if (res)
         startVue(res, params);

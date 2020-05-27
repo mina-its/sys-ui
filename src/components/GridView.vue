@@ -56,6 +56,7 @@
                             <th scope="col" class="text-nowrap" @click="showColumnMenu(prop, $event)" v-for="prop in dec.properties"> {{prop.title || prop.name}}</th>
                         </tr>
                         </thead>
+
                         <tbody>
                         <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown" @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)" @changed="changed"></GridViewRow>
                         </tbody>
@@ -94,7 +95,8 @@
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import {$t, getQs, glob, load, notify, setQs, showCmenu} from '@/main';
-    import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, FunctionExecEventArg, HeadFunc, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '@/types';
+    import {parse, stringify} from 'bson-util';
+    import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, FunctionExecEventArg, HeadFunc, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange, ID} from '@/types';
     import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
     import {EntityMeta, GridRowHeaderStyle, IData, Keys, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, ReqParams, Property} from '../../../sys/src/types';
@@ -134,7 +136,7 @@
 
         objectFilterChanged(e: ItemChangeEventArg) {
             console.log("this.dec.filterData", this.dec.filterData);
-            let ref = setQs(ReqParams.query, JSON.stringify(this.dec.filterData), true);
+            let ref = setQs(ReqParams.query, stringify(this.dec.filterData, true), true);
             ref = setQs(ReqParams.page, null, true, ref);
             load(ref, true);
         }
@@ -149,6 +151,7 @@
         }
 
         mounted() {
+            // console.log("this.items", this.items);
             this.resetHeadFuncs();
 
             if (!this.dec.filterDec) {
@@ -213,7 +216,7 @@
         extractFilteredProps() {
             this.filteredProps = [];
             if (getQs(ReqParams.query))
-                this.filter = JSON.parse(getQs(ReqParams.query));
+                this.filter = parse(getQs(ReqParams.query), true, ID);
             else
                 this.filter = {};
 
@@ -235,7 +238,7 @@
                     query[key] = this.filter[key];
                 }
             }
-            let ref = setQs(ReqParams.query, query ? JSON.stringify(query) : null, true);
+            let ref = setQs(ReqParams.query, query ? stringify(query, true) : null, true);
             ref = setQs(ReqParams.page, null, true, ref);
             load(ref, true);
         }

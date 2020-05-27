@@ -740,7 +740,8 @@ function ajax(url, data, config, done, fail) {
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     // serialize data
     params.data = bson_util_1.stringify(data, true);
-    console.log(params.data);
+    if (params.data)
+        console.log(params.data);
     // Ajax call
     axios(params).then(res => {
         stopProgress();
@@ -750,7 +751,7 @@ function ajax(url, data, config, done, fail) {
         else {
             try {
                 let result = bson_util_1.parse(res.data, true, types_1.ID);
-                // console.log(result);
+                console.log("ajax result :", result);
                 done(result);
             }
             catch (ex) {
@@ -1080,7 +1081,7 @@ function _dispatchRequestServerModify(store, done) {
 function start(params) {
     // console.log('starting ...');
     const mainState = $('#main-state').html();
-    const res = bson_util_1.parse(mainState);
+    const res = bson_util_1.parse(mainState, true, types_1.ID);
     if (res)
         startVue(res, params);
     else {

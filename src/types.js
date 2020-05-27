@@ -109,7 +109,6 @@ class Global {
         this.geoMap = new AppStateGeoMap();
         this.modifies = [];
         this.progress = null;
-        console.log("Global constructor");
         this.fileBrowsed = null;
     }
 }

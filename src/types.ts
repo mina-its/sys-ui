@@ -187,7 +187,6 @@ export class TreeViewAttribute {
 
 export class Global {
     constructor() {
-        console.log("Global constructor");
         this.fileBrowsed = null;
     }
 

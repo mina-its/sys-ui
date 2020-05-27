@@ -1,7 +1,7 @@
 <template>
     <div class="app-locale-menu mx-2" data-toggle="tooltip" title="Change Language">
         <div v-if="glob.config.locale" class="dropdown">
-            <a class="nav-link py-0 px-0 text-light" href="#" id="navbarDropdownLocale" role="button"
+            <a class="nav-link py-0 px-0 text-light dropdown-toggle" href="#" id="navbarDropdownLocale" role="button"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i style="font-size: 16px" class="fal fa-globe text-white px-1"></i>{{glob.config.localeTitle.toUpperCase()}}
             </a>

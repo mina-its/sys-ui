@@ -44,6 +44,7 @@
 
         @Emit("changed")
         raiseChanged(e: FilterChangeEventArg): FilterChangeEventArg {
+            console.log(2);
             let filterVal = e.filterVal;
             if (e.val != null) {
                 switch (this.filterOperator) {
