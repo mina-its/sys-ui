@@ -1,5 +1,5 @@
 <template>
-    <div class="app-user-login mx-2">
+    <div class="app-user-login">
         <div v-if="glob.config.user.loginUrl">
             <a class="my-2 my-sm-0 text-light" :href="glob.config.user.loginUrl">
                 <span v-if="glob.config.user.loginTitle">{{glob.config.user.loginTitle}}</span>
@@ -8,7 +8,7 @@
         </div>
         <div v-else class="dropdown">
             <button class="avatar dropdown-toggle" id="dropdownProfileBrief" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i v-if="buttonStyle" :class="buttonStyle"></i>
+                <i v-if="buttonClass" :class="buttonClass"></i>
                 <span v-else role="img" :style="{'background-image':`url(${profilePhoto})`}" />
             </button>
             <div :class="{'dropdown-menu text-center profile-brief':1,'dropdown-menu-right':ltr}" aria-labelledby="dropdownProfileBrief">
@@ -35,7 +35,7 @@
 
     @Component({name: 'AppUserLoginMenu'})
     export default class AppUserLoginMenu extends Vue {
-        @Prop() private buttonStyle?: string;
+        @Prop() private buttonClass?: string;
 
         get profilePhoto(): string {
             return glob.config.user.photoUrl || 'https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5bed565…/5f7abfa5-a174-45b5-a5a5-68a91a876506/128';

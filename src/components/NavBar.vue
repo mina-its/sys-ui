@@ -9,19 +9,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav">
-                <li v-for="item of glob.config.menu" :class="{'nav-item': true, 'active':currentRef===item.ref, 'dropdown':item.items}">
-                    <a v-if="item.items && item.items.length" href="#" class="nav-link dropdown-toggle" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">{{item.title}}</a>
-                    <div v-if="item.items && item.items.length" class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <template v-for="subitem of item.items">
-                            <div v-if="subitem.title==='-'" class="dropdown-divider"></div>
-                            <a v-else class="dropdown-item" :href="subitem.ref">{{subitem.title}}</a>
-                        </template>
-                    </div>
-                    <a v-else class="nav-link" :href="item.ref">{{item.title}}</a>
-                </li>
-            </ul>
-
+            <NavbarMenu :menu="glob.config.menu" :currentRef="currentRef" />
             <!--<master-search></master-search>-->
             <AppLocaleMenu/>
             <AppUserLoginMenu/>
