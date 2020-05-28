@@ -426,4 +426,8 @@
         background: #555;
     }
 
+    .outline-0 {
+        outline: none;
+    }
+
 </style>
