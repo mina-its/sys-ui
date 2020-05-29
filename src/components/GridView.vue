@@ -113,7 +113,7 @@
 
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainChecked = false;
-        private filter = {};
+        private filter = {$and: []};
         private filterDoc = {};
         private filteringProp: Property = null;
         private filteredProps: Property[] = [];
@@ -130,7 +130,7 @@
         onUriReset() {
             this.filteredProps = [];
             this.filterDoc = {};
-            this.filter = {};
+            this.filter = {$and: []};
             this.filteringProp = this.dec.properties[0];
         }
 
@@ -167,8 +167,26 @@
         }
 
         filterValueChanged(e: FilterChangeEventArg) {
-            this.filterDoc[this.propLocaleName(e.prop)] = e.val;
-            this.filter[this.propLocaleName(e.prop)] = e.filterVal;
+            this.filterDoc[e.prop.name] = e.val;
+
+            let previousFilter = this.filter.$and.find(i => e.prop.name == Object.keys(i.$or[0])[0]);
+            if (e.prop.text && e.prop.text.multiLanguage) {
+                let filter1 = {};
+                filter1[e.prop.name] = e.filterVal;
+                let filter2 = {};
+                filter2[e.prop.name + "." + glob.config.locale] = e.filterVal;
+                if (previousFilter)
+                    previousFilter.$or = [filter1, filter2];
+                else
+                    this.filter.$and.push({$or: [filter1, filter2]});
+            } else {
+                let filter = {};
+                filter[e.prop.name] = e.filterVal;
+                if (previousFilter)
+                    previousFilter.$or = [filter];
+                else
+                    this.filter.$and.push({$or: [filter]});
+            }
 
             // console.log('filter:', this.filter);
 
@@ -194,10 +212,10 @@
             if (typeof filterVal == "string" || typeof filterVal == "number") return filterVal;
 
             if (filterVal) {
-                if (filterVal.$RegExp) {
-                    if (/^\/\^/.test(filterVal.$RegExp)) return filterVal.$RegExp.replace(/^\/\^(.+)\/.+/, "$1");
-                    else if (/\$\/i?$/.test(filterVal.$RegExp)) return filterVal.$RegExp.replace(/^\/(.+)\$\/.+/, "$1");
-                    else return filterVal.$RegExp.replace(/^\/(.+)\/.+/, "$1");
+                if (filterVal instanceof RegExp) {
+                    if (/^\/\^/.test(filterVal.toString())) return filterVal.toString().replace(/^\/\^(.+)\/.+/, "$1");
+                    else if (/\$\/i?$/.test(filterVal.toString())) return filterVal.toString().replace(/^\/(.+)\$\/.+/, "$1");
+                    else return filterVal.toString().replace(/^\/(.+)\/.+/, "$1");
                 } else if (filterVal.$gt) return filterVal.$gt;
                 else if (filterVal.$gte) return filterVal.$gte;
                 else if (filterVal.$lt) return filterVal.$lt;
@@ -218,50 +236,47 @@
             if (getQs(ReqParams.query))
                 this.filter = parse(getQs(ReqParams.query), true, ID);
             else
-                this.filter = {};
+                this.filter = {$and: []};
 
-            for (let key in this.filter) {
-                let prop = this.dec.properties.find(p => p.name == key.replace(/\..+/, ""));
-                if (prop) {
-                    this.filteredProps.push(prop);
-                    this.filterDoc[key.replace(/\..+/, "")] = this.getFilterDocValue(this.filter[key]);
-                } else
-                    console.error(`Property '${key}' not found.`);
+            if (this.filter.$and) { // $and mode
+                for (let item of this.filter.$and) {
+                    if (!item.$or) {
+                        console.error(`Invalid filter, expected $or`, this.filter);
+                        continue;
+                    }
+                    let key = Object.keys(item.$or[0])[0];
+                    let prop = this.dec.properties.find(p => p.name == key.replace(/\..+/, ""));
+                    if (prop) {
+                        this.filteredProps.push(prop);
+                        this.filterDoc[key] = this.getFilterDocValue(item.$or[0][key]);
+                    } else
+                        console.error(`Property '${key}' not found.`);
+                }
+            } else {
+                for (let key in this.filter) {
+                    let prop = this.dec.properties.find(p => p.name == key.replace(/\..+/, ""));
+                    if (prop) {
+                        this.filteredProps.push(prop);
+                        this.filterDoc[key] = this.getFilterDocValue(this.filter[key]);
+                    } else
+                        console.error(`Property '${key}' not found.`);
+                }
             }
+            // console.log("this.filterDoc", this.filterDoc);
         }
 
         refreshQueryByFilter() {
-            let query = null;
-            for (let key in this.filter) {
-                if (this.filter[key] != null) {
-                    query = query || {};
-                    query[key] = this.filter[key];
-                }
-            }
-            let ref = setQs(ReqParams.query, query ? stringify(query, true) : null, true);
+            let ref = setQs(ReqParams.query, this.filter.$and.length ? stringify(this.filter, true) : null, true);
             ref = setQs(ReqParams.page, null, true, ref);
             load(ref, true);
         }
 
-        propLocaleName(prop: Property): string {
-            if (prop.text && prop.text.multiLanguage)
-                return prop.name + "." + glob.config.locale;
-            else
-                return prop.name;
-        }
-
         removeFilter(prop) {
-            this.filter[this.propLocaleName(prop)] = null;
+            let previousFilter = this.filter.$and.find(i => prop.name == Object.keys(i.$or[0])[0]);
+            this.filter.$and.splice(this.filter.$and.indexOf(previousFilter), 1);
             this.filterDoc[prop.name] = null;
             this.filteredProps.splice(this.filteredProps.indexOf(prop), 1);
             this.refreshQueryByFilter();
-        }
-
-        filterKeyDown(e: ItemEventArg) {
-            if (e.event.keyCode == Keys.enter) {
-                this.filteredProps.push(this.filteringProp);
-                this.refreshQueryByFilter();
-            }
         }
 
         changeFilterProp(e) {

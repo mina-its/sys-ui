@@ -44,7 +44,6 @@
 
         @Emit("changed")
         raiseChanged(e: FilterChangeEventArg): FilterChangeEventArg {
-            console.log(2);
             let filterVal = e.filterVal;
             if (e.val != null) {
                 switch (this.filterOperator) {
@@ -120,6 +119,7 @@
         }
 
         keydown(e: ItemEventArg) {
+            console.log(1);
             if (e.event.keyCode == Keys.enter) {
                 let val;
                 if (this.prop._.gtype == GlobalType.string)
@@ -134,10 +134,9 @@
         }
 
         get propFilter() {
-            if (this.prop.text && this.prop.text.multiLanguage)
-                return this.filter[this.prop.name + "." + glob.config.locale];
-            else
-                return this.filter[this.prop.name];
+            let filter = this.filter.$and.find(i => this.prop.name == Object.keys(i.$or[0])[0]);
+            if (!filter || !filter.$or) return null;
+            return filter.$or[0][this.prop.name];
         }
 
         @Emit('changeFilterProp')
@@ -149,10 +148,10 @@
             let val = this.filterDoc[this.prop.name];
             let filterVal = this.propFilter;
             if (filterVal) {
-                if (filterVal.$RegExp) {
-                    if (/^\/\^/.test(filterVal.$RegExp)) return FilterOperator.StartWith;
-                    else if (/\$\/i?$/.test(filterVal.$RegExp)) return FilterOperator.EndWith;
-                    else if (/\/\\w\//.test(filterVal.$RegExp)) return FilterOperator.Exist;
+                if (filterVal instanceof RegExp) {
+                    if (/^\/\^/.test(filterVal.toString())) return FilterOperator.StartWith;
+                    else if (/\$\/i?$/.test(filterVal.toString())) return FilterOperator.EndWith;
+                    else if (/\/\\w\//.test(filterVal.toString())) return FilterOperator.Exist;
                     else return FilterOperator.Like;
                 } else if (filterVal.$not && filterVal.$not.$RegExp) {
                     if (/\/\\w\//.test(filterVal.$not.$RegExp)) return FilterOperator.None;
