@@ -29,6 +29,7 @@ import pluralize = require('pluralize');
 
 declare let $: JQuery, axios: Axios, io: Socket, marked: any;
 export let glob = window["__glob"] || new Global();
+export {parse, stringify};
 window["__glob"] = glob;
 let store;
 
