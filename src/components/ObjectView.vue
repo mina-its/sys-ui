@@ -6,10 +6,12 @@
         ObjectDec,
         ObjectDetailsViewType,
         ObjectListsViewType,
-        AccessPermission
+        AccessPermission,
+        Locale
     } from "../../../sys/src/types";
-    import {glob, getNewItemTitle} from '@/main';
+    import {glob, getQs, $t} from '@/main';
     import pluralize = require('pluralize');
+    import {Constants} from "@/types";
 
     @Component({name: 'ObjectView'})
     export default class ObjectView extends Vue {
@@ -33,8 +35,8 @@
 
             if (Array.isArray(data)) {
                 let viewType = (dec as ObjectDec).listsViewType || ObjectListsViewType.Grid;
-                let newItem = ((dec as ObjectDec).access & AccessPermission.NewItem) &&
-                Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage ? getNewItemTitle(glob.form.title) : null;
+                let newItem = ((dec as ObjectDec).access && AccessPermission.NewItem) && Array.isArray(data) && (dec as ObjectDec).newItemMode == NewItemMode.newPage
+                    ? this.getNewItemTitle(glob.form.title) : null;
                 let props = {uri: e.obj._.ref, dec, newItem, level: this.level};
                 switch (viewType) {
                     default:
@@ -50,6 +52,16 @@
                     return ce('tree-view', {props: {uri: e.obj._.ref, level: this.level}});
                 else
                     return ce('details-view', {props: {uri: e.obj._.ref, dec, level: this.level}});
+            }
+        }
+
+        getNewItemTitle(title: string) {
+            switch (glob.config.locale) {
+                case Locale[Locale.en]:
+                    return "New " + pluralize.singular(glob.form.title);
+
+                default:
+                    return $t("new-item");
             }
         }
     }

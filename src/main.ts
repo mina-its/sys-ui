@@ -360,16 +360,6 @@ export function showCmenu(state, items: MenuItem[], event, handler: (state, item
     glob.cmenu = {show: true, items, handler, state, top: 0, left: 0, right: 0, bottom: 0, event};
 }
 
-export function getNewItemTitle(title: string) {
-    switch (getQs(Constants.QUERY_LOCALE)) {
-        case Locale[Locale.en]:
-            return "New " + pluralize.singular(glob.form.title);
-
-        default:
-            return $t("new-item");
-    }
-}
-
 export function hideCmenu() {
     glob.cmenu.show = false;
 }

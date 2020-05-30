@@ -128,6 +128,11 @@
 
         @Watch('uri') // Switching between forms
         onUriReset() {
+            this.resetFilterParameters();
+            this.resetHeadFuncs();
+        }
+
+        resetFilterParameters() {
             this.filteredProps = [];
             this.filterDoc = {};
             this.filter = {$and: []};
