@@ -9,7 +9,7 @@
         PropertyEditMode
     } from "../../../sys/src/types";
     import {Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
-    import {getPropertyEmbedError} from '@/main';
+    import {getPropertyEmbedError, checkPropDependencyOnChange} from '@/main';
     import * as main from '../main';
 
     @Component({name: 'Property', components: {}})
@@ -29,10 +29,8 @@
             }
             this.prop._ = this.prop._ || {gtype: GlobalType.string};
 
-            // if (this.prop.condition && !main.evalExpression(this.item, this.prop.condition)) {
-            //     this.item[this.prop.name] = null;
-            //     return null;
-            // }
+            if (this.prop.condition && !main.evalExpression(this.item, this.prop.condition))
+                return null;
 
             switch (this.viewType) {
                 case ObjectViewType.GridView:

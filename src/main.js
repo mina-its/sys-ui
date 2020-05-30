@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.evalExpression = exports.$t = exports.getText = exports.stringify = exports.parse = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.processThisExpression = exports.evalExpression = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -22,11 +22,13 @@ const uuid_1 = require("uuid");
 const bson_util_1 = require("bson-util");
 Object.defineProperty(exports, "parse", { enumerable: true, get: function () { return bson_util_1.parse; } });
 Object.defineProperty(exports, "stringify", { enumerable: true, get: function () { return bson_util_1.stringify; } });
+Object.defineProperty(exports, "getBsonValue", { enumerable: true, get: function () { return bson_util_1.getBsonValue; } });
 const vue_1 = tslib_1.__importDefault(require("vue"));
 const vuex_1 = tslib_1.__importDefault(require("vuex"));
 const types_1 = require("./types");
 const types_2 = require("../../sys/src/types");
 const App_vue_1 = tslib_1.__importDefault(require("./App.vue"));
+const pluralize = require("pluralize");
 exports.glob = window["__glob"] || new types_1.Global();
 window["__glob"] = exports.glob;
 let store;
@@ -83,9 +85,8 @@ exports.$t = $t;
 // }
 function evalExpression($this, expression) {
     try {
-        if (expression == null) {
+        if (expression == null)
             return null;
-        }
         return eval(expression.replace(/\bthis\b/g, '$this'));
     }
     catch (ex) {
@@ -93,6 +94,26 @@ function evalExpression($this, expression) {
     }
 }
 exports.evalExpression = evalExpression;
+function processThisExpression($this, expression) {
+    try {
+        if (expression == null)
+            return null;
+        let match;
+        let reg = /\bthis\.(\w+)/;
+        while ((match = reg.exec(expression)) !== null) {
+            let propName = match[1];
+            let propReg = new RegExp(`\\bthis\\.${propName}`, "g");
+            let val = bson_util_1.getBsonValue($this[propName]);
+            let valStr = JSON.stringify(val);
+            expression = expression.replace(propReg, valStr);
+        }
+        return expression;
+    }
+    catch (ex) {
+        console.error(`Evaluating '${expression}' failed! this:`, $this, 'Error:', ex.message);
+    }
+}
+exports.processThisExpression = processThisExpression;
 function addHeadStyle(css) {
     let head = document.head || document.getElementsByTagName('head')[0], style = document.createElement('style');
     head.appendChild(style);
@@ -133,9 +154,6 @@ function vueResetFormData(res) {
             }
         }
     }
-    exports.glob.data = res.data;
-    exports.glob.form = res.form;
-    store.commit('_commitReloadData', exports.glob.data);
 }
 function setUndefinedToNull(item, prop) {
     if (!item) {
@@ -192,6 +210,37 @@ function prepareServerUrl(ref) {
     return ref;
 }
 exports.prepareServerUrl = prepareServerUrl;
+function loadOutboundData(prop, item) {
+    let ref = "/" + prop._.ref;
+    if (prop.filter) {
+        let query = processThisExpression(item, prop.filter);
+        ref += `?q=${query}`;
+    }
+    ajax(setQs('m', types_2.RequestMode.inline, false, ref), null, null, res => {
+        if (!res.data)
+            return;
+        const setDataMeta = (ref, item, dec) => {
+            item._ = item._ || {};
+            item._.ref = ref;
+            item._.dec = dec;
+            return item._;
+        };
+        let dec = exports.glob.form.declarations[prop._.ref];
+        let data = res.data[prop._.ref];
+        if (!data || !dec || !Array.isArray(data))
+            return;
+        data.forEach((item) => {
+            let meta = setDataMeta(ref + "/" + item._id, item, dec);
+            meta.marked = null;
+        });
+        for (const prop of dec.properties) {
+            if (Array.isArray(data))
+                data.forEach(item => setUndefinedToNull(item, prop));
+        }
+        exports.glob.data[prop._.ref] = data;
+    }, err => notify(err));
+}
+exports.loadOutboundData = loadOutboundData;
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
@@ -220,6 +269,9 @@ function handleResponse(res) {
     else if (res.form) {
         // WARNING: never change these orders:
         vueResetFormData(res);
+        exports.glob.data = res.data;
+        exports.glob.form = res.form;
+        store.commit('_commitReloadData', exports.glob.data);
         if (getQs(types_1.Constants.QUERY_NEW))
             initializeModifyForQueryNew(res);
         document.title = exports.glob.form.title;
@@ -518,6 +570,15 @@ function refreshFileGallery(file) {
     openFileGallery(exports.glob.fileGallery.drive, file, exports.glob.fileGallery.path, exports.glob.fileGallery.fixedPath, exports.glob.fileGallery.fileSelectCallback);
 }
 exports.refreshFileGallery = refreshFileGallery;
+function getNewItemTitle(title) {
+    switch (exports.glob.config.locale) {
+        case types_2.Locale[types_2.Locale.en]:
+            return "New " + pluralize.singular(title);
+        default:
+            return $t("new-item");
+    }
+}
+exports.getNewItemTitle = getNewItemTitle;
 function openFileGallery(drive, file, path, fixedPath, fileSelectCallback) {
     exports.glob.fileGallery = {
         list: [],
@@ -732,8 +793,7 @@ function ajax(url, data, config, done, fail) {
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     // serialize data
     params.data = bson_util_1.stringify(data, true);
-    if (params.data)
-        console.log(params.data);
+    // if (params.data) console.log(params.data);
     // Ajax call
     axios(params).then(res => {
         stopProgress();

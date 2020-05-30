@@ -1,3 +1,4 @@
+import {GlobalType} from "../../../sys/src/types";
 <template>
     <input @focus="$emit('focus', $event)" ref="ctrl" v-bind:type="type" @keydown="keydown" :readonly="readOnly"
            :value="value" @blur="refreshText" @input="update" @click="update" class="form-control">
@@ -5,9 +6,9 @@
 
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {Keys, Property, PropertyEditMode} from "../../../sys/src/types";
+    import {Keys, Property, GlobalType, Pair} from "../../../sys/src/types";
     import * as main from '../main';
-    import {glob} from '@/main';
+    import {call, glob, notify} from '@/main';
     import {Constants, ItemChangeEventArg, MenuItem, PropEventArg} from '../types';
 
     @Component({name: 'PropReference'})
@@ -30,9 +31,24 @@
         update(e) {
             if (this.readOnly) return;
             let val = (e.target as any).value;
-            let items = val == null || (this.prop._.items.length < Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
-            items.forEach(item => (item as MenuItem).hover = val == item.title);
-            this.showDropDown(items);
+
+            if (this.prop._.isRef) {
+                let data = {prop: this.prop, instance: this.doc, filter: val};
+                call('getPropertyReferenceValues', data, (err, res) => {
+                    if (err) notify(err);
+                    else {
+                        for (let item of res.data as Pair[]) {
+                            if (!this.prop._.items.find(i => i.ref == item.ref))
+                                this.prop._.items.push(item);
+                        }
+                        this.showDropDown(res.data);
+                    }
+                });
+            } else {
+                let items = val == null || (this.prop._.items.length < Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
+                items.forEach(item => (item as MenuItem).hover = val == item.title);
+                this.showDropDown(items);
+            }
         }
 
         $refs: {
