@@ -1,4 +1,3 @@
-import {GlobalType} from "../../../sys/src/types";
 <template>
     <input @focus="$emit('focus', $event)" ref="ctrl" v-bind:type="type" @keydown="keydown" :readonly="readOnly"
            :value="value" @blur="refreshText" @input="update" @click="update" class="form-control">
@@ -10,6 +9,7 @@ import {GlobalType} from "../../../sys/src/types";
     import * as main from '../main';
     import {call, glob, notify} from '@/main';
     import {Constants, ItemChangeEventArg, MenuItem, PropEventArg} from '../types';
+    import {parse, processThisExpression} from "../main";
 
     @Component({name: 'PropReference'})
     export default class PropReference extends Vue {
@@ -31,9 +31,12 @@ import {GlobalType} from "../../../sys/src/types";
         update(e) {
             if (this.readOnly) return;
             let val = (e.target as any).value;
+            console.log(val);
 
             if (this.prop._.isRef) {
-                let data = {prop: this.prop, instance: this.doc, filter: val};
+                // console.log(this.prop);
+                let query = this.prop.filter ? parse(processThisExpression(this.doc, this.prop.filter), true) : null;
+                let data = {prop: this.prop, instance: this.doc, phrase: val, query};
                 call('getPropertyReferenceValues', data, (err, res) => {
                     if (err) notify(err);
                     else {
