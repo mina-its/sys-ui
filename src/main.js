@@ -754,7 +754,7 @@ function ajax(url, data, config, done, fail) {
         stopProgress();
         console.error(`error on ajax '${url}'`, err);
         if (err.response && err.response.data) {
-            let er = bson_util_1.parse(err.response.data);
+            let er = bson_util_1.parse(err.response.data, true, types_1.ID);
             fail(er);
         }
         else

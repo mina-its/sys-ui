@@ -8,9 +8,9 @@ import {PropertyReferType} from "../../../sys/src/types";
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {Keys, Pair, Property, PropertyReferType} from "../../../sys/src/types";
     import * as main from '../main';
-    import {parse, processThisExpression} from '../main';
+    import {parse, processThisExpression, stringify} from '../main';
     import {call, glob, notify} from '@/main';
-    import {Constants, ItemChangeEventArg, MenuItem, PropEventArg} from '../types';
+    import {Constants, ID, ItemChangeEventArg, MenuItem, PropEventArg} from '../types';
 
     @Component({name: 'PropReference'})
     export default class PropReference extends Vue {
@@ -36,13 +36,14 @@ import {PropertyReferType} from "../../../sys/src/types";
 
             if (this.prop._.isRef) {
                 // console.log(this.prop);
-                let query = this.prop.filter ? parse(processThisExpression(this.doc, this.prop.filter), true) : null;
+                let query = this.prop.filter ? parse(processThisExpression(this.doc, this.prop.filter), true, ID) : null;
                 let instance = this.doc;
                 if (this.prop.referType == PropertyReferType.InnerSelectType) {
                     let match = this.prop._.ref.match(/^(\w+\/\w+)/);
                     instance = this.$store.state.data[match[1]];
                 }
                 let data = {prop: this.prop, instance, phrase: val, query};
+
                 call('getPropertyReferenceValues', data, (err, res) => {
                     if (err) notify(err);
                     else {
