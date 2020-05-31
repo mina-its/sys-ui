@@ -828,7 +828,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         stopProgress();
         console.error(`error on ajax '${url}'`, err);
         if (err.response && err.response.data) {
-            let er = parse(err.response.data);
+            let er = parse(err.response.data, true, ID);
             fail(er);
         } else
             fail({message: err.toString(), code: StatusCode.UnknownError});

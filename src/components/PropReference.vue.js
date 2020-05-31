@@ -4,29 +4,51 @@ const tslib_1 = require("tslib");
 const vue_property_decorator_1 = require("vue-property-decorator");
 const types_1 = require("../../../sys/src/types");
 const main = tslib_1.__importStar(require("../main"));
-const main_1 = require("@/main");
+const main_1 = require("../main");
+const main_2 = require("@/main");
 const types_2 = require("../types");
 let PropReference = /** @class */ (() => {
     let PropReference = class PropReference extends vue_property_decorator_1.Vue {
         keydown(e) {
-            if (main_1.glob.cmenu.show && (e.which === types_1.Keys.up || e.which === types_1.Keys.down)) {
+            if (main_2.glob.cmenu.show && (e.which === types_1.Keys.up || e.which === types_1.Keys.down)) {
                 e.preventDefault();
             }
-            if (!main_1.glob.cmenu.show)
+            if (!main_2.glob.cmenu.show)
                 return { prop: this.prop, event: e };
         }
         update(e) {
             if (this.readOnly)
                 return;
             let val = e.target.value;
-            let items = val == null || (this.prop._.items.length < types_2.Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
-            items.forEach(item => item.hover = val == item.title);
-            let data = { prop: this.prop, instance: this.doc };
-            main_1.call('getPropertyReferenceValues', data, (res, err) => {
-                console.log(res);
-                //    res => prop._.items = res.data, err => notify(err)
-            });
-            this.showDropDown(items);
+            // console.log(val);
+            if (this.prop._.isRef) {
+                // console.log(this.prop);
+                let query = this.prop.filter ? main_1.parse(main_1.processThisExpression(this.doc, this.prop.filter), true, types_2.ID) : null;
+                let instance = this.doc;
+                if (this.prop.referType == types_1.PropertyReferType.InnerSelectType) {
+                    let match = this.prop._.ref.match(/^(\w+\/\w+)/);
+                    instance = this.$store.state.data[match[1]];
+                }
+                let data = { prop: this.prop, instance, phrase: val, query };
+                console.log(data);
+                console.log(main_1.stringify(data, true));
+                main_2.call('getPropertyReferenceValues', data, (err, res) => {
+                    if (err)
+                        main_2.notify(err);
+                    else {
+                        for (let item of res.data) {
+                            if (!this.prop._.items.find(i => i.ref == item.ref))
+                                this.prop._.items.push(item);
+                        }
+                        this.showDropDown(res.data);
+                    }
+                });
+            }
+            else {
+                let items = val == null || (this.prop._.items.length < types_2.Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
+                items.forEach(item => item.hover = val == item.title);
+                this.showDropDown(items);
+            }
         }
         refreshText() {
             this.$refs.ctrl.value = this.value;

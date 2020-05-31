@@ -176,11 +176,6 @@ let DetailsView = /** @class */ (() => {
             let dependents = this.dec.properties.filter(p => p.dependsOn && p.dependsOn.split(',').indexOf(e.prop.name) > -1 && this.item[e.prop.name] != null);
             for (const prop of dependents) {
                 this.changed({ item: this.item, prop, val: null, vue: this });
-                // if (prop._.items) {
-                //     prop._.items = null;
-                //     let data = {prop, instance};
-                //     ajax('/getPropertyReferenceValues', data, null, res => prop._.items = res.data, err => notify(err));
-                // }
             }
         }
         getProps(group) {
@@ -217,7 +212,7 @@ let DetailsView = /** @class */ (() => {
                     console.log(p.condition);
                 }
             });
-            let props = this.dec.properties.filter(p => p.condition == null || main.evalExpression(this.item, p.condition));
+            let props = this.dec.properties.filter(p => p.group && (p.condition == null || main.evalExpression(this.item, p.condition)));
             return props.map(p => p.group).filter(main.onlyUnique);
         }
     };
