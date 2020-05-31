@@ -23,7 +23,7 @@ import {parse, stringify, getBsonValue} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import {Axios, ChangeType, Constants, FileAction, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, Socket, StartParams, StateChange} from './types';
-import {AjaxConfig, DirFile, Drive, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
+import {AjaxConfig, DirFile, Drive, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, RequestMode, StatusCode, WebMethod, WebResponse, PropertyReferType} from '../../sys/src/types';
 import App from './App.vue';
 import pluralize = require('pluralize');
 
@@ -363,6 +363,52 @@ export function getPropReferenceValue(prop: Property, data: any): string {
         let item = prop._.items.find(i => equalID(i.ref, val));
         if (!item) return '...';
         return item.title;
+    }
+}
+
+export function showPropRefMenu(prop: Property, instance: any, phrase: string, ctrl, removeCurrentValues: boolean, itemSelected: (item: MenuItem) => void) {
+    let showDropDown = (items) => {
+
+        if (removeCurrentValues){
+            let values = instance[prop.name];
+            if (!values) values = [];
+            else if (!Array.isArray(values)) values = [values];
+            let valueStrKeys = values.map(v => JSON.stringify(v));
+            items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
+        }
+
+        if (!prop.required && items && items.length)
+            items = [{ref: null, title: "", hover: phrase === ""}].concat(items);
+
+        showCmenu(items, items, {ctrl}, (state, item: MenuItem) => {
+            if (prop._.isRef) // Maybe we have some new items which we need client side
+                for (let it of state) {
+                    if (!prop._.items.find(i => i.ref == it.ref))
+                        prop._.items.push(it);
+                }
+
+            itemSelected(item);
+        });
+    };
+
+    if (prop._.isRef) {
+        let query = prop.filter ? parse(processThisExpression(instance, prop.filter), true, ID) : null;
+        if (prop.referType == PropertyReferType.InnerSelectType) {
+            let match = prop._.ref.match(/^(\w+\/\w+)/);
+            instance = glob.data[match[1]];
+        }
+        let data = {prop, instance, phrase, query};
+
+        call('getPropertyReferenceValues', data, (err, res) => {
+            if (err)
+                notify(err, LogType.Error);
+            else
+                showDropDown(res.data);
+        });
+    } else {
+        let items = phrase == null || (prop._.items.length < Constants.contextMenuVisibleItems && phrase == this.value) ? prop._.items : prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(phrase.toLowerCase()) > -1);
+        items.forEach(item => (item as MenuItem).hover = phrase == item.title);
+        showDropDown(items);
     }
 }
 

@@ -7,7 +7,7 @@
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {Keys, Pair, Property, PropertyReferType, LogType} from "../../../sys/src/types";
     import * as main from '../main';
-    import {parse, processThisExpression} from '../main';
+    import {parse, processThisExpression, showPropRefMenu} from '../main';
     import {call, glob, notify} from '@/main';
     import {Constants, ID, ItemChangeEventArg, MenuItem, PropEventArg} from '../types';
 
@@ -35,29 +35,15 @@
         update(e, clicked) {
             if (this.readOnly) return;
             let val = (e.target as any).value;
-            // console.log(val);
-
-            if (this.prop._.isRef) {
-                // console.log(this.prop);
-                let query = this.prop.filter ? parse(processThisExpression(this.doc, this.prop.filter), true, ID) : null;
-                let instance = this.doc;
-                if (this.prop.referType == PropertyReferType.InnerSelectType) {
-                    let match = this.prop._.ref.match(/^(\w+\/\w+)/);
-                    instance = this.$store.state.data[match[1]];
+            showPropRefMenu(this.prop, this.doc, clicked ? "" : val, this.$refs.ctrl, false, (item: MenuItem) => {
+                if (item == null) { // Esc
+                    this.refreshText();
+                    return;
                 }
-                let data = {prop: this.prop, instance, phrase: clicked ? null : val, query};
-
-                call('getPropertyReferenceValues', data, (err, res) => {
-                    if (err)
-                        notify(err, LogType.Error);
-                    else
-                        this.showDropDown(res.data);
-                });
-            } else {
-                let items = val == null || (this.prop._.items.length < Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
-                items.forEach(item => (item as MenuItem).hover = val == item.title);
-                this.showDropDown(items);
-            }
+                if (!main.equalID(this.doc[this.prop.name], item.ref)) {
+                    this.selectItem(item.ref);
+                }
+            });
         }
 
         $refs: {
@@ -66,27 +52,6 @@
 
         refreshText() {
             this.$refs.ctrl.value = this.value;
-        }
-
-        showDropDown(items) {
-            if (!this.prop.required && items && items.length)
-                items = [{ref: null, title: "", hover: false}].concat(items);
-
-            main.showCmenu(items, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
-                if (item == null) { // Esc
-                    this.refreshText();
-                    return;
-                }
-                if (!main.equalID(this.doc[this.prop.name], item.ref)) {
-                    this.selectItem(item.ref);
-                }
-
-                if (this.prop._.isRef) // Maybe we have some new items which we need client side
-                    for (let it of state) {
-                        if (!this.prop._.items.find(i => i.ref == it.ref))
-                            this.prop._.items.push(it);
-                    }
-            });
         }
 
         @Emit('changed')

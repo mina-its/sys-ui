@@ -3,9 +3,9 @@
         <div v-for="item in items"
              :class="{'ref-multi-item rounded-lg rmI d-inline-block my-1 px-1 border text-nowrap':1,'mr-1':ltr,'ml-1':rtl}">
             <i @click="remove(item)" class="text-black-50 mx-1 rmD fa fa-times" style="cursor:pointer"></i>
-            <span class="rmV">{{item.title}}</span>
+            <span class="rmV cursor-pointer">{{item.title}}</span>
         </div>
-        <textarea @click="showDropDown(prop._.items)" @blur="refreshText" @input="update()" v-if="!readOnly"
+        <textarea @click="click" @blur="refreshText" @input="update" v-if="!readOnly"
                   class="w-100 bg-transparent align-middle rmT d-inline border-0"
                   rows="1" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
                   tabindex="1"></textarea>
@@ -16,7 +16,8 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Pair} from "../../../sys/src/types";
-    import {MenuItem, ItemChangeEventArg, JQuery} from '../types';
+    import {MenuItem, ItemChangeEventArg, JQuery} from '@/types';
+    import {showPropRefMenu} from "@/main";
 
     declare let $: JQuery;
     import * as main from '../main';
@@ -29,11 +30,20 @@
         @Prop() private styles: string;
         @Prop() private readOnly: boolean;
 
-        update() {
-            let val = (event.target as any).value;
-            let items = val == "" ? this.prop._.items : this.prop._.items.filter(item => item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
-            items.forEach(item => (item as MenuItem).hover = false);
-            this.showDropDown(items);
+        update(e, clicked) {
+            if (this.readOnly) return;
+            let val = (e.target as any).value;
+            showPropRefMenu(this.prop, this.doc, clicked ? "" : val, this.$refs.ctrl, true, (item: MenuItem) => {
+                if (item == null) { // Esc
+                    this.refreshText();
+                    return;
+                }
+                this.selectItem(item);
+            });
+        }
+
+        click(e) {
+            this.update(e, true);
         }
 
         refreshText() {
@@ -51,12 +61,6 @@
             let val = this.doc[this.prop.name];
             val = val.filter(v => !main.equalID(v, item.ref));
             return {prop: this.prop, val, vue: this};
-        }
-
-        showDropDown(items) {
-            let valueStrKeys = this.value.map(v => JSON.stringify(v));
-            items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
-            main.showCmenu(this.prop, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => this.selectItem(item));
         }
 
         @Emit('changed')
@@ -81,7 +85,7 @@
         }
 
         get items(): Pair[] {
-            console.log(this.value);
+            // console.log(this.value);
             let items: Pair[] = [];
             for (const v of this.value) {
                 let item = this.prop._.items.find(i => main.equalID(v, i.ref));
