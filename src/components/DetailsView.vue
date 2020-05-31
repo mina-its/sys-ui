@@ -17,7 +17,7 @@
             </template>
 
             <!--  Refresh -->
-            <a class="text-secondary px-2" href="javascript:void(0);" @click="refresh"><i class="fad fa-sync fa-lg"></i></a>
+            <a class="text-secondary px-2" href="javascript:void(0);" @click="refresh"><i class="fal fa-sync fa-lg"></i></a>
 
             <!--  Object Menu -->
             <a class="text-secondary px-2" href="javascript:void(0);" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></a>
