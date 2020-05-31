@@ -19,7 +19,7 @@ let index = {
 
 
 import {v4 as uuidv4} from 'uuid';
-import {parse, stringify} from 'bson-util';
+import {parse, stringify, getBsonValue} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import {Axios, ChangeType, Constants, FileAction, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, Socket, StartParams, StateChange} from './types';
@@ -29,7 +29,7 @@ import pluralize = require('pluralize');
 
 declare let $: JQuery, axios: Axios, io: Socket, marked: any;
 export let glob = window["__glob"] || new Global();
-export {parse, stringify};
+export {parse, stringify, getBsonValue};
 window["__glob"] = glob;
 let store;
 
@@ -86,10 +86,27 @@ export function $t(text: string): string {
 
 export function evalExpression($this: any, expression: string): any {
     try {
-        if (expression == null) {
-            return null;
-        }
+        if (expression == null) return null;
         return eval(expression.replace(/\bthis\b/g, '$this'));
+    } catch (ex) {
+        console.error(`Evaluating '${expression}' failed! this:`, $this, 'Error:', ex.message);
+    }
+}
+
+export function processThisExpression($this: any, expression: string): string {
+    try {
+        if (expression == null) return null;
+
+        let match;
+        let reg = /\bthis\.(\w+)/;
+        while ((match = reg.exec(expression)) !== null) {
+            let propName = match[1];
+            let propReg = new RegExp(`\\bthis\\.${propName}`, "g");
+            let val = getBsonValue($this[propName]);
+            let valStr = JSON.stringify(val);
+            expression = expression.replace(propReg, valStr);
+        }
+        return expression;
     } catch (ex) {
         console.error(`Evaluating '${expression}' failed! this:`, $this, 'Error:', ex.message);
     }
@@ -141,10 +158,6 @@ function vueResetFormData(res: WebResponse) {
             }
         }
     }
-
-    glob.data = res.data;
-    glob.form = res.form as any;
-    store.commit('_commitReloadData', glob.data);
 }
 
 function setUndefinedToNull(item, prop: Property) {
@@ -202,6 +215,40 @@ export function prepareServerUrl(ref: string): string {
     return ref;
 }
 
+export function loadOutboundData(prop: Property, item: any) {
+    let ref = "/" + prop._.ref;
+    if (prop.filter) {
+        let query = processThisExpression(item, prop.filter);
+        ref += `?q=${query}`;
+    }
+    ajax(setQs('m', RequestMode.inline, false, ref), null, null, res => {
+        if (!res.data) return;
+
+        const setDataMeta = (ref: string, item: IData, dec: ObjectDec | FunctionDec) => {
+            item._ = item._ || {} as any;
+            item._.ref = ref;
+            item._.dec = dec;
+            return item._;
+        };
+
+        let dec = glob.form.declarations[prop._.ref];
+        let data = res.data[prop._.ref];
+        if (!data || !dec || !Array.isArray(data)) return;
+
+        data.forEach((item: IData) => {
+            let meta = setDataMeta(ref + "/" + item._id, item, dec);
+            meta.marked = null;
+        });
+
+        for (const prop of dec.properties) {
+            if (Array.isArray(data))
+                data.forEach(item => setUndefinedToNull(item, prop));
+        }
+
+        glob.data[prop._.ref] = data;
+    }, err => notify(err));
+}
+
 export function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
@@ -232,6 +279,10 @@ export function handleResponse(res: WebResponse) {
     else if (res.form) {
         // WARNING: never change these orders:
         vueResetFormData(res);
+        glob.data = res.data;
+        glob.form = res.form as any;
+        store.commit('_commitReloadData', glob.data);
+
         if (getQs(Constants.QUERY_NEW))
             initializeModifyForQueryNew(res);
 
@@ -523,6 +574,16 @@ export function refreshFileGallery(file?: string) {
     openFileGallery(glob.fileGallery.drive, file, glob.fileGallery.path, glob.fileGallery.fixedPath, glob.fileGallery.fileSelectCallback);
 }
 
+export function getNewItemTitle(title: string) {
+    switch (glob.config.locale) {
+        case Locale[Locale.en]:
+            return "New " + pluralize.singular(title);
+
+        default:
+            return $t("new-item");
+    }
+}
+
 export function openFileGallery(drive: Drive, file: string, path: string, fixedPath: boolean,
                                 fileSelectCallback: (path: string, item: DirFile) => void) {
     glob.fileGallery = {
@@ -746,7 +807,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
 
     // serialize data
     params.data = stringify(data, true);
-    if (params.data) console.log(params.data);
+    // if (params.data) console.log(params.data);
 
     // Ajax call
     axios(params).then(res => {

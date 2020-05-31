@@ -16,6 +16,9 @@
                 <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
             </template>
 
+            <!--  Refresh -->
+            <a class="text-secondary px-2" href="javascript:void(0);" @click="refresh"><i class="fad fa-sync fa-lg"></i></a>
+
             <!--  Object Menu -->
             <a class="text-secondary px-2" href="javascript:void(0);" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></a>
         </div>
@@ -57,10 +60,10 @@
 </template>
 
 <script lang="ts">
-    import {ChangeType, FunctionExecEventArg, HeadFunc, ItemChangeEventArg, JQuery, MenuItem, StateChange} from '@/types';
+    import {ChangeType, HeadFunc, ItemChangeEventArg, JQuery, MenuItem, StateChange} from '@/types';
     import {Component, Prop, Vue, Watch, Emit} from 'vue-property-decorator';
-    import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta, GlobalType} from "../../../sys/src/types";
-    import {$t, glob} from '@/main';
+    import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta, GlobalType, PropertyReferType} from "../../../sys/src/types";
+    import {$t, glob, getNewItemTitle, loadOutboundData} from '@/main';
     import * as main from '../main';
     import {v4 as uuidv4} from 'uuid';
 
@@ -111,6 +114,10 @@
             this.reloadLastGroup();
         }
 
+        refresh() {
+            main.load(location.pathname, false);
+        }
+
         clickObjectMenu(e) {
             let items: MenuItem[] = [
                 {ref: "print", title: $t('print')}
@@ -154,39 +161,48 @@
             this.currentGroup = item.title;
             this.saveLastGroup(item);
 
-            // history.pushState(null, null, item.ref);
             if (this.dec.detailsViewType == ObjectDetailsViewType.Tabular) {
                 let $dv = $(".details-view");
-                $dv.animate({
-                        scrollTop: $(item.ref).offset().top + $dv.scrollTop() - $dv.offset().top
-                    }, 0
-                );
+                $dv.animate({scrollTop: $(item.ref).offset().top + $dv.scrollTop() - $dv.offset().top}, 0);
             }
 
             let props = this.getProps(this.currentGroup);
             let newItemLink = this.headFuncs.find(i => i.name == "new-item");
             if (newItemLink) this.headFuncs.splice(this.headFuncs.indexOf(newItemLink), 1);
-            if (props && props.length == 1 && props[0].isList) {
-                this.headFuncs.push({
-                    title: $t("new-item"), name: "new-item", exec: () => {
-                        let uri = this.uri + "/" + props[0].name;
-                        let dec = glob.form.declarations[uri];
-                        let newItem = {_id: uuidv4(), _: {marked: false, dec} as EntityMeta};
-                        this.dec.properties.forEach(prop => newItem[prop.name] = null);
-                        // if (this.dec.reorderable)
-                        //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;
 
-                        if (this.data) {
-                            this.data[uri].push(newItem);
-                        } else
-                            main.dispatchStoreModify(this, {
-                                type: ChangeType.InsertItem,
-                                item: newItem,
-                                uri,
-                                vue: this
-                            } as StateChange);
-                    }
-                });
+            // The Group is a list property
+            if (props && props.length == 1 && props[0].isList) {
+                let prop = props[0];
+                switch (prop.referType) {
+                    case PropertyReferType.inlineData:
+                        let title = getNewItemTitle(prop.title);
+                        this.headFuncs.push({
+                            title, name: "new-item", exec: () => {
+                                let uri = this.uri + "/" + prop.name;
+                                let dec = glob.form.declarations[uri];
+                                let newItem = {_id: uuidv4(), _: {marked: false, dec} as EntityMeta};
+                                this.dec.properties.forEach(p => newItem[p.name] = null);
+                                // if (this.dec.reorderable)
+                                //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;
+
+                                if (this.data) {
+                                    this.data[uri].push(newItem);
+                                } else
+                                    main.dispatchStoreModify(this, {
+                                        type: ChangeType.InsertItem,
+                                        item: newItem,
+                                        uri,
+                                        vue: this
+                                    } as StateChange);
+                            }
+                        });
+                        break;
+
+                    case PropertyReferType.outbound:
+                        let items = this.item[prop.name];
+                        if (items == null) loadOutboundData(prop, this.item);
+                        break;
+                }
             }
         }
 
@@ -238,6 +254,12 @@
                     uri: this.uri,
                     vue: e.vue
                 } as StateChange);
+
+            // Check the properties which are depends to the changed property
+            let dependents = this.dec.properties.filter(p => p.dependsOn && p.dependsOn.split(',').indexOf(e.prop.name) > -1 && this.item[e.prop.name] != null);
+            for (const prop of dependents) {
+                this.changed({item: this.item, prop, val: null, vue: this} as ItemChangeEventArg);
+            }
         }
 
         getProps(group: string) {
@@ -272,12 +294,12 @@
         }
 
         get groups() {
-            this.dec.properties.forEach( p => {
-               if (p.condition){
-                   console.log(p.condition);
-               }
+            this.dec.properties.forEach(p => {
+                if (p.condition) {
+                    console.log(p.condition);
+                }
             });
-            let props = this.dec.properties.filter(p => p.condition == null || main.evalExpression(this.item, p.condition));
+            let props = this.dec.properties.filter(p => p.group && (p.condition == null || main.evalExpression(this.item, p.condition)));
             return props.map(p => p.group).filter(main.onlyUnique);
         }
     }

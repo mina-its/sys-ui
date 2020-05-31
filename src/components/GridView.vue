@@ -66,8 +66,13 @@
                         <tr>
                             <td class="border-0" colspan="100">
                                 <div class="align-items-center d-flex">
+                                    <!-- Add -->
                                     <Function v-if="dec.access & 4" styles="m-1 fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"></Function>
+
+                                    <!-- Delete -->
                                     <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
+
+                                    <!-- Paging -->
                                     <div class="flex-grow-1 d-flex align-items-center">
                                         <ul v-if="dec.pages > 1" class="m-2 pagination ">
                                             <li class="page-item" data-toggle="tooltip" title="Previous Page">
