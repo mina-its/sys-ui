@@ -359,6 +359,49 @@ function getPropReferenceValue(prop, data) {
     }
 }
 exports.getPropReferenceValue = getPropReferenceValue;
+function showPropRefMenu(prop, instance, phrase, ctrl, removeCurrentValues, itemSelected) {
+    let showDropDown = (items) => {
+        if (removeCurrentValues) {
+            let values = instance[prop.name];
+            if (!values)
+                values = [];
+            else if (!Array.isArray(values))
+                values = [values];
+            let valueStrKeys = values.map(v => JSON.stringify(v));
+            items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
+        }
+        if (!prop.required && items && items.length)
+            items = [{ ref: null, title: "", hover: phrase === "" }].concat(items);
+        showCmenu(items, items, { ctrl }, (state, item) => {
+            if (prop._.isRef) // Maybe we have some new items which we need client side
+                for (let it of state) {
+                    if (!prop._.items.find(i => i.ref == it.ref))
+                        prop._.items.push(it);
+                }
+            itemSelected(item);
+        });
+    };
+    if (prop._.isRef) {
+        let query = prop.filter ? bson_util_1.parse(processThisExpression(instance, prop.filter), true, types_1.ID) : null;
+        if (prop.referType == types_2.PropertyReferType.InnerSelectType) {
+            let match = prop._.ref.match(/^(\w+\/\w+)/);
+            instance = exports.glob.data[match[1]];
+        }
+        let data = { prop, instance, phrase, query };
+        call('getPropertyReferenceValues', data, (err, res) => {
+            if (err)
+                notify(err, types_2.LogType.Error);
+            else
+                showDropDown(res.data);
+        });
+    }
+    else {
+        let items = phrase == null || (prop._.items.length < types_1.Constants.contextMenuVisibleItems && phrase == this.value) ? prop._.items : prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(phrase.toLowerCase()) > -1);
+        items.forEach(item => item.hover = phrase == item.title);
+        showDropDown(items);
+    }
+}
+exports.showPropRefMenu = showPropRefMenu;
 function refresh() {
     exports.glob.dirty = false;
     location.reload();
