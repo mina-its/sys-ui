@@ -30,16 +30,14 @@ let PropReference = /** @class */ (() => {
                     instance = this.$store.state.data[match[1]];
                 }
                 let data = { prop: this.prop, instance, phrase: val, query };
-                console.log(data);
-                console.log(main_1.stringify(data, true));
                 main_2.call('getPropertyReferenceValues', data, (err, res) => {
                     if (err)
-                        main_2.notify(err);
+                        main_2.notify(err, types_1.LogType.Error);
                     else {
-                        for (let item of res.data) {
-                            if (!this.prop._.items.find(i => i.ref == item.ref))
-                                this.prop._.items.push(item);
-                        }
+                        // for (let item of res.data as Pair[]) {
+                        //     if (!this.prop._.items.find(i => i.ref == item.ref))
+                        //         this.prop._.items.push(item);
+                        // }
                         this.showDropDown(res.data);
                     }
                 });

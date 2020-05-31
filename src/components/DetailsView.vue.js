@@ -1,6 +1,185 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+;
+class {
+}
+"{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level}" >
+    --Toolbar;
+-- >
+    v - ;
+if ( = "!level")
+    : class {
+    }
+"{'d-flex p-2 align-items-center btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}";
+role = "toolbar";
+aria - label;
+"Toolbar with button groups" >
+    --Breadcrumb;
+-- >
+    />
+    < !--Toolbar;
+Apply / Cancel-- >
+    />
+    < !--Head;
+Functions-- >
+    class {
+    };
+"mr-auto" > /div>
+    < template;
+v - ;
+for ( = "func in headFuncs" >
+; ; )
+    : href = "func.ref";
+class {
+}
+"`${func.style||'btn btn-success mx-1 px-2'}`";
+v - ;
+if ( = "func.ref" > {}) {
+    func.title;
+}
+/a>
+    < Function;
+v - ;
+styles = "btn-primary mx-1";
+name = "func.name";
+"func.exec";
+title = "func.title" /  >
+    /template>
+    < !--Refresh;
+-- >
+    class {
+    };
+"text-secondary px-2";
+href = "javascript:void(0);";
+"refresh" > class {
+};
+"fal fa-sync fa-lg" > /i></a >
+    --Object;
+Menu-- >
+    class {
+    };
+"text-secondary px-2";
+href = "javascript:void(0);";
+"clickObjectMenu" > class {
+};
+"fal fa-cog fa-lg" > /i></a >
+    /div>
+    < !--Content;
+-- >
+    class {
+    };
+"w-100 h-100 overflow-auto d-flex" >
+;
+class {
+}
+"{'d-flex overflow-auto details-view':true, 'bg-white':level}";
+"onScroll()" >
+    --Side;
+Menu-- >
+    v - ;
+if ( = "sideMenuVisible")
+    class {
+    }
+"border-right separator-line sidenav p-2 py-4 d-none d-md-block" >
+    class {
+    };
+"nav flex-column";
+id = "menus" >
+    v - ;
+for ( = "item in sideMenu"; class {
+} = "nav-item" >
+; )
+"selectGroup(item)";
+class {
+}
+"{'text-nowrap text-secondary nav-link': 1, 'active': $data.currentGroup===item.title}";
+href = "javascript:void(0);" > {};
+{
+    item.title;
+}
+/a>
+    < /li>
+    < /ul>
+    < /aside>
+    < !--Main;
+-- >
+;
+class {
+}
+"{'p-4':!level, 'border rounded': level && dec.detailsViewType===2}" >
+    v - ;
+if ( = "groupVisible(group)")
+    : class {
+    }
+"groupPanelStyle(group)";
+v - ;
+for ( = "group in groups"; ; )
+    : id = "getGroupId(group)" >
+        v - ;
+if ( = "groupHeadVisible(group)")
+    class {
+    }
+"text-secondary mb-4" > {};
+{
+    group;
+}
+/h3>
+    < div;
+class {
+}
+"group" >
+    v - ;
+for ( = "prop in getProps(group)" >
+    v - ; ; )
+    if ( = "isNotAloneInlineDataGridProperty(group, prop, item)")
+        class {
+        }
+"prop-label from-outside-label pt-2" > {};
+{
+    prop.title;
+}
+/label>
+    < Property;
+level = "level?level+1:1";
+readonly = "!(dec.access&2)";
+item = "item";
+prop = "prop";
+"changed";
+viewType = "2" /  >
+    /template>
+    < /div>
+    < /div>
+    < div;
+v - ;
+if ( = "nonGroupVisible()")
+    : class {
+    }
+"{'gp':!level}" >
+;
+level = "level?level+1:1";
+v - ;
+for ( = "prop in dec.properties"; ; )
+    : key = "prop.name";
+item = "item";
+prop = "prop";
+"changed";
+viewType = "2" /  >
+    /div>
+    < div;
+v - ;
+if ( = "!level")
+    class {
+    }
+"h-25" > /div>
+    < /div>
+    < /div>
+    < /div>
+    < /div>
+    < /template>
+    < script;
+lang = "ts" >
+;
 const types_1 = require("@/types");
 const vue_property_decorator_1 = require("vue-property-decorator");
 const types_2 = require("../../../sys/src/types");
@@ -240,4 +419,91 @@ let DetailsView = /** @class */ (() => {
     return DetailsView;
 })();
 exports.default = DetailsView;
+/script>
+    < style;
+lang = "scss" >
+        .details - view;
+{
+    scroll - behavior;
+    smooth;
+    min - width;
+    100 % ;
+    sidenav;
+    {
+        background - color;
+        white;
+        min - width;
+        220;
+        px;
+    }
+    label;
+    {
+        color: var ;
+        (--form - label);
+        font - weight;
+        600;
+    }
+    input;
+    {
+        border - color;
+        var ;
+        (--grid - border);
+    }
+    gp;
+    {
+        background: #fff;
+        border - radius;
+        2;
+        px;
+        box - shadow;
+        0;
+        1;
+        px;
+        1;
+        px;
+        0;
+        rgba(0, 0, 0, 0.14), 0;
+        2;
+        px;
+        1;
+        px - 1;
+        px;
+        rgba(0, 0, 0, 0.12), 0;
+        1;
+        px;
+        3;
+        px;
+        0;
+        rgba(0, 0, 0, 0.2);
+        /*color: rgba(0, 0, 0, 0.54);*/
+        margin - bottom;
+        12;
+        px;
+        margin - left;
+        auto;
+        margin - right;
+        auto;
+        outline: none;
+        position: relative;
+        padding: 30;
+        px;
+    }
+    active;
+    {
+        font - weight;
+        500;
+        background - color;
+        #eee;
+        border - left;
+        3;
+        px;
+        solid;
+        var ;
+        (--link - color);
+        margin - left;
+        -3;
+        px;
+    }
+}
+/style>;
 //# sourceMappingURL=DetailsView.vue.js.map

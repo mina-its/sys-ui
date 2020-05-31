@@ -1,14 +1,13 @@
-import {PropertyReferType} from "../../../sys/src/types";
 <template>
     <input @focus="$emit('focus', $event)" ref="ctrl" v-bind:type="type" @keydown="keydown" :readonly="readOnly"
-           :value="value" @blur="refreshText" @input="update" @click="update" class="form-control">
+           :value="value" @blur="refreshText" @input="update" @click="click" class="form-control">
 </template>
 
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {Keys, Pair, Property, PropertyReferType} from "../../../sys/src/types";
+    import {Keys, Pair, Property, PropertyReferType, LogType} from "../../../sys/src/types";
     import * as main from '../main';
-    import {parse, processThisExpression, stringify} from '../main';
+    import {parse, processThisExpression} from '../main';
     import {call, glob, notify} from '@/main';
     import {Constants, ID, ItemChangeEventArg, MenuItem, PropEventArg} from '../types';
 
@@ -29,7 +28,11 @@ import {PropertyReferType} from "../../../sys/src/types";
                 return {prop: this.prop, event: e};
         }
 
-        update(e) {
+        click(e) {
+            this.update(e, true);
+        }
+
+        update(e, clicked) {
             if (this.readOnly) return;
             let val = (e.target as any).value;
             // console.log(val);
@@ -42,17 +45,13 @@ import {PropertyReferType} from "../../../sys/src/types";
                     let match = this.prop._.ref.match(/^(\w+\/\w+)/);
                     instance = this.$store.state.data[match[1]];
                 }
-                let data = {prop: this.prop, instance, phrase: val, query};
+                let data = {prop: this.prop, instance, phrase: clicked ? null : val, query};
 
                 call('getPropertyReferenceValues', data, (err, res) => {
-                    if (err) notify(err);
-                    else {
-                        for (let item of res.data as Pair[]) {
-                            if (!this.prop._.items.find(i => i.ref == item.ref))
-                                this.prop._.items.push(item);
-                        }
+                    if (err)
+                        notify(err, LogType.Error);
+                    else
                         this.showDropDown(res.data);
-                    }
                 });
             } else {
                 let items = val == null || (this.prop._.items.length < Constants.contextMenuVisibleItems && val == this.value) ? this.prop._.items : this.prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(val.toLowerCase()) > -1);
@@ -73,7 +72,7 @@ import {PropertyReferType} from "../../../sys/src/types";
             if (!this.prop.required && items && items.length)
                 items = [{ref: null, title: "", hover: false}].concat(items);
 
-            main.showCmenu(this.prop, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
+            main.showCmenu(items, items, {ctrl: this.$refs.ctrl}, (state, item: MenuItem) => {
                 if (item == null) { // Esc
                     this.refreshText();
                     return;
@@ -81,6 +80,12 @@ import {PropertyReferType} from "../../../sys/src/types";
                 if (!main.equalID(this.doc[this.prop.name], item.ref)) {
                     this.selectItem(item.ref);
                 }
+
+                if (this.prop._.isRef) // Maybe we have some new items which we need client side
+                    for (let it of state) {
+                        if (!this.prop._.items.find(i => i.ref == it.ref))
+                            this.prop._.items.push(it);
+                    }
             });
         }
 
