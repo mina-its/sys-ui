@@ -426,6 +426,10 @@
         background: #555;
     }
 
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
     .outline-0 {
         outline: none;
     }

@@ -7,7 +7,7 @@
             <ToolbarModifyButtons/>
 
             <!-- Filter -->
-            <div v-if="!level && filter && filteringProp && !dec.filterDec" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mx-5 rounded">
+            <div v-if="showFilter" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mx-5 rounded">
                 <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
                 <i class="fal fa-filter p-1 d-inline-block text-muted"></i>
             </div>
@@ -118,7 +118,7 @@
 
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private mainChecked = false;
-        private filter = {$and: []};
+        private filter = null;
         private filterDoc = {};
         private filteringProp: Property = null;
         private filteredProps: Property[] = [];
@@ -135,6 +135,10 @@
         onUriReset() {
             this.resetFilterParameters();
             this.resetHeadFuncs();
+        }
+
+        get showFilter() {
+            return this.filter && glob.form.breadcrumb.length == 0;
         }
 
         resetFilterParameters() {
