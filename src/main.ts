@@ -642,7 +642,7 @@ export function getNewItemTitle(title: string) {
     }
 }
 
-export function openFileGallery(drive: Drive, file: string, path: string, fixedPath: boolean,
+export function openFileGallery(drive: ID, file: string, path: string, fixedPath: boolean,
                                 fileSelectCallback: (path: string, item: DirFile) => void) {
     glob.fileGallery = {
         list: [],
@@ -656,7 +656,7 @@ export function openFileGallery(drive: Drive, file: string, path: string, fixedP
         fileSelectCallback: fileSelectCallback
     };
 
-    ajax('/getFileGallery?m=1', {drive: drive._id, path}, {}, res => {
+    ajax('/getFileGallery?m=1', {drive, path}, {}, res => {
         if (res.code != StatusCode.Ok) {
             glob.fileGallery.show = false;
             notify(res.message, LogType.Error);
@@ -839,6 +839,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
     };
 
     // extract files raw data
+    let multipart = false;
     if (data) {
         let formData: FormData = null;
         for (let key in data) {
@@ -855,6 +856,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         }
 
         if (formData) {
+            multipart = true;
             params.data = formData;
             params.data.append('data', stringify(data, true));
             params.headers['Content-Type'] = 'multipart/form-data';
@@ -865,7 +867,8 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
     // serialize data
-    params.data = stringify(data, true);
+    if (!multipart)
+        params.data = stringify(data, true);
     // if (params.data) console.log(params.data);
 
     // Ajax call

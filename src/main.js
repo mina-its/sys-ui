@@ -645,7 +645,7 @@ function openFileGallery(drive, file, path, fixedPath, fileSelectCallback) {
         show: true,
         fileSelectCallback: fileSelectCallback
     };
-    ajax('/getFileGallery?m=1', { drive: drive._id, path }, {}, res => {
+    ajax('/getFileGallery?m=1', { drive, path }, {}, res => {
         if (res.code != types_2.StatusCode.Ok) {
             exports.glob.fileGallery.show = false;
             notify(res.message, types_2.LogType.Error);
@@ -823,6 +823,7 @@ function ajax(url, data, config, done, fail) {
         withCredentials: true
     };
     // extract files raw data
+    let multipart = false;
     if (data) {
         let formData = null;
         for (let key in data) {
@@ -839,6 +840,7 @@ function ajax(url, data, config, done, fail) {
             }
         }
         if (formData) {
+            multipart = true;
             params.data = formData;
             params.data.append('data', bson_util_1.stringify(data, true));
             params.headers['Content-Type'] = 'multipart/form-data';
@@ -847,7 +849,8 @@ function ajax(url, data, config, done, fail) {
     // Cross origin support
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     // serialize data
-    params.data = bson_util_1.stringify(data, true);
+    if (!multipart)
+        params.data = bson_util_1.stringify(data, true);
     // if (params.data) console.log(params.data);
     // Ajax call
     axios(params).then(res => {

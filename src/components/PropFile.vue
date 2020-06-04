@@ -94,7 +94,7 @@ import {LogType} from "../../../sys/src/types";
         }
 
         selectFromGallery(path: string, item: DirFile) {
-            let uri = `http://${joinUri(this.prop.file.drive._.uri, path, item.name)}`;
+            let uri = `http://${joinUri(this.prop._.fileUri, path, item.name)}`;
             let file = {
                 path,
                 _: {uri},

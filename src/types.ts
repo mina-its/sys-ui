@@ -240,7 +240,7 @@ export enum FilterOperator {
 }
 
 export class AppStateFileGallery {
-    drive: Drive;
+    drive: ID;
     path: string = '';
     list: DirFile[] = [];
     file: string = '';
