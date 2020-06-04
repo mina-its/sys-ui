@@ -18,7 +18,6 @@ let index = {
 };
 
 
-import {v4 as uuidv4} from 'uuid';
 import {parse, stringify, getBsonValue} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
@@ -127,7 +126,7 @@ function vueResetFormData(res: WebResponse) {
     if (!dataset) return;
 
     if (res.form && res.form.declarations) {
-        res.form.elems.forEach(elem => elem.id = uuidv4()); // needs for refreshing form while cancel changes
+        res.form.elems.forEach(elem => elem.id = ID.generateByBrowser()); // needs for refreshing form while cancel changes
 
         const setDataMeta = (ref: string, item: IData, dec: ObjectDec | FunctionDec) => {
             item._ = item._ || {} as any;
@@ -302,7 +301,7 @@ function initializeModifyForQueryNew(res: WebResponse) {
     glob.dirty = true;
     let ref = location.pathname.replace(/\//g, "");
     let data = res.data[ref];
-    let modifyData = {_id: -1};
+    let modifyData = {_id: ID.generateByBrowser(), _new: true};
     for (let prop in data) {
         if (data.hasOwnProperty(prop) && data[prop] != null)
             modifyData[prop] = data[prop];
@@ -369,7 +368,7 @@ export function getPropReferenceValue(prop: Property, data: any): string {
 export function showPropRefMenu(prop: Property, instance: any, phrase: string, ctrl, removeCurrentValues: boolean, itemSelected: (item: MenuItem) => void) {
     let showDropDown = (items) => {
 
-        if (removeCurrentValues){
+        if (removeCurrentValues) {
             let values = instance[prop.name];
             if (!values) values = [];
             else if (!Array.isArray(values)) values = [values];
@@ -708,24 +707,25 @@ export function question(title: string, message: string, buttons: Pair[], option
     glob.question.show = true;
 }
 
-export function loadHeadScript(src) {
-    if (document.querySelector('script[src=\'' + src + '\']')) {
-        return;
-    }
-    const script = document.createElement('script');
-    script.setAttribute('src', src);
-    script.setAttribute('type', 'text/javascript');
-    document.head.appendChild(script);
+export function loadHeadScript(src, done) {
+    loadScript(src, document.head, done);
 }
 
-export function loadBodyScript(src) {
+export function loadBodyScript(src, done?) {
+    loadScript(src, document.body, done);
+}
+
+function loadScript(src, target, done) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
     }
     const script = document.createElement('script');
     script.setAttribute('src', src);
     script.setAttribute('type', 'text/javascript');
-    document.body.appendChild(script);
+    script.onload = function () {
+        if (done) done();
+    };
+    target.appendChild(script);
 }
 
 export function delScript(src) {
@@ -1046,10 +1046,8 @@ function _commitServerChangeResponse(store, arg: { modify: Modify, res: any }) {
             break;
 
         case ChangeType.InsertItem:
-            if (arg.modify.state._id != arg.res._reqId)
-                notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._reqId}' are not same`, LogType.Error);
-            else
-                delete arg.res._reqId;
+            if (!arg.modify.state._id.equals(arg.res._id))
+                notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._id}' are not same`, LogType.Error);
             for (let key in arg.res) {
                 arg.modify.state[key] = arg.res[key];
             }
@@ -1144,7 +1142,7 @@ function _dispatchStoreModify(store, change: StateChange) {
         }
 
         case ChangeType.InsertItem: {
-            let data = {_id: change.item._id};
+            let data = {_id: change.item._id, _new: true};
             if (change.item._z) data["_z"] = change.item._z;
             glob.modifies.push({ref, type: ChangeType.InsertItem, data, state: change.item});
             break;

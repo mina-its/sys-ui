@@ -60,12 +60,11 @@
 </template>
 
 <script lang="ts">
-    import {ChangeType, HeadFunc, ItemChangeEventArg, JQuery, MenuItem, StateChange} from '@/types';
+    import {ChangeType, HeadFunc, ID, ItemChangeEventArg, JQuery, MenuItem, StateChange} from '@/types';
     import {Component, Prop, Vue, Watch, Emit} from 'vue-property-decorator';
     import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta, GlobalType, PropertyReferType} from "../../../sys/src/types";
     import {$t, glob, getNewItemTitle, loadOutboundData} from '@/main';
     import * as main from '../main';
-    import {v4 as uuidv4} from 'uuid';
 
     declare let $: JQuery;
 
@@ -180,7 +179,7 @@
                             title, name: "new-item", exec: () => {
                                 let uri = this.uri + "/" + prop.name;
                                 let dec = glob.form.declarations[uri];
-                                let newItem = {_id: uuidv4(), _: {marked: false, dec} as EntityMeta};
+                                let newItem = {_id: ID.generateByBrowser(), _new:true, _: {marked: false, dec} as EntityMeta};
                                 this.dec.properties.forEach(p => newItem[p.name] = null);
                                 // if (this.dec.reorderable)
                                 //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;

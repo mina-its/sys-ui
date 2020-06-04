@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.processThisExpression = exports.evalExpression = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -17,11 +18,10 @@ let index = {
     "Load                           ": load,
     "Ajax                           ": ajax,
 };
-const uuid_1 = require("uuid");
 const bson_util_1 = require("bson-util");
-exports.parse = bson_util_1.parse;
-exports.stringify = bson_util_1.stringify;
-exports.getBsonValue = bson_util_1.getBsonValue;
+Object.defineProperty(exports, "parse", { enumerable: true, get: function () { return bson_util_1.parse; } });
+Object.defineProperty(exports, "stringify", { enumerable: true, get: function () { return bson_util_1.stringify; } });
+Object.defineProperty(exports, "getBsonValue", { enumerable: true, get: function () { return bson_util_1.getBsonValue; } });
 const vue_1 = tslib_1.__importDefault(require("vue"));
 const vuex_1 = tslib_1.__importDefault(require("vuex"));
 const types_1 = require("./types");
@@ -125,7 +125,7 @@ function vueResetFormData(res) {
     if (!dataset)
         return;
     if (res.form && res.form.declarations) {
-        res.form.elems.forEach(elem => elem.id = uuid_1.v4()); // needs for refreshing form while cancel changes
+        res.form.elems.forEach(elem => elem.id = types_1.ID.generateByBrowser()); // needs for refreshing form while cancel changes
         const setDataMeta = (ref, item, dec) => {
             item._ = item._ || {};
             item._.ref = ref;
@@ -289,7 +289,7 @@ function initializeModifyForQueryNew(res) {
     exports.glob.dirty = true;
     let ref = location.pathname.replace(/\//g, "");
     let data = res.data[ref];
-    let modifyData = { _id: -1 };
+    let modifyData = { _id: types_1.ID.generateByBrowser(), _new: true };
     for (let prop in data) {
         if (data.hasOwnProperty(prop) && data[prop] != null)
             modifyData[prop] = data[prop];
@@ -359,6 +359,49 @@ function getPropReferenceValue(prop, data) {
     }
 }
 exports.getPropReferenceValue = getPropReferenceValue;
+function showPropRefMenu(prop, instance, phrase, ctrl, removeCurrentValues, itemSelected) {
+    let showDropDown = (items) => {
+        if (removeCurrentValues) {
+            let values = instance[prop.name];
+            if (!values)
+                values = [];
+            else if (!Array.isArray(values))
+                values = [values];
+            let valueStrKeys = values.map(v => JSON.stringify(v));
+            items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
+        }
+        if (!prop.required && items && items.length)
+            items = [{ ref: null, title: "", hover: phrase === "" }].concat(items);
+        showCmenu(items, items, { ctrl }, (state, item) => {
+            if (prop._.isRef) // Maybe we have some new items which we need client side
+                for (let it of state) {
+                    if (!prop._.items.find(i => i.ref == it.ref))
+                        prop._.items.push(it);
+                }
+            itemSelected(item);
+        });
+    };
+    if (prop._.isRef) {
+        let query = prop.filter ? bson_util_1.parse(processThisExpression(instance, prop.filter), true, types_1.ID) : null;
+        if (prop.referType == types_2.PropertyReferType.InnerSelectType) {
+            let match = prop._.ref.match(/^(\w+\/\w+)/);
+            instance = exports.glob.data[match[1]];
+        }
+        let data = { prop, instance, phrase, query };
+        call('getPropertyReferenceValues', data, (err, res) => {
+            if (err)
+                notify(err, types_2.LogType.Error);
+            else
+                showDropDown(res.data);
+        });
+    }
+    else {
+        let items = phrase == null || (prop._.items.length < types_1.Constants.contextMenuVisibleItems && phrase == this.value) ? prop._.items : prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(phrase.toLowerCase()) > -1);
+        items.forEach(item => item.hover = phrase == item.title);
+        showDropDown(items);
+    }
+}
+exports.showPropRefMenu = showPropRefMenu;
 function refresh() {
     exports.glob.dirty = false;
     location.reload();
@@ -655,26 +698,27 @@ function question(title, message, buttons, options, select) {
     exports.glob.question.show = true;
 }
 exports.question = question;
-function loadHeadScript(src) {
-    if (document.querySelector('script[src=\'' + src + '\']')) {
-        return;
-    }
-    const script = document.createElement('script');
-    script.setAttribute('src', src);
-    script.setAttribute('type', 'text/javascript');
-    document.head.appendChild(script);
+function loadHeadScript(src, done) {
+    loadScript(src, document.head, done);
 }
 exports.loadHeadScript = loadHeadScript;
-function loadBodyScript(src) {
+function loadBodyScript(src, done) {
+    loadScript(src, document.body, done);
+}
+exports.loadBodyScript = loadBodyScript;
+function loadScript(src, target, done) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
     }
     const script = document.createElement('script');
     script.setAttribute('src', src);
     script.setAttribute('type', 'text/javascript');
-    document.body.appendChild(script);
+    script.onload = function () {
+        if (done)
+            done();
+    };
+    target.appendChild(script);
 }
-exports.loadBodyScript = loadBodyScript;
 function delScript(src) {
     const el = document.querySelector('script[src=\'' + src + '\']');
     if (el) {
@@ -969,10 +1013,8 @@ function _commitServerChangeResponse(store, arg) {
             }
             break;
         case types_1.ChangeType.InsertItem:
-            if (arg.modify.state._id != arg.res._reqId)
-                notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._reqId}' are not same`, types_2.LogType.Error);
-            else
-                delete arg.res._reqId;
+            if (!arg.modify.state._id.equals(arg.res._id))
+                notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._id}' are not same`, types_2.LogType.Error);
             for (let key in arg.res) {
                 arg.modify.state[key] = arg.res[key];
             }
@@ -1058,7 +1100,7 @@ function _dispatchStoreModify(store, change) {
             break;
         }
         case types_1.ChangeType.InsertItem: {
-            let data = { _id: change.item._id };
+            let data = { _id: change.item._id, _new: true };
             if (change.item._z)
                 data["_z"] = change.item._z;
             exports.glob.modifies.push({ ref, type: types_1.ChangeType.InsertItem, data, state: change.item });

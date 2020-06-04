@@ -102,7 +102,6 @@
     import {$t, getQs, glob, load, notify, setQs, showCmenu} from '@/main';
     import {parse, stringify} from 'bson-util';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, FunctionExecEventArg, HeadFunc, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange, ID} from '@/types';
-    import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
     import {EntityMeta, GridRowHeaderStyle, IData, Keys, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, ReqParams, Property} from '../../../sys/src/types';
 
@@ -314,6 +313,10 @@
                 {title: "-"},
                 {ref: "import", title: $t('import')},
                 {title: "-"},
+                {ref: "email-excel", title: $t('email-excel')},
+                {ref: "email-csv", title: $t('email-csv')},
+                {ref: "email-pdf", title: $t('email-pdf')},
+                {title: "-"},
                 {ref: "print", title: $t('print')},
             ];
             main.showCmenu(null, items, e, (state, item: MenuItem) => {
@@ -400,7 +403,7 @@
                         notify("Please save your changes before!", LogType.Warning);
                         return;
                     }
-                    let newItem = {_id: uuidv4(), _: {marked: false, dec: this.dec} as EntityMeta};
+                    let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec: this.dec} as EntityMeta};
                     this.dec.properties.forEach(prop => newItem[prop.name] = null);
                     if (this.dec.reorderable)
                         newItem['_z'] = (Math.max(...this.items.map(item => item._z)) || 0) + 1;

@@ -30,9 +30,8 @@ import {LogType} from "../../../sys/src/types";
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {DirFile, IData, LogType, mFile, Property, RequestMode} from "../../../sys/src/types";
-    import {Constants, FileAction, FileActionType, FunctionExecEventArg, MenuItem} from '@/types';
+    import {Constants, FileAction, FileActionType, FunctionExecEventArg, ID, MenuItem} from '@/types';
     import {$t, glob, joinUri, notify} from '@/main';
-    import {v4 as uuidv4} from 'uuid';
     import * as main from '../main';
 
     @Component({name: 'PropFile', components: {}})
@@ -150,7 +149,7 @@ import {LogType} from "../../../sys/src/types";
 
                 for (let file of files) {
                     file.path = this.prop.file.path;
-                    file.name = uuidv4() + "__" + file.name;
+                    file.name = ID.generateByBrowser() + "__" + file.name;
                 }
 
                 if (this.prop.file && this.prop.file.sizeLimit) {

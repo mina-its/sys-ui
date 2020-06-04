@@ -7,7 +7,6 @@
     import {Component, Vue} from 'vue-property-decorator';
     import {glob} from '@/main';
     import { mFile } from '../../../sys/src/types';
-    import {v4 as uuidv4} from 'uuid';
 
     @Component({name: 'BrowseFile'})
     export default class BrowseFile extends Vue {
