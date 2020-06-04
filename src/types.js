@@ -26,7 +26,7 @@ exports.ChartColors = [
     'rgba(255, 159, 64, 0.8)',
     'rgba(255, 205, 86, 0.8)',
     'rgba(153, 102, 255, 0.8)',
-    'rgba(231,233,237, 0.8)' // grey:
+    'rgba(231,233,237, 0.8)'
 ];
 class HeadFunc {
 }

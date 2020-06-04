@@ -1,6 +1,284 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
+;
+class {
+}
+"{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level}" >
+    --Toolbar;
+-- >
+    v - ;
+if ( = "!level")
+    : class {
+    }
+"{'d-flex align-items-center p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}";
+role = "toolbar";
+aria - label;
+"Toolbar with button groups" >
+;
+count = "dec.count" /  >
+    />
+    < !--Filter;
+-- >
+    v - ;
+if ( = "showFilter")
+    class {
+    }
+"filter-chip border d-flex py-0 align-items-center px-2 bg-white mx-5 rounded" >
+;
+allowPropChange = "true";
+"filterValueChanged";
+"changeFilterProp";
+prop = "filteringProp";
+filter = "filter";
+filterDoc = "filterDoc" /  >
+    class {
+    };
+"fal fa-filter p-1 d-inline-block text-muted" > /i>
+    < /div>
+    < div;
+class {
+}
+"mr-auto" > /div>
+    < !--Head;
+functions-- >
+    v - ;
+for ( = "func in headFuncs" >
+; ; )
+    : href = "func.ref";
+class {
+}
+"`${func.style||'btn btn-success mx-1 px-2'}`";
+v - ;
+if ( = "func.ref" > {}) {
+    func.title;
+}
+/a>
+    < Function;
+v - ;
+styles = "btn-primary mx-1";
+name = "func.name";
+"func.exec";
+title = "func.title" /  >
+    /template>
+    < button;
+v - ;
+if ( = "newItem")
+    class {
+    }
+"btn btn-success mx-1";
+"clickNewItem" > ;
+class {
+}
+"{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}" > /i>{{newItem}}</button >
+    --Object;
+Menu-- >
+    class {
+    };
+"text-secondary px-2";
+href = "javascript:void(0);";
+"clickObjectMenu" > class {
+};
+"fal fa-cog fa-lg" > /i></a >
+    /div>
+    < !--Table;
+-- >
+    class {
+    };
+"w-100 h-100 overflow-auto d-flex" >
+;
+class {
+}
+"{'d-flex w-100 overflow-auto':true, 'bg-white':level}";
+"onScroll()" >
+    --Side;
+Menu-- >
+    v - ;
+if ( = "!level && dec.filterDec")
+    class {
+    }
+"border-right separator-line bg-white sidenav sidenav-filter p-3 d-none d-md-block" >
+    class {
+    };
+"text-muted small" > class {
+};
+"fal fa-filter p-1" > /i>Filter {{glob.form.breadcrumbLast}}:</label >
+;
+dec = "dec.filterDec";
+data = "dec.filterData";
+level = "level?level+1:1";
+"objectFilterChanged" > /DetailsView>
+    < /aside>
+    < !--Main;
+-- >
+;
+class {
+}
+"{'w-100 grid-view':true, 'p-4':!level}" >
+    --Filter;
+Items-- >
+    v - ;
+if ( = "filter && filteringProp && (filteredProps || []).length")
+    class {
+    }
+"pb-2 d-flex" >
+    v - ;
+for ( = "prop of filteredProps"; class {
+} = "filter-chip border d-flex align-items-center px-2 bg-white mr-2" >
+; )
+    : allowPropChange = "false";
+prop = "prop";
+filter = "filter";
+"filterValueChanged";
+filterDoc = "filterDoc" /  >
+;
+"removeFilter(prop)";
+class {
+}
+"fas fa-times p-1 text-dark" > /i>
+    < /div>
+    < /div>
+    < !--Grid;
+View-- >
+;
+class {
+}
+"{'grid-view-box mb-5':!level}" >
+    scope;
+"col";
+v - ;
+if ( = "rowHeaderStyle===2")
+    class {
+    }
+"text-center" >
+;
+checked = "mainChecked";
+"mainCheckChange" > /CheckBox>
+    < /th>
+    < th;
+scope = "col";
+v - ;
+ > /th>
+    < th;
+scope = "col";
+class {
+}
+"text-nowrap";
+"showColumnMenu(prop, $event)";
+v - ;
+for ( = "prop in dec.properties" > {}; { prop, : .title || prop.name }; )
+    ;
+/th>
+    < /tr>
+    < /thead>
+    < tbody >
+;
+"rowSelected";
+selectable = "rowHeaderStyle===2";
+"keydown";
+"showRowMenu";
+v - ;
+for ( = "item in items"; ; )
+    : item = "item";
+readonly = "!(dec.access&2)";
+"changed" > /GridViewRow>
+    < /tbody>
+    < !--Footer;
+-- >
+    class {
+    };
+"border-0";
+colspan = "100" >
+    class {
+    };
+"align-items-center d-flex" >
+    --Add;
+-- >
+    v - ;
+if ( = "dec.access & 4")
+    styles = "m-1 fal fa-plus-circle";
+"insert";
+name = "newItem";
+title = "$t('add')" > /Function>
+    < !--Delete;
+-- >
+    v - ;
+if ( = "rowHeaderStyle===2")
+    styles = "fas fa-trash";
+"deleteItems";
+name = "deleteItems";
+title = "$t('delete')" > /Function>
+    < !--Paging;
+-- >
+    class {
+    };
+"flex-grow-1 d-flex align-items-center" >
+    v - ;
+if ( = "dec.pages > 1")
+    class {
+    }
+"m-2 pagination " >
+    class {
+    };
+"page-item";
+data - toggle;
+"tooltip";
+title = "Previous Page" >
+;
+"goBack";
+href = "javascript:;";
+class {
+}
+"page-link" > ;
+class {
+}
+"{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}" > /i> </a >
+    /li>
+    < li;
+v - ;
+for ( = "page in dec.pageLinks"; ; )
+    : class {
+    }
+"'page-item' + (page.active ? ' active':'') " >
+    class {
+    };
+"page-link";
+href = "page.ref" > {};
+{
+    page.title;
+}
+/a></li >
+    class {
+    };
+"page-item";
+data - toggle;
+"tooltip";
+title = "Next Page" >
+    href;
+"javascript:;";
+class {
+}
+"page-link";
+"goForward" > ;
+class {
+}
+"{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}" > /i> </a >
+    /li>
+    < /ul>
+    < /div>
+    < /div>
+    < /td>
+    < /tr>
+    < /tfoot>
+    < /table>
+    < /div>
+    < /div>
+    < /div>
+    < /div>
+    < /template>
+    < script;
+lang = "ts" >
+;
 const vue_property_decorator_1 = require("vue-property-decorator");
 const main_1 = require("@/main");
 const bson_util_1 = require("bson-util");
@@ -454,4 +732,196 @@ let GridView = /** @class */ (() => {
     return GridView;
 })();
 exports.default = GridView;
+/script>
+    < style;
+lang = "scss" >
+    $left;
+var ;
+(--left);
+$right: var ;
+(--right);
+grid - view - box;
+{
+    border - radius;
+    2;
+    px;
+    box - shadow;
+    0;
+    1;
+    px;
+    1;
+    px;
+    0;
+    rgba(0, 0, 0, 0.14), 0;
+    2;
+    px;
+    1;
+    px - 1;
+    px;
+    rgba(0, 0, 0, 0.12), 0;
+    1;
+    px;
+    3;
+    px;
+    0;
+    rgba(0, 0, 0, 0.2);
+}
+grid - view;
+{
+    table;
+    {
+        background: #fff;
+        /*color: rgba(0, 0, 0, 0.54);*/
+    }
+    td;
+    {
+        padding: 0;
+    }
+    td, th;
+    {
+        border: 1;
+        px;
+        solid;
+        var ;
+        (--grid - border);
+        // border-left: none;
+    }
+    td: last - child, th;
+    last - child;
+    {
+        // border-right: none;
+    }
+    th;
+    {
+        background - color;
+        var ;
+        (--grid - head);
+        padding: .25;
+        rem;
+        .5;
+        rem;
+        user - select;
+        none;
+        -webkit - user - select;
+        none;
+            & ;
+        first - child;
+        {
+            min - width;
+            3;
+            rem;
+        }
+    }
+    input;
+    {
+        border: none;
+        background - color;
+        transparent;
+        outline: none;
+    }
+    filter - item;
+    {
+        cursor: pointer;
+        margin - #;
+        {
+            $right;
+        }
+        var ;
+        (--badge - padding - x);
+        font - size;
+        var ;
+        (--font - size - base);
+        font - weight;
+        normal;
+            & ;
+        hover;
+        {
+            opacity: .9;
+        }
+    }
+    filter - chip;
+    {
+        border - radius;
+        18;
+        px;
+        margin - top;
+        -.7;
+        rem;
+    }
+    page - item;
+    {
+            & ;
+        last - child.page - link;
+        {
+            border - top - #;
+            {
+                $right;
+            }
+            -radius;
+            0.25;
+            rem;
+            border - bottom - #;
+            {
+                $right;
+            }
+            -radius;
+            0.25;
+            rem;
+            border - top - #;
+            {
+                $left;
+            }
+            -radius;
+            inherit;
+            border - bottom - #;
+            {
+                $left;
+            }
+            -radius;
+            inherit;
+        }
+            & ;
+        first - child.page - link;
+        {
+            margin - #;
+            {
+                $left;
+            }
+            0;
+            border - top - #;
+            {
+                $left;
+            }
+            -radius;
+            0.25;
+            rem;
+            border - bottom - #;
+            {
+                $left;
+            }
+            -radius;
+            0.25;
+            rem;
+            border - top - #;
+            {
+                $right;
+            }
+            -radius;
+            inherit;
+            border - bottom - #;
+            {
+                $right;
+            }
+            -radius;
+            inherit;
+        }
+    }
+}
+sidenav - filter;
+{
+    min - width;
+    360;
+    px;
+}
+/style>;
 //# sourceMappingURL=GridView.vue.js.map

@@ -324,7 +324,7 @@ function getPropTextValue(meta, data) {
 }
 exports.getPropTextValue = getPropTextValue;
 function equalID(id1, id2) {
-    if (!id1 && !id2)
+    if (id1 == id2)
         return true;
     else if (!id1 || !id2)
         return false;
@@ -361,17 +361,29 @@ function getPropReferenceValue(prop, data) {
 exports.getPropReferenceValue = getPropReferenceValue;
 function showPropRefMenu(prop, instance, phrase, ctrl, removeCurrentValues, itemSelected) {
     let showDropDown = (items) => {
-        if (removeCurrentValues) {
-            let values = instance[prop.name];
-            if (!values)
-                values = [];
-            else if (!Array.isArray(values))
-                values = [values];
-            let valueStrKeys = values.map(v => JSON.stringify(v));
+        let value = instance[prop.name];
+        if (value != null && removeCurrentValues) {
+            if (!Array.isArray(value))
+                value = [value];
+            let valueStrKeys = value.map(v => JSON.stringify(v));
             items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
         }
-        if (!prop.required && items && items.length)
-            items = [{ ref: null, title: "", hover: phrase === "" }].concat(items);
+        let highlightItem = null;
+        if (phrase) {
+            highlightItem = items.find(i => i.title.toLowerCase().indexOf(phrase.toLowerCase()) == 0);
+            if (!highlightItem)
+                highlightItem = items.find(i => i.title.toLowerCase().indexOf(phrase.toLowerCase()) > -1);
+        }
+        else if (value != null && !highlightItem)
+            highlightItem = items.find(i => equalID(value, i.ref));
+        if (!prop.required && items && items.length) {
+            let emptyItem = { ref: null, title: "" };
+            if (!highlightItem)
+                highlightItem = emptyItem;
+            items.unshift(emptyItem);
+        }
+        if (highlightItem)
+            highlightItem.hover = true;
         showCmenu(items, items, { ctrl }, (state, item) => {
             if (prop._.isRef) // Maybe we have some new items which we need client side
                 for (let it of state) {
