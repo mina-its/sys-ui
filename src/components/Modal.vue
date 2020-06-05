@@ -17,7 +17,7 @@
                                 </form>
                             </div>
                             <div v-if="glob.notify" @click="glob.notify=null" class="text-light bg-danger modal-body">
-                                <span>{{glob.notify.message}}</span>
+                                <span v-html="glob.notify.message"></span>
                             </div>
                             <div class="modal-footer">
                                 <FormElem v-for="elem in footerElems" :elem="elem"></FormElem>

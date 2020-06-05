@@ -3,7 +3,7 @@
     import {ElemType, Elem, PanelType, Orientation} from "../../../sys/src/types";
     import {glob} from '@/main';
 
-    @Component({name:'Panel', components: {}})
+    @Component({name: 'Panel', components: {}})
     export default class Panel extends Vue {
         @Prop() private elem: Elem;
 
@@ -17,6 +17,9 @@
                     let footerElems = elems.filter(el => el.type === ElemType.Function);
                     glob.modal = true;
                     return ce('modal', {
+                        attrs: {
+                            "class": this.elem.styles || null,
+                        },
                         props: {
                             title: this.elem.title,
                             bodyElems,
