@@ -1,3 +1,4 @@
+import {LogType} from "../../../sys/src/types";
 <template>
     <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level}">
         <!-- Toolbar -->
@@ -99,12 +100,11 @@
 
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {$t, getQs, glob, load, notify, setQs, showCmenu} from '@/main';
+    import {$t, call, getQs, glob, load, notify, setQs, showCmenu} from '@/main';
     import {parse, stringify} from 'bson-util';
-    import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, FunctionExecEventArg, HeadFunc, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange, ID} from '@/types';
-    import {v4 as uuidv4} from 'uuid';
+    import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '@/types';
     import * as main from '../main';
-    import {EntityMeta, GridRowHeaderStyle, IData, Keys, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, ReqParams, Property} from '../../../sys/src/types';
+    import {EntityMeta, FileType, GridRowHeaderStyle, IData, Keys, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
 
     declare let $: JQuery;
 
@@ -314,14 +314,22 @@
                 {title: "-"},
                 {ref: "import", title: $t('import')},
                 {title: "-"},
+                {ref: "email-excel", title: $t('email-excel')},
+                {ref: "email-csv", title: $t('email-csv')},
+                {ref: "email-pdf", title: $t('email-pdf')},
+                {title: "-"},
                 {ref: "print", title: $t('print')},
             ];
             main.showCmenu(null, items, e, (state, item: MenuItem) => {
                 switch (item.ref) {
-                    case "export-excel":
+                    case "export-csv":
+                        call('exportData', {type: FileType.Csv}, (err, res) => {
+
+                        });
                         break;
 
-                    case "export-csv":
+                    default:
+                        notify('File type not supported yet', LogType.Error);
                         break;
 
                     case "print":
@@ -400,7 +408,7 @@
                         notify("Please save your changes before!", LogType.Warning);
                         return;
                     }
-                    let newItem = {_id: uuidv4(), _: {marked: false, dec: this.dec} as EntityMeta};
+                    let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec: this.dec} as EntityMeta};
                     this.dec.properties.forEach(prop => newItem[prop.name] = null);
                     if (this.dec.reorderable)
                         newItem['_z'] = (Math.max(...this.items.map(item => item._z)) || 0) + 1;

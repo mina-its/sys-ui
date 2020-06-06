@@ -18,12 +18,11 @@ let index = {
 };
 
 
-import {v4 as uuidv4} from 'uuid';
-import {parse, stringify, getBsonValue} from 'bson-util';
+import {getBsonValue, parse, stringify} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import {Axios, ChangeType, Constants, FileAction, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, Socket, StartParams, StateChange} from './types';
-import {AjaxConfig, DirFile, Drive, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, RequestMode, StatusCode, WebMethod, WebResponse, PropertyReferType} from '../../sys/src/types';
+import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
 import App from './App.vue';
 import pluralize = require('pluralize');
 
@@ -127,7 +126,7 @@ function vueResetFormData(res: WebResponse) {
     if (!dataset) return;
 
     if (res.form && res.form.declarations) {
-        res.form.elems.forEach(elem => elem.id = uuidv4()); // needs for refreshing form while cancel changes
+        res.form.elems.forEach(elem => elem.id = ID.generateByBrowser()); // needs for refreshing form while cancel changes
 
         const setDataMeta = (ref: string, item: IData, dec: ObjectDec | FunctionDec) => {
             item._ = item._ || {} as any;
@@ -302,7 +301,7 @@ function initializeModifyForQueryNew(res: WebResponse) {
     glob.dirty = true;
     let ref = location.pathname.replace(/\//g, "");
     let data = res.data[ref];
-    let modifyData = {_id: -1};
+    let modifyData = {_id: ID.generateByBrowser(), _new: true};
     for (let prop in data) {
         if (data.hasOwnProperty(prop) && data[prop] != null)
             modifyData[prop] = data[prop];
@@ -336,7 +335,7 @@ export function getPropTextValue(meta: Property, data) {
 }
 
 export function equalID(id1: any, id2: any): boolean {
-    if (!id1 && !id2) return true;
+    if (id1 == id2) return true;
     else if (!id1 || !id2) return false;
     else return id1.toString() == id2.toString();
 }
@@ -367,18 +366,31 @@ export function getPropReferenceValue(prop: Property, data: any): string {
 }
 
 export function showPropRefMenu(prop: Property, instance: any, phrase: string, ctrl, removeCurrentValues: boolean, itemSelected: (item: MenuItem) => void) {
-    let showDropDown = (items) => {
+    let showDropDown = (items: MenuItem[]) => {
 
-        if (removeCurrentValues){
-            let values = instance[prop.name];
-            if (!values) values = [];
-            else if (!Array.isArray(values)) values = [values];
-            let valueStrKeys = values.map(v => JSON.stringify(v));
+        let value = instance[prop.name];
+        if (value != null && removeCurrentValues) {
+            if (!Array.isArray(value)) value = [value];
+            let valueStrKeys = value.map(v => JSON.stringify(v));
             items = items.filter(item => !valueStrKeys.includes(JSON.stringify(item.ref)));
         }
 
-        if (!prop.required && items && items.length)
-            items = [{ref: null, title: "", hover: phrase === ""}].concat(items);
+        let highlightItem: MenuItem = null;
+
+        if (phrase) {
+            highlightItem = items.find(i => i.title.toLowerCase().indexOf(phrase.toLowerCase()) == 0);
+            if (!highlightItem)
+                highlightItem = items.find(i => i.title.toLowerCase().indexOf(phrase.toLowerCase()) > -1);
+        } else if (value != null && !highlightItem)
+            highlightItem = items.find(i => equalID(value, i.ref));
+
+        if (!prop.required && items && items.length) {
+            let emptyItem = {ref: null, title: ""} as MenuItem;
+            if (!highlightItem) highlightItem = emptyItem;
+            items.unshift(emptyItem);
+        }
+
+        if (highlightItem) highlightItem.hover = true;
 
         showCmenu(items, items, {ctrl}, (state, item: MenuItem) => {
             if (prop._.isRef) // Maybe we have some new items which we need client side
@@ -630,7 +642,7 @@ export function getNewItemTitle(title: string) {
     }
 }
 
-export function openFileGallery(drive: Drive, file: string, path: string, fixedPath: boolean,
+export function openFileGallery(drive: ID, file: string, path: string, fixedPath: boolean,
                                 fileSelectCallback: (path: string, item: DirFile) => void) {
     glob.fileGallery = {
         list: [],
@@ -644,7 +656,7 @@ export function openFileGallery(drive: Drive, file: string, path: string, fixedP
         fileSelectCallback: fileSelectCallback
     };
 
-    ajax('/getFileGallery?m=1', {drive: drive._id, path}, {}, res => {
+    ajax('/getFileGallery?m=1', {drive, path}, {}, res => {
         if (res.code != StatusCode.Ok) {
             glob.fileGallery.show = false;
             notify(res.message, LogType.Error);
@@ -708,24 +720,25 @@ export function question(title: string, message: string, buttons: Pair[], option
     glob.question.show = true;
 }
 
-export function loadHeadScript(src) {
-    if (document.querySelector('script[src=\'' + src + '\']')) {
-        return;
-    }
-    const script = document.createElement('script');
-    script.setAttribute('src', src);
-    script.setAttribute('type', 'text/javascript');
-    document.head.appendChild(script);
+export function loadHeadScript(src, done) {
+    loadScript(src, document.head, done);
 }
 
-export function loadBodyScript(src) {
+export function loadBodyScript(src, done?) {
+    loadScript(src, document.body, done);
+}
+
+function loadScript(src, target, done) {
     if (document.querySelector('script[src=\'' + src + '\']')) {
         return;
     }
     const script = document.createElement('script');
     script.setAttribute('src', src);
     script.setAttribute('type', 'text/javascript');
-    document.body.appendChild(script);
+    script.onload = function () {
+        if (done) done();
+    };
+    target.appendChild(script);
 }
 
 export function delScript(src) {
@@ -785,6 +798,9 @@ export function getPropertyEmbedError(doc: any, propName: string): string {
 }
 
 export function call(funcName: string, data: any, done: (err, res?) => void) {
+    data = data || {};
+    data._ = data._ || {};
+    data._.ref = location.href;
     ajax(setQs('m', RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res), err => done(err));
 }
 
@@ -826,6 +842,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
     };
 
     // extract files raw data
+    let multipart = false;
     if (data) {
         let formData: FormData = null;
         for (let key in data) {
@@ -842,6 +859,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         }
 
         if (formData) {
+            multipart = true;
             params.data = formData;
             params.data.append('data', stringify(data, true));
             params.headers['Content-Type'] = 'multipart/form-data';
@@ -852,7 +870,8 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
     // serialize data
-    params.data = stringify(data, true);
+    if (!multipart)
+        params.data = stringify(data, true);
     // if (params.data) console.log(params.data);
 
     // Ajax call
@@ -866,8 +885,8 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
                 console.log("ajax result :", result);
                 done(result);
             } catch (ex) {
-                notify(`error on handling ajax response: ${ex.message}`);
-                console.error(res, ex);
+                console.error("Ajax parse", res, ex);
+                notify(ex.message, LogType.Error);
             }
         }
     }).catch(err => {
@@ -1046,10 +1065,8 @@ function _commitServerChangeResponse(store, arg: { modify: Modify, res: any }) {
             break;
 
         case ChangeType.InsertItem:
-            if (arg.modify.state._id != arg.res._reqId)
-                notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._reqId}' are not same`, LogType.Error);
-            else
-                delete arg.res._reqId;
+            if (!arg.modify.state._id.equals(arg.res._id))
+                notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._id}' are not same`, LogType.Error);
             for (let key in arg.res) {
                 arg.modify.state[key] = arg.res[key];
             }
@@ -1144,7 +1161,7 @@ function _dispatchStoreModify(store, change: StateChange) {
         }
 
         case ChangeType.InsertItem: {
-            let data = {_id: change.item._id};
+            let data = {_id: change.item._id, _new: true};
             if (change.item._z) data["_z"] = change.item._z;
             glob.modifies.push({ref, type: ChangeType.InsertItem, data, state: change.item});
             break;
@@ -1236,14 +1253,20 @@ export function start(params?: StartParams) {
         // console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, {transformResponse: res => res, withCredentials: true}).then(res => {
             if (res.data) {
-                // console.log(res.data);
                 let data = parse(res.data, true, ID);
                 startVue(data, params);
             } else
                 console.error(res);
         }).catch(err => {
-            console.error(err);
-            notify("Connecting to proxy server failed! " + err.message, LogType.Fatal);
+            if (err.response && err.response.data && typeof err.response.data == "string") {
+                let data = parse(err.response.data, true, ID);
+                if (data.redirect)
+                    location.href = data.redirect;
+                else
+                    notify(data.message, LogType.Fatal);
+            } else {
+                notify("Connecting to proxy server failed! " + err.message, LogType.Fatal);
+            }
         });
     }
     return glob;

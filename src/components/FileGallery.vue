@@ -93,7 +93,7 @@
         upload() {
             main.browseFile((files: mFile[]) => {
                 main.call('uploadToFileGallery', {
-                        drive: glob.fileGallery.drive._id,
+                        drive: glob.fileGallery.drive,
                         path: glob.fileGallery.path,
                         files
                     }, res => {
@@ -110,7 +110,7 @@
                 [{title: "YES", ref: YesNo.Yes}, {title: "NO", ref: YesNo.No}], null, (ref: any) => {
                     if (!ref || ref == YesNo.No) return;
                     main.ajax("/deleteFromFileGallery?m=1", {
-                        drive: glob.fileGallery.drive._id,
+                        drive: glob.fileGallery.drive,
                         pth: glob.fileGallery.path,
                         name
                     }, null, () => main.refreshFileGallery());
@@ -213,7 +213,6 @@
         }
 
         select(e: FunctionExecEventArg, item?: DirFile) {
-            console.log(1);
             glob.fileGallery.show = false;
             if (item) glob.fileGallery.selected = item;
             if (e.stopProgress) e.stopProgress();
@@ -243,7 +242,7 @@
             parts.forEach((part, i) => result.push({title: part, ref: ""}));
 
             if (result.length > 0)
-                result.unshift({title: main.getText(glob.fileGallery.drive.name), ref: ""});
+                result.unshift({title: main.$t('drive'), ref: ""});
             result.pop();
             return result;
         }
@@ -258,10 +257,10 @@
 
         get current() {
             if (glob.fileGallery.fixedPath) {
-                return main.getText(glob.fileGallery.drive.name) + ` (${glob.fileGallery.path})`;
+                return main.$t('drive') + ` (${glob.fileGallery.path})`;
             } else {
                 let parts = glob.fileGallery.path.split("/").filter(el => el);
-                if (parts.length == 0) return main.getText(glob.fileGallery.drive.name);
+                if (parts.length == 0) return main.$t('drive');
                 return parts.pop();
             }
         }

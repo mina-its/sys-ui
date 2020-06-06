@@ -1,6 +1,6 @@
 {
   "name": "sys-ui",
-  "version": "5.2.30",
+  "version": "5.3.1",
   "description": "sys-ui",
   "main": "./public/js/sys.main.js",
   "scripts": {
@@ -15,7 +15,6 @@
     "axios": "^0.19.2",
     "bson-util": "^1.0.14",
     "pluralize": "^8.0.0",
-    "uuid": "^7.0.3",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.2",
     "vue-property-decorator": "^8.4.2",

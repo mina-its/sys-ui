@@ -39,18 +39,18 @@
                 </aside>
 
                 <!--  Main -->
-                <div :class="{'p-4':!level, 'border rounded': level && dec.detailsViewType===2}">
+                <div :class="{'p-4':!level, 'border rounded': level && dec.detailsViewType===ObjectDetailsViewType_Tabular}">
                     <div v-if="groupVisible(group)" :class="groupPanelStyle(group)" v-for="group in groups" :id="getGroupId(group)">
                         <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
                         <div class="group">
                             <template v-for="prop in getProps(group)">
                                 <label v-if="isNotAloneInlineDataGridProperty(group, prop, item)" class="prop-label from-outside-label pt-2">{{prop.title}}</label>
-                                <Property :level="level?level+1:1" :readonly="!(dec.access&2)" :item="item" :prop="prop" @changed="changed" :viewType="2"/>
+                                <Property :level="level?level+1:1" :readonly="!(dec.access&AccessPermission_Edit)" :item="item" :prop="prop" @changed="changed" :viewType="ObjectDetailsViewType_Tabular"/>
                             </template>
                         </div>
                     </div>
                     <div v-if="nonGroupVisible()" :class="{'gp':!level}">
-                        <Property :level="level?level+1:1" v-for="prop in dec.properties" :key="prop.name" :item="item" :prop="prop" @changed="changed" :viewType="2"/>
+                        <Property :level="level?level+1:1" :readonly="!(dec.access&AccessPermission_Edit)" v-for="prop in dec.properties" :item="item" :prop="prop" @changed="changed" :viewType="ObjectDetailsViewType_Tabular"/>
                     </div>
                     <div v-if="!level" class="h-25"></div>
                 </div>
@@ -60,12 +60,11 @@
 </template>
 
 <script lang="ts">
-    import {ChangeType, HeadFunc, ItemChangeEventArg, JQuery, MenuItem, StateChange} from '@/types';
+    import {ChangeType, HeadFunc, ID, ItemChangeEventArg, JQuery, MenuItem, StateChange} from '@/types';
     import {Component, Prop, Vue, Watch, Emit} from 'vue-property-decorator';
-    import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta, GlobalType, PropertyReferType} from "../../../sys/src/types";
+    import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta, GlobalType, PropertyReferType, AccessPermission} from "../../../sys/src/types";
     import {$t, glob, getNewItemTitle, loadOutboundData} from '@/main';
     import * as main from '../main';
-    import {v4 as uuidv4} from 'uuid';
 
     declare let $: JQuery;
 
@@ -78,6 +77,8 @@
 
         private currentGroup: string = this.groups[0];
         private headFuncs: HeadFunc[] = [];
+        private AccessPermission_Edit = AccessPermission.Edit;
+        private ObjectDetailsViewType_Tabular = ObjectDetailsViewType.Tabular;
 
         isNotAloneInlineDataGridProperty(group, prop) {
             return prop._.gtype == GlobalType.object && prop.isList && (this.level > 0);
@@ -180,7 +181,7 @@
                             title, name: "new-item", exec: () => {
                                 let uri = this.uri + "/" + prop.name;
                                 let dec = glob.form.declarations[uri];
-                                let newItem = {_id: uuidv4(), _: {marked: false, dec} as EntityMeta};
+                                let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec} as EntityMeta};
                                 this.dec.properties.forEach(p => newItem[p.name] = null);
                                 // if (this.dec.reorderable)
                                 //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;

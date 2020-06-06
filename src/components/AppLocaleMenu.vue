@@ -1,5 +1,5 @@
 <template>
-    <div class="app-locale-menu mx-2" data-toggle="tooltip" title="Change Language">
+    <div v-if="glob.config.appLocales && glob.config.appLocales.length>1" class="app-locale-menu mx-2" data-toggle="tooltip" title="Change Language">
         <div v-if="glob.config.locale" class="dropdown">
             <a class="nav-link py-0 px-0 text-light dropdown-toggle" href="#" id="navbarDropdownLocale" role="button"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

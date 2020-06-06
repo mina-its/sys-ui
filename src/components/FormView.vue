@@ -1,6 +1,6 @@
 <template>
     <div class="main-body h-100 overflow-auto w-100 d-flex" @scroll="onScroll()">
-        <FormElem v-for="elem in glob.form.elems" :elem="elem" :key="elem.id"></FormElem>
+        <FormElem v-for="elem in glob.form.elems" :elem="elem" ></FormElem>
     </div>
 </template>
 

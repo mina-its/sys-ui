@@ -10,6 +10,7 @@
             <DashboardInfoBox title="Users" :value="data.usersCount" icon="fa-user-circle" color="#f39c12"
                               class="m-4"></DashboardInfoBox>
         </div>
+
 <!--        <div class="p-4">-->
 <!--            <div class="world-map p-4 bg-white">-->
 <!--                <img src="/images/world.svg">-->

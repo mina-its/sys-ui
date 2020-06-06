@@ -9,7 +9,7 @@
         PropertyEditMode
     } from "../../../sys/src/types";
     import {Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
-    import {getPropertyEmbedError, checkPropDependencyOnChange} from '@/main';
+    import {getPropertyEmbedError} from '@/main';
     import * as main from '../main';
 
     @Component({name: 'Property', components: {}})
@@ -125,7 +125,7 @@
             let pr = {
                 doc: this.item, name: this.prop.name, prop: this.prop, viewType: this.viewType,
                 styles,
-                readOnly: this.readonly || this.prop.editMode == PropertyEditMode.Readonly || (this.prop.editMode == PropertyEditMode.OnceOnly && this.item[this.prop.name] != null)
+                readOnly: this.readonly || this.prop.editMode == PropertyEditMode.Readonly || (this.prop.editMode == PropertyEditMode.OnceOnly && this.item[this.prop.name] != null && !this.item._new)
             };
 
             if (this.prop._.isRef) {
@@ -162,7 +162,7 @@
                             props: pr,
                         });
                     else {
-                        if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && typeof this.item._id != "string") {
+                        if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && !this.item._new) {
                             return ce('prop-link', {
                                 attrs: {"class": styles},
                                 on: {keydown: this.keydown, focus: this.focused},
