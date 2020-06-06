@@ -19,9 +19,9 @@ let index = {
     "Ajax                           ": ajax,
 };
 const bson_util_1 = require("bson-util");
+Object.defineProperty(exports, "getBsonValue", { enumerable: true, get: function () { return bson_util_1.getBsonValue; } });
 Object.defineProperty(exports, "parse", { enumerable: true, get: function () { return bson_util_1.parse; } });
 Object.defineProperty(exports, "stringify", { enumerable: true, get: function () { return bson_util_1.stringify; } });
-Object.defineProperty(exports, "getBsonValue", { enumerable: true, get: function () { return bson_util_1.getBsonValue; } });
 const vue_1 = tslib_1.__importDefault(require("vue"));
 const vuex_1 = tslib_1.__importDefault(require("vuex"));
 const types_1 = require("./types");
@@ -785,6 +785,9 @@ function getPropertyEmbedError(doc, propName) {
 }
 exports.getPropertyEmbedError = getPropertyEmbedError;
 function call(funcName, data, done) {
+    data = data || {};
+    data._ = data._ || {};
+    data._.ref = location.href;
     ajax(setQs('m', types_2.RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res), err => done(err));
 }
 exports.call = call;
@@ -865,8 +868,8 @@ function ajax(url, data, config, done, fail) {
                 done(result);
             }
             catch (ex) {
-                notify(`error on handling ajax response: ${ex.message}`);
-                console.error(res, ex);
+                console.error("Ajax parse", res, ex);
+                notify(ex.message, types_2.LogType.Error);
             }
         }
     }).catch(err => {
@@ -1200,15 +1203,22 @@ function start(params) {
         // console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, { transformResponse: res => res, withCredentials: true }).then(res => {
             if (res.data) {
-                // console.log(res.data);
                 let data = bson_util_1.parse(res.data, true, types_1.ID);
                 startVue(data, params);
             }
             else
                 console.error(res);
         }).catch(err => {
-            console.error(err);
-            notify("Connecting to proxy server failed! " + err.message, types_2.LogType.Fatal);
+            if (err.response && err.response.data && typeof err.response.data == "string") {
+                let data = bson_util_1.parse(err.response.data, true, types_1.ID);
+                if (data.redirect)
+                    location.href = data.redirect;
+                else
+                    notify(data.message, types_2.LogType.Fatal);
+            }
+            else {
+                notify("Connecting to proxy server failed! " + err.message, types_2.LogType.Fatal);
+            }
         });
     }
     return exports.glob;

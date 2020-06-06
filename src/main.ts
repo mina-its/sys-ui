@@ -18,11 +18,11 @@ let index = {
 };
 
 
-import {parse, stringify, getBsonValue} from 'bson-util';
+import {getBsonValue, parse, stringify} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import {Axios, ChangeType, Constants, FileAction, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, Socket, StartParams, StateChange} from './types';
-import {AjaxConfig, DirFile, Drive, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, RequestMode, StatusCode, WebMethod, WebResponse, PropertyReferType} from '../../sys/src/types';
+import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
 import App from './App.vue';
 import pluralize = require('pluralize');
 
@@ -798,6 +798,9 @@ export function getPropertyEmbedError(doc: any, propName: string): string {
 }
 
 export function call(funcName: string, data: any, done: (err, res?) => void) {
+    data = data || {};
+    data._ = data._ || {};
+    data._.ref = location.href;
     ajax(setQs('m', RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res), err => done(err));
 }
 
@@ -882,8 +885,8 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
                 console.log("ajax result :", result);
                 done(result);
             } catch (ex) {
-                notify(`error on handling ajax response: ${ex.message}`);
-                console.error(res, ex);
+                console.error("Ajax parse", res, ex);
+                notify(ex.message, LogType.Error);
             }
         }
     }).catch(err => {
@@ -1250,14 +1253,20 @@ export function start(params?: StartParams) {
         // console.log(`loading main-state async from '${uri}' ...`);
         axios.get(uri, {transformResponse: res => res, withCredentials: true}).then(res => {
             if (res.data) {
-                // console.log(res.data);
                 let data = parse(res.data, true, ID);
                 startVue(data, params);
             } else
                 console.error(res);
         }).catch(err => {
-            console.error(err);
-            notify("Connecting to proxy server failed! " + err.message, LogType.Fatal);
+            if (err.response && err.response.data && typeof err.response.data == "string") {
+                let data = parse(err.response.data, true, ID);
+                if (data.redirect)
+                    location.href = data.redirect;
+                else
+                    notify(data.message, LogType.Fatal);
+            } else {
+                notify("Connecting to proxy server failed! " + err.message, LogType.Fatal);
+            }
         });
     }
     return glob;
