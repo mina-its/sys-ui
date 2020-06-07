@@ -183,8 +183,8 @@
                     if (this.viewType == ObjectViewType.TreeView)
                         return ce('span', {attrs: {"class": styles + " text-success"}}, this.item[this.prop.name]);
 
-                    return ce('prop-text', {
-                        attrs: {type: 'number', "class": styles},
+                    return ce('prop-number', {
+                        attrs: {"class": styles},
                         on: {changed: this.changed, keydown: this.keydown, focus: this.focused},
                         props: pr,
                     });

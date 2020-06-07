@@ -1,23 +1,29 @@
 <template>
-    <input @focus="focus" @blur="blur" :type="type" :value="value" :placeholder="placeholder"
-           :name="viewType!=1 ? prop.name : null" @input="update" @keydown="keydown" :readonly="readOnly">
+    <input @focus="focus" @blur="blur" :type="inputType" :value="value" :placeholder="placeholder"
+           :name="viewType!=1 ? prop.name : null" @change="update" @keydown="keydown" :readonly="readOnly">
 </template>
 
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {Keys, Property, GlobalType} from "../../../sys/src/types";
+    import {Keys, Property} from "../../../sys/src/types";
     import {ItemChangeEventArg, PropEventArg} from '@/types';
-    import {digitGroup, glob} from '@/main';
+    import {digitGroup} from '@/main';
     import * as main from '../main';
 
     @Component({name: 'PropText'})
     export default class PropText extends Vue {
-        @Prop() private type: string;
         @Prop() private doc: any;
         @Prop() private viewType: string;
         @Prop() private prop: Property;
         @Prop() private readOnly: boolean;
         private focused: boolean = false;
+
+        get inputType() {
+            if (this.prop.number && this.prop.number.digitGrouping)
+                return "text";
+            else
+                return "number";
+        }
 
         @Emit("keydown")
         keydown(e): PropEventArg {
@@ -39,34 +45,7 @@
         update(e): ItemChangeEventArg {
             let text = (e.target as any).value;
             if (text === "") text = null;
-            let val = this.doc[this.prop.name];
-
-            if (this.prop.text && this.prop.text.multiLanguage) {
-                if (val == null)
-                    this.$set(this.doc, this.prop.name, {});
-
-                if (glob.config.locale) {
-                    if (typeof val == 'string') {
-                        let oldValue = val;
-                        val = {};
-                        val[glob.config.defaultLocale] = oldValue;
-                        val[glob.config.locale] = text;
-                        this.$set(this.doc, this.prop.name, val);
-                    } else
-                        val = val || {};
-
-                    this.$set(this.doc[this.prop.name], glob.config.locale, text);
-                    val[glob.config.locale] = text;
-                } else {
-                    if (val && typeof val == 'object' && glob.config.defaultLocale) {
-                        this.$set(this.doc[this.prop.name], glob.config.defaultLocale, text);
-                        val[glob.config.defaultLocale] = text;
-                    } else
-                        val = text;
-                }
-            } else
-                val = text;
-
+            let val = text != null ? text.indexOf('.') > -1 ? parseFloat(text) : parseInt(text) : null;
             return {prop: this.prop, val, vue: this};
         }
 
@@ -75,7 +54,12 @@
         }
 
         get value() {
-            return main.getPropTextValue(this.prop, this.doc);
+            let val = main.getPropTextValue(this.prop, this.doc);
+
+            if (this.prop.number && this.prop.number.digitGrouping && !this.focused)
+                return digitGroup(val);
+
+            return val;
         }
 
         get placeholder() {
