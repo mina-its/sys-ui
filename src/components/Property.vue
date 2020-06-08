@@ -84,8 +84,9 @@
             if (embedErr) msg = ce('prop-message', {props: {message: embedErr}});
 
             let title = this.prop.title || this.prop.name;
-            let lbl = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top pt-2"}}, title);
-            let children = this.prop._.gtype == GlobalType.boolean ? [vl] : [lbl, vl, msg];
+            let labelNoWrap = (this.prop.text && this.prop.text.htmlEditor);
+            let label = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top pt-2" + (labelNoWrap ? " text-nowrap" : "")}}, title);
+            let children = this.prop._.gtype == GlobalType.boolean ? [vl] : [label, vl, msg];
 
             // Property comment
             if (this.prop.comment) {
@@ -112,13 +113,13 @@
             let msg = ce('prop-message', {props: {"message": this.item._error}});
             let cmt = this.prop.comment ? ce('small', {attrs: {"class": "property-comment p-3 text-muted d-block"}}, this.prop.comment) : null;
             let title = this.prop.title || this.prop.name;
-            let lbl = this.labelMode == PropertyLabelMode.Hidden ? null : (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "mr-1 tree-view-attr-label"}}, title + ":");
+            let label = this.labelMode == PropertyLabelMode.Hidden ? null : (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "mr-1 tree-view-attr-label"}}, title + ":");
 
             let styles = "d-inline-block";
             if (this.prop._.gtype == GlobalType.boolean)
                 return ce('div', {attrs: {"class": styles + " form-check"}}, [ce('label', {attrs: {"class": "col-sm-8 tree-view-attr-label"}}, [vl, title]), cmt]);
             else
-                return ce('div', {attrs: {"class": styles}}, [lbl, vl, msg, cmt]);
+                return ce('div', {attrs: {"class": styles}}, [label, vl, msg, cmt]);
         }
 
         renderValue(ce, styles: string) {
@@ -158,6 +159,11 @@
                             attrs: {
                                 "class": `prop-text-multiline prop-value border`
                             },
+                            on: {changed: this.changed, focus: this.focused},
+                            props: pr,
+                        });
+                    else if (this.viewType != ObjectViewType.GridView && this.prop.text && this.prop.text.htmlEditor)
+                        return ce('prop-html-editor', {
                             on: {changed: this.changed, focus: this.focused},
                             props: pr,
                         });
