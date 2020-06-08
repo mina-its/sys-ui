@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppStateLog = exports.AppStateQuestion = exports.FileActionType = exports.FileAction = exports.QuestionOptions = exports.AppStateFileGallery = exports.FilterOperator = exports.Modify = exports.Global = exports.TreeViewAttribute = exports.TreeViewLine = exports.TreeViewNode = exports.PropertyLabelMode = exports.AppStateCmenu = exports.FilterChangeEventArg = exports.ItemChangeEventArg = exports.FunctionExecEventArg = exports.ItemEventArg = exports.PropEventArg = exports.StartParams = exports.AppStateGeoMap = exports.ChangeType = exports.StateChange = exports.MenuItem = exports.HeadFunc = exports.ChartColors = exports.Constants = exports.ID = void 0;
 const types_1 = require("../../sys/src/types");
 const bson_util_1 = require("bson-util");
-Object.defineProperty(exports, "ID", { enumerable: true, get: function () { return bson_util_1.ID; } });
+exports.ID = bson_util_1.ID;
 exports.Constants = {
     redirectBack: '_back',
     errorEmbedProperty: 'e',
@@ -26,7 +25,7 @@ exports.ChartColors = [
     'rgba(255, 159, 64, 0.8)',
     'rgba(255, 205, 86, 0.8)',
     'rgba(153, 102, 255, 0.8)',
-    'rgba(231,233,237, 0.8)'
+    'rgba(231,233,237, 0.8)' // grey:
 ];
 class HeadFunc {
 }
