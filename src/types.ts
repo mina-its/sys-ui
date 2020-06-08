@@ -10,6 +10,9 @@ import {
     IData
 } from '../../sys/src/types';
 
+import Vue from 'vue'
+
+
 import {ID} from 'bson-util';
 export {ID};
 
