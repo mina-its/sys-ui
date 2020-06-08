@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.processThisExpression = exports.evalExpression = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -18,9 +19,9 @@ let index = {
     "Ajax                           ": ajax,
 };
 const bson_util_1 = require("bson-util");
-exports.getBsonValue = bson_util_1.getBsonValue;
-exports.parse = bson_util_1.parse;
-exports.stringify = bson_util_1.stringify;
+Object.defineProperty(exports, "getBsonValue", { enumerable: true, get: function () { return bson_util_1.getBsonValue; } });
+Object.defineProperty(exports, "parse", { enumerable: true, get: function () { return bson_util_1.parse; } });
+Object.defineProperty(exports, "stringify", { enumerable: true, get: function () { return bson_util_1.stringify; } });
 const vue_1 = tslib_1.__importDefault(require("vue"));
 const vuex_1 = tslib_1.__importDefault(require("vuex"));
 const types_1 = require("./types");
