@@ -351,7 +351,7 @@ import {LogType} from "../../../sys/src/types";
 
         changed(e: ItemChangeEventArg) {
             main.dispatchStoreModify(this, {
-                type: ChangeType.EditProp,
+                type: e.type,
                 prop: e.prop,
                 value: e.val,
                 item: e.item,

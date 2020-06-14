@@ -295,11 +295,11 @@
         }
 
         get groups() {
-            this.dec.properties.forEach(p => {
-                if (p.condition) {
-                    console.log(p.condition);
-                }
-            });
+            // this.dec.properties.forEach(p => {
+            //     if (p.condition) {
+            //         console.log(p.condition);
+            //     }
+            // });
             let props = this.dec.properties.filter(p => p.group && (p.condition == null || main.evalExpression(this.item, p.condition)));
             return props.map(p => p.group).filter(main.onlyUnique);
         }

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppStateLog = exports.AppStateQuestion = exports.FileActionType = exports.FileAction = exports.QuestionOptions = exports.AppStateFileGallery = exports.FilterOperator = exports.Modify = exports.Global = exports.TreeViewAttribute = exports.TreeViewLine = exports.TreeViewNode = exports.PropertyLabelMode = exports.AppStateCmenu = exports.FilterChangeEventArg = exports.ItemChangeEventArg = exports.FunctionExecEventArg = exports.ItemEventArg = exports.PropEventArg = exports.StartParams = exports.AppStateGeoMap = exports.ChangeType = exports.StateChange = exports.MenuItem = exports.HeadFunc = exports.ChartColors = exports.Constants = exports.ID = void 0;
+exports.AppStateLog = exports.AppStateQuestion = exports.QuestionOptions = exports.AppStateFileGallery = exports.FilterOperator = exports.Modify = exports.Global = exports.TreeViewAttribute = exports.TreeViewLine = exports.TreeViewNode = exports.PropertyLabelMode = exports.AppStateCmenu = exports.FilterChangeEventArg = exports.ItemChangeEventArg = exports.FunctionExecEventArg = exports.ItemEventArg = exports.PropEventArg = exports.StartParams = exports.AppStateGeoMap = exports.ChangeType = exports.StateChange = exports.MenuItem = exports.HeadFunc = exports.ChartColors = exports.Constants = exports.ID = void 0;
 const types_1 = require("../../sys/src/types");
 const bson_util_1 = require("bson-util");
 Object.defineProperty(exports, "ID", { enumerable: true, get: function () { return bson_util_1.ID; } });
@@ -8,13 +8,12 @@ exports.Constants = {
     redirectBack: '_back',
     errorEmbedProperty: 'e',
     redirectSelf: '_self',
-    notifyEvent: 'notify',
     defaultAddress: '/_default',
     questionEvent: 'question',
     contextMenuVisibleItems: 10,
     delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
-    uniqueFilenameRegex: /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}__/,
+    uniqueFilenameRegex: /^[a-fA-F0-9]{24}__/,
     commentBeforeTag: 'comment-before',
     QUERY_LOCALE: 'e',
     QUERY_NEW: 'n',
@@ -42,7 +41,9 @@ var ChangeType;
     ChangeType[ChangeType["EditProp"] = 1] = "EditProp";
     ChangeType[ChangeType["InsertItem"] = 2] = "InsertItem";
     ChangeType[ChangeType["DeleteItem"] = 3] = "DeleteItem";
-    ChangeType[ChangeType["EditFileProp"] = 4] = "EditFileProp";
+    ChangeType[ChangeType["UploadFile"] = 5] = "UploadFile";
+    ChangeType[ChangeType["SelectFile"] = 6] = "SelectFile";
+    ChangeType[ChangeType["DeleteFile"] = 7] = "DeleteFile";
 })(ChangeType = exports.ChangeType || (exports.ChangeType = {}));
 class AppStateGeoMap {
     constructor() {
@@ -152,15 +153,6 @@ exports.AppStateFileGallery = AppStateFileGallery;
 class QuestionOptions {
 }
 exports.QuestionOptions = QuestionOptions;
-class FileAction {
-}
-exports.FileAction = FileAction;
-var FileActionType;
-(function (FileActionType) {
-    FileActionType[FileActionType["Upload"] = 1] = "Upload";
-    FileActionType[FileActionType["Select"] = 2] = "Select";
-    FileActionType[FileActionType["Delete"] = 3] = "Delete";
-})(FileActionType = exports.FileActionType || (exports.FileActionType = {}));
 class AppStateQuestion {
     constructor() {
         this.buttons = [];

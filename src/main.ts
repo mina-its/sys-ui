@@ -4,7 +4,6 @@ let index = {
     "Server: Dispatch Changes       ": dispatchRequestServerModify,
     "Server: Commit Changes         ": commitServerChangeResponse,
     "Reorder Items                  ": commitReorderItems,
-    "File Action                    ": dispatchFileAction,
 
     // Vue
     "Registers Components           ": registerComponents,
@@ -21,7 +20,7 @@ let index = {
 import {getBsonValue, parse, stringify} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {Axios, ChangeType, Constants, FileAction, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, Socket, StartParams, StateChange} from './types';
+import {Axios, ChangeType, Constants, ItemChangeEventArg, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, Socket, StartParams, StateChange} from './types';
 import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
 import App from './App.vue';
 import pluralize = require('pluralize');
@@ -126,7 +125,7 @@ function vueResetFormData(res: WebResponse) {
     if (!dataset) return;
 
     if (res.form && res.form.declarations) {
-        res.form.elems.forEach(elem => elem.id = ID.generateByBrowser()); // needs for refreshing form while cancel changes
+        res.form.elems.forEach(elem => elem.id = elem.id || ID.generateByBrowser()); // needs for refreshing form while cancel changes
 
         const setDataMeta = (ref: string, item: IData, dec: ObjectDec | FunctionDec) => {
             item._ = item._ || {} as any;
@@ -160,12 +159,8 @@ function vueResetFormData(res: WebResponse) {
 }
 
 function setUndefinedToNull(item, prop: Property) {
-    if (!item) {
-        return;
-    }
-    if (item[prop.name] === undefined) {
-        item[prop.name] = null;
-    }
+    if (!item) return;
+    if (item[prop.name] === undefined) item[prop.name] = null;
 
     if (prop.required) {
         setPropertyEmbeddedError(item, prop.name, null);
@@ -475,16 +470,6 @@ export function hideCmenu() {
 
 function handleWindowEvents() {
     $(window)
-        .on(Constants.notifyEvent, function (e: any) {
-            let notify = e.detail as NotificationInfo;
-            if (notify.type == LogType.Debug) {
-                $("#snackbar").addClass("visible").text(notify.message);
-                setTimeout(function () {
-                    $("#snackbar").removeClass("visible");
-                }, 3000);
-            } else
-                glob.notify = notify;
-        })
         .on(Constants.questionEvent, function (e: any) {
             glob.question = e.detail;
         })
@@ -711,8 +696,17 @@ export function notify(content: string | IError, type?: LogType, params?: Notifi
 
     if (type === LogType.Fatal)
         $("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
-    else
-        window.dispatchEvent(new CustomEvent(Constants.notifyEvent, {detail: {message, type}}));
+    else {
+        if (type == LogType.Debug) {
+            $("#snackbar").addClass("visible").text(message);
+            setTimeout(function () {
+                $("#snackbar").removeClass("visible");
+            }, 3000);
+        } else if ($(".notify-message-container").length) {
+            $(".notify-message-container").html(`<div class="notify-message-type-${type}">${message}</div>`);
+        } else
+            glob.notify = notify;
+    }
 }
 
 export function question(title: string, message: string, buttons: Pair[], options: QuestionOptions, select: (ref: any) => void) {
@@ -943,12 +937,10 @@ function startVue(res: WebResponse, params?: StartParams) {
                 _commitStoreChange,
                 _commitServerChangeResponse,
                 _commitReloadData,
-                _commitFileAction,
                 _commitReorderItems,
             },
             actions: {
                 _dispatchStoreModify,
-                _dispatchFileAction,
                 _dispatchRequestServerModify,
             }
         });
@@ -977,34 +969,6 @@ function startVue(res: WebResponse, params?: StartParams) {
     }
 }
 
-function commitFileAction(store, action: FileAction) {
-    store.commit('_commitFileAction', action);
-}
-
-function _commitFileAction(state, e: FileAction) {
-    e.item[e.prop.name] = e.val || null;
-    glob.dirty = true;
-}
-
-export function dispatchFileAction(vue: Vue, e: FileAction) {
-    vue["$store"].dispatch('_dispatchFileAction', e); // .$store had problem in other packages
-}
-
-function _dispatchFileAction(store, e: FileAction) {
-    if (e.item._.ref == null) throw "ref is empty!";
-
-    let modify = {
-        ref: e.item._.ref,
-        type: ChangeType.EditFileProp,
-        data: {},
-        state: e.item,
-    } as Modify;
-    glob.modifies.push(modify);
-    modify.data[e.prop.name] = e.val || null;
-
-    commitFileAction(store, e);
-}
-
 function _commitReloadData(state, data: any) {
     state.data = data;
 }
@@ -1022,6 +986,9 @@ function _commitStoreChange(state, change: StateChange) {
     let ref = change.uri;
 
     switch (change.type) {
+        case ChangeType.UploadFile:
+        case ChangeType.SelectFile:
+        case ChangeType.DeleteFile:
         case ChangeType.EditProp:
             change.item[change.prop.name] = change.value;
             // todo : multi language text
@@ -1179,6 +1146,18 @@ function _dispatchStoreModify(store, change: StateChange) {
             break;
         }
 
+        case ChangeType.UploadFile:
+        case ChangeType.SelectFile:
+        case ChangeType.DeleteFile:
+            let modify = {
+                ref: change.item._.ref,
+                type: change.type,
+                data: {},
+                state: change.item,
+            } as Modify;
+            glob.modifies.push(modify);
+            modify.data[change.prop.name] = change.value || null;
+            break;
     }
 
     glob.dirty = glob.modifies.length > 0;
@@ -1239,8 +1218,9 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
 }
 
 export function start(params?: StartParams) {
-    // console.log('starting ...');
+    console.log('starting ...');
     const mainState = $('#main-state').html();
+    console.log('mainState', mainState);
     const res: WebResponse = parse(mainState, true, ID);
 
     if (res)
