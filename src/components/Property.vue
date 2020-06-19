@@ -1,14 +1,8 @@
+import {ChangeType} from "@/types";
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {
-        Elem,
-        ElemType,
-        GlobalType,
-        ObjectViewType,
-        Property as ObjectProperty,
-        PropertyEditMode
-    } from "../../../sys/src/types";
-    import {Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
+    import {Elem, ElemType, GlobalType, ObjectViewType, Property as ObjectProperty, PropertyEditMode} from "../../../sys/src/types";
+    import {ChangeType, Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
     import {getPropertyEmbedError} from '@/main';
     import * as main from '../main';
 
@@ -16,8 +10,8 @@
     export default class Property extends Vue {
         @Prop() private item: any;
         @Prop() private prop: ObjectProperty;
-        @Prop() private viewType: any;
-        @Prop() private labelMode: any;
+        @Prop() private viewType: ObjectViewType;
+        @Prop() private labelMode: PropertyLabelMode;
         @Prop() private indexInGrid: any;
         @Prop() private readonly: boolean;
         @Prop() private level: number;
@@ -53,7 +47,9 @@
         @Emit("changed")
         raiseChanged(e: ItemChangeEventArg): ItemChangeEventArg {
             main.setPropertyEmbeddedError(this.item, e.prop.name, null);
-            return {prop: e.prop, item: this.item, val: e.val, vue: e.vue};
+            e.item = this.item;
+            e.type = ChangeType.EditProp;
+            return e;
         }
 
         @Emit("focus")

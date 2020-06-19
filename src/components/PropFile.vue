@@ -1,4 +1,3 @@
-import {LogType} from "../../../sys/src/types";
 <template>
     <div :class="styles + ' border-0'">
         <div v-if="viewType==2" class="prop-file-box">
@@ -24,13 +23,14 @@ import {LogType} from "../../../sys/src/types";
                 <div>{{title(file)}}<span class="text-secondary mx-2">{{size(file)}}</span></div>
             </div>
         </div>
+        <a class="w-100 h-100 text-center prop-file-empty fal fa-file-upload cursor-pointer" v-if="viewType!=2 && (!files || !files.length)" @click="selectFile(null)"></a>
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {DirFile, IData, LogType, mFile, Property, RequestMode} from "../../../sys/src/types";
-    import {Constants, FileAction, FileActionType, FunctionExecEventArg, ID, MenuItem} from '@/types';
+    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {DirFile, IData, LogType, mFile, Property, RequestMode, ObjectViewType} from "../../../sys/src/types";
+    import {Constants, ItemChangeEventArg, FunctionExecEventArg, ID, MenuItem, ChangeType} from '@/types';
     import {$t, glob, joinUri, notify} from '@/main';
     import * as main from '../main';
 
@@ -38,7 +38,7 @@ import {LogType} from "../../../sys/src/types";
     export default class PropFile extends Vue {
         @Prop() private prop: Property;
         @Prop() private doc: IData;
-        @Prop() private viewType: any;
+        @Prop() private viewType: ObjectViewType;
         @Prop() private styles: string;
         @Prop() private readOnly: boolean;
 
@@ -51,7 +51,7 @@ import {LogType} from "../../../sys/src/types";
         showMenu(file, e) {
             if (this.prop.file && this.prop.file.drive) {
                 let items: MenuItem[] = [
-                    {title: this.title(file) + "(" + this.size(file) + ")"},
+                    {title: this.title(file) + " (" + this.size(file) + ")"},
                     {ref: "preview", title: $t('preview')},
                     {title: '-'},
                     {ref: "select", title: $t('select')},
@@ -77,18 +77,11 @@ import {LogType} from "../../../sys/src/types";
                     break;
 
                 case "remove":
-                    main.dispatchFileAction(this, {
-                        prop: this.prop,
-                        item: this.doc,
-                        type: FileActionType.Delete
-                    } as FileAction);
+                    this.changed(ChangeType.DeleteFile);
                     break;
 
                 case "select":
                     this.selectFile();
-                    // let val = this.doc[this.prop.name] as mFile;
-                    // let path = val && val.path ? val.path : this.prop.file.path;
-                    // main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
                     break;
             }
         }
@@ -110,12 +103,7 @@ import {LogType} from "../../../sys/src/types";
             } else
                 val = file;
 
-            main.dispatchFileAction(this, {
-                prop: this.prop,
-                val,
-                item: this.doc,
-                type: FileActionType.Select
-            } as FileAction);
+            this.changed(ChangeType.SelectFile, val);
         }
 
         selectFile(e?: FunctionExecEventArg) {
@@ -160,12 +148,7 @@ import {LogType} from "../../../sys/src/types";
                 }
 
                 val = this.prop.isList ? (val as mFile[]).concat(...files) : files[0];
-                main.dispatchFileAction(this, {
-                    prop: this.prop,
-                    val,
-                    item: this.doc,
-                    type: FileActionType.Upload
-                } as FileAction);
+                this.changed(ChangeType.UploadFile, val);
             });
         }
 
@@ -178,13 +161,19 @@ import {LogType} from "../../../sys/src/types";
             } else
                 val = null;
 
-            main.dispatchFileAction(this, {
+            this.changed(ChangeType.DeleteFile);
+            e.stopPropagation();
+        }
+
+        @Emit("changed")
+        changed(type: ChangeType, val?: any): ItemChangeEventArg {
+            return {
                 prop: this.prop,
                 item: this.doc,
                 val,
-                type: FileActionType.Delete
-            } as FileAction);
-            e.stopPropagation();
+                vue: this,
+                type
+            } as ItemChangeEventArg;
         }
 
         size(file) {
@@ -195,6 +184,9 @@ import {LogType} from "../../../sys/src/types";
         }
 
         title(file) {
+            if (this.prop.file && !this.prop.file.gallery)
+                return file.name.replace(Constants.uniqueFilenameRegex, "");
+
             if (Constants.uniqueFilenameRegex.test(file.name))
                 return file.name.replace(Constants.uniqueFilenameRegex, "");
 
@@ -234,6 +226,14 @@ import {LogType} from "../../../sys/src/types";
         .thumbnail {
             height: 32px;
             margin: -0.3rem;
+        }
+    }
+
+    .prop-file-empty {
+        color: transparent !important;
+
+        &:hover {
+            color: black !important;
         }
     }
 

@@ -1,6 +1,5 @@
 import {
     Property,
-    Drive,
     DirFile,
     Pair,
     LogType,
@@ -14,6 +13,7 @@ import Vue from 'vue'
 
 
 import {ID} from 'bson-util';
+
 export {ID};
 
 export interface JQuery {
@@ -44,13 +44,12 @@ export const Constants = {
     redirectBack: '_back',
     errorEmbedProperty: 'e',
     redirectSelf: '_self',
-    notifyEvent: 'notify',
     defaultAddress: '/_default',
     questionEvent: 'question',
     contextMenuVisibleItems: 10,
     delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
-    uniqueFilenameRegex: /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}__/,
+    uniqueFilenameRegex: /^[a-fA-F0-9]{24}__/,
     commentBeforeTag: 'comment-before',
 
     QUERY_LOCALE: 'e',
@@ -94,7 +93,9 @@ export enum ChangeType {
     EditProp = 1,
     InsertItem = 2,
     DeleteItem = 3,
-    EditFileProp = 4,
+    UploadFile = 5,
+    SelectFile = 6,
+    DeleteFile = 7,
 }
 
 export class AppStateGeoMap {
@@ -132,7 +133,8 @@ export class FunctionExecEventArg {
 }
 
 export class ItemChangeEventArg {
-    item?: any;
+    item?: IData;
+    type?: ChangeType;
     prop: Property;
     val: any;
     vue?: Vue;
@@ -258,19 +260,6 @@ export class AppStateFileGallery {
 
 export class QuestionOptions {
     questionId: string;
-}
-
-export class FileAction {
-    item: IData;
-    val: any;
-    prop: Property;
-    type: FileActionType;
-}
-
-export enum FileActionType {
-    Upload = 1,
-    Select = 2,
-    Delete = 3,
 }
 
 export class AppStateQuestion {

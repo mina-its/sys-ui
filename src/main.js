@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.dispatchFileAction = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.processThisExpression = exports.evalExpression = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.processThisExpression = exports.evalExpression = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -8,7 +8,6 @@ let index = {
     "Server: Dispatch Changes       ": dispatchRequestServerModify,
     "Server: Commit Changes         ": commitServerChangeResponse,
     "Reorder Items                  ": commitReorderItems,
-    "File Action                    ": dispatchFileAction,
     // Vue
     "Registers Components           ": registerComponents,
     "Reset Form Data                ": vueResetFormData,
@@ -125,7 +124,7 @@ function vueResetFormData(res) {
     if (!dataset)
         return;
     if (res.form && res.form.declarations) {
-        res.form.elems.forEach(elem => elem.id = types_1.ID.generateByBrowser()); // needs for refreshing form while cancel changes
+        res.form.elems.forEach(elem => elem.id = elem.id || types_1.ID.generateByBrowser()); // needs for refreshing form while cancel changes
         const setDataMeta = (ref, item, dec) => {
             item._ = item._ || {};
             item._.ref = ref;
@@ -155,12 +154,10 @@ function vueResetFormData(res) {
     }
 }
 function setUndefinedToNull(item, prop) {
-    if (!item) {
+    if (!item)
         return;
-    }
-    if (item[prop.name] === undefined) {
+    if (item[prop.name] === undefined)
         item[prop.name] = null;
-    }
     if (prop.required) {
         setPropertyEmbeddedError(item, prop.name, null);
     } // to check later
@@ -467,17 +464,6 @@ function hideCmenu() {
 exports.hideCmenu = hideCmenu;
 function handleWindowEvents() {
     $(window)
-        .on(types_1.Constants.notifyEvent, function (e) {
-        let notify = e.detail;
-        if (notify.type == types_2.LogType.Debug) {
-            $("#snackbar").addClass("visible").text(notify.message);
-            setTimeout(function () {
-                $("#snackbar").removeClass("visible");
-            }, 3000);
-        }
-        else
-            exports.glob.notify = notify;
-    })
         .on(types_1.Constants.questionEvent, function (e) {
         exports.glob.question = e.detail;
     })
@@ -701,8 +687,19 @@ function notify(content, type, params) {
     }
     if (type === types_2.LogType.Fatal)
         $("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
-    else
-        window.dispatchEvent(new CustomEvent(types_1.Constants.notifyEvent, { detail: { message, type } }));
+    else {
+        if (type == types_2.LogType.Debug) {
+            $("#snackbar").addClass("visible").text(message);
+            setTimeout(function () {
+                $("#snackbar").removeClass("visible");
+            }, 3000);
+        }
+        else if ($(".notify-message-container").length) {
+            $(".notify-message-container").html(`<div class="notify-message-type-${type}">${message}</div>`);
+        }
+        else
+            exports.glob.notify = notify;
+    }
 }
 exports.notify = notify;
 function question(title, message, buttons, options, select) {
@@ -921,12 +918,10 @@ function startVue(res, params) {
                 _commitStoreChange,
                 _commitServerChangeResponse,
                 _commitReloadData,
-                _commitFileAction,
                 _commitReorderItems,
             },
             actions: {
                 _dispatchStoreModify,
-                _dispatchFileAction,
                 _dispatchRequestServerModify,
             }
         });
@@ -955,30 +950,6 @@ function startVue(res, params) {
         notify("<strong>Starting Vue failed:</strong> " + err.message, types_2.LogType.Fatal);
     }
 }
-function commitFileAction(store, action) {
-    store.commit('_commitFileAction', action);
-}
-function _commitFileAction(state, e) {
-    e.item[e.prop.name] = e.val || null;
-    exports.glob.dirty = true;
-}
-function dispatchFileAction(vue, e) {
-    vue["$store"].dispatch('_dispatchFileAction', e); // .$store had problem in other packages
-}
-exports.dispatchFileAction = dispatchFileAction;
-function _dispatchFileAction(store, e) {
-    if (e.item._.ref == null)
-        throw "ref is empty!";
-    let modify = {
-        ref: e.item._.ref,
-        type: types_1.ChangeType.EditFileProp,
-        data: {},
-        state: e.item,
-    };
-    exports.glob.modifies.push(modify);
-    modify.data[e.prop.name] = e.val || null;
-    commitFileAction(store, e);
-}
 function _commitReloadData(state, data) {
     state.data = data;
 }
@@ -994,6 +965,9 @@ exports.commitStoreChange = commitStoreChange;
 function _commitStoreChange(state, change) {
     let ref = change.uri;
     switch (change.type) {
+        case types_1.ChangeType.UploadFile:
+        case types_1.ChangeType.SelectFile:
+        case types_1.ChangeType.DeleteFile:
         case types_1.ChangeType.EditProp:
             change.item[change.prop.name] = change.value;
             // todo : multi language text
@@ -1136,6 +1110,18 @@ function _dispatchStoreModify(store, change) {
                 exports.glob.modifies.push({ state: change.item, ref, type: types_1.ChangeType.DeleteItem });
             break;
         }
+        case types_1.ChangeType.UploadFile:
+        case types_1.ChangeType.SelectFile:
+        case types_1.ChangeType.DeleteFile:
+            let modify = {
+                ref: change.item._.ref,
+                type: change.type,
+                data: {},
+                state: change.item,
+            };
+            exports.glob.modifies.push(modify);
+            modify.data[change.prop.name] = change.value || null;
+            break;
     }
     exports.glob.dirty = exports.glob.modifies.length > 0;
     exports.glob.notify = null;
@@ -1190,8 +1176,9 @@ function _dispatchRequestServerModify(store, done) {
     });
 }
 function start(params) {
-    // console.log('starting ...');
+    console.log('starting ...');
     const mainState = $('#main-state').html();
+    console.log('mainState', mainState);
     const res = bson_util_1.parse(mainState, true, types_1.ID);
     if (res)
         startVue(res, params);

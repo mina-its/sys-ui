@@ -32,10 +32,12 @@
                     let children = elems.map((elem) => {
                         return ce("form-elem", {props: {elem}});
                     });
+                    children.push(ce("div", {attrs: {class: "py-2 notify-message-container"}}));
+
                     let horizontal = panel.stack && panel.stack.orientation == Orientation.Horizontal;
                     return ce('div', {
                         attrs: {
-                            class: "d-flex " + (horizontal ? "flex-row" : "flex-column") + " " + this.elem.styles
+                            class: "panel-stack d-flex " + (horizontal ? "flex-row" : "flex-column") + " " + this.elem.styles
                         }
                     }, children);
                 }
@@ -46,7 +48,7 @@
                     });
                     return ce('div', {
                         attrs: {
-                            class: this.elem.styles
+                            class: "panel-wrap " + this.elem.styles
                         }
                     }, children);
                 }
@@ -57,7 +59,7 @@
                     });
                     return ce('div', {
                         attrs: {
-                            class: "d-flex " + this.elem.styles
+                            class: "panel-flex d-flex " + this.elem.styles
                         }
                     }, children);
                 }

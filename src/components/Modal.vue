@@ -16,9 +16,7 @@
                                     <FormElem v-for="elem in bodyElems" :elem="elem"></FormElem>
                                 </form>
                             </div>
-                            <div v-if="glob.notify" @click="glob.notify=null" class="text-light bg-danger modal-body">
-                                <span v-html="glob.notify.message"></span>
-                            </div>
+                            <div @click="clickNotify" class="modal-body notify-message-container"></div>
                             <div class="modal-footer">
                                 <FormElem v-for="elem in footerElems" :elem="elem"></FormElem>
                             </div>
@@ -35,11 +33,17 @@
     import {glob} from '@/main';
     import * as main from '../main';
 
+    declare let $: any;
+
     @Component({name: 'Modal', components: {}})
     export default class Modal extends Vue {
         @Prop() private title: string;
         @Prop() private footerElems: any[];
         @Prop() private bodyElems: any[];
+
+        clickNotify() {
+            $(".notify-message-container").html("");
+        }
 
         close() {
             glob.modal = false;
@@ -48,8 +52,22 @@
     }
 </script>
 
-<style>
+<style lang="scss">
     .modal-header .close {
         color: white;
+    }
+
+    .notify-message-container {
+
+        .notify-message-type- {
+
+            &0, &3 {
+                color: #dc3545 !important;
+            }
+
+            &4 {
+                color: #ffc107 !important;
+            }
+        }
     }
 </style>
