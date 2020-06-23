@@ -1,6 +1,6 @@
 <template>
     <div class="change-region mx-2">
-        <a class="nav-link py-0 px-0 text-light" href="#" id="navbarDropdownLocale" role="button" data-toggle="modal" data-target="#changeRegion">
+        <a class="nav-link py-0 px-0" href="#" id="navbarDropdownLocale" role="button" data-toggle="modal" data-target="#changeRegion">
             <i style="font-size: 16px" class="fal fa-globe text-white px-1"></i>{{$t("change-region")}}
         </a>
 

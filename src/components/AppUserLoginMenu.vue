@@ -1,7 +1,7 @@
 <template>
     <div class="app-user-login">
         <div v-if="glob.config.user.loginUrl">
-            <a class="my-2 my-sm-0 text-light" :href="glob.config.user.loginUrl">
+            <a class="my-2 my-sm-0" :href="glob.config.user.loginUrl">
                 <span v-if="glob.config.user.loginTitle">{{glob.config.user.loginTitle}}</span>
                 <i v-else class="fal fa-user"></i>
             </a>
