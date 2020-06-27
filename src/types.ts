@@ -276,3 +276,12 @@ export class AppStateLog {
     ref?: string;
     type?: LogType;
 }
+
+export enum TaskConcern {
+    Status = 1,
+    Date = 2,
+    Team = 3,
+    Subject = 4,
+    Project = 5,
+    MileStone = 6,
+}

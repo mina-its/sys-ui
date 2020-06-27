@@ -1,7 +1,7 @@
 <template>
     <div v-if="glob.dirty" class="mx-2" role="group">
-        <Function styles="btn-primary" @exec="apply" name="apply" :title="$t('apply')"></Function>
-        <Function styles="btn-link" @exec="cancel" name="cancel" :title="$t('cancel')"></Function>
+        <button class="btn btn-primary" @click="apply">{{$t('apply')}}</button>
+        <button class="btn btn-link" @click="cancel" name="cancel">{{$t('cancel')}}</button>
     </div>
 </template>
 
@@ -10,28 +10,27 @@
     import {Constants, FunctionExecEventArg} from "@/types";
     import {glob} from "@/main";
     import * as main from '../main';
-    import { Keys } from '../../../sys/src/types';
+    import {Keys} from '../../../sys/src/types';
 
     @Component({name: 'ToolbarModifyButtons'})
     export default class ToolbarModifyButtons extends Vue {
-        apply(e: FunctionExecEventArg) {
+        apply() {
             glob.notify = null;
-            if (!e.stopProgress) e.stopProgress = () => main.log('Apply done!');
-            if (!main.validate(this.$store.state.data)) return e.stopProgress();
+            if (!main.validate(this.$store.state.data)) return;
             // todo: if (main.getQs("n") == "true") return main.commitNewItem();
-            main.dispatchRequestServerModify(this.$store, e.stopProgress);
+            main.dispatchRequestServerModify(this.$store, () => main.log('Apply done!'));
         }
 
         mounted() {
             window.addEventListener("keydown", (e: KeyboardEvent) => {
                 if (e.ctrlKey && e.which == Keys.s) {
-                    this.apply({});
+                    this.apply();
                     e.preventDefault();
                 }
             });
         }
 
-        cancel(e: FunctionExecEventArg) {
+        cancel() {
             main.clearModifies();
             main.load(location.pathname, !!main.getQs(Constants.QUERY_NEW));
         }
