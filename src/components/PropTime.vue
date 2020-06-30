@@ -2,8 +2,9 @@
     <div class="prop-time">
         <div class="d-flex">
             <input ref="ctrl" @focus="$emit('focus', $event)" type="text" :value="value"
+                   :placeholder="placeHolder"
                    :name="viewType!=1 ? prop.name : null" :readonly="readOnly" @input="dirty=true"
-                   @blur="update" class="flex-grow-1 border-0">
+                   @blur="update" class="w-100 flex-grow-1 border-0">
             <div class="dropdown" v-if="!readOnly">
                 <i :class="{'fa text-muted':true, 'ml-1': ltr, 'mr-1':rtl, 'fa-clock': !datePick, 'fa-calendar-alt': datePick}" @click="click"></i>
             </div>
@@ -25,6 +26,7 @@
         @Prop() private prop: Property;
         @Prop() private viewType: string;
         @Prop() private readOnly: boolean;
+        @Prop() private placeHolder: string;
 
         private dirty = false;
 
