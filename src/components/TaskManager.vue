@@ -125,7 +125,7 @@
                 <table class="w-100 h-100 flex-fill">
                     <tr v-for="row of calendarRows" class="">
                         <td v-for="day of row.days" class="align-top border">
-                            <div :class="day.style" @drop="drop" @dragover="allowDropDay($event, day)" @dragleave="dragLeave($event, day)">
+                            <div :class="day.style" @drop="dropToDay($event, day)" @dragover="allowDropDay($event, day)" @dragleave="dragLeave($event, day)">
                                 <label v-if="day.day" class="small font-weight-bold text-primary mr-2">{{day.day}},</label>
                                 <label class="small font-weight-bold">{{day.title}}</label>
                                 <input :readonly="!taskEditingMode" @keydown="taskKeypress($event,task)" @mousedown="currentTask=task" v-model="task.title" draggable="true" @dragstart="dragStart($event,task)" @drag="dragging" v-for="task in day.tasks"
@@ -378,6 +378,18 @@
             $(event.target).find(".new-task").focus();
         }
 
+        dropToDay(event, day) {
+            event.preventDefault();
+            day.style = day.style.replace(/drag-hover/, '');
+            if (!this.currentTask.dueDates) this.currentTask.dueDates = [];
+            this.currentTask.dueDates.push(day.date);
+            let patch = {} as Task;
+            patch.dueDates = this.currentTask.dueDates;
+            this.saveTask(this.currentTask._id, patch);
+            this.refreshTasks();
+            this.currentTask = null;
+        }
+
         drop(event, group) {
             event.preventDefault();
             this.currentTask[this.concernProperty] = group.value;
@@ -459,8 +471,13 @@
                                 style += "this-month";
                             if (date.format("D MMM") == moment().startOf('day').format("D MMM"))
                                 style += " today";
+
+                            let title = date.date() == 1 ? date.format("D MMMM") : date.format("D");
+                            if (d == 0 && i == 0)
+                                title = date.format("D MMMM");
+
                             let day = {
-                                title: date.format("D MMM"),
+                                title,
                                 tasks: this.tasks.filter(task => Array.isArray(task.dueDates) && task.dueDates.find(d => date.diff(moment(d), 'days') == 0)),
                                 date: date,
                                 style,
