@@ -809,6 +809,7 @@ function ajax(url, data, config, done, fail) {
     startProgress();
     config = config || {};
     fail = fail || notify;
+    console.log(1);
     if (exports.glob.config.host)
         url = joinUri(exports.glob.config.host, url);
     // ajax params

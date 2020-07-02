@@ -821,6 +821,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
     startProgress();
     config = config || {};
     fail = fail || notify;
+    console.log(1);
     if (glob.config.host) url = joinUri(glob.config.host, url);
 
     // ajax params
