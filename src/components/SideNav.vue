@@ -1,5 +1,6 @@
 <template>
     <div class="side-nav sidenav d-none d-lg-block" v-if="glob.config.navmenu.length">
+        <div @click="toggleSideNav" class="btn" style="padding: .9rem"><i class="fal fa-bars text-white"></i></div>
         <!-- Search  -->
         <!--        <div class="input-group p-3 w-100">-->
         <!--            <input type="text" class="form-control border-right-0" placeholder="Search">-->
@@ -10,13 +11,13 @@
         <!--            </span>-->
         <!--        </div>-->
         <ul class="px-0 list-unstyled mt-3">
-            <li v-for="item of glob.config.navmenu" :class="{'nav-item':1, 'mr-2':ltr, 'ml-2':rtl}">
+            <li v-for="item of glob.config.navmenu" :class="{'nav-item':1, 'mr-2':ltr && item.title!='-', 'ml-2':rtl && item.title!='-'}">
                 <a v-if="item.title=='-'" class="d-block my-2 border-bottom border-secondary"></a>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
                 <a v-else :href="item.ref" :class="getStyle(item)"><i :class="item._cs"></i>{{item.title}}</a>
                 <ul class="list-unstyled">
-                    <li v-for="subitem of item.items" class="mr-2 nav-item"><a :href="subitem.ref"
-                                                                               :class="getStyle(subitem)">{{subitem.title}}</a>
+                    <li v-for="subitem of item.items" class="mr-2 nav-item">
+                        <a :href="subitem.ref" :class="getStyle(subitem)">{{subitem.title}}</a>
                     </li>
                 </ul>
             </li>
@@ -28,10 +29,16 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {glob} from '../main';
 
+    declare let $: any;
+
     @Component({name: 'SideNav'})
     export default class SideNav extends Vue {
         get glob() {
             return glob;
+        }
+
+        toggleSideNav() {
+            $(".side-nav").toggleClass("collapse");
         }
 
         getStyle(item) {
@@ -56,11 +63,11 @@
         background-color: var(--side-nav-bg);
         min-width: 280px;
         width: 280px;
-        transition: all  .3s ease-in-out;
+        transition: all .2s ease-in-out;
 
         &.collapse {
-            min-width: 0;
-            width: 0;
+            min-width: 2.8rem;
+            width: 2.8rem;
         }
 
         a {

@@ -1,11 +1,19 @@
 <template>
-    <div @click="clickgroup" @drop="drop" @dragover="dragovergroup" class="task-manager-group border bg-light p-2">
-        <div class="font-weight-bold text-primary">
+    <div @click="clickgroup" @drop="drop" @dragover="dragovergroup">
+        <div class="font-weight-bold pt-1 text-primary">
             <i v-if="icon" :class="icon"></i>{{title}}
         </div>
+        <label v-if="subtitle" class="small mb-0 font-weight-bold">{{subtitle}}</label>
         <div class="tasks-panel">
-            <input :readonly="!editingMode" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown($event,task)" v-model="task.title" draggable="true"
-                   @dragstart="startdragtask($event,task)" @drag="dragingtask" v-for="task in tasks" class="task-item mt-1 px-1 border w-100 rounded">
+            <template v-for="task in tasks">
+                <div class="w-100 d-flex align-items-center">
+                    <i v-if="task.parent" class="fal fa-circle fa-xs mx-1 text-black-50"></i>
+<!--                    <i v-if="task.children" class="fal fa-plus-square fa-sm mx-1 text-black-50"></i>-->
+                    <input :readonly="!editingMode" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown($event,task)" v-model="task.title" draggable="true"
+                           @dragstart="startdragtask($event,task)"
+                           :class="'task-item px-1 border w-100 rounded ' + (task._.style || '')">
+                </div>
+            </template>
         </div>
         <input class="new-task mt-1 px-1 border-0 w-100 bg-transparent" @change="newtask">
     </div>
@@ -20,6 +28,7 @@
     export default class TaskManagerGroup extends Vue {
         @Prop() private icon: string;
         @Prop() private title: string;
+        @Prop() private subtitle: string;
         @Prop() private editingMode: boolean;
         @Prop() private tasks: Task[];
 
@@ -34,23 +43,18 @@
         }
 
         @Emit('dragovergroup')
-        dragovergroup(e) {
-            return e;
+        dragovergroup(event) {
+            return event;
         }
 
         @Emit('taskkeypress')
-        taskkeypress(e, task) {
-            return {e, task};
+        taskkeypress(ev, task) {
+            return {ev, task};
         }
 
         @Emit('startdragtask')
-        startdragtask(e, task) {
-            return {e, task};
-        }
-
-        @Emit('dragingtask')
-        dragingtask(e, task) {
-            return {e, task};
+        startdragtask(ev, task) {
+            return {ev, task};
         }
 
         @Emit('newtask')
@@ -59,12 +63,8 @@
         }
 
         @Emit('taskmousedown')
-        taskmousedown(e, task) {
-            return {e, task};
+        taskmousedown(ev, task) {
+            return {ev, task};
         }
     }
 </script>
-
-<style scoped lang="scss">
-
-</style>

@@ -2,25 +2,8 @@
     <div class="task-manager h-100 d-flex flex-column flex-fill overflow-auto">
         <!--  Toolbar -->
         <div class="d-flex p-2 align-items-center btn-toolbar separator-line toolbar" role="toolbar">
-            <!--  Project -->
-            <div class="project-filter dropdown mr-2">
-                <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
-                        :class="{'toolbar-button btn mx-1':1, 'btn-secondary': !!currentProject, 'btn-outline-secondary':!currentProject}">
-                    <i class="fal fa-construction fa-lg"></i>
-                    <label v-if="currentProject">{{currentProject.title}}</label>
-                    <label v-else>All Projects</label>
-                </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item py-2" href="#" @click="currentProject=null">All Projects</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item py-2" href="#" @click="currentProject=project"
-                       v-for="project of this.profile.projects">{{project.title}}</a>
-                </div>
-            </div>
-
             <!--  Concern -->
-            <div class="btn-group mr-2" role="group" aria-label="First group">
-                <label class="font-weight-bold text-uppercase input-group-text mb-1 concern-label">Concern</label>
+            <div class="concerns btn-group mr-2" role="group" aria-label="First group">
                 <button @click="activateConcern(TaskConcern_Start)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Start===profile.concern}">
                     <i class="fal fa-inbox fa-lg"></i>
@@ -34,7 +17,7 @@
                 <button @click="activateConcern(TaskConcern_DueDate)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_DueDate===profile.concern}">
                     <i class="fal fa-calendar-alt fa-lg"></i>
-                    <label>Due Date</label>
+                    <label>Calendar</label>
                 </button>
                 <button @click="activateConcern(TaskConcern_Assignee)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Assignee===profile.concern}">
@@ -51,6 +34,29 @@
                     <i class="fal fa-layer-group fa-lg"></i>
                     <label>Category</label>
                 </button>
+                <button type="button"
+                        :class="{'btn btn-secondary toolbar-button':1}">
+                    <i class="fal fa-street-view fa-lg"></i>
+                    <label>Category Category</label>
+                </button>
+            </div>
+
+            <!--  Project -->
+            <div class="project-filter dropdown">
+                <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
+                        :class="{'toolbar-button btn mx-1':1, 'btn-secondary': !!currentProject, 'btn-outline-secondary':!currentProject}">
+                    <i class="fal fa-construction fa-lg"></i>
+                    <label v-if="currentProject">{{currentProject.title}}</label>
+                    <label v-else>All Projects</label>
+                </button>
+                <div class="dropdown-menu">
+                    <button class="btn btn-link dropdown-item py-2" @click="filterProject(null)">All
+                        Projects
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item py-2" href="javascript:void(0);" @click="filterProject(project)"
+                       v-for="project of this.profile.projects">{{project.title}}</a>
+                </div>
             </div>
 
             <!--  Filter -->
@@ -98,21 +104,45 @@
                                        :label="item.title"></check-box>
                         </div>
                     </form>
-                    <button class="btn btn-success px-5 mt-2">Apply</button>
+                    <button @click="refreshTasks" class="btn btn-success px-5 mt-2">Apply</button>
                 </div>
             </div>
 
             <!--  Coloring -->
-            <button type="button" class="toolbar-button btn btn-outline-secondary mx-1 px-1">
-                <i class="fal fa-adjust fa-lg"></i>
-                <label>Coloring</label>
-            </button>
+            <div class="dropdown">
+                <button type="button" class="toolbar-button btn btn-outline-secondary mx-1 px-1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fad fa-adjust fa-lg"></i>
+                    <label>Coloring</label>
+                </button>
+                <div class="dropdown-menu">
+                    <button :class="{'btn btn-link dropdown-item':1,'active':profile.coloring==TaskConcern_Status}" @click="applyColoring(TaskConcern_Status)">Status</button>
+                    <button :class="{'btn btn-link dropdown-item':1,'active':profile.coloring==TaskConcern_Project}" @click="applyColoring(TaskConcern_Project)">Project</button>
+                    <button :class="{'btn btn-link dropdown-item':1,'active':profile.coloring==TaskConcern_Priority}" @click="applyColoring(TaskConcern_Priority)">Priority</button>
+                    <button :class="{'btn btn-link dropdown-item':1,'active':profile.coloring==TaskConcern_Assignee}" @click="applyColoring(TaskConcern_Assignee)">Assignee</button>
+                    <button v-if="currentProject" :class="{'btn btn-link dropdown-item':1,'active':profile.coloring==TaskConcern_Category}" @click="applyColoring(TaskConcern_Category)">Category</button>
+                    <button v-if="currentProject" :class="{'btn btn-link dropdown-item':1,'active':profile.coloring==TaskConcern_MileStone}" @click="applyColoring(TaskConcern_MileStone)">Milestone</button>
+                </div>
+            </div>
 
-            <!--  Sub Task -->
-            <button type="button" class="toolbar-button btn btn-outline-secondary mx-1 px-1">
-                <i class="fal fa-arrow-square-right fa-lg"></i>
-                <label>Sub Task</label>
-            </button>
+            <!--  Search -->
+            <div class="dropdown">
+                <button id="searchButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        type="button" class="toolbar-button btn btn-outline-secondary mx-1">
+                    <i class="fal fa-search fa-lg"></i>
+                    <label>Search</label>
+                </button>
+                <div class="dropdown-menu filter-panel p-3" aria-labelledby="searchButton">
+                    <form>
+                        <div class="input-group" style="min-width: 300px">
+                            <input v-model="searchPhrase" class="form-control" @change="search" placeholder="Task ID / Task Title">
+                            <div class="input-group-append">
+                                <button @click="search" class="btn btn-success">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="flex-grow-1"></div>
 
             <!-- Profile -->
@@ -122,43 +152,65 @@
             </button>
 
             <!-- Feedback -->
-            <button type="button" class="btn btn-outline-secondary toolbar-button m-1">
-                <i class="fal fa-comment-lines px-2 fa-lg"></i>
-                <label>Feedback</label>
-            </button>
+            <div class="dropdown m-1 mt-2">
+                <button id="feedbackButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        type="button" class="toolbar-button btn btn-outline-secondary">
+                    <i class="fal fa-comment-lines px-2 fa-lg"></i>
+                    <label>Feedback</label>
+                </button>
+                <div class="dropdown-menu filter-panel p-3" aria-labelledby="feedbackButton" style="width: 30rem">
+                    <form>
+                        <div class="mr-2">How much are you satisfied?</div>
+                        <div class="my-2">
+                            <i class="fal fa-tired pr-2 fa-lg"></i>
+                            <i class="fal fa-frown px-2 fa-lg"></i>
+                            <i class="fal fa-meh px-2 fa-lg"></i>
+                            <i class="fal fa-smile px-2 fa-lg"></i>
+                            <i class="fal fa-laugh-beam px-2 fa-lg"></i>
+                        </div>
+                        <div class="mr-2">Your requests:</div>
+                        <textarea placeholder="Comment" class="w-100 p-2"></textarea>
+                        <button @click="postFeedback" class="btn btn-success px-4 mt-2">Post</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-            <!-- Settings -->
-            <button type="button" class="btn btn-outline-secondary m-1 toolbar-button">
-                <i class="fal fa-cog px-2 fa-lg"></i>
-                <label>Settings</label>
-            </button>
+        <!--  Task Details -->
+        <div v-if="showTaskDetails" class="task-details container w-100 h-100 p-5">
+            <div class="card p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <h2 class="flex-fill">Task: {{currentTask.title}}</h2>
+                    <button class="btn btn-link" @click="showTaskDetails=false"><i class="fal fa-times text-black-50 fa-2x text-right"></i></button>
+                </div>
+                <details-view @changed="taskChanged" :data="currentTask" :dec="tasksDec" :level="1"></details-view>
+                <textarea class="w-100 mt-3">{{currentTask.comment}}</textarea>
+            </div>
         </div>
 
         <!--  Content -->
-        <div class="w-100 h-100 overflow-auto d-flex task-manager-content">
+        <div v-else class="w-100 h-100 overflow-auto d-flex task-manager-content">
+
             <!--  Calendar -->
             <div class="calendar w-100 h-100 d-flex" v-if="TaskConcern_DueDate===profile.concern">
-                <task-manager-group :tasks="unscheduledTasks" title="Unscheduled" @dragingtask="dragging"
-                                    @startdragtask="dragStart"
-                                    @taskmousedown="taskMouseDown" @taskkeypress="taskKeypress" @clickgroup="clickGroup"
+                <task-manager-group :tasks="unscheduledTasks" v-if="unscheduledTasks.length" title="Unscheduled"
+                                    class="task-manager-group bg-light px-2 py-1"
+                                    @startdragtask="dragStart($event.ev,$event.task,null)"
+                                    @taskmousedown="selectTask($event.task,unscheduledTasks)" @taskkeypress="taskKeypress($event.ev,$event.task,unscheduledTasks)" @clickgroup="clickGroup"
                                     @newtask="newTask($event, null)"
-                                    @dropgroup="drop($event,null)" @dragovergroup="allowDrop"
+                                    @dropgroup="drop($event,null)" @dragovergroup="ondragover($event,null)"
                                     :editingMode="taskEditingMode"></task-manager-group>
-                <table class="w-100 h-100 flex-fill">
+                <table class="w-100 h-100 flex-fill" @wheel="calendarWheel">
                     <tr v-for="row of calendarRows" class="">
-                        <td v-for="day of row.days" class="align-top border">
-                            <div :class="day.style" @drop="dropToDay($event, day)" @dragover="allowDropDay($event, day)"
-                                 @dragleave="dragLeave($event, day)">
-                                <div v-if="day.day"
-                                       class="small mb-0 mt-1 font-weight-bold text-primary mr-2">{{day.day}}</div>
-                                <label class="small mb-0 font-weight-bold">{{day.title}}</label>
-                                <input :readonly="!taskEditingMode" @keydown="taskKeypress($event,task)"
-                                       @mousedown="currentTask=task" v-model="task.title" draggable="true"
-                                       @dragstart="dragStart($event,task)" @drag="dragging" v-for="task in day.tasks"
-                                       class="task-item mb-1 px-1 border w-100 rounded">
-                                <input class="new-task px-1 border-0 h-100 w-100 bg-transparent"
-                                       @change="newTask($event,null)">
-                            </div>
+                        <td v-for="day of row.days" :class="day.style" @click="clickGroup">
+                            <task-manager-group :tasks="day.tasks" :title="day.day" :subtitle="day.title"
+                                                :class="{'calendar-day':1,'drag-over':day.dragOver}"
+                                                @startdragtask="dragStart($event.ev,$event.task,day)" @ondragover="ondragover"
+                                                @taskmousedown="selectTask($event.task,day.tasks)" @taskkeypress="taskKeypress($event.ev,$event.task,day.tasks)"
+                                                @clickgroup="clickGroup"
+                                                @newtask="newTask($event, day)"
+                                                @dropgroup="drop($event,day)" @dragovergroup="ondragover($event,day)" :icon="day.icon"
+                                                :editingMode="taskEditingMode"></task-manager-group>
                         </td>
                     </tr>
                 </table>
@@ -166,56 +218,68 @@
 
             <!--  Columns -->
             <task-manager-group v-else v-for="group in taskGroups" :tasks="group.tasks" :title="group.title"
-                                @dragingtask="dragging" @startdragtask="dragStart"
-                                @taskmousedown="taskMouseDown" @taskkeypress="taskKeypress" @clickgroup="clickGroup"
+                                class="task-manager-group border-right bg-light px-2 py-1"
+                                @startdragtask="dragStart($event.ev,$event.task,group)" @ondragover="ondragover"
+                                @taskmousedown="selectTask($event.task,group.tasks)" @taskkeypress="taskKeypress($event.ev,$event.task,group.tasks)" @clickgroup="clickGroup"
                                 @newtask="newTask($event, group)"
-                                @dropgroup="drop($event,group)" @dragovergroup="allowDrop" :icon="group.icon"
+                                @dropgroup="drop($event,group)" @dragovergroup="ondragover($event,group)" :icon="group.icon"
                                 :editingMode="taskEditingMode"></task-manager-group>
 
             <div class="flex-grow-1"></div>
 
             <!--  Task Properties -->
-            <div v-if="currentTask" class="task-properties border bg-white p-3">
-                <div class="font-weight-bold">Task title:</div>
-                <input class="w-100" v-model="currentTask.title">
-                <div class="font-weight-bold mt-2">Comment:</div>
-                <textarea class="w-100" v-model="currentTask.comment"></textarea>
+            <div class="task-properties border-left bg-white p-3">
+                <div v-if="currentTask">
+                    <!--  After Archive Actions -->
+                    <div v-if="currentTask.archive" class="mt-5">
+                        <button @click="undoArchive(currentTask)" class="btn btn-outline-dark mb-2">Undo Archive</button>
+                        <button @click="deleteTask(currentTask)" class="btn btn-outline-danger">Delete Permanently
+                        </button>
+                    </div>
+
+                    <!--  Task Properties -->
+                    <div v-else>
+                        <!-- Actions: Archive -->
+                        <div class="mb-2">
+                            <!--  Task Details -->
+                            <button @click="toggleDetails" class="btn btn-link p-0 mx-2" title="Task Details">
+                                <i class="fal fa-bars fa-lg"></i>
+                            </button>
+
+                            <!--  Archive -->
+                            <button @click="archive(currentTask)" class="btn btn-link p-0 mx-2" title="Archive">
+                                <i class="fal fa-file-times fa-lg"></i>
+                            </button>
+
+                            <!--  Favorite -->
+                            <button @click="toggleFavorite" class="btn btn-link p-0 mx-2" title="Favorite">
+                                <i :class="{'fa-heart-circle fa-lg':1,'fal':!currentTask.favorite,'fad':currentTask.favorite}"></i>
+                            </button>
+
+                            <!--  Sub Task -->
+                            <button @click="toggleSubtask(currentTask)" type="button" class="btn btn-link mx-2 p-0" title="Toggle Sub Task">
+                                <i :class="{'fal fa-lg':1,'fa-arrow-to-left':currentTask.parent,'fa-arrow-to-right':!currentTask.parent}"></i>
+                            </button>
+
+                        </div>
+                        <details-view @changed="taskChanged" :data="currentTask" :dec="tasksDec" :level="1"></details-view>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!--  Filter -->
-        <div class="filter-panel">
-
-        </div>
-
-        <div class="order-line"></div>
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {
-        Task,
-        WebMethod,
-        ID,
-        Keys,
-        TaskConcern,
-        TaskManagerProfile,
-        TaskPriority,
-        TaskStatus,
-        Project
-    } from '../../../sys/src/types';
-    import {call, ajax, question, equalID} from '@/main';
-    import CheckBox from "@/components/CheckBox.vue";
-    import PropTime from "@/components/PropTime.vue";
-    import TaskManagerGroup from "@/components/TaskManagerGroup.vue";
+    import {ID, Keys, ObjectDec, Project, Task, TaskConcern, TaskInboxGroup, TaskManagerProfile, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
+    import TaskManagerGroup from "../components/TaskManagerGroup.vue";
+    import {ItemChangeEventArg} from "../types";
+    import {ajax, call, equalID, question} from "../main";
 
     declare let $, moment: any;
 
-    @Component({
-        name: 'TaskManager',
-        components: {TaskManagerGroup}
-    })
+    @Component({name: 'TaskManager', components: {TaskManagerGroup}})
     export default class TaskManager extends Vue {
         private tasks: Task[];
         private profile: TaskManagerProfile = {concern: TaskConcern.Start} as TaskManagerProfile;
@@ -224,21 +288,28 @@
             days: {
                 title: string,
                 date: any,
+                dragOver: boolean,
                 day: string,
                 style: string,
                 tasks: Task[]
             }[]
         }[] = [];
+        private tasksDec: ObjectDec = null;
         private unscheduledTasks: Task[] = [];
         private concernProperty: string;
+        private showTaskDetails: boolean = false;
         private TaskConcern_Start = TaskConcern.Start;
         private TaskConcern_Status = TaskConcern.Status;
+        private TaskConcern_Project = TaskConcern.Project;
         private TaskConcern_DueDate = TaskConcern.DueDate;
         private TaskConcern_Assignee = TaskConcern.Assignee;
         private TaskConcern_Priority = TaskConcern.Priority;
         private TaskConcern_Category = TaskConcern.Category;
         private TaskConcern_MileStone = TaskConcern.MileStone;
+        private searchPhrase = null;
         private currentTask: Task = null;
+        private currentGroupTasks: Task[] = null;
+        private dragSourceGroup = null;
         private currentProject: Project = null;
         private taskEditingMode: boolean = false;
         private dragOffset = null;
@@ -248,24 +319,129 @@
             call('getTasks', {}, (err, res) => {
                 this.tasks = res.data.tasks;
                 this.profile = res.data.profile;
+                this.tasksDec = res.data.tasksDec;
+                console.log("this.tasksDec", this.tasksDec);
                 this.activateConcern(TaskConcern.Status);
             });
+        }
+
+        postFeedback() {
+
+        }
+
+        search() {
+            this.searchPhrase = null;
+        }
+
+        toggleDetails() {
+            this.showTaskDetails = !this.showTaskDetails;
+        }
+
+        applyColoring(concern: TaskConcern) {
+            this.profile.coloring = concern;
+
+            for (let task of this.tasks) {
+                this.applyTaskColoring(task);
+            }
+        }
+
+        applyTaskColoring(task: Task) {
+            let index = -1;
+            switch (this.profile.coloring) {
+                case TaskConcern.Status:
+                    index = [TaskStatus.Todo, TaskStatus.Doing, TaskStatus.OnHold, TaskStatus.Verify, TaskStatus.Done].indexOf(task.status);
+                    break;
+
+                case TaskConcern.Project:
+                    index = this.profile.projects.findIndex(p => equalID(p._id, task.project));
+                    break;
+
+                case TaskConcern.Priority:
+                    index = [TaskPriority.Normal, TaskPriority.Urgent, TaskPriority.Low, TaskPriority.High].indexOf(task.priority);
+                    break;
+
+                case TaskConcern.Assignee:
+                    index = this.profile.users.findIndex(user => Array.isArray(task.assignees) && task.assignees.find(a => equalID(a, user._id)));
+                    console.log('index', index);
+                    break;
+            }
+            task._.style = index == -1 ? null : "color-" + index;
+        }
+
+        taskChanged(e: ItemChangeEventArg) {
+            let change = new Task();
+            change[e.prop.name] = e.val;
+            this.applyTaskColoring(this.currentTask);
+            this.saveTask(this.currentTask._id, change, (res) => {
+                this.refreshTasks();
+            });
+        }
+
+        filterProject(project) {
+            this.currentProject = project;
+            this.refreshTasks();
+        }
+
+        calendarWheel(e) {
+            this.profile.calendarOffset = this.profile.calendarOffset | 0;
+            this.profile.calendarOffset += (e.deltaY > 0 ? 7 : -7);
+            this.refreshTasks();
+            e.preventDefault();
+        }
+
+        toggleFavorite() {
+            this.currentTask.favorite = !this.currentTask.favorite;
+            this.saveTask(this.currentTask._id, {favorite: this.currentTask.favorite} as Task, (res) => {
+                this.refreshTasks();
+            });
+        }
+
+        archive(task: Task) {
+            task.archive = true;
+            this.saveTask(task._id, {archive: true} as Task, (res) => {
+                this.refreshTasks();
+            });
+        }
+
+        undoArchive(task: Task) {
+            task.archive = false;
+            this.saveTask(task._id, {archive: true} as Task, (res) => {
+                this.refreshTasks();
+            });
+        }
+
+        deleteTask(task: Task) {
+            ajax(`/tasks/${task._id}`, null, {method: WebMethod.del}, (res) => {
+                this.tasks.splice(this.tasks.indexOf(task), 1);
+                this.refreshTasks();
+            });
+            this.currentTask = null;
         }
 
         getFilterItems(concern: TaskConcern) {
             let items;
             switch (concern) {
                 case TaskConcern.Status:
-                    items = [{title: 'All', checked: this.profile.filter.statuses == null, value: null}];
-                    if (this.profile.filter.statuses) {
-                        for (let item in TaskStatus) {
-                            if (!isNaN(Number(item)))
-                                items.push({
-                                    title: TaskStatus[item],
-                                    checked: this.profile.filter.statuses.indexOf(Number(item)) > -1,
-                                    value: Number(item)
-                                });
-                        }
+                    items = [];
+                    for (let item in TaskStatus) {
+                        if (!isNaN(Number(item)))
+                            items.push({
+                                title: TaskStatus[item],
+                                checked: this.profile.filter.statuses == null || this.profile.filter.statuses.indexOf(Number(item)) > -1,
+                                value: Number(item)
+                            });
+                    }
+                    break;
+
+                case TaskConcern.Priority:
+                    items = [];
+                    for (let item in TaskPriority) {
+                        if (!isNaN(Number(item)))
+                            items.push({
+                                title: TaskPriority[item],
+                                checked: this.profile.filter.priorities == null || this.profile.filter.priorities.indexOf(Number(item)) > -1,
+                                value: Number(item)
+                            });
                     }
                     break;
 
@@ -314,17 +490,16 @@
         filterItemCheckChanged($event, item, concern: TaskConcern) {
             switch (concern) {
                 case TaskConcern.Status:
-                    if (item.value == null) // All
-                        this.profile.filter.statuses = $event.val ? null : [];
-                    else {
-                        let index = this.profile.filter.statuses.indexOf(item.value);
-                        if ($event.val) {
-                            if (index == -1)
-                                this.profile.filter.statuses.push(item.value);
-                        } else {
-                            if (index != -1)
-                                this.profile.filter.statuses.splice(index, 1);
-                        }
+                    if (this.profile.filter.statuses == null)
+                        this.profile.filter.statuses = [TaskStatus.Todo, TaskStatus.Doing, TaskStatus.Done, TaskStatus.OnHold, TaskStatus.Verify];
+
+                    let index = this.profile.filter.statuses.indexOf(item.value);
+                    if ($event.val) {
+                        if (index == -1)
+                            this.profile.filter.statuses.push(item.value);
+                    } else {
+                        if (index != -1)
+                            this.profile.filter.statuses.splice(index, 1);
                     }
                     break;
 
@@ -383,62 +558,135 @@
         }
 
         refreshTasks() {
-            this.taskGroups = [];
-            for (let group of this.groupItems) {
-                let tasks = this.tasks.filter(task => {
-                    if (Array.isArray(task[this.concernProperty])) {
-                        for (let item of task[this.concernProperty]) {
-                            if (equalID(item, group.value))
-                                return true;
-                        }
-                        return false;
-                    } else
-                        return equalID(task[this.concernProperty], group.value);
-                });
-                this.taskGroups.push({title: group.title, tasks, value: group.value, icon: group.icon});
+            let tasks = this.tasks.filter(task => !task.archive);
+            if (this.currentProject)
+                tasks = tasks.filter(task => task.project && equalID(task.project, this.currentProject._id));
+
+            if (this.profile.concern == TaskConcern.DueDate) {
+                this.calendarRows = [];
+                let firstDay = moment().startOf('month');
+                let date = firstDay.add(firstDay.weekday() ? -firstDay.weekday() + 1 : 0, 'days').add(this.profile.calendarOffset || 0, 'days');
+
+                for (let i = 0; i < 6; i++) {
+                    let row = {days: []};
+                    this.calendarRows.push(row);
+
+                    for (let d = 0; d < 7; d++) {
+                        let style = "border align-top ";
+                        if (date >= moment().startOf('month') && date < moment().startOf('month').add(1, 'month'))
+                            style += "this-month";
+                        if (date.format("D MMM") == moment().startOf('day').format("D MMM"))
+                            style += " today";
+
+                        if (date.month() % 2 == 1) style += " odd-month";
+                        // if (date.date() > date.daysInMonth() - 7) style += " bottom-days";
+                        // if (date.date() == date.daysInMonth() && d != 6) style += " last-day-of-month"; // last day of month if not at the end if row
+
+                        let title = (date.date() == 1) ? (date.year() == moment().year() ? date.format("D MMMM") : date.format("D MMMM YYYY")) : date.format("D");
+                        if (d == 0 && i == 0)
+                            title = date.format("D MMMM");
+
+                        let day = {
+                            title,
+                            dragOver: false,
+                            tasks: tasks.filter(task => Array.isArray(task.dueDates) && task.dueDates.find(d => date.diff(moment(d), 'days') == 0)),
+                            date: moment(date),
+                            style,
+                            day: i == 0 ? date.format("ddd") : ""
+                        };
+                        date = date.add(1, 'days');
+                        row.days.push(day);
+                    }
+                }
+
+                this.unscheduledTasks = tasks.filter(task => (!task.dueDates || !task.dueDates.length) && !task.archive);
+                return;
             }
 
-            // let allValues = this.groupItems.map(e => e.value);
-            // this.taskGroups.unshift({icon: 'fad fa-fog fa-lg', title: 'Brainstorm', value: null, tasks: this.tasks.filter(task => task[this.concernProperty] == null || allValues.indexOf(task[this.concernProperty]) == -1)});
+            this.taskGroups = [];
+            for (let group of this.groupItems) {
+
+                switch (this.profile.concern) {
+                    case TaskConcern.Status:
+                        if (this.profile.filter.statuses && this.profile.filter.statuses.indexOf(group.value) == -1)
+                            continue;
+                }
+
+                let groupTasks = tasks.filter(task => {
+
+                    switch (this.profile.concern) {
+                        case TaskConcern.Start:
+                            if (!Array.isArray(task.assignees) || !task.assignees.find(a => equalID(a, this.profile.currentUser)))
+                                return false;
+
+                            switch (group.value) {
+                                case TaskInboxGroup.Favorite:
+                                    return !!task.favorite;
+
+                                case TaskInboxGroup.Urgent:
+                                    return task.priority == TaskPriority.Urgent;
+                            }
+                            break;
+
+                        default:
+                            if (Array.isArray(task[this.concernProperty])) {
+                                for (let item of task[this.concernProperty]) {
+                                    if (equalID(item, group.value))
+                                        return true;
+                                }
+                                return false;
+                            } else
+                                return equalID(task[this.concernProperty], group.value);
+                    }
+                });
+                this.taskGroups.push({title: group.title, tasks: groupTasks, value: group.value, icon: group.icon});
+            }
         }
 
-        dragStart(event) {
-            event.e.dataTransfer.setData("Text", event.task._id);
-            event.e.dataTransfer.effectAllowed = 'move';
-            this.currentTask = event.task;
+        selectTask(task, tasks) {
+            this.currentTask = task;
+            this.currentGroupTasks = tasks;
         }
 
-        taskMouseDown(e) {
-            this.currentTask = e.task;
+        dragStart(ev, task, group) {
+            ev.dataTransfer.setData("text", task._id.toString());
+            ev.dataTransfer.effectAllowed = 'all';
+            this.dragSourceGroup = group;
         }
 
-        dragging(event) {
-            // console.log(event.x, event.y);
+        ondragover(ev, group) {
+            switch (this.profile.concern) {
+                case TaskConcern.Status:
+                    ev.dataTransfer.dropEffect = 'none';
+                    break;
+
+                case TaskConcern.DueDate:
+                    if (group) group.dragOver = true;
+                    break;
+
+                case TaskConcern.Start:
+                    break;
+
+                default:
+                    ev.dataTransfer.dropEffect = ev.ctrlKey ? 'copy' : 'none';
+                    break;
+            }
+            // ev.preventDefault();
         }
 
         dragLeave(e, day) {
-            day.style = day.style.replace(/drag-hover/, '');
+            day.dragOver = false;
             e.preventDefault();
         }
 
-        allowDropDay(e, day) {
-            day.style = day.style.replace(/ drag-hover/, '') + " drag-hover";
-            e.preventDefault();
-        }
-
-        allowDrop(event) {
-            event.preventDefault();
-        }
-
-        clickGroup(event) {
-            $(event.target).find(".new-task").focus();
+        clickGroup(e) {
+            $(e.target).find(".new-task").focus();
         }
 
         dropToDay(event, day) {
             event.preventDefault();
-            day.style = day.style.replace(/drag-hover/, '');
             if (!this.currentTask.dueDates) this.currentTask.dueDates = [];
-            this.currentTask.dueDates.push(day.date);
+            this.currentTask.dueDates.push(day.date.toDate());
             let patch = {} as Task;
             patch.dueDates = this.currentTask.dueDates;
             this.saveTask(this.currentTask._id, patch);
@@ -449,6 +697,7 @@
         drop(event, group) {
             event.preventDefault();
             this.currentTask[this.concernProperty] = group.value;
+            this.applyTaskColoring(this.currentTask);
             let patch = {} as Task;
             patch[this.concernProperty] = group.value;
             this.saveTask(this.currentTask._id, patch);
@@ -456,37 +705,58 @@
             this.currentTask = null;
         }
 
-        saveTask(task: ID, patch: Task) {
+        saveTask(task: ID, patch: Task, done?) {
             ajax(`/tasks/${task}`, patch, {method: WebMethod.patch}, (res) => {
                 console.log("Saved!");
+                if (done) done(res);
             });
         }
 
-        taskKeypress(event) {
-            this.currentTask = event.task;
-            switch (event.e.which) {
+        taskKeypress(ev, task: Task, tasks: Task[]) {
+            this.currentTask = task;
+            switch (ev.which) {
                 case Keys.del:
                     if (this.taskEditingMode) return;
-                    question("Delete confirm", "Are you sure to delete this task?", [{
-                            title: "YES",
-                            ref: "yes"
-                        }, {title: "NO", ref: "no", _cs: "btn btn-dark"}],
+                    question("The task will be permanently deleted.", "You won't be able to undo this action.", [
+                            {title: "Cancel", ref: "no", _cs: "btn btn-light ml-1"},
+                            {title: "Delete task", ref: "yes", _cs: "btn btn-danger ml-1"}],
                         null, (option) => {
-                            if (option == "yes") {
-                                ajax(`/tasks/${event.task._id}`, null, {method: WebMethod.del}, (res) => {
-                                    this.tasks.splice(this.tasks.indexOf(event.task), 1);
-                                    this.refreshTasks();
-                                });
-                            }
+                            if (option == "yes") this.deleteTask(task);
                         });
+                    break;
+
+                case Keys.ins:
+                    this.toggleSubtask(task);
                     break;
 
                 case Keys.enter:
                     if (this.taskEditingMode)
-                        this.saveTask(event.task._id, {title: event.task.title} as Task);
+                        this.saveTask(task._id, {title: task.title} as Task);
                     this.taskEditingMode = !this.taskEditingMode;
                     break;
             }
+        }
+
+        toggleSubtask(task: Task) {
+            if (task.parent) {
+                task.parent = null
+                this.saveTask(task._id, {parent: null} as Task);
+            } else {
+                let index = this.currentGroupTasks.indexOf(task);
+                for (let i = index - 1; i >= 0; i--) {
+                    if (!this.currentGroupTasks[i].parent) { // Can be parent
+                        task.parent = this.currentGroupTasks[i]._id;
+                        this.currentGroupTasks[i].children = this.currentGroupTasks[i].children || [];
+                        this.currentGroupTasks[i].children.push(task._id);
+                        this.saveTask(task._id, {parent: this.currentGroupTasks[i]._id} as Task);
+                        break;
+                    }
+                }
+
+                if (!task.parent)
+                    alert("Can't be subtask.");
+            }
+            this.refreshTasks();
         }
 
         activateConcern(concern: TaskConcern) {
@@ -495,59 +765,28 @@
                 case TaskConcern.Status:
                     this.concernProperty = "status";
                     this.groupItems = [
-                        {title: "To Do", value: 1},
-                        {title: "Doing", value: 2},
-                        {title: "Verify", value: 5},
-                        {title: "Done", value: 3},
-                        {title: "On Hold", value: 4}
+                        {title: "To Do", value: TaskStatus.Todo},
+                        {title: "Doing", value: TaskStatus.Doing},
+                        {title: "Verify", value: TaskStatus.Verify},
+                        {title: "Done", value: TaskStatus.Done},
+                        {title: "On Hold", value: TaskStatus.OnHold}
                     ];
                     break;
 
                 case TaskConcern.Start:
                     this.concernProperty = null;
                     this.groupItems = [
-                        {title: "Brainstorm", value: 1, icon: 'fad fa-fog fa-lg'},
-                        {title: "To Do (Today)", value: 2},
-                        {title: "Doing (Today)", value: 3},
-                        {title: "Urgent", value: 4},
-                        {title: "Overdue", value: 5},
+                        {title: "Brainstorm", value: TaskInboxGroup.Brainstorm, icon: 'fad fa-fog fa-lg'},
+                        {title: "To Do (Today)", value: TaskInboxGroup.Todo},
+                        {title: "Doing (Today)", value: TaskInboxGroup.Doing},
+                        {title: "Urgent", value: TaskInboxGroup.Urgent},
+                        {title: "Overdue", value: TaskInboxGroup.Overdue},
+                        {title: "Favorite", value: TaskInboxGroup.Favorite, icon: 'fal fa-heart mr-1'},
                     ];
                     break;
 
                 case TaskConcern.DueDate:
                     this.concernProperty = "dueDates";
-                    this.calendarRows = [];
-                    let firstDay = moment().startOf('week').date() % 7;
-                    let date = moment().startOf('month').add(-firstDay - 7, 'days');
-
-                    for (let i = 0; i < 7; i++) {
-                        let row = {days: []};
-                        this.calendarRows.push(row);
-
-                        for (let d = 0; d < 7; d++) {
-                            let style = "calendar-day ";
-                            if (date >= moment().startOf('month') && date < moment().startOf('month').add(1, 'month'))
-                                style += "this-month";
-                            if (date.format("D MMM") == moment().startOf('day').format("D MMM"))
-                                style += " today";
-
-                            let title = date.date() == 1 ? date.format("D MMMM") : date.format("D");
-                            if (d == 0 && i == 0)
-                                title = date.format("D MMMM");
-
-                            let day = {
-                                title,
-                                tasks: this.tasks.filter(task => Array.isArray(task.dueDates) && task.dueDates.find(d => date.diff(moment(d), 'days') == 0)),
-                                date: date,
-                                style,
-                                day: i == 0 ? date.format("ddd") : ""
-                            };
-                            date = date.add(1, 'days');
-                            row.days.push(day);
-                        }
-                    }
-
-                    this.unscheduledTasks = this.tasks.filter(task => !task.dueDates || !task.dueDates.length);
                     break;
 
                 case TaskConcern.Assignee:
@@ -577,10 +816,50 @@
 
         newTask(e, group) {
             if (e.target.value) {
-                let task = {title: e.target.value, _id: ID.generateByBrowser()} as Task;
+                let task = {
+                    title: e.target.value,
+                    _id: ID.generateByBrowser(),
+                    status: TaskStatus.Todo,
+                    project: this.currentProject ? this.currentProject._id : null,
+                    priority: TaskPriority.Normal,
+                    _: {}
+                } as Task;
                 task["_new"] = true;
-                task[this.concernProperty] = group.value;
+
+                switch (this.profile.concern) {
+                    case TaskConcern.Assignee:
+                        task[this.concernProperty] = group.value;
+                        break;
+
+                    case TaskConcern.DueDate:
+                        if (group) {
+                            task.dueDates = task.dueDates || [];
+                            task.dueDates.push(group.date.toDate());
+                        }
+                        break;
+
+                    case TaskConcern.Category:
+                        task[this.concernProperty] = group.value;
+                        break;
+
+                    case TaskConcern.MileStone:
+                        task[this.concernProperty] = group.value;
+                        break;
+
+                    case TaskConcern.Priority:
+                        task[this.concernProperty] = group.value;
+                        break;
+
+                    case TaskConcern.Start:
+                        task[this.concernProperty] = group.value;
+                        break;
+
+                    case TaskConcern.Status:
+                        task[this.concernProperty] = group.value;
+                        break;
+                }
                 this.tasks.push(task);
+                this.applyTaskColoring(task);
                 this.refreshTasks();
                 e.target.value = "";
                 ajax(`/tasks`, task, {method: WebMethod.post}, (res) => {
@@ -608,8 +887,9 @@
         }
 
         .toolbar-button {
-            min-width: 4rem;
+            min-width: 3.5rem;
             margin-bottom: .2rem;
+            padding: 0.375rem 0.5rem;
 
             label {
                 display: block;
@@ -638,7 +918,7 @@
         }
 
         .task-properties {
-            width: 15rem;
+            width: 20rem;
             font-size: .8rem;
         }
 
@@ -649,8 +929,9 @@
 
         .task-item {
             font-size: .8rem;
-            background-color: white;
             cursor: default;
+            color: black;
+            background-color: white;
 
             &.hover {
                 background-color: gray !important;
@@ -659,6 +940,80 @@
             input {
                 background-color: transparent;
                 cursor: default;
+            }
+
+            &.subitem-task {
+                padding-left: 1rem !important;
+            }
+
+            &.subitem-task:before {
+                content: 'X';
+            }
+        }
+
+        .color- {
+            &0 {
+                color: white;
+                background-color: #0083d9;
+            }
+
+            &1 {
+                color: white;
+                background-color: #ff6a00;
+            }
+
+            &2 {
+                color: white;
+                background-color: #aaa;
+            }
+
+            &3 {
+                color: white;
+                background-color: orange;
+            }
+
+            &4 {
+                color: white;
+                background-color: green;
+            }
+
+            &5 {
+                color: white;
+                background-color: #0083d9;
+            }
+
+            &6 {
+                color: white;
+                background-color: #ff6a00;
+            }
+
+            &7 {
+                color: white;
+                background-color: #aaa;
+            }
+
+            &8 {
+                color: white;
+                background-color: orange;
+            }
+
+            &9 {
+                color: white;
+                background-color: green;
+            }
+        }
+
+        .details-view {
+            .prop-label {
+                width: 5rem;
+            }
+
+            .prop-value {
+                width: 10rem;
+            }
+
+            .form-group {
+                width: 15rem;
             }
         }
 
@@ -694,6 +1049,12 @@
             border-bottom-right-radius: 0;
         }
 
+        .concerns {
+            .active {
+                background-color: var(--mina-blue) !important;
+            }
+        }
+
         .calendar {
             table {
                 table-layout: fixed;
@@ -703,9 +1064,18 @@
                 color: gray;
             }
 
+            td.odd-month {
+                background-color: #f8f9fa;
+            }
+
             .calendar-day {
                 padding: 0 .2rem;
                 height: 100%;
+                overflow: auto;
+
+                &.drag-over {
+                    background-color: #b0cfef;
+                }
             }
 
             .this-month label {
@@ -717,10 +1087,6 @@
                 color: white;
                 padding: 0 .3rem;
                 border-radius: .2rem;
-            }
-
-            .drag-hover {
-                outline: 1px solid black;
             }
         }
     }
