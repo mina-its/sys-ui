@@ -1,9 +1,8 @@
-import {ChangeType} from "@/types";
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {Elem, ElemType, GlobalType, ObjectViewType, Property as ObjectProperty, PropertyEditMode} from "../../../sys/src/types";
-    import {ChangeType, Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '@/types';
-    import {getPropertyEmbedError} from '@/main';
+    import {ChangeType, Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '../types';
+    import {getPropertyEmbedError} from '../main';
     import * as main from '../main';
 
     @Component({name: 'Property', components: {}})
@@ -161,6 +160,11 @@ import {ChangeType} from "@/types";
                     else if (this.viewType != ObjectViewType.GridView && this.prop.text && this.prop.text.htmlEditor)
                         return ce('prop-html-editor', {
                             on: {changed: this.changed, focus: this.focused},
+                            props: pr,
+                        });
+                    else if (this.prop.isList)
+                        return ce('prop-text-multiple', {
+                            on: {changed: this.changed, focus: this.focused, keydown: this.keydown},
                             props: pr,
                         });
                     else {

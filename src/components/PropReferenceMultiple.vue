@@ -1,14 +1,14 @@
 <template>
-    <div @focus="focus" tabindex="1" ref="ctrl" :class="styles + ' prop-reference ref-multi pr-3'">
+    <div @focus="focus" @click="click" tabindex="1" ref="ctrl" :class="styles + ' prop-reference ref-multi pr-3'">
         <div v-for="item in items"
              :class="{'ref-multi-item rounded-lg rmI d-inline-block my-1 px-1 border text-nowrap':1,'mr-1':ltr,'ml-1':rtl}">
             <i @click="remove(item)" class="text-black-50 mx-1 rmD fa fa-times" style="cursor:pointer"></i>
             <span class="rmV cursor-pointer">{{item.title}}</span>
         </div>
-        <textarea @click="click" @blur="refreshText" @input="update" v-if="!readOnly"
-                  class="w-100 bg-transparent align-middle rmT d-inline border-0"
-                  rows="1" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
-                  tabindex="1"></textarea>
+        <input @blur="refreshText" @input="update" v-if="!readOnly"
+               class="w-100 bg-transparent align-middle rmT d-inline border-0"
+               spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+               tabindex="1">
         <div v-else class="pt-2 pb-3">&nbsp;</div>
     </div>
 </template>
@@ -16,8 +16,8 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Pair} from "../../../sys/src/types";
-    import {MenuItem, ItemChangeEventArg, JQuery} from '@/types';
-    import {showPropRefMenu} from "@/main";
+    import {MenuItem, ItemChangeEventArg, JQuery} from '../types';
+    import {showPropRefMenu} from "../main";
 
     declare let $: JQuery;
     import * as main from '../main';
@@ -53,7 +53,7 @@
         }
 
         focus() {
-            $(this.$refs.ctrl).find("textarea").focus();
+            $(this.$refs.ctrl).find("input").focus();
         }
 
         @Emit('changed')
@@ -71,7 +71,7 @@
             }
             let val = this.doc[this.prop.name];
             if (!val) val = [];
-            val = [...val];
+            if (!Array.isArray(val)) val = [val];
             val.push(item.ref);
             return {prop: this.prop, val, vue: this};
         }
@@ -104,7 +104,7 @@
         outline: none;
         padding: 0 0.25rem !important;
 
-        textarea {
+        input {
             width: 40px !important;
             outline: none;
             resize: none;

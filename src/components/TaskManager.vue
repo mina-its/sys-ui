@@ -2,8 +2,27 @@
     <div class="task-manager h-100 d-flex flex-column flex-fill overflow-auto">
         <!--  Toolbar -->
         <div class="d-flex p-2 align-items-center btn-toolbar separator-line toolbar" role="toolbar">
+
+            <!--  Project -->
+            <div class="project-filter dropdown mr-2">
+                <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
+                        :class="{'toolbar-button btn mx-1':1, 'btn-secondary': !!currentProject, 'btn-outline-secondary':!currentProject}">
+                    <i class="fal fa-construction fa-lg"></i>
+                    <label v-if="currentProject">{{currentProject.title}}</label>
+                    <label v-else>All Projects</label>
+                </button>
+                <div class="dropdown-menu">
+                    <button class="btn btn-link dropdown-item py-2" @click="filterProject(null)">All
+                        Projects
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item py-2" href="javascript:void(0);" @click="filterProject(project)"
+                       v-for="project of this.profile.projects">{{project.title}}</a>
+                </div>
+            </div>
+
             <!--  Concern -->
-            <div class="concerns btn-group mr-2" role="group" aria-label="First group">
+            <div class="concerns btn-group" role="group" aria-label="First group">
                 <button @click="activateConcern(TaskConcern_Start)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Start===profile.concern}">
                     <i class="fal fa-inbox fa-lg"></i>
@@ -34,28 +53,26 @@
                     <i class="fal fa-layer-group fa-lg"></i>
                     <label>Category</label>
                 </button>
-                <button type="button"
-                        :class="{'btn btn-secondary toolbar-button':1}">
-                    <i class="fal fa-street-view fa-lg"></i>
-                    <label>Category Category</label>
-                </button>
             </div>
 
-            <!--  Project -->
-            <div class="project-filter dropdown">
+            <!--  Profiles -->
+            <div class="dropdown mr-2">
                 <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
-                        :class="{'toolbar-button btn mx-1':1, 'btn-secondary': !!currentProject, 'btn-outline-secondary':!currentProject}">
-                    <i class="fal fa-construction fa-lg"></i>
+                        :class="{'toolbar-button btn mx-1':1, 'btn-primary': !!currentProject, 'btn-secondary':!currentProject}">
+                    <i class="fal fa-head-vr fa-lg"></i>
                     <label v-if="currentProject">{{currentProject.title}}</label>
-                    <label v-else>All Projects</label>
+                    <label v-else>My Views</label>
                 </button>
                 <div class="dropdown-menu">
-                    <button class="btn btn-link dropdown-item py-2" @click="filterProject(null)">All
-                        Projects
-                    </button>
+                    <a class="dropdown-item py-2" href="javascript:void(0);" @click="activateProfile(profile)"
+                       v-for="profile of this.profiles">{{profile.title}}</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item py-2" href="javascript:void(0);" @click="filterProject(project)"
-                       v-for="project of this.profile.projects">{{project.title}}</a>
+                    <div class="input-group px-2" style="min-width: 400px">
+                        <input v-model="searchPhrase" class="form-control" @change="search" placeholder="View Title">
+                        <div class="input-group-append">
+                            <button @click="search" class="btn btn-dark">Save</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -144,12 +161,6 @@
             </div>
 
             <div class="flex-grow-1"></div>
-
-            <!-- Profile -->
-            <button type="button" class="btn btn-outline-secondary toolbar-button m-1">
-                <i class="fal fa-head-vr px-2 fa-lg"></i>
-                <label>Profiles</label>
-            </button>
 
             <!-- Feedback -->
             <div class="dropdown m-1 mt-2">
@@ -283,6 +294,7 @@
     export default class TaskManager extends Vue {
         private tasks: Task[];
         private profile: TaskManagerProfile = {concern: TaskConcern.Start} as TaskManagerProfile;
+        private profiles: TaskManagerProfile[] = [];
         private taskGroups: { title?: string, icon?: string, value: any, tasks: Task[] }[] = [];
         private calendarRows: {
             days: {
@@ -757,6 +769,10 @@
                     alert("Can't be subtask.");
             }
             this.refreshTasks();
+        }
+
+        activateProfile(profile: TaskManagerProfile) {
+            this.activateConcern(profile.concern);
         }
 
         activateConcern(concern: TaskConcern) {

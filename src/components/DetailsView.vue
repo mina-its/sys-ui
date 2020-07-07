@@ -268,12 +268,14 @@
         }
 
         getProps(group: string) {
-            return this.dec.properties.filter(prop => {
+            let props = this.dec.properties.filter(prop => {
                 if (prop.properties)
                     return group == prop.title;
                 else
                     return prop.group == group;
             });
+            console.log(props);
+            return props;
         }
 
         get sideMenuVisible() {
