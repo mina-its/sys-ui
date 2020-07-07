@@ -9,7 +9,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <NavbarMenu :menu="glob.config.menu" :currentRef="currentRef" />
+            <NavbarMenu :menu="glob.config.menu" :currentRef="currentRef"/>
             <!--<master-search></master-search>-->
             <AppLocaleMenu/>
             <AppUserLoginMenu/>
@@ -28,14 +28,12 @@
         get currentRef() {
             return location.hostname;
         }
+
     }
 </script>
 
 <style lang="scss">
-    $left: left;
-    $right: right;
-
     .navbar-nav {
-        margin-#{$right}: auto !important;
+        margin-right: auto !important;
     }
 </style>

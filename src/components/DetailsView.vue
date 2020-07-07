@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level}">
+    <div :class="{'main-body details-view-container h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level, 'compress-view':compressView}">
         <!--  Toolbar -->
         <div v-if="!level" :class="{'d-flex p-2 align-items-center btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
 
@@ -79,6 +79,10 @@
         private headFuncs: HeadFunc[] = [];
         private AccessPermission_Edit = AccessPermission.Edit;
         private ObjectDetailsViewType_Tabular = ObjectDetailsViewType.Tabular;
+
+        get compressView() {
+            return this.dec.detailsViewType === ObjectDetailsViewType.Compress;
+        }
 
         isNotAloneInlineDataGridProperty(group, prop) {
             return prop._.gtype == GlobalType.object && prop.isList && (this.level > 0);
@@ -344,6 +348,12 @@
             background-color: #eee;
             border-left: 3px solid var(--link-color);
             margin-left: -3px;
+        }
+    }
+
+    .compress-view {
+        .form-group {
+            margin-bottom: 0;
         }
     }
 </style>

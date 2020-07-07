@@ -96,7 +96,7 @@
             flex: 1 1 100%;
             width: 100%;
             height: 100%;
-            border: 1px solid white;
+            border: 2px solid white;
             cursor: pointer;
         }
 

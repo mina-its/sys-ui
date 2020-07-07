@@ -1,4 +1,3 @@
-import {LogType} from "../../../sys/src/types";
 <template>
     <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level}">
         <!-- Toolbar -->

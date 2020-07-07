@@ -464,9 +464,6 @@ function hideCmenu() {
 exports.hideCmenu = hideCmenu;
 function handleWindowEvents() {
     $(window)
-        .on(types_1.Constants.questionEvent, function (e) {
-        exports.glob.question = e.detail;
-    })
         .on("popstate", (e) => {
         load(location.href);
     })
@@ -703,8 +700,7 @@ function notify(content, type, params) {
 }
 exports.notify = notify;
 function question(title, message, buttons, options, select) {
-    window.dispatchEvent(new CustomEvent(types_1.Constants.questionEvent, { detail: { title, message, buttons, options, select } }));
-    exports.glob.question.show = true;
+    exports.glob.question = { title, message, buttons, options, select, show: true };
 }
 exports.question = question;
 function loadHeadScript(src, done) {

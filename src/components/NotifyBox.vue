@@ -1,6 +1,6 @@
 <template>
     <transition name="fade">
-        <div v-if="glob.notify && !glob.modal" ref="notifyBox" id="notify-box"
+        <div v-if="glob.notify && !glob.modal && glob.notify.message" ref="notifyBox" id="notify-box"
              :class="'text-left w-100 navbar notify-type-'+glob.notify.type" role="alert" @click="glob.notify=null">
 	    <span>
 	    	<i v-if="glob.notify.type===3" class="m-1 fa fa-exclamation-circle fa-2x"></i>

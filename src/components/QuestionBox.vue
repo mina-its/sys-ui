@@ -1,26 +1,14 @@
 <template>
-    <transition name="fade">
-        <div v-if="glob.question.show" id="question-box">
-            <div class="modal-mask">
-                <div class="modal-wrapper">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header text-white bg-dark text-uppercase font-weight-bold">
-                                <h5 class="modal-title">{{glob.question.title}}</h5>
-                                <button type="button" @click="close" class="close"><span aria-hidden="true">×</span></button>
-                            </div>
-                            <div class="modal-body d-flex align-items-center">
-                                <div class="flex-grow-1 mx-2" v-html="message"></div>
-                            </div>
-                            <div class="modal-footer">
-                                <button @click="select(button.ref)" :class="button._cs || 'btn btn-primary'" v-for="button in glob.question.buttons">{{button.title}}</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div v-if="glob.question.show" class="question-box">
+        <div class="overlay"></div>
+        <div class="main p-3">
+            <div class="main-title font-weight-bold">{{glob.question.title}}</div>
+            <div class="main-message" v-html="message"></div>
+            <div class="main-footer text-right pt-3">
+                <button @click="select(button.ref)" :class="button._cs || 'btn btn-primary mx-1'" v-for="button in glob.question.buttons">{{button.title}}</button>
             </div>
         </div>
-    </transition>
+    </div>
 </template>
 
 <script lang="ts">
@@ -53,14 +41,44 @@
     }
 </script>
 
-<style scoped lang="scss">
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity .5s;
-    }
+<style lang="scss">
+    .question-box {
+        background-color: transparent;
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-    .fade-enter, .fade-leave-to
-    {
-        opacity: 0;
-    }
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.4);
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            position: absolute;
+        }
 
+        .btn{
+            border-radius: 0.1rem;
+        }
+
+        .main {
+            -webkit-font-smoothing: antialiased;
+            font-size: 14px;
+            font-weight: 400;
+            box-shadow: rgba(0, 0, 0, 0.22) 0px 25.6px 57.6px 0px, rgba(0, 0, 0, 0.18) 0px 4.8px 14.4px 0px;
+            background-color: rgb(255, 255, 255);
+            box-sizing: border-box;
+            position: relative;
+            text-align: left;
+            max-height: 100%;
+            overflow-y: auto;
+            border-radius: 2px;
+            outline: transparent solid 3px;
+        }
+    }
 </style>

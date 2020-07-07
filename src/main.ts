@@ -470,9 +470,6 @@ export function hideCmenu() {
 
 function handleWindowEvents() {
     $(window)
-        .on(Constants.questionEvent, function (e: any) {
-            glob.question = e.detail;
-        })
         .on("popstate", (e) => {
             load(location.href);
         })
@@ -710,8 +707,7 @@ export function notify(content: string | IError, type?: LogType, params?: Notifi
 }
 
 export function question(title: string, message: string, buttons: Pair[], options: QuestionOptions, select: (ref: any) => void) {
-    window.dispatchEvent(new CustomEvent(Constants.questionEvent, {detail: {title, message, buttons, options, select}}));
-    glob.question.show = true;
+    glob.question = {title, message, buttons, options, select, show: true};
 }
 
 export function loadHeadScript(src, done) {

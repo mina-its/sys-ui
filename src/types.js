@@ -9,7 +9,6 @@ exports.Constants = {
     errorEmbedProperty: 'e',
     redirectSelf: '_self',
     defaultAddress: '/_default',
-    questionEvent: 'question',
     contextMenuVisibleItems: 10,
     delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],

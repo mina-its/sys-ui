@@ -100,7 +100,7 @@ import {ChangeType} from "@/types";
                     children.push(cmt);
             }
 
-            return ce('div', {attrs: {"class": "form-group"}}, children);
+            return ce('div', {attrs: {"class": "form-group p_" + this.prop.name}}, children);
         }
 
         renderTreeView(ce) {
@@ -277,6 +277,10 @@ import {ChangeType} from "@/types";
                 color: #f4b400;
             }
         }
+    }
+
+    .compress-view .prop-value {
+        width: 100%;
     }
 
     @media (max-width: 576px) {

@@ -49,6 +49,7 @@
 
     :root {
         --primary: #0072C6;
+        --mina-blue: #007bff;
         --danger: #ff4136;
         --dark: #24292e;
         --header-bg: #24292e;
@@ -95,6 +96,11 @@
             color: purple;
             font-weight: 600;
         }
+    }
+
+    .btn-light {
+        background-color: #ededed;
+        border-color: #ededed;
     }
 
     html {
