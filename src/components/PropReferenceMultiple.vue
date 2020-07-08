@@ -1,19 +1,19 @@
 <template>
-    <div @click="focus" :class="styles + ' prop-reference ref-multi pb-0 pr-3'">
+    <div @click="focus" :class="styles + ' prop-reference ref-multi pb-0 pl-1 pr-3'">
         <div v-for="item in items"
              :class="{'ref-multi-item rounded-lg rmI d-inline-block mb-1 px-1 border text-nowrap':1,'mr-1':ltr,'ml-1':rtl}">
             <i @click="remove(item)" class="text-black-50 mx-1 rmD fa fa-times" style="cursor:pointer"></i>
             <span class="rmV cursor-pointer">{{item.title}}</span>
         </div>
-        <input @blur="refreshText" @input="update" v-if="!readOnly"
-               class="bg-transparent rmT border-0" @click="click"
+        <input @blur="refreshText" @input="update" v-if="!readOnly" @keydown="keypress"
+               class="bg-transparent rmT border-0" @click="click" v-model="phrase"
                spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {Property, Pair} from "../../../sys/src/types";
+    import {Property, Pair, Keys} from "../../../sys/src/types";
     import {MenuItem, ItemChangeEventArg, JQuery} from '../types';
     import {showPropRefMenu} from "../main";
 
@@ -27,11 +27,12 @@
         @Prop() private prop: Property;
         @Prop() private styles: string;
         @Prop() private readOnly: boolean;
+        private phrase: string = '';
 
         update(e, clicked) {
             if (this.readOnly) return;
-            let val = (e.target as any).value;
-            showPropRefMenu(this.prop, this.doc, clicked ? "" : val, this.$el, true, (item: MenuItem) => {
+            showPropRefMenu(this.prop, this.doc, clicked ? "" : this.phrase, this.$el, true, (item: MenuItem) => {
+                this.phrase = "";
                 if (item == null) { // Esc
                     this.refreshText();
                     return;
@@ -39,6 +40,14 @@
                 $(this.$el).find("input").focus();
                 this.selectItem(item);
             });
+        }
+
+        keypress(e) {
+            switch (e.which) {
+                case Keys.backspace:
+                    // this.items.pop();
+                    break;
+            }
         }
 
         click(e) {
@@ -109,11 +118,11 @@
         }
 
         input {
-            width: 1rem !important;
+            width: 1px !important;
             outline: none;
 
             &:focus {
-                width: 8rem !important;
+                width: 4rem !important;
             }
         }
 

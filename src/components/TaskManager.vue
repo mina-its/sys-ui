@@ -141,26 +141,13 @@
                 </div>
             </div>
 
-            <!--  Search -->
-            <div class="dropdown">
-                <button id="searchButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        type="button" class="toolbar-button btn btn-outline-secondary mx-1">
-                    <i class="fal fa-search fa-lg"></i>
-                    <label>Search</label>
-                </button>
-                <div class="dropdown-menu filter-panel p-3" aria-labelledby="searchButton">
-                    <form>
-                        <div class="input-group" style="min-width: 300px">
-                            <input v-model="searchPhrase" class="form-control" @change="search" placeholder="Task ID / Task Title">
-                            <div class="input-group-append">
-                                <button @click="search" class="btn btn-success">Search</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
             <div class="flex-grow-1"></div>
+
+            <!--  Search -->
+            <div class="search-box border rounded px-1">
+                <i class="fal fa-search mx-1"></i>
+                <input type="search" v-model="searchPhrase" placeholder="Search task #no / title" class="border-0 outline-0" @change="search">
+            </div>
 
             <!-- Feedback -->
             <div class="dropdown m-1 mt-2" title="Feedback">
@@ -213,7 +200,7 @@
                     <tr v-for="row of calendarRows" class="">
                         <td v-for="day of row.days" :class="day.style" @click="clickGroup">
                             <task-group :tasks="day.tasks" :title="day.day" :subtitle="day.title"
-                                        :class="{'task-group h-100 w-100 calendar-day':1,'drag-over':day.dragOver}"
+                                        class="task-group h-100 w-100 calendar-day"
                                         @startdragtask="dragStart($event.ev,$event.task,day)" @ondragover="ondragover"
                                         @taskmousedown="selectTask($event.task,day.tasks)" @taskkeypress="taskKeypress($event.ev,$event.task,day.tasks)"
                                         @clickgroup="clickGroup"
@@ -281,8 +268,8 @@
     import {Component, Vue} from 'vue-property-decorator';
     import {ID, Keys, ObjectDec, Project, Task, TaskConcern, TaskInboxGroup, TaskManagerProfile, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
     import TaskGroup from "../components/TaskGroup.vue";
-    import {ItemChangeEventArg} from "../types";
-    import {ajax, call, equalID, onlyUnique, question} from "../main";
+    import {ItemChangeEventArg, MenuItem} from "../types";
+    import {ajax, call, equalID, onlyUnique, question, showCmenu} from "../main";
 
     declare let $, moment: any;
 
@@ -296,7 +283,6 @@
             days: {
                 title: string,
                 date: any,
-                dragOver: boolean,
                 day: string,
                 style: string,
                 tasks: Task[]
@@ -327,6 +313,7 @@
                 this.tasks = res.data.tasks;
                 this.profile = res.data.profile;
                 this.tasksDec = res.data.tasksDec;
+                this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "description", "time", "status", "owner", "priority"].indexOf(p.name) > -1);
                 // console.log("this.tasksDec", this.tasksDec);
                 this.activateConcern(TaskConcern.Status);
             });
@@ -337,7 +324,15 @@
         }
 
         search() {
-            this.searchPhrase = null;
+            if (!this.searchPhrase) return;
+            call("searchTasks", {phrase: this.searchPhrase}, (err, res) => {
+                let items = res.data.tasks.map(task => {
+                    return {title: task.title, ref: task} as MenuItem;
+                });
+                showCmenu(null, items, {ctrl: $(".search-box")}, (state, item: MenuItem) => {
+                    console.log(item.ref);
+                });
+            });
         }
 
         toggleDetails() {
@@ -596,7 +591,6 @@
 
                         let day = {
                             title,
-                            dragOver: false,
                             tasks: tasks.filter(task => Array.isArray(task.dueDates) && task.dueDates.find(d => date.diff(moment(d), 'days') == 0)),
                             date: moment(date),
                             style,
@@ -693,7 +687,6 @@
                     break;
 
                 case TaskConcern.DueDate:
-                    if (group) group.dragOver = true;
                     break;
 
                 case TaskConcern.Start:
@@ -707,7 +700,6 @@
         }
 
         dragLeave(e, day) {
-            day.dragOver = false;
             e.preventDefault();
         }
 
@@ -898,6 +890,7 @@
                 this.refreshTasks();
                 e.target.value = "";
                 ajax(`/tasks`, task, {method: WebMethod.post}, (res) => {
+                    Object.assign(task, res.modifyResult);
                     console.log("Saved!");
                 });
             }
@@ -919,6 +912,10 @@
 
         .task-group {
             width: 15rem;
+
+            &.drag-over {
+                background-color: rgba(0, 140, 255, 0.05) !important;
+            }
         }
 
         .toolbar-button {
@@ -1111,10 +1108,6 @@
             .calendar-day {
                 padding: 0 .2rem;
                 overflow: auto;
-
-                &.drag-over {
-                    background-color: #b0cfef;
-                }
             }
 
             .this-month label {

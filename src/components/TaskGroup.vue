@@ -1,5 +1,5 @@
 <template>
-    <div @click="clickgroup" @drop="drop" @dragover="dragovergroup">
+    <div @click="clickgroup" tabindex="1" @drop="drop" @mouseup="mouseUp" @dragover="dragovergroup" @dragleave="dragOver=false" :class="{'drag-over':dragOver}">
         <div v-if="title" class="font-weight-bold py-1 text-primary">
             <i v-if="icon" :class="icon"></i>{{title}}
         </div>
@@ -9,7 +9,8 @@
                 <div class="w-100 d-flex align-items-center">
                     <i v-if="task.parent" class="fal fa-circle fa-xs mx-1 text-black-50"></i>
                     <!--                    <i v-if="task.children" class="fal fa-plus-square fa-sm mx-1 text-black-50"></i>-->
-                    <div draggable="true" @dragstart="startdragtask($event,task)" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown($event,task)" :class="'task-item d-flex align-items-center border w-100 rounded ' + (task._.style || '') + (task._.multiPlace?' multi-place':'')">
+                    <div draggable="true" @dragstart="startdragtask($event,task)" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown($event,task)"
+                         :class="'task-item d-flex align-items-center border w-100 rounded ' + (task._.style || '') + (task._.multiPlace?' multi-place':'')">
                         <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-caret-down':!task._.expand,'fas fa-caret-right':task._.expand}"></i>
                         <input @change="changeTitle($event,task)" @keydown="inputKeyPress($event,task)" :readonly="!editingMode" v-model="task.title" class="px-1 border-0 w-100">
                     </div>
@@ -17,6 +18,7 @@
             </template>
         </div>
         <input class="new-task mt-1 px-1 border-0 w-100 bg-transparent" @change="newtask">
+        <input class="w-100 h-100 border-0 bg-transparent">
     </div>
 </template>
 
@@ -34,6 +36,7 @@
         @Prop() private subtitle: string;
         @Prop() private tasks: Task[];
         editingMode: boolean = false;
+        dragOver: boolean = false;
 
         hasChild(task: Task) {
             return this.tasks.filter(t => equalID(t.parent, task._id)).length > 0;
@@ -56,7 +59,12 @@
 
         @Emit('dropgroup')
         drop(e) {
+            this.dragOver = false;
             return e;
+        }
+
+        mouseUp(e) {
+
         }
 
         changeTitle(ev, task) {
@@ -73,6 +81,7 @@
 
         @Emit('dragovergroup')
         dragovergroup(event) {
+            this.dragOver = true;
             return event;
         }
 

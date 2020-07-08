@@ -1,23 +1,21 @@
 <template>
-    <div @click="focus" :class="styles + ' prop-text-multi pb-0'">
+    <div @click="focus" :class="styles + ' prop-text-multi px-1 pb-0'">
         <div v-for="item in items"
              :class="{'ref-multi-item rounded-lg rmI d-inline-block mb-1 px-1 border text-nowrap':1,'mr-1':ltr,'ml-1':rtl}">
             <i @click="remove(item)" class="text-black-50 mx-1 rmD fa fa-times" style="cursor:pointer"></i>
             <span class="rmV cursor-pointer">{{item}}</span>
         </div>
-        <input @blur="refreshText" @change="update" v-if="!readOnly"
+        <input @blur="refreshText" v-model="phrase" @keydown="keypress" @change="update" v-if="!readOnly"
                class="bg-transparent rmT border-0">
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {Property, Pair} from "../../../sys/src/types";
-    import {MenuItem, ItemChangeEventArg, JQuery} from '@/types';
-    import {showPropRefMenu} from "@/main";
+    import {Property, Keys} from "../../../sys/src/types";
+    import {ItemChangeEventArg} from '../types';
 
     declare let $: any;
-    import * as main from '../main';
 
     @Component({name: 'PropTextMultiple'})
     export default class PropTextMultiple extends Vue {
@@ -26,13 +24,24 @@
         @Prop() private prop: Property;
         @Prop() private styles: string;
         @Prop() private readOnly: boolean;
+        private phrase: string = '';
 
-        update(e, clicked) {
-            if (this.readOnly) return;
-            let val = (e.target as any).value;
-            if (!val) return;
-            e.target.value = "";
-            this.addItem(val);
+        keypress(e) {
+            switch (e.which) {
+                case Keys.backspace:
+                    if (!this.phrase) {
+                        let item = this.items.pop();
+                        if (item) this.remove(item);
+                    }
+                    break;
+            }
+        }
+
+        update(e) {
+            if (this.phrase) {
+                this.addItem(this.phrase);
+                this.phrase = "";
+            }
         }
 
         refreshText() {
