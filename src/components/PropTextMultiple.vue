@@ -1,14 +1,12 @@
 <template>
-    <div @focus="focus" tabindex="1" ref="ctrl" :class="styles + ' prop-text-multi pr-3'">
+    <div @click="focus" :class="styles + ' prop-text-multi pb-0'">
         <div v-for="item in items"
-             :class="{'ref-multi-item rounded-lg rmI d-inline-block my-1 px-1 border text-nowrap':1,'mr-1':ltr,'ml-1':rtl}">
+             :class="{'ref-multi-item rounded-lg rmI d-inline-block mb-1 px-1 border text-nowrap':1,'mr-1':ltr,'ml-1':rtl}">
             <i @click="remove(item)" class="text-black-50 mx-1 rmD fa fa-times" style="cursor:pointer"></i>
             <span class="rmV cursor-pointer">{{item}}</span>
         </div>
-        <input @click="click" @blur="refreshText" @change="update" v-if="!readOnly"
-               class="bg-transparent rmT border-0"
-               spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
-        ></input>
+        <input @blur="refreshText" @change="update" v-if="!readOnly"
+               class="bg-transparent rmT border-0">
     </div>
 </template>
 
@@ -18,7 +16,7 @@
     import {MenuItem, ItemChangeEventArg, JQuery} from '@/types';
     import {showPropRefMenu} from "@/main";
 
-    declare let $: JQuery;
+    declare let $: any;
     import * as main from '../main';
 
     @Component({name: 'PropTextMultiple'})
@@ -34,11 +32,7 @@
             let val = (e.target as any).value;
             if (!val) return;
             e.target.value = "";
-            this.addtem(val);
-        }
-
-        click(e) {
-            this.update(e, true);
+            this.addItem(val);
         }
 
         refreshText() {
@@ -48,7 +42,7 @@
         }
 
         focus() {
-            $(this.$refs.ctrl).find("input").focus();
+            $(this.$el).find("input").focus();
         }
 
         @Emit('changed')
@@ -58,7 +52,7 @@
         }
 
         @Emit('changed')
-        addtem(value: string): ItemChangeEventArg {
+        addItem(value: string): ItemChangeEventArg {
             if (!value) { // Esc
                 this.refreshText();
                 return;
@@ -80,8 +74,21 @@
 
 <style lang="scss">
     .prop-text-multi {
-        outline: none;
-        padding: 0 0.25rem !important;
+        min-height: 2rem;
+
+        &:focus-within {
+            outline: 1px dotted #212121;
+            outline: 5px auto -webkit-focus-ring-color;
+        }
+
+        input {
+            width: 1rem !important;
+            outline: none;
+
+            &:focus {
+                width: 8rem !important;
+            }
+        }
 
         .ref-multi-item {
             background-color: whitesmoke;

@@ -63,7 +63,7 @@
         --grid-row-header-highlight: #FFE;
         --form-label: #666;
         --layout-border: #ddd;
-        --side-nav-bg: #2f353c;
+        --side-nav-bg: #3b3b45;
         --side-nav-color: #fff;
         --breadcrumb-separator: #aaa;
         --link-color: #4285f4;
@@ -244,7 +244,7 @@
         box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
         border-radius: 0 0 .25rem .25rem;
         border: none !important;
-        margin-top: .55rem;
+        /*!*margin-top: .55rem;*! I removed this because of multi reference problem*/
     }
 
     .breadcrumb-item {

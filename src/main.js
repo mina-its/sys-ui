@@ -498,7 +498,6 @@ function handleWindowEvents() {
         if (!/\bf=\d/.test(href)) // push state on not function link
             history.pushState(null, null, href);
         load(href);
-        // e.stopPropagation();
     });
 }
 function handleImagesPreview(selector) {
@@ -669,7 +668,7 @@ function joinUri(...parts) {
     return uri.substr(1);
 }
 exports.joinUri = joinUri;
-function notify(content, type, params) {
+function notify(content, type) {
     if (!content) {
         return;
     }
@@ -695,7 +694,7 @@ function notify(content, type, params) {
             $(".notify-message-container").html(`<div class="notify-message-type-${type}">${message}</div>`);
         }
         else
-            exports.glob.notify = notify;
+            exports.glob.notify = { message, type };
     }
 }
 exports.notify = notify;
@@ -786,13 +785,8 @@ function call(funcName, data, done) {
 exports.call = call;
 function load(href, pushState = false) {
     if (exports.glob.dirty) {
-        // if (glob.form.toolbar) {
         notify($t('save-before'), types_2.LogType.Warning);
         return;
-        // } else {
-        //     glob.modifies = [];
-        //     glob.dirty = false;
-        // }
     }
     if (pushState && location.href != href) {
         history.pushState(null, null, href);
@@ -813,9 +807,7 @@ function ajax(url, data, config, done, fail) {
         dataType: "text",
         transformResponse: res => res,
         method: config.method || (data ? types_2.WebMethod.post : types_2.WebMethod.get),
-        headers: {
-            'Content-Type': "text/plain"
-        },
+        headers: { 'Content-Type': "text/plain" },
         withCredentials: true
     };
     // extract files raw data
@@ -848,6 +840,7 @@ function ajax(url, data, config, done, fail) {
     if (!multipart)
         params.data = bson_util_1.stringify(data, true);
     // if (params.data) console.log(params.data);
+    console.log("ajax params :", params);
     // Ajax call
     axios(params).then(res => {
         stopProgress();
@@ -857,7 +850,7 @@ function ajax(url, data, config, done, fail) {
         else {
             try {
                 let result = bson_util_1.parse(res.data, true, types_1.ID);
-                console.log("ajax result :", result);
+                // console.log("ajax result :", result);
                 done(result);
             }
             catch (ex) {
@@ -1148,8 +1141,8 @@ function _dispatchRequestServerModify(store, done) {
             method = types_2.WebMethod.del;
             break;
     }
-    console.log(modify.data);
-    console.log(bson_util_1.stringify(modify.data, true));
+    // console.log(modify.data);
+    // console.log(stringify(modify.data, true));
     ajax(prepareServerUrl(modify.ref), modify.data, { method }, (res) => {
         commitServerChangeResponse(store, modify, res.modifyResult);
         if (getQs("n")) {
@@ -1172,9 +1165,9 @@ function _dispatchRequestServerModify(store, done) {
     });
 }
 function start(params) {
-    console.log('starting ...');
+    console.log('Starting ...');
     const mainState = $('#main-state').html();
-    console.log('mainState', mainState);
+    // console.log('mainState', mainState);
     const res = bson_util_1.parse(mainState, true, types_1.ID);
     if (res)
         startVue(res, params);

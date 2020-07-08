@@ -505,7 +505,6 @@ function handleWindowEvents() {
         if (!/\bf=\d/.test(href)) // push state on not function link
             history.pushState(null, null, href);
         load(href);
-        // e.stopPropagation();
     });
 }
 
@@ -678,7 +677,7 @@ export function joinUri(...parts: string[]): string {
     return uri.substr(1);
 }
 
-export function notify(content: string | IError, type?: LogType, params?: NotificationInfo) {
+export function notify(content: string | IError, type?: LogType) {
     if (!content) {
         return;
     }
@@ -702,7 +701,7 @@ export function notify(content: string | IError, type?: LogType, params?: Notifi
         } else if ($(".notify-message-container").length) {
             $(".notify-message-container").html(`<div class="notify-message-type-${type}">${message}</div>`);
         } else
-            glob.notify = notify;
+            glob.notify = {message, type};
     }
 }
 
@@ -796,13 +795,8 @@ export function call(funcName: string, data: any, done: (err, res?) => void) {
 
 export function load(href: string, pushState = false) {
     if (glob.dirty) {
-        // if (glob.form.toolbar) {
         notify($t('save-before'), LogType.Warning);
         return;
-        // } else {
-        //     glob.modifies = [];
-        //     glob.dirty = false;
-        // }
     }
 
     if (pushState && location.href != href) {
@@ -825,9 +819,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         dataType: "text",
         transformResponse: res => res,
         method: config.method || (data ? WebMethod.post : WebMethod.get),
-        headers: {
-            'Content-Type': "text/plain"
-        },
+        headers: {'Content-Type': "text/plain"},
         withCredentials: true
     };
 
@@ -864,6 +856,8 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         params.data = stringify(data, true);
     // if (params.data) console.log(params.data);
 
+    console.log("ajax params :", params);
+
     // Ajax call
     axios(params).then(res => {
         stopProgress();
@@ -872,7 +866,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         } else {
             try {
                 let result = parse(res.data, true, ID);
-                console.log("ajax result :", result);
+                // console.log("ajax result :", result);
                 done(result);
             } catch (ex) {
                 console.error("Ajax parse", res, ex);
@@ -1188,8 +1182,8 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
             method = WebMethod.del;
             break;
     }
-    console.log(modify.data);
-    console.log(stringify(modify.data, true));
+    // console.log(modify.data);
+    // console.log(stringify(modify.data, true));
 
     ajax(prepareServerUrl(modify.ref), modify.data, {method}, (res) => {
         commitServerChangeResponse(store, modify, res.modifyResult);
@@ -1214,9 +1208,9 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
 }
 
 export function start(params?: StartParams) {
-    console.log('starting ...');
+    console.log('Starting ...');
     const mainState = $('#main-state').html();
-    console.log('mainState', mainState);
+    // console.log('mainState', mainState);
     const res: WebResponse = parse(mainState, true, ID);
 
     if (res)

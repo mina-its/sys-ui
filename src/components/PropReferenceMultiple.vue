@@ -1,15 +1,13 @@
 <template>
-    <div @focus="focus" @click="click" tabindex="1" ref="ctrl" :class="styles + ' prop-reference ref-multi pr-3'">
+    <div @click="focus" :class="styles + ' prop-reference ref-multi pb-0 pr-3'">
         <div v-for="item in items"
-             :class="{'ref-multi-item rounded-lg rmI d-inline-block my-1 px-1 border text-nowrap':1,'mr-1':ltr,'ml-1':rtl}">
+             :class="{'ref-multi-item rounded-lg rmI d-inline-block mb-1 px-1 border text-nowrap':1,'mr-1':ltr,'ml-1':rtl}">
             <i @click="remove(item)" class="text-black-50 mx-1 rmD fa fa-times" style="cursor:pointer"></i>
             <span class="rmV cursor-pointer">{{item.title}}</span>
         </div>
         <input @blur="refreshText" @input="update" v-if="!readOnly"
-               class="w-100 bg-transparent align-middle rmT d-inline border-0"
-               spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
-               tabindex="1">
-        <div v-else class="pt-2 pb-3">&nbsp;</div>
+               class="bg-transparent rmT border-0" @click="click"
+               spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
     </div>
 </template>
 
@@ -33,11 +31,12 @@
         update(e, clicked) {
             if (this.readOnly) return;
             let val = (e.target as any).value;
-            showPropRefMenu(this.prop, this.doc, clicked ? "" : val, this.$refs.ctrl, true, (item: MenuItem) => {
+            showPropRefMenu(this.prop, this.doc, clicked ? "" : val, this.$el, true, (item: MenuItem) => {
                 if (item == null) { // Esc
                     this.refreshText();
                     return;
                 }
+                $(this.$el).find("input").focus();
                 this.selectItem(item);
             });
         }
@@ -52,8 +51,9 @@
             this.doc[this.prop.name] = val;
         }
 
-        focus() {
-            $(this.$refs.ctrl).find("input").focus();
+        focus(e) {
+            $(this.$el).find("input").focus();
+            this.update(e, true);
         }
 
         @Emit('changed')
@@ -101,14 +101,20 @@
 
 <style lang="scss">
     .prop-reference.ref-multi {
-        outline: none;
-        padding: 0 0.25rem !important;
+        min-height: 2rem;
+
+        &:focus-within {
+            outline: 1px dotted #212121;
+            outline: 5px auto -webkit-focus-ring-color;
+        }
 
         input {
-            width: 40px !important;
+            width: 1rem !important;
             outline: none;
-            resize: none;
-            overflow: hidden;
+
+            &:focus {
+                width: 8rem !important;
+            }
         }
 
         .ref-multi-item {
@@ -120,12 +126,4 @@
             color: #666;
         }
     }
-
-    /*.prop-reference.ref-multi textarea {*/
-    /*    display: none !important;*/
-    /*}*/
-
-    /*.prop-reference.ref-multi:focus textarea, .prop-reference.ref-multi:focus-within textarea {*/
-    /*    display: inline-block !important;*/
-    /*}*/
 </style>

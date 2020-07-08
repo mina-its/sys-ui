@@ -274,7 +274,6 @@
                 else
                     return prop.group == group;
             });
-            console.log(props);
             return props;
         }
 

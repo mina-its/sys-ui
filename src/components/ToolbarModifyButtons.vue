@@ -18,7 +18,9 @@
             glob.notify = null;
             if (!main.validate(this.$store.state.data)) return;
             // todo: if (main.getQs("n") == "true") return main.commitNewItem();
-            main.dispatchRequestServerModify(this.$store, () => main.log('Apply done!'));
+            main.dispatchRequestServerModify(this.$store, () => {
+                // main.log('Apply done!')
+            });
         }
 
         mounted() {

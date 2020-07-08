@@ -163,11 +163,10 @@
             <div class="flex-grow-1"></div>
 
             <!-- Feedback -->
-            <div class="dropdown m-1 mt-2">
+            <div class="dropdown m-1 mt-2" title="Feedback">
                 <button id="feedbackButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        type="button" class="toolbar-button btn btn-outline-secondary">
-                    <i class="fal fa-comment-lines px-2 fa-lg"></i>
-                    <label>Feedback</label>
+                        type="button" class="btn btn-link">
+                    <i class="fal fa-comment-alt-exclamation fa-lg"></i>
                 </button>
                 <div class="dropdown-menu filter-panel p-3" aria-labelledby="feedbackButton" style="width: 30rem">
                     <form>
@@ -204,37 +203,34 @@
 
             <!--  Calendar -->
             <div class="calendar w-100 h-100 d-flex" v-if="TaskConcern_DueDate===profile.concern">
-                <task-manager-group :tasks="unscheduledTasks" v-if="unscheduledTasks.length" title="Unscheduled"
-                                    class="task-manager-group bg-light px-2 py-1"
-                                    @startdragtask="dragStart($event.ev,$event.task,null)"
-                                    @taskmousedown="selectTask($event.task,unscheduledTasks)" @taskkeypress="taskKeypress($event.ev,$event.task,unscheduledTasks)" @clickgroup="clickGroup"
-                                    @newtask="newTask($event, null)"
-                                    @dropgroup="drop($event,null)" @dragovergroup="ondragover($event,null)"
-                                    :editingMode="taskEditingMode"></task-manager-group>
+                <task-group :tasks="unscheduledTasks" v-if="unscheduledTasks.length" title="Unscheduled"
+                            class="task-group bg-light px-2 py-1"
+                            @startdragtask="dragStart($event.ev,$event.task,null)"
+                            @taskmousedown="selectTask($event.task,unscheduledTasks)" @taskkeypress="taskKeypress($event.ev,$event.task,unscheduledTasks)" @clickgroup="clickGroup"
+                            @newtask="newTask($event, null)"
+                            @dropgroup="drop($event,null)" @dragovergroup="ondragover($event,null)"></task-group>
                 <table class="w-100 h-100 flex-fill" @wheel="calendarWheel">
                     <tr v-for="row of calendarRows" class="">
                         <td v-for="day of row.days" :class="day.style" @click="clickGroup">
-                            <task-manager-group :tasks="day.tasks" :title="day.day" :subtitle="day.title"
-                                                :class="{'calendar-day':1,'drag-over':day.dragOver}"
-                                                @startdragtask="dragStart($event.ev,$event.task,day)" @ondragover="ondragover"
-                                                @taskmousedown="selectTask($event.task,day.tasks)" @taskkeypress="taskKeypress($event.ev,$event.task,day.tasks)"
-                                                @clickgroup="clickGroup"
-                                                @newtask="newTask($event, day)"
-                                                @dropgroup="drop($event,day)" @dragovergroup="ondragover($event,day)" :icon="day.icon"
-                                                :editingMode="taskEditingMode"></task-manager-group>
+                            <task-group :tasks="day.tasks" :title="day.day" :subtitle="day.title"
+                                        :class="{'task-group h-100 w-100 calendar-day':1,'drag-over':day.dragOver}"
+                                        @startdragtask="dragStart($event.ev,$event.task,day)" @ondragover="ondragover"
+                                        @taskmousedown="selectTask($event.task,day.tasks)" @taskkeypress="taskKeypress($event.ev,$event.task,day.tasks)"
+                                        @clickgroup="clickGroup"
+                                        @newtask="newTask($event, day)"
+                                        @dropgroup="drop($event,day)" @dragovergroup="ondragover($event,day)" :icon="day.icon"></task-group>
                         </td>
                     </tr>
                 </table>
             </div>
 
             <!--  Columns -->
-            <task-manager-group v-else v-for="group in taskGroups" :tasks="group.tasks" :title="group.title"
-                                class="task-manager-group border-right bg-light px-2 py-1"
-                                @startdragtask="dragStart($event.ev,$event.task,group)" @ondragover="ondragover"
-                                @taskmousedown="selectTask($event.task,group.tasks)" @taskkeypress="taskKeypress($event.ev,$event.task,group.tasks)" @clickgroup="clickGroup"
-                                @newtask="newTask($event, group)"
-                                @dropgroup="drop($event,group)" @dragovergroup="ondragover($event,group)" :icon="group.icon"
-                                :editingMode="taskEditingMode"></task-manager-group>
+            <task-group v-else v-for="group in taskGroups" :tasks="group.tasks" :title="group.title"
+                        class="task-group border-right bg-light px-2 py-1"
+                        @startdragtask="dragStart($event.ev,$event.task,group)" @ondragover="ondragover"
+                        @taskmousedown="selectTask($event.task,group.tasks)" @taskkeypress="taskKeypress($event.ev,$event.task,group.tasks)" @clickgroup="clickGroup"
+                        @newtask="newTask($event, group)"
+                        @dropgroup="drop($event,group)" @dragovergroup="ondragover($event,group)" :icon="group.icon"></task-group>
 
             <div class="flex-grow-1"></div>
 
@@ -284,13 +280,13 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {ID, Keys, ObjectDec, Project, Task, TaskConcern, TaskInboxGroup, TaskManagerProfile, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
-    import TaskManagerGroup from "../components/TaskManagerGroup.vue";
+    import TaskGroup from "../components/TaskGroup.vue";
     import {ItemChangeEventArg} from "../types";
-    import {ajax, call, equalID, question} from "../main";
+    import {ajax, call, equalID, onlyUnique, question} from "../main";
 
     declare let $, moment: any;
 
-    @Component({name: 'TaskManager', components: {TaskManagerGroup}})
+    @Component({name: 'TaskManager', components: {TaskGroup}})
     export default class TaskManager extends Vue {
         private tasks: Task[];
         private profile: TaskManagerProfile = {concern: TaskConcern.Start} as TaskManagerProfile;
@@ -323,7 +319,6 @@
         private currentGroupTasks: Task[] = null;
         private dragSourceGroup = null;
         private currentProject: Project = null;
-        private taskEditingMode: boolean = false;
         private dragOffset = null;
         private groupItems: { title: string, value: any, icon?: string }[];
 
@@ -332,7 +327,7 @@
                 this.tasks = res.data.tasks;
                 this.profile = res.data.profile;
                 this.tasksDec = res.data.tasksDec;
-                console.log("this.tasksDec", this.tasksDec);
+                // console.log("this.tasksDec", this.tasksDec);
                 this.activateConcern(TaskConcern.Status);
             });
         }
@@ -573,6 +568,7 @@
             let tasks = this.tasks.filter(task => !task.archive);
             if (this.currentProject)
                 tasks = tasks.filter(task => task.project && equalID(task.project, this.currentProject._id));
+            tasks.forEach(t => t._.multiPlace = false);
 
             if (this.profile.concern == TaskConcern.DueDate) {
                 this.calendarRows = [];
@@ -625,18 +621,34 @@
                 }
 
                 let groupTasks = tasks.filter(task => {
-
                     switch (this.profile.concern) {
                         case TaskConcern.Start:
-                            if (!Array.isArray(task.assignees) || !task.assignees.find(a => equalID(a, this.profile.currentUser)))
-                                return false;
-
                             switch (group.value) {
                                 case TaskInboxGroup.Favorite:
                                     return !!task.favorite;
 
+                                case TaskInboxGroup.Brainstorm:
+                                    return !task.assignees;
+                            }
+
+                            // Other tasks must belong to current user
+                            if (!Array.isArray(task.assignees) || !task.assignees.find(a => equalID(a, this.profile.currentUser)))
+                                return false;
+
+                            let today = moment().startOf('day');
+                            switch (group.value) {
                                 case TaskInboxGroup.Urgent:
                                     return task.priority == TaskPriority.Urgent;
+
+                                case TaskInboxGroup.Todo:
+                                    return task.status == TaskStatus.Todo && task.dueDates && task.dueDates.find(d => today.diff(moment(d), 'days') == 0);
+
+                                case TaskInboxGroup.Doing:
+                                    return task.status == TaskStatus.Doing && task.dueDates && task.dueDates.find(d => today.diff(moment(d), 'days') == 0);
+
+                                case TaskInboxGroup.Overdue:
+                                    if (task.status == TaskStatus.Done || task.status == TaskStatus.OnHold || !task.dueDates) return false;
+                                    return !task.dueDates.find(d => today.diff(moment(d), 'days') < 0);
                             }
                             break;
 
@@ -651,6 +663,14 @@
                                 return equalID(task[this.concernProperty], group.value);
                     }
                 });
+
+                let parentTasksNeedToInclude = groupTasks.filter(t => t.parent && !groupTasks.find(tsk => equalID(tsk._id, t.parent))).map(t => t.parent);
+                for (let task of parentTasksNeedToInclude) {
+                    if (groupTasks.find(tsk => equalID(task, tsk._id))) continue;
+                    let parentTask = this.tasks.find(tsk => equalID(tsk._id, task));
+                    parentTask._.multiPlace = true;
+                    groupTasks.unshift(parentTask);
+                }
                 this.taskGroups.push({title: group.title, tasks: groupTasks, value: group.value, icon: group.icon});
             }
         }
@@ -728,7 +748,6 @@
             this.currentTask = task;
             switch (ev.which) {
                 case Keys.del:
-                    if (this.taskEditingMode) return;
                     question("The task will be permanently deleted.", "You won't be able to undo this action.", [
                             {title: "Cancel", ref: "no", _cs: "btn btn-light ml-1"},
                             {title: "Delete task", ref: "yes", _cs: "btn btn-danger ml-1"}],
@@ -741,11 +760,11 @@
                     this.toggleSubtask(task);
                     break;
 
-                case Keys.enter:
-                    if (this.taskEditingMode)
-                        this.saveTask(task._id, {title: task.title} as Task);
-                    this.taskEditingMode = !this.taskEditingMode;
-                    break;
+                // case Keys.f2:
+                //     if (this.taskEditingMode)
+                //         this.saveTask(task._id, {title: task.title} as Task);
+                //     this.taskEditingMode = !this.taskEditingMode;
+                //     break;
             }
         }
 
@@ -758,8 +777,8 @@
                 for (let i = index - 1; i >= 0; i--) {
                     if (!this.currentGroupTasks[i].parent) { // Can be parent
                         task.parent = this.currentGroupTasks[i]._id;
-                        this.currentGroupTasks[i].children = this.currentGroupTasks[i].children || [];
-                        this.currentGroupTasks[i].children.push(task._id);
+                        this.currentGroupTasks[i]._.children = this.currentGroupTasks[i]._.children || [];
+                        this.currentGroupTasks[i]._.children.push(task._id);
                         this.saveTask(task._id, {parent: this.currentGroupTasks[i]._id} as Task);
                         break;
                     }
@@ -898,7 +917,7 @@
             border-radius: 0.25rem;
         }
 
-        .task-manager-group {
+        .task-group {
             width: 15rem;
         }
 
@@ -946,8 +965,8 @@
         .task-item {
             font-size: .8rem;
             cursor: default;
-            color: black;
             background-color: white;
+            min-width: 5rem;
 
             &.hover {
                 background-color: gray !important;
@@ -956,6 +975,7 @@
             input {
                 background-color: transparent;
                 cursor: default;
+                color: inherit;
             }
 
             &.subitem-task {
@@ -964,6 +984,10 @@
 
             &.subitem-task:before {
                 content: 'X';
+            }
+
+            &.multi-place {
+                border-style: dashed !important;
             }
         }
 
@@ -984,7 +1008,7 @@
             }
 
             &3 {
-                color: white;
+                color: #905000;
                 background-color: orange;
             }
 
@@ -1086,7 +1110,6 @@
 
             .calendar-day {
                 padding: 0 .2rem;
-                height: 100%;
                 overflow: auto;
 
                 &.drag-over {

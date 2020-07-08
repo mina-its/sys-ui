@@ -1,7 +1,7 @@
 module.exports = {
     devServer: {
-        host: 'tasks.localhost',
-        proxy: 'http://tasks.localhost:3400/'
+        host: 'localhost',
+        proxy: 'http://localhost:3400/'
     },
 
     productionSourceMap: false,
