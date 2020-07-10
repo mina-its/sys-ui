@@ -1,45 +1,55 @@
 <template>
-    <div @click="clickgroup" tabindex="1" @drop="drop" @mouseup="mouseUp" @dragover="dragovergroup" @dragleave="dragOver=false" :class="{'drag-over':dragOver}">
-        <div v-if="title" class="font-weight-bold py-1 text-primary">
-            <i v-if="icon" :class="icon"></i>{{title}}
+    <div @click="clickgroup" @drop="drop" @mouseup="mouseUp" @dragover="dragovergroup" @dragleave="dragOver=false" :class="{'task-group':1,'drag-over':dragOver}">
+        <div v-if="group.title" class="font-weight-bold py-1 text-primary">
+            <i v-if="group.icon" :class="group.icon"></i>{{group.title}}
         </div>
-        <label v-if="subtitle" class="small mb-0 font-weight-bold">{{subtitle}}</label>
+        <label v-if="group.subtitle" class="small mb-0 font-weight-bold" v-html="group.subtitle"></label>
         <div class="tasks-panel">
-            <template v-for="task in tasks" v-if="isVisible(task)">
+            <template v-for="task in group.tasks" v-if="isVisible(task)">
                 <div class="w-100 d-flex align-items-center">
                     <i v-if="task.parent" class="fal fa-circle fa-xs mx-1 text-black-50"></i>
                     <!--                    <i v-if="task.children" class="fal fa-plus-square fa-sm mx-1 text-black-50"></i>-->
                     <div draggable="true" @dragstart="startdragtask($event,task)" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown($event,task)"
                          :class="'task-item d-flex align-items-center border w-100 rounded ' + (task._.style || '') + (task._.multiPlace?' multi-place':'')">
                         <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-caret-down':!task._.expand,'fas fa-caret-right':task._.expand}"></i>
+                        <div class="font-weight-bold" v-html="getTaskTime(task)"></div>
                         <input @change="changeTitle($event,task)" @keydown="inputKeyPress($event,task)" :readonly="!editingMode" v-model="task.title" class="px-1 border-0 w-100">
                     </div>
                 </div>
             </template>
         </div>
         <input class="new-task mt-1 px-1 border-0 w-100 bg-transparent" @change="newtask">
-        <input class="w-100 h-100 border-0 bg-transparent">
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {Keys, ID, WebMethod, Task} from "../../../sys/src/types";
+    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+    import {ID, Keys, Task, TaskConcern, WebMethod} from "../../../sys/src/types";
     import {ajax, equalID} from "../main";
+    import {TaskGroupData} from "../types";
 
-    declare let $: any;
+    declare let $, moment: any;
 
     @Component({name: 'TaskGroup'})
     export default class TaskGroup extends Vue {
-        @Prop() private icon: string;
-        @Prop() private title: string;
-        @Prop() private subtitle: string;
-        @Prop() private tasks: Task[];
+        @Prop() private group: TaskGroupData;
         editingMode: boolean = false;
         dragOver: boolean = false;
 
         hasChild(task: Task) {
-            return this.tasks.filter(t => equalID(t.parent, task._id)).length > 0;
+            return this.group.tasks.filter(t => equalID(t.parent, task._id)).length > 0;
+        }
+
+        getTaskTime(task: Task) {
+            if (this.group.concern == TaskConcern.DueDate && this.group.value) {
+                let dueDate = task.dueDates.find(d => d.setTime && this.group.value.diff(d.time) <= 0 && this.group.value.add(1, 'days').diff(d.time) > 0);
+                if (dueDate) {
+                    return "<span>&nbsp;<span>" + moment(dueDate.time).format("HH:mm") + "<span>&nbsp;<span>";
+                } else {
+                    return "";
+                }
+            }
+            return "";
         }
 
         isVisible(task: Task) {
@@ -48,7 +58,7 @@
 
         toggleExpand(task: Task) {
             task._.expand = !task._.expand;
-            this.tasks.filter(t => equalID(t.parent, task._id)).forEach(t => t._.expand = task._.expand);
+            this.group.tasks.filter(t => equalID(t.parent, task._id)).forEach(t => t._.expand = task._.expand);
             this.$forceUpdate();
         }
 
@@ -57,7 +67,7 @@
             return e;
         }
 
-        @Emit('dropgroup')
+        @Emit('drop')
         drop(e) {
             this.dragOver = false;
             return e;
@@ -80,9 +90,10 @@
         }
 
         @Emit('dragovergroup')
-        dragovergroup(event) {
+        dragovergroup(ev) {
             this.dragOver = true;
-            return event;
+            ev.preventDefault();
+            return ev;
         }
 
         inputKeyPress(ev, task) {
@@ -119,3 +130,34 @@
         }
     }
 </script>
+
+<style lang="scss">
+    .task-manager {
+        .task-group {
+            width: 15rem;
+            overflow: auto;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+            transition: background-color .2s;
+
+            &:hover {
+                -ms-overflow-style: unset;
+                scrollbar-width: unset;
+            }
+
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            &:hover::-webkit-scrollbar {
+                display: unset;
+            }
+
+            &.drag-over {
+                background-color: rgba(0, 140, 255, 0.05) !important;
+            }
+        }
+
+    }
+</style>

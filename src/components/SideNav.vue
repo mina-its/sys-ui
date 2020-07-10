@@ -1,6 +1,6 @@
 <template>
-    <div class="side-nav sidenav d-none d-lg-block" v-if="glob.config.navmenu.length">
-        <div @click="toggleSideNav" class="btn" style="padding: .9rem"><i class="fal fa-bars text-white"></i></div>
+    <div :class="{'side-nav sidenav d-none d-lg-block':1,'collapse':collapse}" v-if="glob.config.navmenu.length">
+        <div @click="toggleSideNav" class="btn" style="padding: .8rem"><i :class="{'fal fa-arrow-to-left text-white':1,'fa-arrow-to-right':collapse}"></i></div>
         <!-- Search  -->
         <!--        <div class="input-group p-3 w-100">-->
         <!--            <input type="text" class="form-control border-right-0" placeholder="Search">-->
@@ -10,14 +10,16 @@
         <!--		        </span>-->
         <!--            </span>-->
         <!--        </div>-->
-        <ul class="px-0 list-unstyled mt-3">
-            <li v-for="item of glob.config.navmenu" :class="{'nav-item':1, 'mr-2':ltr && item.title!='-', 'ml-2':rtl && item.title!='-'}">
-                <a v-if="item.title=='-'" class="d-block my-2 border-bottom border-secondary"></a>
+        <ul class="list-unstyled">
+            <li v-for="item of glob.config.navmenu" class="nav-item">
+                <a v-if="item.title=='-'" class="d-block border-bottom border-secondary"></a>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
-                <a v-else :href="item.ref" :class="getStyle(item)"><i :class="item._cs"></i>{{item.title}}</a>
+                <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-nowrap px-2 nav-link':1,'has-child':item.items}">
+                    <i :class="item._cs"></i>{{item.title}}
+                </a>
                 <ul class="list-unstyled">
                     <li v-for="subitem of item.items" class="mr-2 nav-item">
-                        <a :href="subitem.ref" :class="getStyle(subitem)">{{subitem.title}}</a>
+                        <a :href="subitem.ref" :class="{'text-nowrap nav-link':1}">{{subitem.title}}</a>
                     </li>
                 </ul>
             </li>
@@ -33,21 +35,19 @@
 
     @Component({name: 'SideNav'})
     export default class SideNav extends Vue {
+        private collapse = false;
+
         get glob() {
             return glob;
         }
 
         toggleSideNav() {
-            $(".side-nav").toggleClass("collapse");
+            this.collapse = !this.collapse;
         }
 
-        getStyle(item) {
-            let style = "text-nowrap nav-link";
-            if (location.hostname == item.ref)
-                style += " active";
-            if (item.items)
-                style += " has-child";
-            return style;
+        clickLink(ev, item) {
+            $("a.active").removeClass("active");
+            $(`a[href='${item.ref}']`).addClass("active");
         }
     }
 </script>
@@ -66,8 +66,8 @@
         transition: all .2s ease-in-out;
 
         &.collapse {
-            min-width: 2.8rem;
-            width: 2.8rem;
+            min-width: 2.6rem;
+            width: 2.6rem;
         }
 
         a {
@@ -76,8 +76,12 @@
 
             &:hover {
                 color: var(--side-nav-color);
+                background-color: #555;
+            }
+
+            &.active {
+                color: var(--side-nav-color);
                 background-color: #222;
-                border-left-color: var(--link-color);
             }
         }
 

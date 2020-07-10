@@ -1,5 +1,21 @@
 <template>
     <nav :class="{'navbar navbar-expand-lg navbar-dark':true, 'container':containerStyle}">
+
+        <!-- Apps Menu -->
+        <a class="apps-menu py-1 mr-3" href="#">
+            <svg viewBox="0 0 32 32">
+                <rect height="6" width="6" x="1" y="1"/>
+                <rect height="6" width="6" x="25" y="1"/>
+                <rect height="6" width="6" x="13" y="1"/>
+                <rect height="6" width="6" x="1" y="13"/>
+                <rect height="6" width="6" x="1" y="25"/>
+                <rect height="6" width="6" x="25" y="25"/>
+                <rect height="6" width="6" x="25" y="13"/>
+                <rect height="6" width="6" x="13" y="13"/>
+                <rect height="6" width="6" x="13" y="25"/>
+            </svg>
+        </a>
+
         <a class="navbar-brand" href="/">
             <img v-if="glob.config.brandingLogo" alt="logo" class='branding-logo img-responsive' :src="glob.config.brandingLogo"/>
             <span class="app-title">{{glob.config.appTitle}}</span>
@@ -14,6 +30,7 @@
             <AppLocaleMenu/>
             <AppUserLoginMenu/>
             <!-- <AppChangeRegion/> -->
+
         </div>
     </nav>
 </template>
@@ -36,4 +53,23 @@
     .navbar-nav {
         margin-right: auto !important;
     }
+
+    .apps-menu {
+        width: 16px;
+
+        rect {
+            fill: none;
+            stroke: white;
+            stroke-linejoin: round;
+            stroke-width: 2px;
+        }
+
+        &:hover {
+            rect {
+                stroke: gray;
+            }
+        }
+
+    }
+
 </style>

@@ -21,6 +21,9 @@
             </template>
             <button v-if="newItem" class="btn btn-success mx-1" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>{{newItem}}</button>
 
+            <!--  Refresh -->
+            <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
+
             <!-- Object Menu -->
             <a class="text-secondary px-2" href="javascript:void(0);" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></a>
         </div>
@@ -46,7 +49,7 @@
                     </div>
 
                     <!-- Grid View -->
-                    <table :class="{'grid-view-box mb-5':!level}">
+                    <table :class="{'bg-white':1,'grid-view-box mb-5':!level}">
                         <thead>
                         <tr>
                             <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
@@ -128,6 +131,10 @@
                 return this.data;
             else
                 return this.$store.state.data[this.uri] || [];
+        }
+
+        refresh() {
+            main.load(location.pathname, false);
         }
 
         @Watch('uri') // Switching between forms
@@ -579,17 +586,11 @@
     $left: var(--left);
     $right: var(--right);
 
-    .grid-view-box {
-        border-radius: 2px;
-        box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    .grid-view-box tfoot td {
+        border: 1px solid var(--object-border) !important;
     }
 
     .grid-view {
-
-        table {
-            background: #fff;
-            /*color: rgba(0, 0, 0, 0.54);*/
-        }
 
         td {
             padding: 0;
@@ -597,11 +598,11 @@
 
         td, th {
             border: 1px solid var(--grid-border);
-            // border-left: none;
         }
 
-        td:last-child, th:last-child {
-            // border-right: none;
+        th {
+            border-top-color: var(--object-border);
+            border-left-color: var(--object-border);
         }
 
         th {

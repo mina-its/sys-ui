@@ -17,7 +17,7 @@
             </template>
 
             <!--  Refresh -->
-            <a class="text-secondary px-2" href="javascript:void(0);" @click="refresh"><i class="fal fa-sync fa-lg"></i></a>
+            <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
 
             <!--  Object Menu -->
             <a class="text-secondary px-2" href="javascript:void(0);" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></a>
@@ -28,11 +28,11 @@
             <div :class="{'d-flex overflow-auto details-view':true, 'bg-white':level}" @scroll="onScroll()">
 
                 <!--  Side Menu -->
-                <aside v-if="sideMenuVisible" class="border-right separator-line sidenav p-2 py-4 d-none d-md-block">
+                <aside v-if="sideMenuVisible" class="border-right separator-line sidenav py-4 d-none d-md-block">
                     <ul class="nav flex-column" id="menus">
                         <li v-for="item in sideMenu" class="nav-item">
                             <a @click="selectGroup(item)"
-                               :class="{'text-nowrap text-secondary nav-link': 1, 'active': $data.currentGroup===item.title}"
+                               :class="{'text-nowrap text-secondary nav-link': 1, 'font-weight-bold active': $data.currentGroup===item.title}"
                                href="javascript:void(0);">{{item.title}}</a>
                         </li>
                     </ul>
@@ -333,9 +333,7 @@
 
         .gp {
             background: #fff;
-            border-radius: 2px;
-            box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
-            /*color: rgba(0, 0, 0, 0.54);*/
+            border: 1px solid var(--object-border);
             margin-bottom: 12px;
             margin-left: auto;
             margin-right: auto;
@@ -345,10 +343,7 @@
         }
 
         .active {
-            font-weight: 500;
-            background-color: #eee;
-            border-left: 3px solid var(--link-color);
-            margin-left: -3px;
+            background-color: #d8d8d8;
         }
     }
 

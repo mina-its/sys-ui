@@ -56,14 +56,15 @@
         --warning: #ff7700;
         --grid-head: #f6f8fa;
         --grid-border: #d7d9dc;
+        --object-border: #ccc;
+        --panel-separator-line: #ccc;
         --check-box-border: #d7d9dc;
-        --panel-separator-line: #dee2e6;
         --grid-row-hover: #f0f8ff;
         --grid-row-highlight: #FFC;
         --grid-row-header-highlight: #FFE;
         --form-label: #666;
         --layout-border: #ddd;
-        --side-nav-bg: #3b3b45;
+        --side-nav-bg: #3b3b3b;
         --side-nav-color: #fff;
         --breadcrumb-separator: #aaa;
         --link-color: #4285f4;

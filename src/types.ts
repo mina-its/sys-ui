@@ -6,7 +6,9 @@ import {
     NotificationInfo,
     AppStateConfig,
     FormDto,
-    IData
+    IData,
+    Task,
+    TaskConcern
 } from '../../sys/src/types';
 
 import Vue from 'vue'
@@ -274,4 +276,14 @@ export class AppStateLog {
     message?: string;
     ref?: string;
     type?: LogType;
+}
+
+export class TaskGroupData {
+    title: string;
+    subtitle?: string;
+    concern: TaskConcern;
+    value: any;
+    icon?: string;
+    style?: string;
+    tasks: Task[];
 }

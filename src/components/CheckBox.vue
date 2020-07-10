@@ -33,7 +33,8 @@
     }
 
     td > .checkbox-wrapper {
-        display: block;
+        display: flex;
+        justify-content: center;
     }
 
     .checkbox {
