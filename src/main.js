@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.processThisExpression = exports.evalExpression = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -81,6 +81,10 @@ exports.$t = $t;
 // 	//}
 // 	localStorage.setItem('_navmenu', JSON.stringify(glob.config.navmenu));
 // }
+function clone(obj) {
+    return bson_util_1.parse(bson_util_1.stringify(obj, true), true, types_1.ID);
+}
+exports.clone = clone;
 function evalExpression($this, expression) {
     try {
         if (expression == null)

@@ -17,60 +17,60 @@
                     </button>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item py-2" href="javascript:void(0);" @click="filterProject(project)"
-                       v-for="project of this.profile.projects">{{project.title}}</a>
+                       v-for="project of projects">{{project.title}}</a>
                 </div>
             </div>
 
-            <!--  Concern -->
+            <!--  View -->
             <div class="concerns btn-group" role="group" aria-label="First group">
                 <button @click="activateConcern(TaskConcern_Start)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Start===profile.concern}">
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Start===view.concern&&view.primary}">
                     <i class="fal fa-inbox fa-lg"></i>
                     <label>Start</label>
                 </button>
                 <button @click="activateConcern(TaskConcern_Status)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Status===profile.concern}">
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Status===view.concern&&view.primary}">
                     <i class="fal fa-ballot-check fa-lg"></i>
                     <label>Status</label>
                 </button>
                 <button @click="activateConcern(TaskConcern_DueDate)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_DueDate===profile.concern}">
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_DueDate===view.concern&&view.primary}">
                     <i class="fal fa-calendar-alt fa-lg"></i>
                     <label>Calendar</label>
                 </button>
                 <button @click="activateConcern(TaskConcern_Assignee)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Assignee===profile.concern}">
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Assignee===view.concern&&view.primary}">
                     <i class="fal fa-users fa-lg"></i>
                     <label>Assignee</label>
                 </button>
                 <button v-if="currentProject" @click="activateConcern(TaskConcern_MileStone)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_MileStone===profile.concern}">
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_MileStone===view.concern&&view.primary}">
                     <i class="fal fa-pennant fa-lg"></i>
                     <label>Milestone</label>
                 </button>
                 <button v-if="currentProject" @click="activateConcern(TaskConcern_Category)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Category===profile.concern}">
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Category===view.concern&&view.primary}">
                     <i class="fal fa-layer-group fa-lg"></i>
                     <label>Category</label>
                 </button>
             </div>
 
-            <!--  Profiles -->
+            <!--  My Views -->
             <div class="dropdown mr-2">
                 <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
-                        :class="{'toolbar-button btn mx-1':1, 'btn-primary': !!currentProject, 'btn-secondary':!currentProject}">
-                    <i class="fal fa-head-vr fa-lg"></i>
-                    <label v-if="currentProject">{{currentProject.title}}</label>
+                        :class="{'toolbar-button btn mx-1':1, 'btn-primary': !view.primary, 'btn-secondary':!!view.primary}">
+                    <i class="fal fa-eye fa-lg"></i>
+                    <label v-if="!view.primary">{{view.title}}</label>
                     <label v-else>My Views</label>
                 </button>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item py-2" href="javascript:void(0);" @click="activateProfile(profile)"
-                       v-for="profile of this.profiles">{{profile.title}}</a>
+                    <a class="dropdown-item py-2" href="javascript:void(0);" @click="activateView(view)"
+                       v-for="view of views.filter(v => !v.primary)">{{view.title}}</a>
                     <div class="dropdown-divider"></div>
                     <div class="input-group px-2" style="min-width: 400px">
-                        <input v-model="searchPhrase" class="form-control" @change="search" placeholder="View Title">
+                        <input v-model="newViewName" class="form-control" @change="newView" placeholder="Save Current View Title As">
                         <div class="input-group-append">
-                            <button @click="search" class="btn btn-dark">Save</button>
+                            <button @click="newView" class="btn btn-dark">Save</button>
                         </div>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
                     <i class="fal fa-filter fa-lg"></i>
                     <label>Filter</label>
                 </button>
-                <div v-if="profile.filter" class="dropdown-menu filter-panel p-3" aria-labelledby="filterButton">
+                <div v-if="view.filter" class="dropdown-menu filter-panel p-3" aria-labelledby="filterButton">
                     <form class="d-flex">
                         <div class="filter-item mx-2">
                             <label class="font-weight-bold">Status</label>
@@ -176,7 +176,7 @@
         <div v-else class="w-100 h-100 overflow-auto d-flex task-manager-content">
 
             <!--  Calendar -->
-            <div class="calendar w-100 h-100 d-flex" v-if="TaskConcern_DueDate===profile.concern">
+            <div class="calendar w-100 h-100 d-flex" v-if="TaskConcern_DueDate===view.concern">
                 <task-group v-if="unscheduledTasksGroup && unscheduledTasksGroup.tasks.length"
                             :group="unscheduledTasksGroup" class="bg-light px-2 py-1" @newtask="newTask($event, null)"
                             @startdragtask="dragStart($event.ev,$event.task,null)"
@@ -210,7 +210,7 @@
                 <div class="coloring-legend details-view border-bottom pb-3 mb-2">
                     <div class="d-flex align-items-center">
                         <label class="prop-label px-1">Coloring</label>
-                        <select class="prop-value flex-fill border bg-white m-1" @change="applyColoring">
+                        <select :value="view.coloring" class="prop-value flex-fill border bg-white m-1" @change="applyColoring">
                             <option></option>
                             <option value="2">Status</option>
                             <option value="4">Assignee</option>
@@ -221,7 +221,7 @@
                         </select>
                     </div>
 
-                    <div class="row px-3" v-if="profile.coloring">
+                    <div class="row px-3" v-if="view.coloring">
                         <div class="col-6 legend-item p-1" v-for="(item,i) of coloringLegend">
                             <div :class="`py-1 px-2 color-${i}`">{{item.title}}</div>
                         </div>
@@ -271,19 +271,21 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {ID, Keys, ObjectDec, Pair, Project, Task, TaskConcern, TaskInboxGroup, TaskManagerProfile, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
+    import {GetTaskDto, ID, Keys, LogType, ObjectDec, Pair, Project, ProjectView, Task, TaskConcern, TaskInboxGroup, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
     import TaskGroup from "../components/TaskGroup.vue";
     import {ItemChangeEventArg, MenuItem, TaskGroupData} from "../types";
-    import {ajax, call, equalID, markDown, question, showCmenu} from "../main";
+    import {ajax, call, clone, equalID, markDown, notify, question, showCmenu} from "../main";
 
     declare let $, moment: any;
 
     @Component({name: 'TaskManager', components: {TaskGroup}})
     export default class TaskManager extends Vue {
         private tasks: Task[] = [];
-        private profile: TaskManagerProfile = {concern: TaskConcern.Start} as TaskManagerProfile;
+        private view: ProjectView = {} as ProjectView;
+        private projects: Project[] = [];
+        private newViewName = "";
         private coloringLegend: Pair[] = [];
-        private profiles: TaskManagerProfile[] = [];
+        private views: ProjectView[] = [];
         private taskGroups: TaskGroupData[] = [];
         private calendarRows: {
             days: TaskGroupData[]
@@ -301,6 +303,8 @@
         private TaskConcern_Category = TaskConcern.Category;
         private TaskConcern_MileStone = TaskConcern.MileStone;
         private searchPhrase = null;
+        private users: Pair[];
+        private currentUser: ID;
         private currentTask: Task = null;
         private sourceGroup: TaskGroupData = null;
         private currentProject: Project = null;
@@ -309,17 +313,56 @@
 
         created() {
             call('getTasks', {}, (err, res) => {
-                this.tasks = res.data.tasks;
-                this.profile = res.data.profile;
-                this.tasksDec = res.data.tasksDec;
+                let data: GetTaskDto = res.data;
+
+                // Users
+                this.users = data.users;
+                this.currentUser = data.currentUser;
+
+                // Tasks
+                this.tasks = data.tasks;
+                for (let task of this.tasks) {
+                    task._ = {style: null};
+                }
+
+                // Task Properties
+                this.tasksDec = data.tasksDec;
                 this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "project", "description", "time", "status", "owner", "priority"].indexOf(p.name) > -1);
-                // console.log("this.tasksDec", this.tasksDec);
-                this.activateConcern(TaskConcern.Status);
+
+                // Projects
+                this.projects = data.projects;
+
+                // Views
+                this.views = data.views;
+                for (let view of this.views) {
+                    view.filter = {statuses: null};
+                }
+                let index = localStorage.getItem("task-manager.active-view") || 0;
+                this.view = index < this.views.length ? this.views[index] : this.views[0];
+                this.activateView(this.view);
             });
         }
 
         postFeedback() {
 
+        }
+
+        newView() {
+            if (!this.newViewName) return;
+            let view = clone(this.view) as ProjectView;
+            Object.assign(view, {_id: ID.generateByBrowser(), title: this.newViewName, primary: false, _new: true});
+            this.newViewName = "";
+            this.views.push(view);
+            this.saveView((err, res) => {
+                if (res.code == 200)
+                    notify(`Custom view '${view.title}' is created!`, LogType.Info);
+                this.activateView(view);
+            });
+        }
+
+        saveView(done?) {
+            call("saveUserCustomization", {property: "projectViews", item: this.view}, done ? done : () => {
+            });
         }
 
         search() {
@@ -339,13 +382,16 @@
         }
 
         applyColoring(ev) {
-            this.profile.coloring = ev.target.value ? parseInt(ev.target.value) : null;
+            this.view.coloring = ev.target.value ? parseInt(ev.target.value) : null;
+            this.refreshTaskColoring();
+            this.saveView();
+        }
 
+        refreshTaskColoring() {
             for (let task of this.tasks) {
                 this.applyTaskColoring(task);
             }
-
-            this.coloringLegend = this.getConcernItems(this.profile.coloring);
+            this.coloringLegend = this.getConcernItems(this.view.coloring);
         }
 
         getConcernItems(concern: TaskConcern): Pair[] {
@@ -360,7 +406,7 @@
                     ];
 
                 case TaskConcern.Project:
-                    return this.profile.projects.map(project => {
+                    return this.projects.map(project => {
                         return {title: project.title, ref: project._id} as Pair;
                     });
 
@@ -373,9 +419,7 @@
                     ];
 
                 case TaskConcern.Assignee:
-                    return this.profile.users.map(user => {
-                        return {title: user.title, ref: user._id} as Pair;
-                    });
+                    return this.users;
 
                 case TaskConcern.MileStone:
                     return this.currentProject.milestones.map(item => {
@@ -390,10 +434,10 @@
         }
 
         applyTaskColoring(task: Task) {
-            let items = this.getConcernItems(this.profile.coloring);
+            let items = this.getConcernItems(this.view.coloring);
             let index = -1;
 
-            switch (this.profile.coloring) {
+            switch (this.view.coloring) {
                 case TaskConcern.Status:
                     index = items.findIndex(item => item.ref == task.status);
                     break;
@@ -415,7 +459,7 @@
                     break;
 
                 case TaskConcern.Assignee:
-                    index = this.profile.users.findIndex(user => Array.isArray(task.assignees) && task.assignees.find(a => equalID(a, user._id)));
+                    index = this.users.findIndex(user => Array.isArray(task.assignees) && task.assignees.find(a => equalID(a, user.ref)));
                     break;
             }
             task._.style = index == -1 ? null : "color-" + index;
@@ -432,12 +476,14 @@
 
         filterProject(project) {
             this.currentProject = project;
+            this.view.project = project._id;
+            this.saveView();
             this.refreshTasks();
         }
 
         calendarWheel(e) {
-            this.profile.calendarOffset = this.profile.calendarOffset | 0;
-            this.profile.calendarOffset += (e.deltaY > 0 ? 7 : -7);
+            this.view.calendarOffset = this.view.calendarOffset | 0;
+            this.view.calendarOffset += (e.deltaY > 0 ? 7 : -7);
             this.refreshTasks();
             e.preventDefault();
         }
@@ -480,7 +526,7 @@
                         if (!isNaN(Number(item)))
                             items.push({
                                 title: TaskStatus[item],
-                                checked: this.profile.filter.statuses == null || this.profile.filter.statuses.indexOf(Number(item)) > -1,
+                                checked: this.view.filter.statuses == null || this.view.filter.statuses.indexOf(Number(item)) > -1,
                                 value: Number(item)
                             });
                     }
@@ -492,32 +538,32 @@
                         if (!isNaN(Number(item)))
                             items.push({
                                 title: TaskPriority[item],
-                                checked: this.profile.filter.priorities == null || this.profile.filter.priorities.indexOf(Number(item)) > -1,
+                                checked: this.view.filter.priorities == null || this.view.filter.priorities.indexOf(Number(item)) > -1,
                                 value: Number(item)
                             });
                     }
                     break;
 
                 case TaskConcern.Assignee:
-                    items = [{title: 'All', checked: this.profile.filter.assignees == null, value: null}];
-                    if (this.profile.filter.assignees) {
-                        for (let user of this.profile.users) {
+                    items = [{title: 'All', checked: this.view.filter.assignees == null, value: null}];
+                    if (this.view.filter.assignees) {
+                        for (let user of this.users) {
                             items.push({
                                 title: user.title,
-                                checked: this.profile.filter.assignees.indexOf(user._id) > -1,
-                                value: user._id
+                                checked: this.view.filter.assignees.indexOf(user.ref) > -1,
+                                value: user.ref
                             });
                         }
                     }
                     break;
 
                 case TaskConcern.MileStone:
-                    items = [{title: 'All', checked: this.profile.filter.milestones == null, value: null}];
-                    if (this.profile.filter.milestones) {
+                    items = [{title: 'All', checked: this.view.filter.milestones == null, value: null}];
+                    if (this.view.filter.milestones) {
                         for (let milestone of this.currentProject.milestones) {
                             items.push({
                                 title: milestone.title,
-                                checked: this.profile.filter.milestones.indexOf(milestone._id) > -1,
+                                checked: this.view.filter.milestones.indexOf(milestone._id) > -1,
                                 value: milestone._id
                             });
                         }
@@ -525,12 +571,12 @@
                     break;
 
                 case TaskConcern.Category:
-                    items = [{title: 'All', checked: this.profile.filter.categories == null, value: null}];
-                    if (this.profile.filter.categories) {
+                    items = [{title: 'All', checked: this.view.filter.categories == null, value: null}];
+                    if (this.view.filter.categories) {
                         for (let category of this.currentProject.categories) {
                             items.push({
                                 title: category,
-                                checked: this.profile.filter.categories.indexOf(category) > -1,
+                                checked: this.view.filter.categories.indexOf(category) > -1,
                                 value: category
                             });
                         }
@@ -543,60 +589,60 @@
         filterItemCheckChanged($event, item, concern: TaskConcern) {
             switch (concern) {
                 case TaskConcern.Status:
-                    if (this.profile.filter.statuses == null)
-                        this.profile.filter.statuses = [TaskStatus.Todo, TaskStatus.Doing, TaskStatus.Done, TaskStatus.OnHold, TaskStatus.Verify];
+                    if (this.view.filter.statuses == null)
+                        this.view.filter.statuses = [TaskStatus.Todo, TaskStatus.Doing, TaskStatus.Done, TaskStatus.OnHold, TaskStatus.Verify];
 
-                    let index = this.profile.filter.statuses.indexOf(item.value);
+                    let index = this.view.filter.statuses.indexOf(item.value);
                     if ($event.val) {
                         if (index == -1)
-                            this.profile.filter.statuses.push(item.value);
+                            this.view.filter.statuses.push(item.value);
                     } else {
                         if (index != -1)
-                            this.profile.filter.statuses.splice(index, 1);
+                            this.view.filter.statuses.splice(index, 1);
                     }
                     break;
 
                 case TaskConcern.Assignee:
                     if (item.value == null) // All
-                        this.profile.filter.assignees = $event.val ? null : [];
+                        this.view.filter.assignees = $event.val ? null : [];
                     else {
-                        let index = this.profile.filter.assignees.indexOf(item.value);
+                        let index = this.view.filter.assignees.indexOf(item.value);
                         if ($event.val) {
                             if (index == -1)
-                                this.profile.filter.assignees.push(item.value);
+                                this.view.filter.assignees.push(item.value);
                         } else {
                             if (index != -1)
-                                this.profile.filter.assignees.splice(index, 1);
+                                this.view.filter.assignees.splice(index, 1);
                         }
                     }
                     break;
 
                 case TaskConcern.MileStone:
                     if (item.value == null) // All
-                        this.profile.filter.milestones = $event.val ? null : [];
+                        this.view.filter.milestones = $event.val ? null : [];
                     else {
-                        let index = this.profile.filter.milestones.indexOf(item.value);
+                        let index = this.view.filter.milestones.indexOf(item.value);
                         if ($event.val) {
                             if (index == -1)
-                                this.profile.filter.milestones.push(item.value);
+                                this.view.filter.milestones.push(item.value);
                         } else {
                             if (index != -1)
-                                this.profile.filter.milestones.splice(index, 1);
+                                this.view.filter.milestones.splice(index, 1);
                         }
                     }
                     break;
 
                 case TaskConcern.Category:
                     if (item.value == null) // All
-                        this.profile.filter.categories = $event.val ? null : [];
+                        this.view.filter.categories = $event.val ? null : [];
                     else {
-                        let index = this.profile.filter.categories.indexOf(item.value);
+                        let index = this.view.filter.categories.indexOf(item.value);
                         if ($event.val) {
                             if (index == -1)
-                                this.profile.filter.categories.push(item.value);
+                                this.view.filter.categories.push(item.value);
                         } else {
                             if (index != -1)
-                                this.profile.filter.categories.splice(index, 1);
+                                this.view.filter.categories.splice(index, 1);
                         }
                     }
                     break;
@@ -638,10 +684,10 @@
                 tasks = tasks.filter(task => task.project && equalID(task.project, this.currentProject._id));
             tasks.forEach(t => t._.multiPlace = false);
 
-            if (this.profile.concern == TaskConcern.DueDate) {
+            if (this.view.concern == TaskConcern.DueDate) {
                 this.calendarRows = [];
                 let firstDay = moment().startOf('month');
-                let date = firstDay.add(firstDay.weekday() ? -firstDay.weekday() + 1 : 0, 'days').add(this.profile.calendarOffset || 0, 'days');
+                let date = firstDay.add(firstDay.weekday() ? -firstDay.weekday() + 1 : 0, 'days').add(this.view.calendarOffset || 0, 'days');
 
                 for (let i = 0; i < 6; i++) {
                     let row = {days: []};
@@ -675,20 +721,21 @@
                 }
 
                 this.unscheduledTasksGroup = {tasks: tasks.filter(task => (!task.dueDates || !task.dueDates.length) && !task.archive), title: "Unscheduled"} as TaskGroupData;
+                this.refreshTaskColoring();
                 return;
             }
 
             this.taskGroups = [];
             for (let group of this.groupItems) {
 
-                switch (this.profile.concern) {
+                switch (this.view.concern) {
                     case TaskConcern.Status:
-                        if (this.profile.filter.statuses && this.profile.filter.statuses.indexOf(group.value) == -1)
+                        if (this.view.filter.statuses && this.view.filter.statuses.indexOf(group.value) == -1)
                             continue;
                 }
 
                 let groupTasks = tasks.filter(task => {
-                    switch (this.profile.concern) {
+                    switch (this.view.concern) {
                         case TaskConcern.Start:
                             switch (group.value) {
                                 case TaskInboxGroup.Favorite:
@@ -699,7 +746,7 @@
                             }
 
                             // Other tasks must belong to current user
-                            if (!task.assignees || !task.assignees.find(a => equalID(a, this.profile.currentUser)))
+                            if (!task.assignees || !task.assignees.find(a => equalID(a, this.view.currentUser)))
                                 return false;
 
                             let today = moment().startOf('day');
@@ -747,15 +794,16 @@
                     tasks: this.sortTasks(groupTasks),
                     value: group.value,
                     icon: group.icon,
-                    concern: this.profile.concern
+                    concern: this.view.concern
                 } as TaskGroupData;
 
-                if (this.profile.concern == TaskConcern.MileStone && group.value) {
+                if (this.view.concern == TaskConcern.MileStone && group.value) {
                     groupData.subtitle = markDown(this.currentProject.milestones.find(m => equalID(m._id, group.value)).objectives);
                 }
 
                 this.taskGroups.push(groupData);
             }
+            this.refreshTaskColoring();
         }
 
         selectTask(task, group) {
@@ -764,7 +812,7 @@
         }
 
         dragStart(ev, task: Task, group: TaskGroupData) {
-            ev.dataTransfer.setData("text", task._id.toString());
+            ev.dataTransfer.setData("text", "" + task._id);
             ev.dataTransfer.effectAllowed = 'all';
             this.sourceGroup = group;
         }
@@ -782,7 +830,7 @@
         }
 
         ondragover(ev, group) {
-            switch (this.profile.concern) {
+            switch (this.view.concern) {
                 case TaskConcern.Status:
                     ev.dataTransfer.dropEffect = 'move';
                     break;
@@ -804,7 +852,7 @@
             ev.preventDefault();
             this.currentTask._z = (Math.max(...group.tasks.map(t => t._z)) | 0) + 1;
             let patch = {_z: this.currentTask._z} as Task;
-            switch (this.profile.concern) {
+            switch (this.view.concern) {
                 case TaskConcern.DueDate: {
                     this.currentTask.dueDates = this.currentTask.dueDates || [];
                     let indexInSource = this.currentTask.dueDates.findIndex(d => this.sourceGroup.value.diff(d.time) == 0);
@@ -872,7 +920,7 @@
             this.currentTask = task;
             switch (ev.which) {
                 case Keys.del:
-                    switch (this.profile.concern) {
+                    switch (this.view.concern) {
                         case TaskConcern.DueDate:
                             if (task.dueDates && task.dueDates.length > 1) {
                                 let indexOnTarget = task.dueDates.findIndex(d => this.datePeriodContains(d.time, group.value));
@@ -935,13 +983,12 @@
             this.refreshTasks();
         }
 
-        activateProfile(profile: TaskManagerProfile) {
-            this.activateConcern(profile.concern);
-        }
+        activateView(view: ProjectView) {
+            localStorage.setItem("task-manager.active-view", this.views.indexOf(view).toString());
+            this.view = view;
+            this.currentProject = view.project ? this.projects.find(p => equalID(view.project, p._id)) : null;
 
-        activateConcern(concern: TaskConcern) {
-            this.profile.concern = concern;
-            switch (concern) {
+            switch (view.concern) {
                 case TaskConcern.Status:
                     this.concernProperty = "status";
                     this.groupItems = [
@@ -971,8 +1018,8 @@
 
                 case TaskConcern.Assignee:
                     this.concernProperty = "assignees";
-                    this.groupItems = this.profile.users.map(user => {
-                        return {title: user.title, value: user._id}
+                    this.groupItems = this.users.map(user => {
+                        return {title: user.title, value: user.ref}
                     });
                     this.groupItems.unshift({title: "[Unassigned]", value: null});
                     break;
@@ -996,6 +1043,11 @@
             this.refreshTasks();
         }
 
+        activateConcern(concern: TaskConcern) {
+            let view = this.views.find(view => view.primary && view.concern == concern);
+            this.activateView(view);
+        }
+
         newTask(e, group: TaskGroupData) {
             if (e.target.value) {
                 let task = {
@@ -1009,7 +1061,7 @@
                 } as Task;
                 task["_new"] = true;
 
-                switch (this.profile.concern) {
+                switch (this.view.concern) {
                     case TaskConcern.Assignee:
                         task[this.concernProperty] = group.value;
                         break;

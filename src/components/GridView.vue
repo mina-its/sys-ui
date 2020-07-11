@@ -102,9 +102,9 @@
 
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {$t, call, getQs, glob, load, notify, setQs, showCmenu} from '@/main';
+    import {$t, call, getQs, glob, load, notify, setQs, showCmenu} from '../main';
     import {parse, stringify} from 'bson-util';
-    import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '@/types';
+    import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
     import * as main from '../main';
     import {EntityMeta, FileType, GridRowHeaderStyle, IData, Keys, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
 

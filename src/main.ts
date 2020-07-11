@@ -82,6 +82,10 @@ export function $t(text: string): string {
 // 	localStorage.setItem('_navmenu', JSON.stringify(glob.config.navmenu));
 // }
 
+export function clone(obj: any) {
+    return parse(stringify(obj, true), true, ID);
+}
+
 export function evalExpression($this: any, expression: string): any {
     try {
         if (expression == null) return null;
