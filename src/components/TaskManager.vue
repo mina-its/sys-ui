@@ -43,12 +43,12 @@
                     <i class="fal fa-users fa-lg"></i>
                     <label>Assignee</label>
                 </button>
-                <button v-if="currentProject" @click="activateConcern(TaskConcern_MileStone)" type="button"
+                <button @click="activateConcern(TaskConcern_MileStone)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_MileStone===view.concern&&view.primary}">
                     <i class="fal fa-pennant fa-lg"></i>
                     <label>Milestone</label>
                 </button>
-                <button v-if="currentProject" @click="activateConcern(TaskConcern_Category)" type="button"
+                <button @click="activateConcern(TaskConcern_Category)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Category===view.concern&&view.primary}">
                     <i class="fal fa-layer-group fa-lg"></i>
                     <label>Category</label>
@@ -309,7 +309,7 @@
         private sourceGroup: TaskGroupData = null;
         private currentProject: Project = null;
         private dragOffset = null;
-        private groupItems: { title: string, value: any, icon?: string }[];
+        private groupItems: { title: string, value: any, icon?: string }[] = [];
 
         created() {
             call('getTasks', {}, (err, res) => {
@@ -320,14 +320,14 @@
                 this.currentUser = data.currentUser;
 
                 // Tasks
-                this.tasks = data.tasks;
-                for (let task of this.tasks) {
+                for (let task of data.tasks) {
                     task._ = {style: null};
                 }
+                this.tasks = data.tasks;
 
                 // Task Properties
                 this.tasksDec = data.tasksDec;
-                this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "project", "description", "time", "status", "owner", "priority"].indexOf(p.name) > -1);
+                this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "project", "description", "time", "status", "owner", "priority", "assignees"].indexOf(p.name) > -1);
 
                 // Projects
                 this.projects = data.projects;
@@ -353,15 +353,15 @@
             Object.assign(view, {_id: ID.generateByBrowser(), title: this.newViewName, primary: false, _new: true});
             this.newViewName = "";
             this.views.push(view);
-            this.saveView((err, res) => {
+            this.saveView(this.view, (err, res) => {
                 if (res.code == 200)
                     notify(`Custom view '${view.title}' is created!`, LogType.Info);
                 this.activateView(view);
             });
         }
 
-        saveView(done?) {
-            call("saveUserCustomization", {property: "projectViews", item: this.view}, done ? done : () => {
+        saveView(view, done?) {
+            call("saveUserCustomization", {property: "projectViews", item: view}, done ? done : () => {
             });
         }
 
@@ -384,7 +384,7 @@
         applyColoring(ev) {
             this.view.coloring = ev.target.value ? parseInt(ev.target.value) : null;
             this.refreshTaskColoring();
-            this.saveView();
+            this.saveView(this.view);
         }
 
         refreshTaskColoring() {
@@ -392,6 +392,7 @@
                 this.applyTaskColoring(task);
             }
             this.coloringLegend = this.getConcernItems(this.view.coloring);
+            this.$forceUpdate();
         }
 
         getConcernItems(concern: TaskConcern): Pair[] {
@@ -474,10 +475,30 @@
             });
         }
 
+        checkConcernNeedsSelectedProject() {
+            if (!this.currentProject && (this.view.concern == TaskConcern.MileStone || this.view.concern == TaskConcern.Category)) {
+                notify(`Please select the project for this view`, LogType.Warning);
+                this.taskGroups = [];
+                this.groupItems = [];
+                this.$forceUpdate();
+                return true;
+            }
+            return false;
+        }
+
         filterProject(project) {
             this.currentProject = project;
-            this.view.project = project._id;
-            this.saveView();
+            if (!this.view.primary) {
+                this.view.project = project ? project._id : null;
+                this.saveView(this.view);
+            }
+
+            if (this.checkConcernNeedsSelectedProject())
+                return;
+
+            if (this.currentProject && (this.view.concern == TaskConcern.MileStone || this.view.concern == TaskConcern.Category))
+                this.activateView(this.view);
+
             this.refreshTasks();
         }
 
@@ -746,7 +767,7 @@
                             }
 
                             // Other tasks must belong to current user
-                            if (!task.assignees || !task.assignees.find(a => equalID(a, this.view.currentUser)))
+                            if (!task.assignees || !task.assignees.find(a => equalID(a, this.currentUser)))
                                 return false;
 
                             let today = moment().startOf('day');
@@ -986,7 +1007,12 @@
         activateView(view: ProjectView) {
             localStorage.setItem("task-manager.active-view", this.views.indexOf(view).toString());
             this.view = view;
-            this.currentProject = view.project ? this.projects.find(p => equalID(view.project, p._id)) : null;
+
+            if (view.primary) {
+                if (this.checkConcernNeedsSelectedProject())
+                    return;
+            } else
+                this.currentProject = view.project ? this.projects.find(p => equalID(view.project, p._id)) : null;
 
             switch (view.concern) {
                 case TaskConcern.Status:
@@ -1026,7 +1052,7 @@
 
                 case TaskConcern.MileStone:
                     this.concernProperty = "milestone";
-                    this.groupItems = this.currentProject.milestones.map(milestone => {
+                    this.groupItems = (this.currentProject.milestones || []).map(milestone => {
                         return {title: milestone.title, value: milestone._id}
                     });
                     this.groupItems.unshift({title: "[Unplanned]", value: null});
@@ -1034,7 +1060,7 @@
 
                 case TaskConcern.Category:
                     this.concernProperty = "categories";
-                    this.groupItems = this.currentProject.categories.map(category => {
+                    this.groupItems = (this.currentProject.categories || []).map(category => {
                         return {title: category, value: category}
                     });
                     this.groupItems.unshift({title: "[Uncategorized]", value: null});
