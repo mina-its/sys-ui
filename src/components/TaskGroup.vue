@@ -12,8 +12,8 @@
                     <div draggable="true" @dragstart="startdragtask($event,task)" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown(task)"
                          :class="'task-item d-flex align-items-center border w-100 rounded ' + (task._.style || '') + (task._.multiPlace?' multi-place':'')">
                         <i v-if="task.archive" class="px-1 fal fa-archive"></i>
-                        <div class="font-weight-bold" v-html="getTaskTime(task)"></div>
                         <input @change="changeTitle($event,task)" @keydown="inputKeyPress($event,task)" :readonly="!editingMode" v-model="task.title" class="px-1 border-0 w-100">
+                        <div class="font-weight-bold" v-html="getTaskTime(task)"></div>
                         <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-angle-up':!task._.expand,'fas fa-angle-down':task._.expand}"></i>
                     </div>
                 </div>
