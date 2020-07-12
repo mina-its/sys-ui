@@ -41,8 +41,13 @@
             return glob;
         }
 
+        mounted() {
+            this.collapse = localStorage.getItem('sys-sidenav-collapse') == "1";
+        }
+
         toggleSideNav() {
             this.collapse = !this.collapse;
+            localStorage.setItem('sys-sidenav-collapse', this.collapse ? "1" : null);
         }
 
         clickLink(ev, item) {

@@ -1,28 +1,34 @@
 <template>
     <div class="task-manager h-100 d-flex flex-column flex-fill overflow-auto">
         <!--  Toolbar -->
-        <div class="d-flex p-2 align-items-center toolbar" role="toolbar">
+        <div class="d-flex p-2 align-items-center btn-toolbar toolbar" role="toolbar">
 
-            <!--  Project -->
-            <div class="project-filter dropdown mr-2">
-                <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
-                        :class="{'toolbar-button btn mx-1':1, 'btn-secondary': !!currentProject, 'btn-outline-secondary':!currentProject}">
-                    <i class="fal fa-construction fa-lg"></i>
-                    <label v-if="currentProject">{{currentProject.title}}</label>
-                    <label v-else>All Projects</label>
-                </button>
-                <div class="dropdown-menu">
-                    <button class="btn btn-link dropdown-item py-2" @click="filterProject(null)">All
-                        Projects
+            <div class="btn-group input-group mr-2">
+                <div class="input-group-prepend" style="margin-bottom: .2rem">
+                    <span class="input-group-text" id="">Project:</span>
+                </div>
+                <div class="input-group-prepend" role="group">
+                    <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
+                            :class="{'rounded-right toolbar-button btn':1, 'btn-secondary': !!currentProject, 'btn-outline-secondary':!currentProject}">
+                        <i class="fal fa-construction fa-lg"></i>
+                        <label v-if="currentProject">{{currentProject.title}}</label>
+                        <label v-else>[ All Projects ]</label>
                     </button>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item py-2" href="javascript:void(0);" @click="filterProject(project)"
-                       v-for="project of projects">{{project.title}}</a>
+                    <!--                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</button>-->
+                    <div class="dropdown-menu">
+                        <button class="btn btn-link dropdown-item py-2" @click="filterProject(null)">[ All Projects ]</button>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item py-2" href="javascript:void(0);" @click="filterProject(project)"
+                           v-for="project of projects">{{project.title}}</a>
+                    </div>
                 </div>
             </div>
 
             <!--  View -->
-            <div class="concerns btn-group" role="group" aria-label="First group">
+            <div class="concerns btn-group input-group mx-1" role="group" aria-label="First group">
+                <div class="input-group-prepend" style="margin-bottom: .2rem">
+                    <span class="input-group-text">View:</span>
+                </div>
                 <button @click="activateConcern(TaskConcern_Start)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Start===view.concern&&view.primary}">
                     <i class="fal fa-inbox fa-lg"></i>
@@ -43,83 +49,95 @@
                     <i class="fal fa-users fa-lg"></i>
                     <label>Assignee</label>
                 </button>
-                <button @click="activateConcern(TaskConcern_MileStone)" type="button"
+                <button v-if="currentProject" @click="activateConcern(TaskConcern_MileStone)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_MileStone===view.concern&&view.primary}">
                     <i class="fal fa-pennant fa-lg"></i>
                     <label>Milestone</label>
                 </button>
-                <button @click="activateConcern(TaskConcern_Category)" type="button"
+                <button v-if="currentProject" @click="activateConcern(TaskConcern_Category)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Category===view.concern&&view.primary}">
                     <i class="fal fa-layer-group fa-lg"></i>
                     <label>Category</label>
                 </button>
-            </div>
-
-            <!--  My Views -->
-            <div class="dropdown mr-2">
-                <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
-                        :class="{'toolbar-button btn mx-1':1, 'btn-primary': !view.primary, 'btn-secondary':!!view.primary}">
+                <button v-for="vw of views.filter(v => !v.primary)" @click="activateView(vw)" type="button"
+                        :class="{'btn btn-secondary toolbar-button':1,'active':vw===view}">
                     <i class="fal fa-eye fa-lg"></i>
-                    <label v-if="!view.primary">{{view.title}}</label>
-                    <label v-else>My Views</label>
+                    <label>{{vw.title}}</label>
                 </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item py-2" href="javascript:void(0);" @click="activateView(view)"
-                       v-for="view of views.filter(v => !v.primary)">{{view.title}}</a>
-                    <div class="dropdown-divider"></div>
-                    <div class="input-group px-2" style="min-width: 400px">
-                        <input v-model="newViewName" class="form-control" @change="newView" placeholder="Save Current View Title As">
-                        <div class="input-group-append">
-                            <button @click="newView" class="btn btn-dark">Save</button>
+
+                <div class="input-group-append" role="group">
+                    <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
+                            class="toolbar-button rounded-right btn btn-outline-secondary">
+                        <i class="fal fa-eye fa-lg"></i>
+                        <label>My Views</label>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item py-2" href="javascript:void(0);" @click="activateView(view)"
+                           v-for="view of views.filter(v => !v.primary)">{{view.title}}</a>
+                        <div class="dropdown-divider"></div>
+                        <div class="input-group px-2" style="min-width: 400px">
+                            <input v-model="newViewName" class="form-control" @change="newView" placeholder="Save current view as">
+                            <div class="input-group-append">
+                                <button @click="newView" class="btn btn-dark">Save</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!--  My Views -->
+
             <!--  Filter -->
-            <div class="dropdown">
+            <div class="dropdown mx-1">
                 <button id="filterButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         type="button" class="toolbar-button btn btn-outline-secondary mx-1">
                     <i class="fal fa-filter fa-lg"></i>
                     <label>Filter</label>
                 </button>
                 <div v-if="view.filter" class="dropdown-menu filter-panel p-3" aria-labelledby="filterButton">
-                    <form class="d-flex">
+                    <form>
+                        <div class="properties d-flex">
+                            <div class="filter-item mx-2">
+                                <label class="font-weight-bold">Status</label>
+                                <check-box v-for="item of getFilterItems(TaskConcern_Status)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskConcern_Status)"
+                                           :label="item.title"></check-box>
+                            </div>
+                            <!--                        <div class="filter-item mx-2 filter-duedate">-->
+                            <!--                            <label class="font-weight-bold mb-2 mt-1">Due Dates</label>-->
+                            <!--                            <prop-time placeHolder="Range from" :doc="{}" :prop="{}"></prop-time>-->
+                            <!--                            <prop-time placeHolder="Range To" :doc="{}" :prop="{}"></prop-time>-->
+                            <!--                        </div>-->
+                            <div class="filter-item mx-2">
+                                <label class="font-weight-bold">Priority</label>
+                                <check-box v-for="item of getFilterItems(TaskConcern_Priority)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskConcern_Priority)"
+                                           :label="item.title"></check-box>
+                            </div>
+                            <div class="filter-item mx-2">
+                                <label class="font-weight-bold">Assignees</label>
+                                <check-box v-for="item of getFilterItems(TaskConcern_Assignee)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskConcern_Assignee)"
+                                           :label="item.title"></check-box>
+                            </div>
+                            <div v-if="currentProject" class="filter-item mx-2">
+                                <label class="font-weight-bold">Milestones</label>
+                                <check-box v-for="item of getFilterItems(TaskConcern_MileStone)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskConcern_MileStone)"
+                                           :label="item.title"></check-box>
+                            </div>
+                            <div v-if="currentProject" class="filter-item mx-2">
+                                <label class="font-weight-bold">Categories</label>
+                                <check-box v-for="item of getFilterItems(TaskConcern_Category)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskConcern_Category)"
+                                           :label="item.title"></check-box>
+                            </div>
+                        </div>
+                        <hr>
                         <div class="filter-item mx-2">
-                            <label class="font-weight-bold">Status</label>
-                            <check-box v-for="item of getFilterItems(TaskConcern_Status)" :checked="item.checked"
-                                       @changed="filterItemCheckChanged($event, item, TaskConcern_Status)"
-                                       :label="item.title"></check-box>
+                            <check-box :checked="showArchivedTasks" @changed="toggleShowArchivedTasks" label="Show archived tasks"></check-box>
                         </div>
-                        <!--                        <div class="filter-item mx-2 filter-duedate">-->
-                        <!--                            <label class="font-weight-bold mb-2 mt-1">Due Dates</label>-->
-                        <!--                            <prop-time placeHolder="Range from" :doc="{}" :prop="{}"></prop-time>-->
-                        <!--                            <prop-time placeHolder="Range To" :doc="{}" :prop="{}"></prop-time>-->
-                        <!--                        </div>-->
-                        <div class="filter-item mx-2">
-                            <label class="font-weight-bold">Priority</label>
-                            <check-box v-for="item of getFilterItems(TaskConcern_Priority)" :checked="item.checked"
-                                       @changed="filterItemCheckChanged($event, item, TaskConcern_Priority)"
-                                       :label="item.title"></check-box>
-                        </div>
-                        <div class="filter-item mx-2">
-                            <label class="font-weight-bold">Assignees</label>
-                            <check-box v-for="item of getFilterItems(TaskConcern_Assignee)" :checked="item.checked"
-                                       @changed="filterItemCheckChanged($event, item, TaskConcern_Assignee)"
-                                       :label="item.title"></check-box>
-                        </div>
-                        <div v-if="currentProject" class="filter-item mx-2">
-                            <label class="font-weight-bold">Milestones</label>
-                            <check-box v-for="item of getFilterItems(TaskConcern_MileStone)" :checked="item.checked"
-                                       @changed="filterItemCheckChanged($event, item, TaskConcern_MileStone)"
-                                       :label="item.title"></check-box>
-                        </div>
-                        <div v-if="currentProject" class="filter-item mx-2">
-                            <label class="font-weight-bold">Categories</label>
-                            <check-box v-for="item of getFilterItems(TaskConcern_Category)" :checked="item.checked"
-                                       @changed="filterItemCheckChanged($event, item, TaskConcern_Category)"
-                                       :label="item.title"></check-box>
-                        </div>
+                        <hr>
                     </form>
                     <button @click="refreshTasks" class="btn btn-success px-5 mt-2">Apply</button>
                 </div>
@@ -157,37 +175,22 @@
             </div>
         </div>
 
-        <!--  Task Details -->
-        <div v-if="showTaskDetails" class="task-details container w-100 h-100 p-5">
-            <div class="card p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="flex-fill">
-                        <h2>#{{currentTask.no}}</h2>
-                        <h3>{{currentTask.title}}</h3>
-                    </div>
-                    <button class="btn btn-link" @click="showTaskDetails=false"><i class="fal fa-times text-black-50 fa-2x text-right"></i></button>
-                </div>
-                <details-view @changed="taskChanged" :data="currentTask" :dec="tasksDec" :level="1"></details-view>
-                <textarea class="w-100 mt-3">{{currentTask.comment}}</textarea>
-            </div>
-        </div>
-
         <!--  Content -->
-        <div v-else class="w-100 h-100 overflow-auto d-flex task-manager-content">
+        <div v-if="!showTaskDetails" class="w-100 h-100 overflow-auto d-flex task-manager-content">
 
             <!--  Calendar -->
             <div class="calendar w-100 h-100 d-flex" v-if="TaskConcern_DueDate===view.concern">
                 <task-group v-if="unscheduledTasksGroup && unscheduledTasksGroup.tasks.length"
                             :group="unscheduledTasksGroup" class="bg-light px-2 py-1" @newtask="newTask($event, null)"
                             @startdragtask="dragStart($event.ev,$event.task,null)"
-                            @taskmousedown="selectTask($event.task,unscheduledTasksGroup)" @taskkeypress="taskKeypress($event.ev,$event.task,unscheduledTasksGroup)" @clickgroup="clickGroup"
+                            @taskmousedown="selectTask" @taskkeypress="taskKeypress($event.ev,$event.task,unscheduledTasksGroup)" @clickgroup="clickGroup"
                             @drop="drop($event,null)" @dragovergroup="ondragover($event,null)"></task-group>
                 <table class="w-100 h-100 flex-fill" @wheel="calendarWheel">
                     <tr v-for="row of calendarRows" class="">
                         <td v-for="day of row.days" :class="day.style" @click="clickGroup($event,day)">
                             <task-group class="h-100 w-100 calendar-day" :group="day"
                                         @startdragtask="dragStart($event.ev,$event.task,day)" @ondragover="ondragover"
-                                        @taskmousedown="selectTask($event.task,day)" @taskkeypress="taskKeypress($event.ev,$event.task,day)"
+                                        @taskmousedown="selectTask" @taskkeypress="taskKeypress($event.ev,$event.task,day)"
                                         @clickgroup="clickGroup" @newtask="newTask($event, day)"
                                         @drop="drop($event,day)" @dragovergroup="ondragover($event,day)"></task-group>
                         </td>
@@ -199,7 +202,7 @@
             <task-group v-else v-for="group in taskGroups"
                         class="border-right bg-light px-2 py-1" :group="group"
                         @startdragtask="dragStart($event.ev,$event.task,group)" @ondragover="ondragover"
-                        @taskmousedown="selectTask($event.task,group)" @taskkeypress="taskKeypress($event.ev,$event.task,group)" @clickgroup="clickGroup"
+                        @taskmousedown="selectTask" @taskkeypress="taskKeypress($event.ev,$event.task,group)" @clickgroup="clickGroup"
                         @newtask="newTask($event, group)"
                         @drop="drop($event,group)" @dragovergroup="ondragover($event,group)"></task-group>
 
@@ -240,13 +243,13 @@
                         <!-- Actions: Archive -->
                         <div class="mb-2">
                             <!--  Task Details -->
-                            <button @click="toggleDetails" class="btn btn-link p-0 mx-2" title="Task Details">
-                                <i class="fal fa-bars fa-lg"></i>
+                            <button @click="showCurrentTaskDetails" class="btn btn-link p-0 mx-2" title="Task Details">
+                                <i class="fal fa-file-alt fa-lg"></i>
                             </button>
 
                             <!--  Archive -->
                             <button @click="archive(currentTask)" class="btn btn-link p-0 mx-2" title="Archive">
-                                <i class="fal fa-file-times fa-lg"></i>
+                                <i class="fal fa-archive fa-lg"></i>
                             </button>
 
                             <!--  Favorite -->
@@ -259,11 +262,48 @@
                                 <i :class="{'fal fa-lg':1,'fa-arrow-to-left':currentTask.parent,'fa-arrow-to-right':!currentTask.parent}"></i>
                             </button>
 
+                            <!--  Clock -->
+                            <button v-if="currentTaskDueDate" @click="toggleSetTime" type="button" class="btn btn-link mx-2 p-0" title="Set/Unset Due Time">
+                                <i :class="{'fa-lg fa-clock':1,'fal':!currentTaskDueDate.setTime,'fad':currentTaskDueDate.setTime}"></i>
+                            </button>
+
                         </div>
-                        <details-view @changed="taskChanged" :data="currentTask" :dec="tasksDec" :level="1"></details-view>
+                        <details-view class="compress-view" @changed="taskChanged" :data="currentTask" :dec="tasksDec" :level="1"></details-view>
+                        <details-view class="compress-view" v-if="currentTaskDueDate" @changed="taskChanged" :data="currentTaskDueDate" :dec="dueDatesDec" :level="1"></details-view>
                     </div>
                 </div>
                 <div v-else>Select a task to see its details here.</div>
+            </div>
+        </div>
+
+        <!--  Task Details -->
+        <div v-else class="task-details overflow-auto w-100 h-100 p-5">
+            <div class="container card p-4">
+                <div class="row">
+                    <div class="col-md-6 px-4 col-sm-12 border-right">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-fill">
+                                <h2>#{{currentTask.no}}</h2>
+                            </div>
+                            <button class="btn btn-link px-0" @click="closeTaskDetails">
+                                <i class="fal fa-times text-black-50 fa-2x text-right"></i>
+                            </button>
+                        </div>
+                        <div>
+                            <textarea placeholder="Add Note ..." class="border-0 p-2 w-100" v-model="addNoteContent"></textarea>
+                        </div>
+                        <button class="btn btn-light py-1" @click="addNote">Add Note</button>
+                        <div class="comments">
+                            <div class="my-2" v-for="item of currentTask.comments">
+                                <div class="small text-right font-weight-bold text-black-50">{{friendlyTime(item.time)}}</div>
+                                <div class="border p-2">{{item.content}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-4 col-sm-12">
+                        <details-view @changed="taskChanged" :data="currentTask" :dec="tasksDec" :level="1"></details-view>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -271,7 +311,7 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {GetTaskDto, ID, Keys, LogType, ObjectDec, Pair, Project, ProjectView, Task, TaskConcern, TaskInboxGroup, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
+    import {GetTaskDto, ID, Keys, LogType, ObjectDec, TaskDueDate, Pair, Project, ProjectView, Task, TaskConcern, TaskInboxGroup, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
     import TaskGroup from "../components/TaskGroup.vue";
     import {ItemChangeEventArg, MenuItem, TaskGroupData} from "../types";
     import {ajax, call, clone, equalID, markDown, notify, question, showCmenu} from "../main";
@@ -284,6 +324,7 @@
         private view: ProjectView = {} as ProjectView;
         private projects: Project[] = [];
         private newViewName = "";
+        private addNoteContent = "";
         private coloringLegend: Pair[] = [];
         private views: ProjectView[] = [];
         private taskGroups: TaskGroupData[] = [];
@@ -291,6 +332,8 @@
             days: TaskGroupData[]
         }[] = [];
         private tasksDec: ObjectDec = null;
+        private dueDatesDec: ObjectDec = null;
+        private showArchivedTasks: boolean = false;
         private unscheduledTasksGroup: TaskGroupData = null;
         private concernProperty: string;
         private showTaskDetails: boolean = false;
@@ -306,7 +349,8 @@
         private users: Pair[];
         private currentUser: ID;
         private currentTask: Task = null;
-        private sourceGroup: TaskGroupData = null;
+        private currentTaskDueDate: TaskDueDate = null;
+        private currentGroup: TaskGroupData = null;
         private currentProject: Project = null;
         private dragOffset = null;
         private groupItems: { title: string, value: any, icon?: string }[] = [];
@@ -322,12 +366,14 @@
                 // Tasks
                 for (let task of data.tasks) {
                     task._ = {style: null};
+                    task.comments = task.comments || [];
                 }
                 this.tasks = data.tasks;
 
                 // Task Properties
                 this.tasksDec = data.tasksDec;
                 this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "project", "description", "time", "status", "owner", "priority", "assignees"].indexOf(p.name) > -1);
+                this.dueDatesDec = data.dueDatesDec;
 
                 // Projects
                 this.projects = data.projects;
@@ -340,7 +386,47 @@
                 let index = localStorage.getItem("task-manager.active-view") || 0;
                 this.view = index < this.views.length ? this.views[index] : this.views[0];
                 this.activateView(this.view);
+
+                this.checkHashAddress();
             });
+
+            window.onhashchange = () => {
+                this.checkHashAddress();
+            };
+        }
+
+        toggleSetTime() {
+            this.currentTaskDueDate.setTime = !this.currentTaskDueDate.setTime;
+            this.$forceUpdate();
+        }
+
+        friendlyTime(time) {
+            return moment(time).format("DD MMM - HH:mm");
+        }
+
+        addNote() {
+            if (!this.addNoteContent) return;
+            this.currentTask.comments.push({_id: ID.generateByBrowser(), content: this.addNoteContent, user: this.currentUser, time: new Date()});
+            this.addNoteContent = "";
+            this.saveTask(this.currentTask._id, {comments: this.currentTask.comments} as Task);
+        }
+
+        checkHashAddress() {
+            if (/^#\d+$/.test(document.location.hash)) {
+                let taskNo = parseInt(document.location.hash.substr(1));
+                let task = this.tasks.find(t => t.no == taskNo);
+                if (task) {
+                    this.currentTask = task;
+                    this.showTaskDetails = true;
+                } else {
+                    notify(`Task #${taskNo} not found!`, LogType.Error);
+                }
+            } else
+                this.showTaskDetails = false;
+        }
+
+        toggleShowArchivedTasks() {
+            this.showArchivedTasks = !this.showArchivedTasks;
         }
 
         postFeedback() {
@@ -372,13 +458,24 @@
                     return {title: task.title, ref: task} as MenuItem;
                 });
                 showCmenu(null, items, {ctrl: $(".search-box")}, (state, item: MenuItem) => {
-                    console.log(item.ref);
+                    if (item) {
+                        this.currentTask = item.ref;
+                        this.showCurrentTaskDetails();
+                    }
                 });
             });
         }
 
-        toggleDetails() {
-            this.showTaskDetails = !this.showTaskDetails;
+        showCurrentTaskDetails() {
+            this.showTaskDetails = true;
+            history.pushState(null, "Task:" + this.currentTask.title, `#${this.currentTask.no}`);
+            this.checkHashAddress();
+        }
+
+        closeTaskDetails() {
+            this.showTaskDetails = false;
+            history.pushState(null, null, "#");
+            this.$forceUpdate();
         }
 
         applyColoring(ev) {
@@ -700,7 +797,7 @@
         }
 
         refreshTasks() {
-            let tasks = this.tasks.filter(task => !task.archive);
+            let tasks = this.showArchivedTasks ? this.tasks : this.tasks.filter(task => !task.archive);
             if (this.currentProject)
                 tasks = tasks.filter(task => task.project && equalID(task.project, this.currentProject._id));
             tasks.forEach(t => t._.multiPlace = false);
@@ -736,7 +833,7 @@
                             style,
                             title: i == 0 ? date.format("ddd") : ""
                         } as TaskGroupData;
-                        date = date.add(1, 'days');
+                        date.add(1, 'days');
                         row.days.push(day);
                     }
                 }
@@ -827,27 +924,30 @@
             this.refreshTaskColoring();
         }
 
-        selectTask(task, group) {
-            this.currentTask = task;
-            this.sourceGroup = group;
+        selectTask(ev) {
+            this.currentTask = ev.task;
+            this.currentGroup = ev.group;
+            let date = this.currentGroup.value;
+            this.currentTaskDueDate = ev.task.dueDates ? ev.task.dueDates.find(d => this.datePeriodContains(d.time, date)) : null;
+            this.$forceUpdate();
         }
 
         dragStart(ev, task: Task, group: TaskGroupData) {
             ev.dataTransfer.setData("text", "" + task._id);
             ev.dataTransfer.effectAllowed = 'all';
-            this.sourceGroup = group;
+            this.currentGroup = group;
         }
 
         dragLeave(e, day) {
             e.preventDefault();
         }
 
-        clickGroup(ev, group) {
+        clickGroup(ev, group: TaskGroupData) {
             $(ev.target).find(".new-task").focus();
         }
 
         datePeriodContains(time: Date, date: any) {
-            return date.diff(time) <= 0 && date.add(1, 'days').diff(time) > 0;
+            return date.diff(time) <= 0 && moment(date).add(1, 'days').diff(time) > 0;
         }
 
         ondragover(ev, group) {
@@ -876,7 +976,7 @@
             switch (this.view.concern) {
                 case TaskConcern.DueDate: {
                     this.currentTask.dueDates = this.currentTask.dueDates || [];
-                    let indexInSource = this.currentTask.dueDates.findIndex(d => this.sourceGroup.value.diff(d.time) == 0);
+                    let indexInSource = this.currentTask.dueDates.findIndex(d => this.currentGroup.value.diff(d.time) == 0);
                     if (!ev.ctrlKey) {
                         if (indexInSource > -1) this.currentTask.dueDates.splice(indexInSource, 1);
                     }
@@ -892,7 +992,7 @@
                         this.currentTask.categories = null;
                     } else {
                         this.currentTask.categories = this.currentTask.categories || [];
-                        let indexInSource = this.currentTask.categories.indexOf(this.sourceGroup.value);
+                        let indexInSource = this.currentTask.categories.indexOf(this.currentGroup.value);
                         if (!ev.ctrlKey) {
                             if (indexInSource > -1) this.currentTask.categories.splice(indexInSource, 1);
                         }
@@ -908,7 +1008,7 @@
                         this.currentTask.assignees = null;
                     } else {
                         this.currentTask.assignees = this.currentTask.assignees || [];
-                        let indexInSource = this.currentTask.assignees.findIndex(d => equalID(d, this.sourceGroup.value));
+                        let indexInSource = this.currentTask.assignees.findIndex(d => equalID(d, this.currentGroup.value));
                         if (!ev.ctrlKey) {
                             if (indexInSource > -1) this.currentTask.assignees.splice(indexInSource, 1);
                         }
@@ -987,13 +1087,13 @@
                 task.parent = null
                 this.saveTask(task._id, {parent: null} as Task);
             } else {
-                let index = this.sourceGroup.tasks.indexOf(task);
+                let index = this.currentGroup.tasks.indexOf(task);
                 for (let i = index - 1; i >= 0; i--) {
-                    if (!this.sourceGroup.tasks[i].parent) { // Can be parent
-                        task.parent = this.sourceGroup.tasks[i]._id;
-                        this.sourceGroup.tasks[i]._.children = this.sourceGroup.tasks[i]._.children || [];
-                        this.sourceGroup.tasks[i]._.children.push(task._id);
-                        this.saveTask(task._id, {parent: this.sourceGroup.tasks[i]._id} as Task);
+                    if (!this.currentGroup.tasks[i].parent) { // Can be parent
+                        task.parent = this.currentGroup.tasks[i]._id;
+                        this.currentGroup.tasks[i]._.children = this.currentGroup.tasks[i]._.children || [];
+                        this.currentGroup.tasks[i]._.children.push(task._id);
+                        this.saveTask(task._id, {parent: this.currentGroup.tasks[i]._id} as Task);
                         break;
                     }
                 }
@@ -1214,6 +1314,12 @@
             }
         }
 
+        .form-group.p_description {
+            textarea {
+                width: 100%;
+            }
+        }
+
         .color- {
             &0 {
                 color: white;
@@ -1324,6 +1430,12 @@
 
         select option {
             font-size: 1rem;
+        }
+
+        .task-details {
+            .form-group {
+                margin-bottom: 0;
+            }
         }
 
         .calendar {

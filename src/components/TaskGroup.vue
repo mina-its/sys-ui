@@ -7,13 +7,14 @@
         <div class="tasks-panel">
             <template v-for="task in group.tasks" v-if="isVisible(task)">
                 <div class="w-100 d-flex align-items-center">
-                    <i v-if="task.parent" class="fal fa-circle fa-xs mx-1 text-black-50"></i>
+                    <i v-if="task.parent" class="fal fa-genderless fa-xs mx-2 text-black-50"></i>
                     <!--                    <i v-if="task.children" class="fal fa-plus-square fa-sm mx-1 text-black-50"></i>-->
-                    <div draggable="true" @dragstart="startdragtask($event,task)" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown($event,task)"
+                    <div draggable="true" @dragstart="startdragtask($event,task)" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown(task)"
                          :class="'task-item d-flex align-items-center border w-100 rounded ' + (task._.style || '') + (task._.multiPlace?' multi-place':'')">
-                        <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-caret-down':!task._.expand,'fas fa-caret-right':task._.expand}"></i>
+                        <i v-if="task.archive" class="px-1 fal fa-archive"></i>
                         <div class="font-weight-bold" v-html="getTaskTime(task)"></div>
                         <input @change="changeTitle($event,task)" @keydown="inputKeyPress($event,task)" :readonly="!editingMode" v-model="task.title" class="px-1 border-0 w-100">
+                        <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-angle-up':!task._.expand,'fas fa-angle-down':task._.expand}"></i>
                     </div>
                 </div>
             </template>
@@ -42,7 +43,7 @@
 
         getTaskTime(task: Task) {
             if (this.group.concern == TaskConcern.DueDate && this.group.value) {
-                let dueDate = task.dueDates.find(d => d.setTime && this.group.value.diff(d.time) <= 0 && this.group.value.add(1, 'days').diff(d.time) > 0);
+                let dueDate = task.dueDates.find(d => d.setTime && this.group.value.diff(d.time) <= 0 && moment(this.group.value).add(1, 'days').diff(d.time) > 0);
                 if (dueDate) {
                     return "<span>&nbsp;<span>" + moment(dueDate.time).format("HH:mm") + "<span>&nbsp;<span>";
                 } else {
@@ -125,8 +126,8 @@
         }
 
         @Emit('taskmousedown')
-        taskmousedown(ev, task) {
-            return {ev, task};
+        taskmousedown(task) {
+            return {task, group: this.group};
         }
     }
 </script>

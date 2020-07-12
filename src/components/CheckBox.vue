@@ -1,7 +1,6 @@
 <template>
     <div :class="{'checkbox-wrapper text-center mr-2':1}" @click="changed">
-        <input class="checkbox" @keyup.space="changed" @keydown="keydown" type="checkbox" v-model="checked" tabindex="0"
-               @input="changed">
+        <input class="checkbox" @keyup.space="changed" @keydown="keydown" type="checkbox" :checked="checked" tabindex="0" @input="changed">
         <label :class="{'checkbox-label':true, 'no-label':!label}">{{label}}</label>
     </div>
 </template>
