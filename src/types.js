@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TaskGroupData = exports.AppStateLog = exports.AppStateQuestion = exports.QuestionOptions = exports.AppStateFileGallery = exports.FilterOperator = exports.Modify = exports.Global = exports.TreeViewAttribute = exports.TreeViewLine = exports.TreeViewNode = exports.PropertyLabelMode = exports.AppStateCmenu = exports.FilterChangeEventArg = exports.ItemChangeEventArg = exports.FunctionExecEventArg = exports.ItemEventArg = exports.PropEventArg = exports.StartParams = exports.AppStateGeoMap = exports.ChangeType = exports.StateChange = exports.MenuItem = exports.HeadFunc = exports.ChartColors = exports.Constants = exports.ID = void 0;
+exports.TaskEvent = exports.TaskGroupData = exports.AppStateLog = exports.AppStateQuestion = exports.QuestionOptions = exports.AppStateFileGallery = exports.FilterOperator = exports.Modify = exports.Global = exports.TreeViewAttribute = exports.TreeViewLine = exports.TreeViewNode = exports.PropertyLabelMode = exports.AppStateCmenu = exports.FilterChangeEventArg = exports.ItemChangeEventArg = exports.FunctionExecEventArg = exports.ItemEventArg = exports.PropEventArg = exports.StartParams = exports.AppStateGeoMap = exports.ChangeType = exports.StateChange = exports.MenuItem = exports.HeadFunc = exports.ChartColors = exports.Constants = exports.ID = void 0;
 const types_1 = require("../../sys/src/types");
 const bson_util_1 = require("bson-util");
 Object.defineProperty(exports, "ID", { enumerable: true, get: function () { return bson_util_1.ID; } });
@@ -165,4 +165,7 @@ exports.AppStateLog = AppStateLog;
 class TaskGroupData {
 }
 exports.TaskGroupData = TaskGroupData;
+class TaskEvent {
+}
+exports.TaskEvent = TaskEvent;
 //# sourceMappingURL=types.js.map

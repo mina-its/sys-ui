@@ -44,7 +44,7 @@
                     <i class="fal fa-calendar-alt fa-lg"></i>
                     <label>Calendar</label>
                 </button>
-                <button @click="activateConcern(TaskConcern_Assignee)" type="button"
+                <button v-if="currentProject" @click="activateConcern(TaskConcern_Assignee)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Assignee===view.concern&&view.primary}">
                     <i class="fal fa-users fa-lg"></i>
                     <label>Assignee</label>
@@ -188,7 +188,7 @@
                 <table class="w-100 h-100 flex-fill" @wheel="calendarWheel">
                     <tr v-for="row of calendarRows" class="">
                         <td v-for="day of row.days" :class="day.style" @click="clickGroup($event,day)">
-                            <task-group class="h-100 w-100 calendar-day" :group="day"
+                            <task-group class="h-100 w-100 calendar-day" :group="day" @dragEnterTask="dragEnterTask" @dragEnterGroup="dragEnterGroup"
                                         @startdragtask="dragStart($event.ev,$event.task,day)" @ondragover="ondragover"
                                         @taskmousedown="selectTask" @taskkeypress="taskKeypress($event.ev,$event.task,day)"
                                         @clickgroup="clickGroup" @newtask="newTask($event, day)"
@@ -201,6 +201,7 @@
             <!--  Columns -->
             <task-group v-else v-for="group in taskGroups"
                         class="border-right bg-light px-2 py-1" :group="group"
+                        @dragEnterTask="dragEnterTask" @dragEnterGroup="dragEnterGroup"
                         @startdragtask="dragStart($event.ev,$event.task,group)" @ondragover="ondragover"
                         @taskmousedown="selectTask" @taskkeypress="taskKeypress($event.ev,$event.task,group)" @clickgroup="clickGroup"
                         @newtask="newTask($event, group)"
@@ -226,7 +227,7 @@
 
                     <div class="row px-3" v-if="view.coloring">
                         <div class="col-6 legend-item p-1" v-for="(item,i) of coloringLegend">
-                            <div :class="`py-1 px-2 color-${i}`">{{item.title}}</div>
+                            <div class="py-1 px-2" :style="{color:colorTable[i%colorTable.length].color, 'background-color':colorTable[i%colorTable.length].bgColor}">{{item.title}}</div>
                         </div>
                     </div>
                 </div>
@@ -313,7 +314,7 @@
     import {Component, Vue} from 'vue-property-decorator';
     import {GetTaskDto, ID, Keys, LogType, ObjectDec, TaskDueDate, Pair, Project, ProjectView, Task, TaskConcern, TaskInboxGroup, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
     import TaskGroup from "../components/TaskGroup.vue";
-    import {ItemChangeEventArg, MenuItem, TaskGroupData} from "../types";
+    import {ItemChangeEventArg, MenuItem, TaskEvent, TaskGroupData} from "../types";
     import {ajax, call, clone, equalID, markDown, notify, question, showCmenu} from "../main";
 
     declare let $, moment: any;
@@ -354,6 +355,18 @@
         private currentProject: Project = null;
         private dragOffset = null;
         private groupItems: { title: string, value: any, icon?: string }[] = [];
+        private colorTable = [
+            {color: 'white', bgColor: '#0083d9'},
+            {color: 'white', bgColor: '#ff6a00'},
+            {color: '#905000', bgColor: 'orange'},
+            {color: 'white', bgColor: 'green'},
+            {color: 'white', bgColor: '#721786'},
+            {color: 'white', bgColor: '#0083d9'},
+            {color: 'white', bgColor: '#ff6a00'},
+            {color: 'white', bgColor: '#aaa'},
+            {color: 'white', bgColor: 'orange'},
+            {color: 'white', bgColor: 'green'}
+        ]
 
         created() {
             call('getTasks', {}, (err, res) => {
@@ -365,7 +378,7 @@
 
                 // Tasks
                 for (let task of data.tasks) {
-                    task._ = {style: null};
+                    task._ = {dragging: false};
                     task.comments = task.comments || [];
                 }
                 this.tasks = data.tasks;
@@ -393,6 +406,82 @@
             window.onhashchange = () => {
                 this.checkHashAddress();
             };
+        }
+
+        dragEnterGroup(e) {
+            if (e.group._z != this.currentGroup._z) {
+                let z = Math.ceil((Math.max(...e.group.tasks.map(t => t._z)) | 0) + 1);
+                this.moveTask(z, e.ev.ctrlKey, e.group);
+                this.currentGroup = e.group;
+            }
+        }
+
+        dragEnterTask(e: TaskEvent) {
+            if (e.task != this.currentTask) {
+                let i = e.group.tasks.indexOf(e.task);
+                let z = i == 0 ? Math.ceil(e.task._z - 1) : this.calculateMiddleZ(e.group.tasks[i - 1], e.task);
+                this.moveTask(z, e.ev.ctrlKey, e.group);
+            }
+        }
+
+        moveTask(z: number, ctrlKey: boolean, group: TaskGroupData) {
+            this.currentTask._z = z;
+            switch (this.view.concern) {
+                case TaskConcern.DueDate: {
+                    this.currentTask.dueDates = this.currentTask.dueDates || [];
+                    let indexInSource = this.currentTask.dueDates.findIndex(d => this.currentGroup.value.diff(d.time) == 0);
+                    if (!ctrlKey) {
+                        if (indexInSource > -1) this.currentTask.dueDates.splice(indexInSource, 1);
+                    }
+
+                    let indexOnTarget = this.currentTask.dueDates.findIndex(d => group.value.diff(d.time) == 0);
+                    if (indexOnTarget == -1) // Check if it does not already exists
+                        this.currentTask.dueDates.push({_id: ID.generateByBrowser(), time: group.value.toDate()});
+                }
+                    break;
+
+                case TaskConcern.Category:
+                    if (!group.value) {
+                        this.currentTask.categories = null;
+                    } else {
+                        this.currentTask.categories = this.currentTask.categories || [];
+                        let indexInSource = this.currentTask.categories.indexOf(this.currentGroup.value);
+                        if (!ctrlKey) {
+                            if (indexInSource > -1) this.currentTask.categories.splice(indexInSource, 1);
+                        }
+
+                        let indexOnTarget = this.currentTask.categories.indexOf(group.value);
+                        if (indexOnTarget == -1) // Check if it does not already exists
+                            this.currentTask.categories.push(group.value);
+                    }
+                    break;
+
+                case TaskConcern.Assignee:
+                    if (!group.value) {
+                        this.currentTask.assignees = null;
+                    } else {
+                        this.currentTask.assignees = this.currentTask.assignees || [];
+                        let indexInSource = this.currentTask.assignees.findIndex(d => equalID(d, this.currentGroup.value));
+                        if (!ctrlKey) {
+                            if (indexInSource > -1) this.currentTask.assignees.splice(indexInSource, 1);
+                        }
+
+                        let indexOnTarget = this.currentTask.assignees.findIndex(d => equalID(d, group.value));
+                        if (indexOnTarget == -1) // Check if it does not already exists
+                            this.currentTask.assignees.push(group.value);
+                    }
+                    break;
+
+                default:
+                    this.currentTask[this.concernProperty] = group.value;
+                    break;
+            }
+            this.refreshTasks();
+        }
+
+        calculateMiddleZ(task1: Task, task2: Task) {
+            let dis = task2._z - task1._z;
+            return task1._z + dis / 2;
         }
 
         toggleSetTime() {
@@ -560,7 +649,13 @@
                     index = this.users.findIndex(user => Array.isArray(task.assignees) && task.assignees.find(a => equalID(a, user.ref)));
                     break;
             }
-            task._.style = index == -1 ? null : "color-" + index;
+            if (index == -1) {
+                task._.color = 'inherit';
+                task._.bgColor = 'inherit';
+            } else {
+                task._.color = this.colorTable[index % this.colorTable.length].color;
+                task._.bgColor = this.colorTable[index % this.colorTable.length].bgColor;
+            }
         }
 
         taskChanged(e: ItemChangeEventArg) {
@@ -825,6 +920,7 @@
                             subtitle = date.format("D MMMM");
 
                         let day = {
+                            _z: i * 7 + d + 1,
                             concern: TaskConcern.DueDate,
                             subtitle,
                             tasks: this.sortTasks(tasks.filter(task => task.dueDates &&
@@ -835,10 +931,12 @@
                         } as TaskGroupData;
                         date.add(1, 'days');
                         row.days.push(day);
+
+                        // console.log(day.tasks.map(t => t._z+":"+t.title));
                     }
                 }
 
-                this.unscheduledTasksGroup = {tasks: tasks.filter(task => (!task.dueDates || !task.dueDates.length) && !task.archive), title: "Unscheduled"} as TaskGroupData;
+                this.unscheduledTasksGroup = {_z: 0, tasks: tasks.filter(task => (!task.dueDates || !task.dueDates.length) && !task.archive), title: "[ Unscheduled ]"} as TaskGroupData;
                 this.refreshTaskColoring();
                 return;
             }
@@ -868,7 +966,6 @@
                                 return false;
 
                             let today = moment().startOf('day');
-                            console.log(today.toDate().toUTCString());
                             switch (group.value) {
                                 case TaskInboxGroup.Urgent:
                                     return task.priority == TaskPriority.Urgent;
@@ -908,6 +1005,7 @@
                 }
 
                 let groupData = {
+                    _z: this.taskGroups.length,
                     title: group.title,
                     tasks: this.sortTasks(groupTasks),
                     value: group.value,
@@ -936,6 +1034,9 @@
             ev.dataTransfer.setData("text", "" + task._id);
             ev.dataTransfer.effectAllowed = 'all';
             this.currentGroup = group;
+            setTimeout(() => {
+                task._.dragging = true; // To prevent apply the gray style to dragging icon
+            }, 1);
         }
 
         dragLeave(e, day) {
@@ -971,62 +1072,11 @@
 
         drop(ev, group) {
             ev.preventDefault();
-            this.currentTask._z = (Math.max(...group.tasks.map(t => t._z)) | 0) + 1;
             let patch = {_z: this.currentTask._z} as Task;
-            switch (this.view.concern) {
-                case TaskConcern.DueDate: {
-                    this.currentTask.dueDates = this.currentTask.dueDates || [];
-                    let indexInSource = this.currentTask.dueDates.findIndex(d => this.currentGroup.value.diff(d.time) == 0);
-                    if (!ev.ctrlKey) {
-                        if (indexInSource > -1) this.currentTask.dueDates.splice(indexInSource, 1);
-                    }
-
-                    let indexOnTarget = this.currentTask.dueDates.findIndex(d => group.value.diff(d.time) == 0);
-                    if (indexOnTarget == -1) // Check if it does not already exists
-                        this.currentTask.dueDates.push({_id: ID.generateByBrowser(), time: group.value.toDate()});
-                }
-                    break;
-
-                case TaskConcern.Category:
-                    if (!group.value) {
-                        this.currentTask.categories = null;
-                    } else {
-                        this.currentTask.categories = this.currentTask.categories || [];
-                        let indexInSource = this.currentTask.categories.indexOf(this.currentGroup.value);
-                        if (!ev.ctrlKey) {
-                            if (indexInSource > -1) this.currentTask.categories.splice(indexInSource, 1);
-                        }
-
-                        let indexOnTarget = this.currentTask.categories.indexOf(group.value);
-                        if (indexOnTarget == -1) // Check if it does not already exists
-                            this.currentTask.categories.push(group.value);
-                    }
-                    break;
-
-                case TaskConcern.Assignee:
-                    if (!group.value) {
-                        this.currentTask.assignees = null;
-                    } else {
-                        this.currentTask.assignees = this.currentTask.assignees || [];
-                        let indexInSource = this.currentTask.assignees.findIndex(d => equalID(d, this.currentGroup.value));
-                        if (!ev.ctrlKey) {
-                            if (indexInSource > -1) this.currentTask.assignees.splice(indexInSource, 1);
-                        }
-
-                        let indexOnTarget = this.currentTask.assignees.findIndex(d => equalID(d, group.value));
-                        if (indexOnTarget == -1) // Check if it does not already exists
-                            this.currentTask.assignees.push(group.value);
-                    }
-                    break;
-
-                default:
-                    this.currentTask[this.concernProperty] = group.value;
-                    break;
-            }
+            this.currentTask._.dragging = false;
             this.applyTaskColoring(this.currentTask);
             patch[this.concernProperty] = this.currentTask[this.concernProperty];
             this.saveTask(this.currentTask._id, patch);
-            this.refreshTasks();
             this.currentTask = null;
         }
 
@@ -1147,7 +1197,7 @@
                     this.groupItems = this.users.map(user => {
                         return {title: user.title, value: user.ref}
                     });
-                    this.groupItems.unshift({title: "[Unassigned]", value: null});
+                    this.groupItems.unshift({title: "[ Unassigned ]", value: null});
                     break;
 
                 case TaskConcern.MileStone:
@@ -1155,7 +1205,7 @@
                     this.groupItems = (this.currentProject.milestones || []).map(milestone => {
                         return {title: milestone.title, value: milestone._id}
                     });
-                    this.groupItems.unshift({title: "[Unplanned]", value: null});
+                    this.groupItems.unshift({title: "[ Unplanned ]", value: null});
                     break;
 
                 case TaskConcern.Category:
@@ -1163,7 +1213,7 @@
                     this.groupItems = (this.currentProject.categories || []).map(category => {
                         return {title: category, value: category}
                     });
-                    this.groupItems.unshift({title: "[Uncategorized]", value: null});
+                    this.groupItems.unshift({title: "[ Uncategorized ]", value: null});
                     break;
             }
             this.refreshTasks();
@@ -1183,7 +1233,7 @@
                     project: this.currentProject ? this.currentProject._id : null,
                     priority: TaskPriority.Normal,
                     _z: (Math.max(...group.tasks.map(t => t._z)) | 0) + 1,
-                    _: {}
+                    _: {dragging: false}
                 } as Task;
                 task["_new"] = true;
 
@@ -1291,6 +1341,12 @@
             background-color: white;
             min-width: 5rem;
 
+            &.dragging {
+                color: #ccc !important;
+                background-color: #ccc !important;
+                border: none !important;
+            }
+
             &.hover {
                 background-color: gray !important;
             }
@@ -1317,58 +1373,6 @@
         .form-group.p_description {
             textarea {
                 width: 100%;
-            }
-        }
-
-        .color- {
-            &0 {
-                color: white;
-                background-color: #0083d9;
-            }
-
-            &1 {
-                color: white;
-                background-color: #ff6a00;
-            }
-
-            &2 {
-                color: white;
-                background-color: #aaa;
-            }
-
-            &3 {
-                color: #905000;
-                background-color: orange;
-            }
-
-            &4 {
-                color: white;
-                background-color: green;
-            }
-
-            &5 {
-                color: white;
-                background-color: #0083d9;
-            }
-
-            &6 {
-                color: white;
-                background-color: #ff6a00;
-            }
-
-            &7 {
-                color: white;
-                background-color: #aaa;
-            }
-
-            &8 {
-                color: white;
-                background-color: orange;
-            }
-
-            &9 {
-                color: white;
-                background-color: green;
             }
         }
 

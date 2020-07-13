@@ -1,25 +1,27 @@
 <template>
-    <div @click="clickgroup" @drop="drop" @mouseup="mouseUp" @dragover="dragovergroup" @dragleave="dragOver=false" :class="{'task-group':1,'drag-over':dragOver}">
+    <div @click="clickgroup" @drop="drop" @mouseup="mouseUp" @dragenter="dragEnterGroup" @dragover="dragovergroup" class="task-group">
         <div v-if="group.title" class="font-weight-bold py-1 text-primary">
             <i v-if="group.icon" :class="group.icon"></i>{{group.title}}
         </div>
         <label v-if="group.subtitle" class="small mb-0 font-weight-bold" v-html="group.subtitle"></label>
         <div class="tasks-panel">
-            <template v-for="task in group.tasks" v-if="isVisible(task)">
-                <div class="w-100 d-flex align-items-center">
-                    <i v-if="task.parent" class="fal fa-genderless fa-xs mx-2 text-black-50"></i>
-                    <!--                    <i v-if="task.children" class="fal fa-plus-square fa-sm mx-1 text-black-50"></i>-->
-                    <div draggable="true" @dragstart="startdragtask($event,task)" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown(task)"
-                         :class="'task-item d-flex align-items-center border w-100 rounded ' + (task._.style || '') + (task._.multiPlace?' multi-place':'')">
-                        <i v-if="task.archive" class="px-1 fal fa-archive"></i>
-                        <input @change="changeTitle($event,task)" @keydown="inputKeyPress($event,task)" :readonly="!editingMode" v-model="task.title" class="px-1 border-0 w-100">
-                        <div class="font-weight-bold" v-html="getTaskTime(task)"></div>
-                        <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-angle-up':!task._.expand,'fas fa-angle-down':task._.expand}"></i>
-                    </div>
+            <div v-for="task in group.tasks" v-if="isVisible(task)" class="w-100 d-flex align-items-center" @dragenter="dragEnterTask($event,task)">
+                <i v-if="task.parent" class="fal fa-genderless fa-xs mx-2 text-black-50"></i>
+                <!--                    <i v-if="task.children" class="fal fa-plus-square fa-sm mx-1 text-black-50"></i>-->
+                <div draggable="true" @dragstart="startdragtask($event,task)" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown(task)"
+                     :class="{'task-item text-nowrap noselect d-flex align-items-center border w-100 rounded': 1, 'multi-place':task._.multiPlace,'dragging': task._.dragging}"
+                     :style="{'color':task._.color,'background-color':task._.bgColor}">
+                    <i v-if="task.archive" class="px-1 fal fa-archive"></i>
+                    <input v-if="editingMode" @change="changeTitle($event,task)" @keydown="inputKeyPress($event,task)" v-model="task.title"
+                           class="px-1 border-0 w-100 noselect">
+                    <div tabindex="0" @keydown="inputKeyPress($event,task)" class="px-1 w-100" v-else>{{task.title}}</div>
+
+                    <div class="font-weight-bold" v-html="getTaskTime(task)"></div>
+                    <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-angle-up':!task._.expand,'fas fa-angle-down':task._.expand}"></i>
                 </div>
-            </template>
+            </div>
         </div>
-        <input class="new-task mt-1 px-1 border-0 w-100 bg-transparent" @change="newtask">
+        <input class="new-task mt-1 px-1 border-0 w-100 bg-transparent" @keydown.esc="$event.target.value=null" @change="newtask">
     </div>
 </template>
 
@@ -27,7 +29,7 @@
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {ID, Keys, Task, TaskConcern, WebMethod} from "../../../sys/src/types";
     import {ajax, equalID} from "../main";
-    import {TaskGroupData} from "../types";
+    import {TaskEvent, TaskGroupData} from "../types";
 
     declare let $, moment: any;
 
@@ -35,10 +37,19 @@
     export default class TaskGroup extends Vue {
         @Prop() private group: TaskGroupData;
         editingMode: boolean = false;
-        dragOver: boolean = false;
 
         hasChild(task: Task) {
             return this.group.tasks.filter(t => equalID(t.parent, task._id)).length > 0;
+        }
+
+        @Emit('dragEnterTask')
+        dragEnterTask(ev, task) {
+            return {ev, task, group: this.group} as TaskEvent;
+        }
+
+        @Emit('dragEnterGroup')
+        dragEnterGroup(ev) {
+            return {ev, group: this.group} as TaskEvent;
         }
 
         getTaskTime(task: Task) {
@@ -70,7 +81,6 @@
 
         @Emit('drop')
         drop(e) {
-            this.dragOver = false;
             return e;
         }
 
@@ -92,7 +102,6 @@
 
         @Emit('dragovergroup')
         dragovergroup(ev) {
-            this.dragOver = true;
             ev.preventDefault();
             return ev;
         }
@@ -116,7 +125,7 @@
         }
 
         @Emit('startdragtask')
-        startdragtask(ev, task) {
+        startdragtask(ev, task: Task) {
             return {ev, task};
         }
 
@@ -153,10 +162,6 @@
 
             &:hover::-webkit-scrollbar {
                 display: unset;
-            }
-
-            &.drag-over {
-                background-color: rgba(0, 140, 255, 0.05) !important;
             }
         }
 

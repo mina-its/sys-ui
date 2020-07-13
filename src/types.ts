@@ -279,6 +279,7 @@ export class AppStateLog {
 }
 
 export class TaskGroupData {
+    _z: number;
     title: string;
     subtitle?: string;
     concern: TaskConcern;
@@ -286,4 +287,10 @@ export class TaskGroupData {
     icon?: string;
     style?: string;
     tasks: Task[];
+}
+
+export class TaskEvent {
+    ev: any;
+    task: Task;
+    group: TaskGroupData;
 }
