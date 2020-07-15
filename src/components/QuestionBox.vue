@@ -1,11 +1,12 @@
 <template>
     <div v-if="glob.question.show" class="question-box">
         <div class="overlay"></div>
-        <div class="main p-3">
+        <div class="main p-5">
+            <button @click="close" class="btn btn-link position-absolute" style="top:0;right:0"><i class="fal fa-times"></i></button>
             <div class="main-title font-weight-bold">{{glob.question.title}}</div>
             <div class="main-message" v-html="message"></div>
             <div class="main-footer text-right pt-3">
-                <button @click="select(button.ref)" :class="button._cs || 'btn btn-primary mx-1'" v-for="button in glob.question.buttons">{{button.title}}</button>
+                <button @click="select(button.ref)" :class="button._cs || 'btn btn-primary mx-2'" v-for="button in glob.question.buttons">{{button.title}}</button>
             </div>
         </div>
     </div>
@@ -17,7 +18,7 @@
     import {glob} from '@/main';
     import {Pair} from '../../../sys/src/types';
 
-    declare let marked: any;
+    declare let $, marked: any;
 
     @Component({name: 'QuestionBox', components: {}})
     export default class QuestionBox extends Vue {
@@ -26,10 +27,16 @@
         }
 
         select(ref: any) {
-            glob.question.select(ref);
             glob.question.buttons = []; // to not send again null
             glob.question.show = false;
             this.$forceUpdate();
+            glob.question.select(ref);
+        }
+
+        updated() {
+            this.$nextTick(() => {
+                $(this.$el).find(".main-footer button:first").focus(); // Focus on first button
+            });
         }
 
         get message() {
@@ -62,7 +69,7 @@
             position: absolute;
         }
 
-        .btn{
+        .btn {
             border-radius: 0.1rem;
         }
 

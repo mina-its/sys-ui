@@ -1,5 +1,5 @@
 <template>
-    <div @click="clickgroup" @drop="drop" @mouseup="mouseUp" @dragenter="dragEnterGroup" @dragover="dragovergroup" class="task-group">
+    <div @click="clickGroup" @drop="drop" @dragenter="dragEnterGroup" @dragover="dragovergroup" class="noselect task-group">
         <div v-if="group.title" class="font-weight-bold py-1 text-primary">
             <i v-if="group.icon" :class="group.icon"></i>{{group.title}}
         </div>
@@ -7,21 +7,17 @@
         <div class="tasks-panel">
             <div v-for="task in group.tasks" v-if="isVisible(task)" class="w-100 d-flex align-items-center" @dragenter="dragEnterTask($event,task)">
                 <i v-if="task.parent" class="fal fa-genderless fa-xs mx-2 text-black-50"></i>
-                <!--                    <i v-if="task.children" class="fal fa-plus-square fa-sm mx-1 text-black-50"></i>-->
-                <div draggable="true" @dragstart="startdragtask($event,task)" @keydown="taskkeypress($event,task)" @mousedown="taskmousedown(task)"
-                     :class="{'task-item text-nowrap noselect d-flex align-items-center border w-100 rounded': 1, 'multi-place':task._.multiPlace,'dragging': task._.dragging}"
+                <div tabindex="0" draggable="true" @dragstart="dragStart($event,task)" @keydown="taskkeypress($event,task)" @focus="focusTask(task)"
+                     :class="{'task-item text-nowrap d-flex align-items-center border w-100 rounded': 1, 'multi-place':task._.multiPlace,'dragging': task._.dragging}"
                      :style="{'color':task._.color,'background-color':task._.bgColor}">
                     <i v-if="task.archive" class="px-1 fal fa-archive"></i>
-                    <input v-if="editingMode" @change="changeTitle($event,task)" @keydown="inputKeyPress($event,task)" v-model="task.title"
-                           class="px-1 border-0 w-100 noselect">
-                    <div tabindex="0" @keydown="inputKeyPress($event,task)" class="px-1 w-100" v-else>{{task.title}}</div>
-
+                    <div class="px-1 w-100 overflow-hidden" style="text-overflow: ellipsis">{{task.title}}</div>
                     <div class="font-weight-bold" v-html="getTaskTime(task)"></div>
                     <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-angle-up':!task._.expand,'fas fa-angle-down':task._.expand}"></i>
                 </div>
             </div>
         </div>
-        <input class="new-task mt-1 px-1 border-0 w-100 bg-transparent" @keydown.esc="$event.target.value=null" @change="newtask">
+        <input class="new-task mt-1 px-1 border-0 w-100 bg-transparent" @keydown.esc="$event.target.value=null" @change="newTask">
     </div>
 </template>
 
@@ -36,7 +32,6 @@
     @Component({name: 'TaskGroup'})
     export default class TaskGroup extends Vue {
         @Prop() private group: TaskGroupData;
-        editingMode: boolean = false;
 
         hasChild(task: Task) {
             return this.group.tasks.filter(t => equalID(t.parent, task._id)).length > 0;
@@ -53,7 +48,7 @@
         }
 
         getTaskTime(task: Task) {
-            if (this.group.concern == TaskConcern.DueDate && this.group.value) {
+            if (this.group.concern == TaskConcern.DueDate && this.group.value && task.dueDates) {
                 let dueDate = task.dueDates.find(d => d.setTime && this.group.value.diff(d.time) <= 0 && moment(this.group.value).add(1, 'days').diff(d.time) > 0);
                 if (dueDate) {
                     return "<span>&nbsp;<span>" + moment(dueDate.time).format("HH:mm") + "<span>&nbsp;<span>";
@@ -74,23 +69,13 @@
             this.$forceUpdate();
         }
 
-        @Emit('clickgroup')
-        clickgroup(e) {
-            return e;
+        clickGroup(ev) {
+            $(ev.target).find(".new-task").focus();
         }
 
         @Emit('drop')
-        drop(e) {
-            return e;
-        }
-
-        mouseUp(e) {
-
-        }
-
-        changeTitle(ev, task) {
-            this.editingMode = false;
-            this.saveTask(task._id, {title: task.title} as Task);
+        drop(ev) {
+            return {ev, group: this.group};
         }
 
         saveTask(task: ID, patch: Task, done?) {
@@ -103,40 +88,27 @@
         @Emit('dragovergroup')
         dragovergroup(ev) {
             ev.preventDefault();
-            return ev;
-        }
-
-        inputKeyPress(ev, task) {
-            switch (ev.which) {
-                case Keys.f2:
-                    this.editingMode = true;
-                    return;
-            }
-        }
-
-        taskkeypress(ev, task) {
-            if (this.editingMode) return;
-            this.raiseTaskkeypress(ev, task);
+            return {ev, group: this.group} as TaskEvent;
         }
 
         @Emit('taskkeypress')
-        raiseTaskkeypress(ev, task) {
-            return {ev, task};
+        taskkeypress(ev, task) {
+            return {ev, task, group: this.group} as TaskEvent;
         }
 
-        @Emit('startdragtask')
-        startdragtask(ev, task: Task) {
-            return {ev, task};
+        @Emit('dragStart')
+        dragStart(ev, task: Task) {
+            return {ev, task, group: this.group} as TaskEvent;
         }
 
-        @Emit('newtask')
-        newtask(e) {
-            return e;
+        @Emit('newTask')
+        newTask(ev) {
+            return {ev, group: this.group};
         }
 
-        @Emit('taskmousedown')
-        taskmousedown(task) {
-            return {task, group: this.group};
+        @Emit('focusTask')
+        focusTask(task) {
+            return {task, group: this.group} as TaskEvent;
         }
     }
 </script>

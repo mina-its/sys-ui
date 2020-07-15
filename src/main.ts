@@ -491,6 +491,12 @@ function handleWindowEvents() {
         .on("keydown", (e) => {
             if (glob.cmenu.show)
                 handleCmenuKeys(e);
+
+            if (glob.question.show && e.which == Keys.esc) {
+                glob.question.show = false;
+                glob.question.select(null);
+            }
+
             glob.notify = null;
         })
         .on("mouseup", (e: any) => {

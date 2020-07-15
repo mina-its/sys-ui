@@ -1,5 +1,5 @@
 <template>
-    <check-box v-else :label="label" :checked="checked" @changed="change" />
+    <switch-box :checked="checked" @changed="change" />
 </template>
 
 <script lang="ts">
@@ -7,11 +7,10 @@
     import {Property} from "../../../sys/src/types";
     import {ItemChangeEventArg} from '../types';
 
-    @Component({name: 'PropBoolean'})
-    export default class PropBoolean extends Vue {
+    @Component({name: 'PropBooleanSwitch'})
+    export default class PropBooleanSwitch extends Vue {
         @Prop() private prop: Property;
         @Prop() private doc: any;
-        @Prop() private label?: string;
         @Prop() private readOnly: boolean;
 
         @Emit('keydown')
@@ -30,3 +29,7 @@
         }
     }
 </script>
+
+<style lang="scss">
+
+</style>

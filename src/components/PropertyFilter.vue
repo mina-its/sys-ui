@@ -15,7 +15,7 @@
         render(ce) {
             let $this = this;
             let propTitle = ce(this.allowPropChange ? 'a' : 'div', {
-                attrs: {"class": "filter-prop-title p-1" + (this.allowPropChange ? '' : ' font-weight-bold'), "href": "javascript:void(0);"},
+                attrs: {"class": "filter-prop-title" + (this.allowPropChange ? '' : ' font-weight-bold'), "href": "javascript:void(0);"},
                 on: {click: $this.changeFilterProp}
             }, this.prop.title || this.prop.name);
 
@@ -285,6 +285,10 @@
 </script>
 
 <style lang="scss">
+
+    .filter-prop-title {
+        padding: .375rem .25rem !important;
+    }
 
     .filter-prop-oper {
         background-color: #ddd;

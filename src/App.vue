@@ -53,7 +53,7 @@
         --danger: #ff4136;
         --dark: #24292e;
         --header-bg: #24292e;
-        --warning: #ff7700;
+        --warning: #e46e29;
         --grid-head: #f6f8fa;
         --grid-border: #d7d9dc;
         --object-border: #ccc;
@@ -274,7 +274,7 @@
         color: #fff; /* White text color */
         text-align: center; /* Centered text */
         border-radius: 2px; /* Rounded borders */
-        padding: 16px; /* Padding */
+        padding: 3rem;
         position: fixed; /* Sit on top of the screen */
         z-index: 1; /* Add a z-index if needed */
         left: 50%; /* Center the snackbar */

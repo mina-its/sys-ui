@@ -3,59 +3,35 @@
         <!--  Toolbar -->
         <div class="d-flex p-2 align-items-center btn-toolbar toolbar" role="toolbar">
 
-            <div class="btn-group input-group mr-2">
-                <div class="input-group-prepend" style="margin-bottom: .2rem">
-                    <span class="input-group-text" id="">Project:</span>
-                </div>
-                <div class="input-group-prepend" role="group">
-                    <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
-                            :class="{'rounded-right toolbar-button btn':1, 'btn-secondary': !!currentProject, 'btn-outline-secondary':!currentProject}">
-                        <i class="fal fa-construction fa-lg"></i>
-                        <label v-if="currentProject">{{currentProject.title}}</label>
-                        <label v-else>[ All Projects ]</label>
-                    </button>
-                    <!--                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</button>-->
-                    <div class="dropdown-menu">
-                        <button class="btn btn-link dropdown-item py-2" @click="filterProject(null)">[ All Projects ]</button>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item py-2" href="javascript:void(0);" @click="filterProject(project)"
-                           v-for="project of projects">{{project.title}}</a>
-                    </div>
-                </div>
-            </div>
-
             <!--  View -->
             <div class="concerns btn-group input-group mx-1" role="group" aria-label="First group">
-                <div class="input-group-prepend" style="margin-bottom: .2rem">
-                    <span class="input-group-text">View:</span>
-                </div>
-                <button @click="activateConcern(TaskConcern_Start)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Start===view.concern&&view.primary}">
-                    <i class="fal fa-inbox fa-lg"></i>
-                    <label>Start</label>
+                <button @click="selectPrimaryView(TaskView_Home)" type="button"
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Home===view.concern&&view.primary}">
+                    <i class="fal fa-home fa-lg"></i>
+                    <label>Home</label>
                 </button>
-                <button @click="activateConcern(TaskConcern_Status)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Status===view.concern&&view.primary}">
+                <button @click="selectPrimaryView(TaskView_Status)" type="button"
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Status===view.concern&&view.primary}">
                     <i class="fal fa-ballot-check fa-lg"></i>
                     <label>Status</label>
                 </button>
-                <button @click="activateConcern(TaskConcern_DueDate)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_DueDate===view.concern&&view.primary}">
+                <button @click="selectPrimaryView(TaskView_DueDate)" type="button"
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_DueDate===view.concern&&view.primary}">
                     <i class="fal fa-calendar-alt fa-lg"></i>
                     <label>Calendar</label>
                 </button>
-                <button v-if="currentProject" @click="activateConcern(TaskConcern_Assignee)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Assignee===view.concern&&view.primary}">
+                <button @click="selectPrimaryView(TaskView_Assignee)" type="button"
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Assignee===view.concern&&view.primary}">
                     <i class="fal fa-users fa-lg"></i>
                     <label>Assignee</label>
                 </button>
-                <button v-if="currentProject" @click="activateConcern(TaskConcern_MileStone)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_MileStone===view.concern&&view.primary}">
+                <button @click="selectPrimaryView(TaskView_MileStone)" type="button"
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_MileStone===view.concern&&view.primary}">
                     <i class="fal fa-pennant fa-lg"></i>
                     <label>Milestone</label>
                 </button>
-                <button v-if="currentProject" @click="activateConcern(TaskConcern_Category)" type="button"
-                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskConcern_Category===view.concern&&view.primary}">
+                <button @click="selectPrimaryView(TaskView_Category)" type="button"
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Category===view.concern&&view.primary}">
                     <i class="fal fa-layer-group fa-lg"></i>
                     <label>Category</label>
                 </button>
@@ -64,43 +40,46 @@
                     <i class="fal fa-eye fa-lg"></i>
                     <label>{{vw.title}}</label>
                 </button>
+            </div>
 
-                <div class="input-group-append" role="group">
-                    <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
-                            class="toolbar-button rounded-right btn btn-outline-secondary">
-                        <i class="fal fa-eye fa-lg"></i>
-                        <label>My Views</label>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item py-2" href="javascript:void(0);" @click="activateView(view)"
-                           v-for="view of views.filter(v => !v.primary)">{{view.title}}</a>
+            <!--  My Views -->
+            <div class="input-group-append mx-2" role="group">
+                <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
+                        class="toolbar-button rounded-right btn btn-outline-secondary">
+                    <i class="fal fa-eye fa-lg"></i>
+                    <label>My Views</label>
+                </button>
+                <div class="dropdown-menu">
+                    <div v-for="view of views.filter(v => !v.primary)">
+                        <div class="d-flex px-2 align-items-center">
+                            <div class="px-2 flex-fill">{{view.title}}</div>
+                            <button @click="removeView(view)" class="py-1 btn btn-outline-secondary">Delete</button>
+                        </div>
                         <div class="dropdown-divider"></div>
-                        <div class="input-group px-2" style="min-width: 400px">
-                            <input v-model="newViewName" class="form-control" @change="newView" placeholder="Save current view as">
-                            <div class="input-group-append">
-                                <button @click="newView" class="btn btn-dark">Save</button>
-                            </div>
+                    </div>
+                    <div class="input-group px-2">
+                        <input v-model="newViewName" class="form-control" placeholder="Save current view as ...">
+                        <div class="input-group-append">
+                            <button @click="newView" class="btn btn-secondary px-3">Save</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!--  My Views -->
-
             <!--  Filter -->
             <div class="dropdown mx-1">
-                <button id="filterButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        type="button" class="toolbar-button btn btn-outline-secondary mx-1">
+                <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"
+                        class="toolbar-button rounded-right btn btn-outline-secondary">
                     <i class="fal fa-filter fa-lg"></i>
-                    <label>Filter</label>
+                    <label>Filters</label>
                 </button>
                 <div v-if="view.filter" class="dropdown-menu filter-panel p-3" aria-labelledby="filterButton">
                     <form>
                         <div class="properties d-flex">
                             <div class="filter-item mx-2">
                                 <label class="font-weight-bold">Status</label>
-                                <check-box v-for="item of getFilterItems(TaskConcern_Status)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskConcern_Status)"
+                                <check-box v-for="item of getFilterItems(TaskView_Status)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskView_Status)"
                                            :label="item.title"></check-box>
                             </div>
                             <!--                        <div class="filter-item mx-2 filter-duedate">-->
@@ -110,26 +89,26 @@
                             <!--                        </div>-->
                             <div class="filter-item mx-2">
                                 <label class="font-weight-bold">Priority</label>
-                                <check-box v-for="item of getFilterItems(TaskConcern_Priority)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskConcern_Priority)"
+                                <check-box v-for="item of getFilterItems(TaskView_Priority)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskView_Priority)"
                                            :label="item.title"></check-box>
                             </div>
                             <div class="filter-item mx-2">
                                 <label class="font-weight-bold">Assignees</label>
-                                <check-box v-for="item of getFilterItems(TaskConcern_Assignee)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskConcern_Assignee)"
+                                <check-box v-for="item of getFilterItems(TaskView_Assignee)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskView_Assignee)"
                                            :label="item.title"></check-box>
                             </div>
                             <div v-if="currentProject" class="filter-item mx-2">
                                 <label class="font-weight-bold">Milestones</label>
-                                <check-box v-for="item of getFilterItems(TaskConcern_MileStone)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskConcern_MileStone)"
+                                <check-box v-for="item of getFilterItems(TaskView_MileStone)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskView_MileStone)"
                                            :label="item.title"></check-box>
                             </div>
                             <div v-if="currentProject" class="filter-item mx-2">
                                 <label class="font-weight-bold">Categories</label>
-                                <check-box v-for="item of getFilterItems(TaskConcern_Category)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskConcern_Category)"
+                                <check-box v-for="item of getFilterItems(TaskView_Category)" :checked="item.checked"
+                                           @changed="filterItemCheckChanged($event, item, TaskView_Category)"
                                            :label="item.title"></check-box>
                             </div>
                         </div>
@@ -146,97 +125,75 @@
             <div class="flex-grow-1"></div>
 
             <!--  Search -->
-            <div class="search-box border rounded px-1">
+            <div class="search-box border mx-2">
                 <i class="fal fa-search mx-1"></i>
-                <input type="search" v-model="searchPhrase" placeholder="Search task #no / title" class="border-0 outline-0" @change="search">
+                <input type="search" v-model="searchPhrase" placeholder="Search" class="border-0 outline-0" @change="search">
             </div>
 
-            <!-- Feedback -->
-            <div class="dropdown m-1 mt-2" title="Feedback">
-                <button id="feedbackButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        type="button" class="btn btn-link">
-                    <i class="fal fa-comment-alt-exclamation fa-lg"></i>
-                </button>
-                <div class="dropdown-menu filter-panel p-3" aria-labelledby="feedbackButton" style="width: 30rem">
-                    <form>
-                        <div class="mr-2">How much are you satisfied?</div>
-                        <div class="my-2">
-                            <i class="fal fa-tired pr-2 fa-lg"></i>
-                            <i class="fal fa-frown px-2 fa-lg"></i>
-                            <i class="fal fa-meh px-2 fa-lg"></i>
-                            <i class="fal fa-smile px-2 fa-lg"></i>
-                            <i class="fal fa-laugh-beam px-2 fa-lg"></i>
-                        </div>
-                        <div class="mr-2">Your requests:</div>
-                        <textarea placeholder="Comment" class="w-100 p-2"></textarea>
-                        <button @click="postFeedback" class="btn btn-success px-4 mt-2">Post</button>
-                    </form>
-                </div>
-            </div>
+            <!--  Projects -->
+            <select :value="currentProjectKey" class="border bg-white p-1 m-1" @change="selectProject">
+                <option :value="null">[ All Projects ]</option>
+                <option :value="''+project._id" v-for="project of projects">{{project.title}}</option>
+            </select>
         </div>
 
         <!--  Content -->
         <div v-if="!showTaskDetails" class="w-100 h-100 overflow-auto d-flex task-manager-content">
 
             <!--  Calendar -->
-            <div class="calendar w-100 h-100 d-flex" v-if="TaskConcern_DueDate===view.concern">
+            <div class="calendar w-100 h-100 d-flex" v-if="TaskView_DueDate===view.concern">
                 <task-group v-if="unscheduledTasksGroup && unscheduledTasksGroup.tasks.length"
-                            :group="unscheduledTasksGroup" class="bg-light px-2 py-1" @newtask="newTask($event, null)"
-                            @startdragtask="dragStart($event.ev,$event.task,null)"
-                            @taskmousedown="selectTask" @taskkeypress="taskKeypress($event.ev,$event.task,unscheduledTasksGroup)" @clickgroup="clickGroup"
-                            @drop="drop($event,null)" @dragovergroup="ondragover($event,null)"></task-group>
+                            :group="unscheduledTasksGroup" class="bg-light px-2 py-1" @newTask="newTask" @dragStart="dragStart"
+                            @focusTask="focusTask" @taskkeypress="taskKeypress" @drop="drop" @dragovergroup="ondragover"/>
                 <table class="w-100 h-100 flex-fill" @wheel="calendarWheel">
                     <tr v-for="row of calendarRows" class="">
-                        <td v-for="day of row.days" :class="day.style" @click="clickGroup($event,day)">
+                        <td v-for="day of row.days" :class="day.style">
                             <task-group class="h-100 w-100 calendar-day" :group="day" @dragEnterTask="dragEnterTask" @dragEnterGroup="dragEnterGroup"
-                                        @startdragtask="dragStart($event.ev,$event.task,day)" @ondragover="ondragover"
-                                        @taskmousedown="selectTask" @taskkeypress="taskKeypress($event.ev,$event.task,day)"
-                                        @clickgroup="clickGroup" @newtask="newTask($event, day)"
-                                        @drop="drop($event,day)" @dragovergroup="ondragover($event,day)"></task-group>
+                                        @dragStart="dragStart" @ondragover="ondragover" @newTask="newTask"
+                                        @focusTask="focusTask" @taskkeypress="taskKeypress" @drop="drop" @dragovergroup="ondragover"/>
                         </td>
                     </tr>
                 </table>
             </div>
 
             <!--  Columns -->
-            <task-group v-else v-for="group in taskGroups"
-                        class="border-right bg-light px-2 py-1" :group="group"
-                        @dragEnterTask="dragEnterTask" @dragEnterGroup="dragEnterGroup"
-                        @startdragtask="dragStart($event.ev,$event.task,group)" @ondragover="ondragover"
-                        @taskmousedown="selectTask" @taskkeypress="taskKeypress($event.ev,$event.task,group)" @clickgroup="clickGroup"
-                        @newtask="newTask($event, group)"
-                        @drop="drop($event,group)" @dragovergroup="ondragover($event,group)"></task-group>
+            <task-group v-else v-for="group in taskGroups" class="border-right bg-light px-2 py-1" :group="group" @dragEnterTask="dragEnterTask"
+                        @dragEnterGroup="dragEnterGroup" @dragStart="dragStart" @ondragover="ondragover" @newTask="newTask"
+                        @focusTask="focusTask" @taskkeypress="taskKeypress" @drop="drop" @dragovergroup="ondragover"/>
 
             <div class="flex-grow-1"></div>
 
             <!--  Right Panel -->
             <div class="right-panel border-left bg-white p-3">
+
+                <!--  Coloring legend -->
                 <div class="coloring-legend details-view border-bottom pb-3 mb-2">
                     <div class="d-flex align-items-center">
                         <label class="prop-label px-1">Coloring</label>
                         <select :value="view.coloring" class="prop-value flex-fill border bg-white m-1" @change="applyColoring">
                             <option></option>
                             <option value="2">Status</option>
-                            <option value="4">Assignee</option>
                             <option value="5">Priority</option>
                             <option value="6">Project</option>
+                            <option v-if="this.currentProject" value="4">Assignee</option>
                             <option v-if="this.currentProject" value="8">Category</option>
                             <option v-if="this.currentProject" value="9">MileStone</option>
                         </select>
                     </div>
 
                     <div class="row px-3" v-if="view.coloring">
-                        <div class="col-6 legend-item p-1" v-for="(item,i) of coloringLegend">
+                        <div class="col-6 text-nowrap legend-item p-1" v-for="(item,i) of coloringLegend">
                             <div class="py-1 px-2" :style="{color:colorTable[i%colorTable.length].color, 'background-color':colorTable[i%colorTable.length].bgColor}">{{item.title}}</div>
                         </div>
                     </div>
                 </div>
+
+                <!--  CurrentTask properties -->
                 <div v-if="currentTask">
                     <!--  After Archive Actions -->
                     <div v-if="currentTask.archive" class="mt-5">
-                        <button @click="undoArchive(currentTask)" class="btn btn-outline-dark mb-2">Undo Archive</button>
-                        <button @click="deleteTask(currentTask)" class="btn btn-outline-danger">Delete Permanently
-                        </button>
+                        <button @click="undoArchive(currentTask)" class="btn btn-outline-dark mb-2 d-block">Undo Archive</button>
+                        <button @click="deleteTask(currentTask)" class="btn btn-outline-danger d-block">Delete Permanently</button>
                     </div>
 
                     <!--  Task Properties -->
@@ -273,6 +230,8 @@
                         <details-view class="compress-view" v-if="currentTaskDueDate" @changed="taskChanged" :data="currentTaskDueDate" :dec="dueDatesDec" :level="1"></details-view>
                     </div>
                 </div>
+
+                <!--  Task details -->
                 <div v-else>Select a task to see its details here.</div>
             </div>
         </div>
@@ -312,14 +271,15 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {GetTaskDto, ID, Keys, LogType, ObjectDec, TaskDueDate, Pair, Project, ProjectView, Task, TaskConcern, TaskInboxGroup, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
+    import {GetTaskDto, ID, Keys, LogType, ObjectDec, Pair, Project, ProjectView, Task, TaskConcern, TaskDueDate, TaskInboxGroup, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
     import TaskGroup from "../components/TaskGroup.vue";
     import {ItemChangeEventArg, MenuItem, TaskEvent, TaskGroupData} from "../types";
-    import {ajax, call, clone, equalID, markDown, notify, question, showCmenu} from "../main";
+    import {ajax, call, clone, equalID, glob, markDown, notify, question, showCmenu} from "../main";
+    import SwitchBox from "./SwitchBox.vue";
 
     declare let $, moment: any;
 
-    @Component({name: 'TaskManager', components: {TaskGroup}})
+    @Component({name: 'TaskManager', components: {SwitchBox, TaskGroup}})
     export default class TaskManager extends Vue {
         private tasks: Task[] = [];
         private view: ProjectView = {} as ProjectView;
@@ -338,14 +298,14 @@
         private unscheduledTasksGroup: TaskGroupData = null;
         private concernProperty: string;
         private showTaskDetails: boolean = false;
-        private TaskConcern_Start = TaskConcern.Start;
-        private TaskConcern_Status = TaskConcern.Status;
-        private TaskConcern_Project = TaskConcern.Project;
-        private TaskConcern_DueDate = TaskConcern.DueDate;
-        private TaskConcern_Assignee = TaskConcern.Assignee;
-        private TaskConcern_Priority = TaskConcern.Priority;
-        private TaskConcern_Category = TaskConcern.Category;
-        private TaskConcern_MileStone = TaskConcern.MileStone;
+        private TaskView_Home = TaskConcern.Start;
+        private TaskView_Status = TaskConcern.Status;
+        private TaskView_Project = TaskConcern.Project;
+        private TaskView_DueDate = TaskConcern.DueDate;
+        private TaskView_Assignee = TaskConcern.Assignee;
+        private TaskView_Priority = TaskConcern.Priority;
+        private TaskView_Category = TaskConcern.Category;
+        private TaskView_MileStone = TaskConcern.MileStone;
         private searchPhrase = null;
         private users: Pair[];
         private currentUser: ID;
@@ -378,8 +338,9 @@
 
                 // Tasks
                 for (let task of data.tasks) {
-                    task._ = {dragging: false};
+                    task._ = {dragging: false, color: null, bgColor: null};
                     task.comments = task.comments || [];
+                    if (task.parent) task._.parent = data.tasks.find(t => equalID(t._id, task.parent));
                 }
                 this.tasks = data.tasks;
 
@@ -408,74 +369,139 @@
             };
         }
 
+        get currentProjectKey() {
+            return this.currentProject ? '' + this.currentProject._id : null;
+        }
+
         dragEnterGroup(e) {
-            if (e.group._z != this.currentGroup._z) {
-                let z = Math.ceil((Math.max(...e.group.tasks.map(t => t._z)) | 0) + 1);
-                this.moveTask(z, e.ev.ctrlKey, e.group);
+            if (this.currentGroup && this.currentTask && e.group._z != this.currentGroup._z) {
+                let z = Math.ceil((Math.max(...e.group.tasks.map(t => t._z)) | 0));
+                if (z != this.currentTask._z) z = z + 1;
+                this.moveTask(this.currentTask, z, e.ev.ctrlKey, e.group);
                 this.currentGroup = e.group;
             }
         }
 
         dragEnterTask(e: TaskEvent) {
-            if (e.task != this.currentTask) {
+            if (this.currentTask && e.task != this.currentTask) {
                 let i = e.group.tasks.indexOf(e.task);
                 let z = i == 0 ? Math.ceil(e.task._z - 1) : this.calculateMiddleZ(e.group.tasks[i - 1], e.task);
-                this.moveTask(z, e.ev.ctrlKey, e.group);
+                this.moveTask(this.currentTask, z, e.ev.ctrlKey, e.group);
             }
         }
 
-        moveTask(z: number, ctrlKey: boolean, group: TaskGroupData) {
-            this.currentTask._z = z;
+        drop(e: TaskEvent) {
+            let task = this.currentTask || this.tasks.find(t => t._.dragging);
+            if (!task) {
+                console.warn('drop: currenttask is null');
+                return;
+            }
+            e.ev.preventDefault();
+            task._.dragging = false;
+            this.applyTaskColoring(task);
+            this.currentTask = null;
+
+            this.$forceUpdate();
+            this.$nextTick(() => {
+                this.$forceUpdate();
+            })
+
+            //, status: task.status, assignees: task.assignees, dueDates: task.dueDates, priority: task.priority
+            let patch = {_z: task._z} as Task;
+            patch[this.concernProperty] = task[this.concernProperty];
+            this.saveTask(task, patch);
+        }
+
+        moveTask(task: Task, z: number, ctrlKey: boolean, group: TaskGroupData) {
+            if (!task) {
+                return;
+            }
+            task._z = z;
             switch (this.view.concern) {
                 case TaskConcern.DueDate: {
-                    this.currentTask.dueDates = this.currentTask.dueDates || [];
-                    let indexInSource = this.currentTask.dueDates.findIndex(d => this.currentGroup.value.diff(d.time) == 0);
+                    task.dueDates = task.dueDates || [];
+                    let indexInSource = task.dueDates.findIndex(d => this.currentGroup.value.diff(d.time) == 0);
                     if (!ctrlKey) {
-                        if (indexInSource > -1) this.currentTask.dueDates.splice(indexInSource, 1);
+                        if (indexInSource > -1) task.dueDates.splice(indexInSource, 1);
                     }
 
-                    let indexOnTarget = this.currentTask.dueDates.findIndex(d => group.value.diff(d.time) == 0);
+                    let indexOnTarget = task.dueDates.findIndex(d => group.value.diff(d.time) == 0);
                     if (indexOnTarget == -1) // Check if it does not already exists
-                        this.currentTask.dueDates.push({_id: ID.generateByBrowser(), time: group.value.toDate()});
+                        task.dueDates.push({_id: ID.generateByBrowser(), time: group.value.toDate()});
                 }
                     break;
 
                 case TaskConcern.Category:
                     if (!group.value) {
-                        this.currentTask.categories = null;
+                        task.categories = null;
                     } else {
-                        this.currentTask.categories = this.currentTask.categories || [];
-                        let indexInSource = this.currentTask.categories.indexOf(this.currentGroup.value);
+                        task.categories = task.categories || [];
+                        let indexInSource = task.categories.indexOf(this.currentGroup.value);
                         if (!ctrlKey) {
-                            if (indexInSource > -1) this.currentTask.categories.splice(indexInSource, 1);
+                            if (indexInSource > -1) task.categories.splice(indexInSource, 1);
                         }
 
-                        let indexOnTarget = this.currentTask.categories.indexOf(group.value);
+                        let indexOnTarget = task.categories.indexOf(group.value);
                         if (indexOnTarget == -1) // Check if it does not already exists
-                            this.currentTask.categories.push(group.value);
+                            task.categories.push(group.value);
                     }
                     break;
 
                 case TaskConcern.Assignee:
                     if (!group.value) {
-                        this.currentTask.assignees = null;
+                        task.assignees = null;
                     } else {
-                        this.currentTask.assignees = this.currentTask.assignees || [];
-                        let indexInSource = this.currentTask.assignees.findIndex(d => equalID(d, this.currentGroup.value));
+                        task.assignees = task.assignees || [];
+                        let indexInSource = task.assignees.findIndex(d => equalID(d, this.currentGroup.value));
                         if (!ctrlKey) {
-                            if (indexInSource > -1) this.currentTask.assignees.splice(indexInSource, 1);
+                            if (indexInSource > -1) task.assignees.splice(indexInSource, 1);
                         }
 
-                        let indexOnTarget = this.currentTask.assignees.findIndex(d => equalID(d, group.value));
+                        let indexOnTarget = task.assignees.findIndex(d => equalID(d, group.value));
                         if (indexOnTarget == -1) // Check if it does not already exists
-                            this.currentTask.assignees.push(group.value);
+                            task.assignees.push(group.value);
                     }
                     break;
 
+                // case TaskConcern.Start:
+                //     switch (group.value as TaskInboxGroup) {
+                //         case TaskInboxGroup.Doing:
+                //         case TaskInboxGroup.Todo:
+                //             task.status = group.value == TaskInboxGroup.Todo ? TaskStatus.Todo : TaskStatus.Doing;
+                //
+                //             task.assignees = task.assignees || [];
+                //             if (!task.assignees.some(a => equalID(a, this.currentUser)))
+                //                 task.assignees.push(this.currentUser);
+                //
+                //             task.dueDates = task.dueDates || [];
+                //             let today = moment().startOf('day');
+                //             if (!task.dueDates.some(d => this.datePeriodContains(d.time, today)))
+                //                 task.dueDates.push({_id: ID.generateByBrowser(), time: today.toDate()});
+                //             break;
+                //
+                //         case TaskInboxGroup.Urgent:
+                //             task.priority = TaskPriority.Urgent;
+                //             break;
+                //
+                //         case TaskInboxGroup.Favorite:
+                //             task.favorite = true;
+                //             break;
+                //     }
+                //     break;
+                //
                 default:
-                    this.currentTask[this.concernProperty] = group.value;
+                    task[this.concernProperty] = group.value;
                     break;
             }
+
+            // Moving parent
+            // if (task.parent) {
+            //     if (this.currentGroup.tasks.filter(t => equalID(t.parent, task.parent)).length == 0 // this is the last child
+            //         && this.currentGroup.tasks.some(t => equalID(t._id, task.parent))) { // it parent is there
+            //
+            //     }
+            // }
+
             this.refreshTasks();
         }
 
@@ -497,7 +523,7 @@
             if (!this.addNoteContent) return;
             this.currentTask.comments.push({_id: ID.generateByBrowser(), content: this.addNoteContent, user: this.currentUser, time: new Date()});
             this.addNoteContent = "";
-            this.saveTask(this.currentTask._id, {comments: this.currentTask.comments} as Task);
+            this.saveTask(this.currentTask, {comments: this.currentTask.comments} as Task);
         }
 
         checkHashAddress() {
@@ -518,20 +544,18 @@
             this.showArchivedTasks = !this.showArchivedTasks;
         }
 
-        postFeedback() {
-
-        }
-
         newView() {
             if (!this.newViewName) return;
             let view = clone(this.view) as ProjectView;
             Object.assign(view, {_id: ID.generateByBrowser(), title: this.newViewName, primary: false, _new: true});
             this.newViewName = "";
-            this.views.push(view);
-            this.saveView(this.view, (err, res) => {
-                if (res.code == 200)
-                    notify(`Custom view '${view.title}' is created!`, LogType.Info);
-                this.activateView(view);
+            this.saveView(view, (err, res) => {
+                if (res.code == 200) {
+                    notify(`Custom view '${view.title}' is created!`, LogType.Debug);
+                    delete view["_new"];
+                    this.views.push(view);
+                    this.activateView(view);
+                }
             });
         }
 
@@ -544,9 +568,10 @@
             if (!this.searchPhrase) return;
             call("searchTasks", {phrase: this.searchPhrase}, (err, res) => {
                 let items = res.data.tasks.map(task => {
-                    return {title: task.title, ref: task} as MenuItem;
+                    return {title: `#${task.no} - ${task.title}`, ref: task} as MenuItem;
                 });
                 showCmenu(null, items, {ctrl: $(".search-box")}, (state, item: MenuItem) => {
+                    this.searchPhrase = null;
                     if (item) {
                         this.currentTask = item.ref;
                         this.showCurrentTaskDetails();
@@ -650,8 +675,8 @@
                     break;
             }
             if (index == -1) {
-                task._.color = 'inherit';
-                task._.bgColor = 'inherit';
+                task._.color = '#333';
+                task._.bgColor = 'white';
             } else {
                 task._.color = this.colorTable[index % this.colorTable.length].color;
                 task._.bgColor = this.colorTable[index % this.colorTable.length].bgColor;
@@ -662,13 +687,13 @@
             let change = new Task();
             change[e.prop.name] = e.val;
             this.applyTaskColoring(this.currentTask);
-            this.saveTask(this.currentTask._id, change, (res) => {
+            this.saveTask(this.currentTask, change, (res) => {
                 this.refreshTasks();
             });
         }
 
         checkConcernNeedsSelectedProject() {
-            if (!this.currentProject && (this.view.concern == TaskConcern.MileStone || this.view.concern == TaskConcern.Category)) {
+            if (!this.currentProject && (this.view.concern == TaskConcern.MileStone || this.view.concern == TaskConcern.Category || this.view.concern == TaskConcern.Assignee)) {
                 notify(`Please select the project for this view`, LogType.Warning);
                 this.taskGroups = [];
                 this.groupItems = [];
@@ -678,17 +703,17 @@
             return false;
         }
 
-        filterProject(project) {
-            this.currentProject = project;
-            if (!this.view.primary) {
-                this.view.project = project ? project._id : null;
-                this.saveView(this.view);
-            }
+        selectProject(ev) {
+            glob.notify = null;
+
+            this.currentProject = ev.target.value ? this.projects.find(p => "" + p._id == ev.target.value) : null;
+            this.view.project = this.currentProject ? this.currentProject._id : null;
+            this.saveView(this.view);
 
             if (this.checkConcernNeedsSelectedProject())
                 return;
 
-            if (this.currentProject && (this.view.concern == TaskConcern.MileStone || this.view.concern == TaskConcern.Category))
+            if (this.currentProject && (this.view.concern == TaskConcern.MileStone || this.view.concern == TaskConcern.Category || this.view.concern == TaskConcern.Assignee))
                 this.activateView(this.view);
 
             this.refreshTasks();
@@ -703,31 +728,44 @@
 
         toggleFavorite() {
             this.currentTask.favorite = !this.currentTask.favorite;
-            this.saveTask(this.currentTask._id, {favorite: this.currentTask.favorite} as Task, (res) => {
+            this.saveTask(this.currentTask, {favorite: this.currentTask.favorite} as Task, (res) => {
                 this.refreshTasks();
             });
         }
 
         archive(task: Task) {
             task.archive = true;
-            this.saveTask(task._id, {archive: true} as Task, (res) => {
+            this.saveTask(task, {archive: true} as Task, (res) => {
                 this.refreshTasks();
             });
         }
 
         undoArchive(task: Task) {
             task.archive = false;
-            this.saveTask(task._id, {archive: true} as Task, (res) => {
+            this.saveTask(task, {archive: true} as Task, (res) => {
                 this.refreshTasks();
             });
         }
 
         deleteTask(task: Task) {
-            ajax(`/tasks/${task._id}`, null, {method: WebMethod.del}, (res) => {
-                this.tasks.splice(this.tasks.indexOf(task), 1);
+            let tasks = this.tasks.filter(t => t._.parent == task);
+            tasks.unshift(task);
+            tasks.forEach(t => t.archive = true);
+            this.currentTask = null;
+
+            this.doDeleteTask(tasks, () => {
                 this.refreshTasks();
             });
-            this.currentTask = null;
+        }
+
+        doDeleteTask(tasksToDelete: Task[], done) {
+            let task = tasksToDelete.pop();
+            if (!task) return done();
+
+            ajax(`/tasks/${task._id}`, null, {method: WebMethod.del}, (res) => {
+                this.tasks.splice(this.tasks.indexOf(task), 1);
+                this.doDeleteTask(tasksToDelete, done);
+            });
         }
 
         getFilterItems(concern: TaskConcern) {
@@ -875,7 +913,15 @@
                 task._z = ++maxZ;
                 task._.dirty = true;
             });
-            tasks.sort((t1, t2) => t1._z - t2._z);
+
+            tasks.sort((t1, t2) => {
+                let z1 = t1._.parent ? t1._.parent._z : t1._z;
+                let z2 = t2._.parent ? t2._.parent._z : t2._z;
+                if (z1 != z2) return z1 - z2;
+                if (t1._.parent == t2) return 1;
+                if (t2._.parent == t1) return -1;
+                return t1._z - t2._z;
+            });
 
             for (let i = 1; i < tasks.length; i++) { // Check if there is an issue in orders
                 if (tasks[i]._z <= tasks[i - 1]._z) {
@@ -885,10 +931,58 @@
             }
 
             for (let task of tasks.filter(t => t._.dirty)) {
-                this.saveTask(task._id, {_z: task._z} as Task);
+                this.saveTask(task, {_z: task._z} as Task);
             }
 
             return tasks;
+        }
+
+        refreshTasksForCalendar(tasks: Task[]) {
+            this.calendarRows = [];
+            let firstDay = moment().startOf('month');
+            let date = firstDay.add(firstDay.weekday() ? -firstDay.weekday() + 1 : 0, 'days').add(this.view.calendarOffset || 0, 'days');
+
+            for (let i = 0; i < 6; i++) {
+                let row = {days: []};
+                this.calendarRows.push(row);
+
+                for (let d = 0; d < 7; d++) {
+                    let style = "border align-top ";
+                    if (date >= moment().startOf('month') && date < moment().startOf('month').add(1, 'month'))
+                        style += "this-month";
+                    if (date.format("D MMM") == moment().startOf('day').format("D MMM"))
+                        style += " today";
+
+                    if (date.month() % 2 == 1) style += " odd-month";
+
+                    let subtitle = (date.date() == 1) ? (date.year() == moment().year() ? date.format("D MMMM") : date.format("D MMMM YYYY")) : date.format("D");
+                    if (d == 0 && i == 0)
+                        subtitle = date.format("D MMMM");
+
+                    let groupTasks = tasks.filter(task => task.dueDates && task.dueDates.some(d => this.datePeriodContains(d.time, moment(date))));
+                    groupTasks = this.organizeGroupTasks(groupTasks);
+
+                    let day = {
+                        _z: i * 7 + d + 1,
+                        concern: TaskConcern.DueDate,
+                        subtitle,
+                        tasks: groupTasks,
+                        value: moment(date),
+                        style,
+                        title: i == 0 ? date.format("ddd") : ""
+                    } as TaskGroupData;
+                    date.add(1, 'days');
+                    row.days.push(day);
+
+                    // console.log(day.tasks.map(t => t._z+":"+t.title));
+                }
+            }
+
+            let groupTasks = tasks.filter(task => (!task.dueDates || !task.dueDates.length) && !task.archive);
+            groupTasks = this.organizeGroupTasks(groupTasks);
+
+            this.unscheduledTasksGroup = {_z: 0, tasks: groupTasks, title: "[ Unscheduled ]"} as TaskGroupData;
+            this.refreshTaskColoring();
         }
 
         refreshTasks() {
@@ -897,53 +991,16 @@
                 tasks = tasks.filter(task => task.project && equalID(task.project, this.currentProject._id));
             tasks.forEach(t => t._.multiPlace = false);
 
+            // Calendar tasks
             if (this.view.concern == TaskConcern.DueDate) {
-                this.calendarRows = [];
-                let firstDay = moment().startOf('month');
-                let date = firstDay.add(firstDay.weekday() ? -firstDay.weekday() + 1 : 0, 'days').add(this.view.calendarOffset || 0, 'days');
-
-                for (let i = 0; i < 6; i++) {
-                    let row = {days: []};
-                    this.calendarRows.push(row);
-
-                    for (let d = 0; d < 7; d++) {
-                        let style = "border align-top ";
-                        if (date >= moment().startOf('month') && date < moment().startOf('month').add(1, 'month'))
-                            style += "this-month";
-                        if (date.format("D MMM") == moment().startOf('day').format("D MMM"))
-                            style += " today";
-
-                        if (date.month() % 2 == 1) style += " odd-month";
-
-                        let subtitle = (date.date() == 1) ? (date.year() == moment().year() ? date.format("D MMMM") : date.format("D MMMM YYYY")) : date.format("D");
-                        if (d == 0 && i == 0)
-                            subtitle = date.format("D MMMM");
-
-                        let day = {
-                            _z: i * 7 + d + 1,
-                            concern: TaskConcern.DueDate,
-                            subtitle,
-                            tasks: this.sortTasks(tasks.filter(task => task.dueDates &&
-                                task.dueDates.find(d => this.datePeriodContains(d.time, moment(date))))),
-                            value: moment(date),
-                            style,
-                            title: i == 0 ? date.format("ddd") : ""
-                        } as TaskGroupData;
-                        date.add(1, 'days');
-                        row.days.push(day);
-
-                        // console.log(day.tasks.map(t => t._z+":"+t.title));
-                    }
-                }
-
-                this.unscheduledTasksGroup = {_z: 0, tasks: tasks.filter(task => (!task.dueDates || !task.dueDates.length) && !task.archive), title: "[ Unscheduled ]"} as TaskGroupData;
-                this.refreshTaskColoring();
+                this.refreshTasksForCalendar(tasks);
                 return;
             }
 
             this.taskGroups = [];
             for (let group of this.groupItems) {
 
+                // Hide columns if needed
                 switch (this.view.concern) {
                     case TaskConcern.Status:
                         if (this.view.filter.statuses && this.view.filter.statuses.indexOf(group.value) == -1)
@@ -980,7 +1037,7 @@
 
                                 case TaskInboxGroup.Overdue:
                                     if (task.status == TaskStatus.Done || task.status == TaskStatus.OnHold || !task.dueDates) return false;
-                                    return task.dueDates.find(d => moment(d.time).diff(today) < 0);
+                                    return task.dueDates.find(d => moment(d.time).diff(today) < 0) && !task.dueDates.find(d => moment(d.time).diff(today, 'days') >= 0);
                             }
                             break;
 
@@ -995,19 +1052,12 @@
                                 return equalID(task[this.concernProperty], group.value);
                     }
                 });
-
-                let parentTasksNeedToInclude = groupTasks.filter(t => t.parent && !groupTasks.find(tsk => equalID(tsk._id, t.parent))).map(t => t.parent);
-                for (let task of parentTasksNeedToInclude) {
-                    if (groupTasks.find(tsk => equalID(task, tsk._id))) continue;
-                    let parentTask = this.tasks.find(tsk => equalID(tsk._id, task));
-                    parentTask._.multiPlace = true;
-                    groupTasks.unshift(parentTask);
-                }
+                groupTasks = this.organizeGroupTasks(groupTasks);
 
                 let groupData = {
                     _z: this.taskGroups.length,
                     title: group.title,
-                    tasks: this.sortTasks(groupTasks),
+                    tasks: groupTasks,
                     value: group.value,
                     icon: group.icon,
                     concern: this.view.concern
@@ -1022,147 +1072,172 @@
             this.refreshTaskColoring();
         }
 
-        selectTask(ev) {
+        findTask(taskId: ID) {
+            return this.tasks.find(task => equalID(task._id, taskId));
+        }
+
+        organizeGroupTasks(tasks: Task[]): Task[] {
+            let parentTasks = tasks.filter(t => t.parent && !tasks.find(tsk => equalID(tsk._id, t.parent))).map(t => t.parent);
+            for (let task of parentTasks) {
+                if (tasks.some(t => equalID(task, t._id)))
+                    continue;
+
+                let parentTask = this.findTask(task);
+                if (parentTask) {
+                    parentTask._.multiPlace = true;
+                    tasks.push(parentTask);
+                }
+            }
+
+            tasks = this.sortTasks(tasks);
+
+            return tasks;
+        }
+
+        focusTask(ev: TaskEvent) {
             this.currentTask = ev.task;
             this.currentGroup = ev.group;
-            let date = this.currentGroup.value;
-            this.currentTaskDueDate = ev.task.dueDates ? ev.task.dueDates.find(d => this.datePeriodContains(d.time, date)) : null;
+            if (this.view.concern == TaskConcern.DueDate) {
+                let date = this.currentGroup.value;
+                this.currentTaskDueDate = ev.task.dueDates ? ev.task.dueDates.find(d => this.datePeriodContains(d.time, date)) : null;
+            } else
+                this.currentTaskDueDate = null;
             this.$forceUpdate();
         }
 
-        dragStart(ev, task: Task, group: TaskGroupData) {
-            ev.dataTransfer.setData("text", "" + task._id);
-            ev.dataTransfer.effectAllowed = 'all';
-            this.currentGroup = group;
+        dragStart(e: TaskEvent) {
+            if (this.view.concern == this.TaskView_Home) {
+                e.ev.preventDefault();
+                return;
+            }
+
+            e.ev.dataTransfer.setData("text", "" + e.task._id);
+            e.ev.dataTransfer.effectAllowed = 'all';
+            this.currentGroup = e.group;
             setTimeout(() => {
-                task._.dragging = true; // To prevent apply the gray style to dragging icon
+                e.task._.dragging = true; // Workaround: To prevent apply the gray style to dragging icon
             }, 1);
-        }
-
-        dragLeave(e, day) {
-            e.preventDefault();
-        }
-
-        clickGroup(ev, group: TaskGroupData) {
-            $(ev.target).find(".new-task").focus();
         }
 
         datePeriodContains(time: Date, date: any) {
             return date.diff(time) <= 0 && moment(date).add(1, 'days').diff(time) > 0;
         }
 
-        ondragover(ev, group) {
+        ondragover(e: TaskEvent) {
             switch (this.view.concern) {
                 case TaskConcern.Status:
-                    ev.dataTransfer.dropEffect = 'move';
+                    e.ev.dataTransfer.dropEffect = 'move';
                     break;
 
                 case TaskConcern.DueDate:
-                    ev.dataTransfer.dropEffect = ev.ctrlKey ? 'copy' : 'move';
+                    if (!e.group.value)
+                        e.ev.dataTransfer.dropEffect = 'none';
+                    else
+                        e.ev.dataTransfer.dropEffect = e.ev.ctrlKey ? 'copy' : 'move';
                     break;
 
                 case TaskConcern.Start:
+                    e.ev.dataTransfer.dropEffect = 'none';
                     break;
 
                 default:
-                    ev.dataTransfer.dropEffect = ev.ctrlKey ? 'copy' : 'move';
+                    e.ev.dataTransfer.dropEffect = e.ev.ctrlKey ? 'copy' : 'move';
                     break;
             }
         }
 
-        drop(ev, group) {
-            ev.preventDefault();
-            let patch = {_z: this.currentTask._z} as Task;
-            this.currentTask._.dragging = false;
-            this.applyTaskColoring(this.currentTask);
-            patch[this.concernProperty] = this.currentTask[this.concernProperty];
-            this.saveTask(this.currentTask._id, patch);
-            this.currentTask = null;
-        }
-
-        saveTask(task: ID, patch: Task, done?) {
-            ajax(`/tasks/${task}`, patch, {method: WebMethod.patch}, (res) => {
-                console.log("Saved!");
+        saveTask(task: Task, patch: Task, done?) {
+            ajax(`/tasks/${task._id}`, patch, {method: WebMethod.patch}, (res) => {
+                // console.log(`Task '${task.title}' is saved!`);
                 if (done) done(res);
             });
         }
 
-        taskKeypress(ev, task: Task, group: TaskGroupData) {
-            this.currentTask = task;
-            switch (ev.which) {
+        taskKeypress(e: TaskEvent) {
+            this.currentTask = e.task;
+            switch (e.ev.which) {
                 case Keys.del:
                     switch (this.view.concern) {
                         case TaskConcern.DueDate:
-                            if (task.dueDates && task.dueDates.length > 1) {
-                                let indexOnTarget = task.dueDates.findIndex(d => this.datePeriodContains(d.time, group.value));
+                            if (e.task.dueDates && e.task.dueDates.length > 1) {
+                                let indexOnTarget = e.task.dueDates.findIndex(d => this.datePeriodContains(d.time, e.group.value));
                                 this.currentTask.dueDates.splice(indexOnTarget, 1);
-                                this.saveTask(this.currentTask._id, {dueDates: this.currentTask.dueDates} as Task);
+                                this.saveTask(this.currentTask, {dueDates: this.currentTask.dueDates} as Task);
                                 this.refreshTasks();
                                 return;
                             }
                             break;
 
                         case TaskConcern.Assignee:
-                            if (task.assignees && task.assignees.length > 1) {
-                                let indexOnTarget = task.assignees.findIndex(d => equalID(d, group.value));
+                            if (e.task.assignees && e.task.assignees.length > 1) {
+                                let indexOnTarget = e.task.assignees.findIndex(d => equalID(d, e.group.value));
                                 this.currentTask.assignees.splice(indexOnTarget, 1);
-                                this.saveTask(this.currentTask._id, {assignees: this.currentTask.assignees} as Task);
+                                this.saveTask(this.currentTask, {assignees: this.currentTask.assignees} as Task);
                                 this.refreshTasks();
                                 return;
                             }
                             break;
                     }
                     question("The task will be permanently deleted.", "You won't be able to undo this action.", [
-                            {title: "Cancel", ref: "no", _cs: "btn btn-light ml-1"},
-                            {title: "Delete task", ref: "yes", _cs: "btn btn-danger ml-1"}],
+                            {title: "Cancel", ref: "no", _cs: "btn btn-light ml-2"},
+                            {title: "Delete task", ref: "yes", _cs: "btn btn-danger ml-2"}],
                         null, (option) => {
-                            if (option == "yes") this.deleteTask(task);
+                            if (option == "yes") this.deleteTask(e.task);
                         });
                     break;
 
                 case Keys.ins:
-                    this.toggleSubtask(task);
+                    this.toggleSubtask(e.task);
                     break;
-
-                // case Keys.f2:
-                //     if (this.taskEditingMode)
-                //         this.saveTask(task._id, {title: task.title} as Task);
-                //     this.taskEditingMode = !this.taskEditingMode;
-                //     break;
             }
         }
 
         toggleSubtask(task: Task) {
             if (task.parent) {
-                task.parent = null
-                this.saveTask(task._id, {parent: null} as Task);
+                task.parent = null;
+                task._.parent = null;
+                this.saveTask(task, {parent: null} as Task);
+            } else if (this.tasks.some(t => t.parent && equalID(t.parent, task._id))) {
+                notify('This task can not be subtask of another one!', LogType.Debug);
+                return;
             } else {
                 let index = this.currentGroup.tasks.indexOf(task);
                 for (let i = index - 1; i >= 0; i--) {
                     if (!this.currentGroup.tasks[i].parent) { // Can be parent
-                        task.parent = this.currentGroup.tasks[i]._id;
-                        this.currentGroup.tasks[i]._.children = this.currentGroup.tasks[i]._.children || [];
-                        this.currentGroup.tasks[i]._.children.push(task._id);
-                        this.saveTask(task._id, {parent: this.currentGroup.tasks[i]._id} as Task);
+                        task._.parent = this.currentGroup.tasks[i];
+                        task.parent = task._.parent._id;
+                        let patch = {parent: this.currentGroup.tasks[i]._id} as Task;
+                        if (!task.project) {
+                            task.project = task._.parent.project;
+                            patch.project = task.project;
+                        }
+                        this.saveTask(task, patch);
                         break;
                     }
                 }
 
                 if (!task.parent)
-                    alert("Can't be subtask.");
+                    notify("Error on changing the task to subtask. please refresh the page and try again!", LogType.Error);
             }
             this.refreshTasks();
+        }
+
+        removeView(view: ProjectView) {
+            call("deleteUserCustomization", {property: "projectViews", itemID: view._id}, () => {
+                if (view == this.view) this.activateView(this.views[0]);
+                this.views.splice(this.views.indexOf(view), 1);
+            });
         }
 
         activateView(view: ProjectView) {
             localStorage.setItem("task-manager.active-view", this.views.indexOf(view).toString());
             this.view = view;
+            this.currentProject = view.project ? this.projects.find(p => equalID(view.project, p._id)) : null;
 
             if (view.primary) {
                 if (this.checkConcernNeedsSelectedProject())
                     return;
-            } else
-                this.currentProject = view.project ? this.projects.find(p => equalID(view.project, p._id)) : null;
+            }
 
             switch (view.concern) {
                 case TaskConcern.Status:
@@ -1219,63 +1294,78 @@
             this.refreshTasks();
         }
 
-        activateConcern(concern: TaskConcern) {
+        selectPrimaryView(concern: TaskConcern) {
+            glob.notify = null;
             let view = this.views.find(view => view.primary && view.concern == concern);
             this.activateView(view);
         }
 
-        newTask(e, group: TaskGroupData) {
-            if (e.target.value) {
-                let task = {
-                    title: e.target.value,
+        newTask(e: TaskEvent) {
+            if (e.ev.target.value) {
+                let newTask = {
+                    title: e.ev.target.value,
                     _id: ID.generateByBrowser(),
                     status: TaskStatus.Todo,
                     project: this.currentProject ? this.currentProject._id : null,
                     priority: TaskPriority.Normal,
-                    _z: (Math.max(...group.tasks.map(t => t._z)) | 0) + 1,
-                    _: {dragging: false}
+                    _: {dragging: false, color: null, bgColor: null},
+                    _z: (Math.max(...e.group.tasks.map(t => t._z)) | 0) + 1
                 } as Task;
-                task["_new"] = true;
+                newTask["_new"] = true;
+
+                e.ev.target.value = "";
+                let lastTaskInGroup = null;
+                if (e.group.tasks.length) lastTaskInGroup = e.group.tasks[e.group.tasks.length - 1];
+                if (lastTaskInGroup && lastTaskInGroup.parent) {
+                    newTask.parent = lastTaskInGroup.parent;
+                    newTask.project = lastTaskInGroup.project;
+                    newTask.status = lastTaskInGroup.status;
+                    newTask.priority = lastTaskInGroup.priority;
+                }
 
                 switch (this.view.concern) {
                     case TaskConcern.Assignee:
-                        task[this.concernProperty] = group.value;
+                        newTask[this.concernProperty] = e.group.value;
                         break;
 
                     case TaskConcern.DueDate:
-                        if (group) {
-                            task.dueDates = task.dueDates || [];
-                            task.dueDates.push({_id: ID.generateByBrowser(), time: group.value.toDate()});
+                        if (e.group.value) {
+                            newTask.dueDates = newTask.dueDates || [];
+                            newTask.dueDates.push({_id: ID.generateByBrowser(), time: e.group.value.toDate()});
                         }
                         break;
 
                     case TaskConcern.Category:
-                        task[this.concernProperty] = group.value;
+                        newTask[this.concernProperty] = e.group.value;
                         break;
 
                     case TaskConcern.MileStone:
-                        task[this.concernProperty] = group.value;
+                        newTask[this.concernProperty] = e.group.value;
                         break;
 
                     case TaskConcern.Priority:
-                        task[this.concernProperty] = group.value;
+                        newTask[this.concernProperty] = e.group.value;
                         break;
 
                     case TaskConcern.Start:
-                        task[this.concernProperty] = group.value;
+                        newTask[this.concernProperty] = e.group.value;
                         break;
 
                     case TaskConcern.Status:
-                        task[this.concernProperty] = group.value;
+                        newTask.status = e.group.value;
                         break;
                 }
-                this.tasks.push(task);
-                this.applyTaskColoring(task);
-                this.refreshTasks();
-                e.target.value = "";
-                ajax(`/tasks`, task, {method: WebMethod.post}, (res) => {
-                    Object.assign(task, res.modifyResult);
+                this.tasks.push(newTask);
+                ajax(`/tasks`, newTask, {method: WebMethod.post}, (res) => {
                     console.log("Saved!");
+                    Object.assign(newTask, res.modifyResult);
+                    delete newTask["_new"];
+
+                    if (lastTaskInGroup && lastTaskInGroup.parent)
+                        newTask._.parent = lastTaskInGroup.parent;
+
+                    this.applyTaskColoring(newTask);
+                    this.refreshTasks();
                 });
             }
         }
@@ -1295,7 +1385,7 @@
         }
 
         .toolbar-button {
-            min-width: 3.5rem;
+            min-width: 4rem;
             margin-bottom: .2rem;
             padding: 0.375rem 0.5rem;
 
@@ -1338,13 +1428,12 @@
         .task-item {
             font-size: .8rem;
             cursor: default;
-            background-color: white;
             min-width: 5rem;
 
             &.dragging {
-                color: #ccc !important;
+                color: white !important;
                 background-color: #ccc !important;
-                border: none !important;
+                font-weight: bold;
             }
 
             &.hover {
@@ -1439,6 +1528,21 @@
         .task-details {
             .form-group {
                 margin-bottom: 0;
+            }
+        }
+
+        .search-box {
+            padding: .125rem .125rem;
+
+            input {
+                width: 5rem;
+                transition: width 0.2s ease-in-out;
+                -webkit-transition: width 0.2s ease-in-out;
+                -moz-transition: width 0.2s ease-in-out;
+
+                &:focus {
+                    width: 10rem;
+                }
             }
         }
 

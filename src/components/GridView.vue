@@ -7,12 +7,10 @@
             <ToolbarModifyButtons/>
 
             <!-- Filter -->
-            <div v-if="showFilter" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mx-5 rounded">
-                <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
+            <div v-if="showFilter" class="filter-chip border d-flex py-0 align-items-center px-2 bg-white mx-4 rounded">
                 <i class="fal fa-filter p-1 d-inline-block text-muted"></i>
+                <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
             </div>
-
-            <div class="mr-auto"></div>
 
             <!-- Head functions -->
             <template v-for="func in headFuncs">
@@ -20,6 +18,8 @@
                 <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
             </template>
             <button v-if="newItem" class="btn btn-success mx-1" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>{{newItem}}</button>
+
+            <div class="mr-auto"></div>
 
             <!--  Refresh -->
             <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>

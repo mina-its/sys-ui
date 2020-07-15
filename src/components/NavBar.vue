@@ -26,11 +26,17 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <NavbarMenu :menu="glob.config.menu" :currentRef="currentRef"/>
-            <!--<master-search></master-search>-->
-            <AppLocaleMenu/>
-            <AppUserLoginMenu/>
-            <!-- <AppChangeRegion/> -->
 
+            <!-- Feedback -->
+            <AppFeedback />
+
+            <!-- Language -->
+            <AppLocaleMenu class="mx-3" />
+
+            <!-- Login -->
+            <AppUserLoginMenu/>
+
+            <!-- <AppChangeRegion/> -->
         </div>
     </nav>
 </template>
@@ -45,6 +51,7 @@
         get currentRef() {
             return location.hostname;
         }
+
 
     }
 </script>

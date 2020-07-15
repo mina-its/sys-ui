@@ -81,7 +81,7 @@
             let title = this.prop.title || this.prop.name;
             let labelNoWrap = (this.prop.text && this.prop.text.htmlEditor);
             let label = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top pt-2" + (labelNoWrap ? " text-nowrap" : "")}}, title);
-            let children = this.prop._.gtype == GlobalType.boolean ? [vl] : [label, vl, msg];
+            let children = [label, vl, msg];
 
             // Property comment
             if (this.prop.comment) {
@@ -200,12 +200,15 @@
                         return null;
 
                     if (this.viewType == ObjectViewType.DetailsView)
-                        pr["label"] = this.prop.title;
-
-                    return ce('prop-boolean', {
-                        on: {changed: this.changed, keydown: this.keydown, focus: this.focused},
-                        props: pr,
-                    });
+                        return ce('prop-boolean-switch', {
+                            on: {changed: this.changed, keydown: this.keydown, focus: this.focused},
+                            props: pr,
+                        });
+                    else
+                        return ce('prop-boolean', {
+                            on: {changed: this.changed, keydown: this.keydown, focus: this.focused},
+                            props: pr,
+                        });
 
                 case GlobalType.time:
                     if (this.viewType == ObjectViewType.TreeView)

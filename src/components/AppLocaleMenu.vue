@@ -1,9 +1,9 @@
 <template>
     <div v-if="glob.config.appLocales && glob.config.appLocales.length>1" class="app-locale-menu mx-2" data-toggle="tooltip" title="Change Language">
         <div v-if="glob.config.locale" class="dropdown">
-            <a class="nav-link py-0 px-0 text-light dropdown-toggle" href="#" id="navbarDropdownLocale" role="button"
+            <a class="nav-link py-0 px-0 text-light" href="#" id="navbarDropdownLocale" role="button"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i style="font-size: 16px" class="fal fa-globe text-white px-1"></i>{{glob.config.localeTitle.toUpperCase()}}
+                <i style="font-size: 16px" class="fal fa-globe text-white px-1"></i>{{glob.config.localeTitle}}
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownLocale">
                 <a v-for="item in glob.config.appLocales" class="dropdown-item py-2 font-weight-bold text-center" @click="changeLocale(item)"
