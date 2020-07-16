@@ -251,38 +251,39 @@
     $left: left;
     $right: right;
 
-    .prop- {
-        &label {
-            width: 160px;
+    .prop-label {
+        width: 160px;
+    }
+
+    .prop-value {
+        display: inline-block;
+        width: 320px;
+        padding: 0.25rem 0.5rem;
+
+        &-wide {
+            width: 500px;
         }
+    }
 
-        &value {
-            display: inline-block;
-            width: 320px;
-            padding: 0.25rem 0.5rem;
+    .prop-message {
+        display: block;
+        font-weight: 500;
+    }
 
-            &-wide {
-                width: 500px;
-            }
-        }
+    .prop-comment {
+        display: block;
+    }
 
+    .prop-comment.prop-comment-default {
+        background-color: #fef6e0;
+        border: 1px solid #FFDE80;
+        border-radius: 6px;
+        color: rgba(0, 0, 0, 0.87);
+        display: flex;
+        font-size: 12px;
 
-        &message {
-            display: block;
-            font-weight: 500;
-        }
-
-        &comment.prop-comment-default {
-            background-color: #fef6e0;
-            border: 1px solid #FFDE80;
-            border-radius: 6px;
-            color: rgba(0, 0, 0, 0.87);
-            display: flex;
-            font-size: 12px;
-
-            .fa {
-                color: #f4b400;
-            }
+        .fa {
+            color: #f4b400;
         }
     }
 

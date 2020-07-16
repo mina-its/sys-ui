@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -150,14 +150,14 @@ function vueResetFormData(res) {
                 setDataMeta(ref, data, dec);
             for (const prop of dec.properties) {
                 if (Array.isArray(data))
-                    data.forEach(item => setUndefinedToNull(item, prop));
+                    data.forEach(item => assignNullToEmptyProperty(item, prop));
                 else
-                    setUndefinedToNull(data, prop);
+                    assignNullToEmptyProperty(data, prop);
             }
         }
     }
 }
-function setUndefinedToNull(item, prop) {
+function assignNullToEmptyProperty(item, prop) {
     if (!item)
         return;
     if (item[prop.name] === undefined)
@@ -166,6 +166,7 @@ function setUndefinedToNull(item, prop) {
         setPropertyEmbeddedError(item, prop.name, null);
     } // to check later
 }
+exports.assignNullToEmptyProperty = assignNullToEmptyProperty;
 function getDec(data) {
     return data._ ? data._.dec : null;
 }
@@ -235,7 +236,7 @@ function loadOutboundData(prop, item) {
         });
         for (const prop of dec.properties) {
             if (Array.isArray(data))
-                data.forEach(item => setUndefinedToNull(item, prop));
+                data.forEach(item => assignNullToEmptyProperty(item, prop));
         }
         exports.glob.data[prop._.ref] = data;
     }, err => notify(err));
@@ -466,6 +467,22 @@ function hideCmenu() {
     exports.glob.cmenu.show = false;
 }
 exports.hideCmenu = hideCmenu;
+function newID() {
+    return types_1.ID.generateByBrowser();
+}
+exports.newID = newID;
+function pushToGridViewRecentList(path, ref, title) {
+    let recent = localStorage.getItem("gridView-recentItems-" + path);
+    let recentItems = recent ? JSON.parse(recent) : [];
+    let index = recentItems.findIndex(i => i.ref == ref);
+    if (index > -1)
+        recentItems.splice(index, 1);
+    recentItems.unshift({ title, ref });
+    if (recentItems.length > 6)
+        recentItems.pop();
+    localStorage.setItem("gridView-recentItems-" + path, JSON.stringify(recentItems));
+}
+exports.pushToGridViewRecentList = pushToGridViewRecentList;
 function handleWindowEvents() {
     $(window)
         .on("popstate", (e) => {

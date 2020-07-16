@@ -78,6 +78,12 @@
 
                         case TimeFormat.HourMinute:
                             return "HH:mm";
+
+                        case TimeFormat.YearMonthDay:
+                            return "YYYY/MM/DD";
+
+                        case TimeFormat.DayMonthNameYear:
+                            return "DD MMM YYYY";
                     }
                 }
             }

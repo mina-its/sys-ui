@@ -20,7 +20,7 @@
             <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
 
             <!--  Object Menu -->
-            <a class="text-secondary px-2" href="javascript:void(0);" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></a>
+            <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
         </div>
 
         <!--  Content -->

@@ -82,11 +82,6 @@
                                            @changed="filterItemCheckChanged($event, item, TaskView_Status)"
                                            :label="item.title"></check-box>
                             </div>
-                            <!--                        <div class="filter-item mx-2 filter-duedate">-->
-                            <!--                            <label class="font-weight-bold mb-2 mt-1">Due Dates</label>-->
-                            <!--                            <prop-time placeHolder="Range from" :doc="{}" :prop="{}"></prop-time>-->
-                            <!--                            <prop-time placeHolder="Range To" :doc="{}" :prop="{}"></prop-time>-->
-                            <!--                        </div>-->
                             <div class="filter-item mx-2">
                                 <label class="font-weight-bold">Priority</label>
                                 <check-box v-for="item of getFilterItems(TaskView_Priority)" :checked="item.checked"
@@ -131,10 +126,21 @@
             </div>
 
             <!--  Projects -->
-            <select :value="currentProjectKey" class="border bg-white p-1 m-1" @change="selectProject">
+            <select v-model="currentProjectValue" class="border bg-white p-1 m-1">
                 <option :value="null">[ All Projects ]</option>
-                <option :value="''+project._id" v-for="project of projects">{{project.title}}</option>
+                <option :value="project._id" v-for="project of projects">{{project.title}}</option>
             </select>
+
+            <!--  Refresh -->
+            <button title="Refresh" class="btn btn-link text-secondary px-2" @click="reload"><i class="fas fa-sync"></i></button>
+
+            <!--  Configurations -->
+            <div class="dropdown">
+                <button title="Configurations" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button" class="btn btn-link text-secondary px-2"><i class="fal fa-cog fa-lg"></i></button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/projects">Configure projects</a>
+                </div>
+            </div>
         </div>
 
         <!--  Content -->
@@ -170,20 +176,20 @@
                 <div class="coloring-legend details-view border-bottom pb-3 mb-2">
                     <div class="d-flex align-items-center">
                         <label class="prop-label px-1">Coloring</label>
-                        <select :value="view.coloring" class="prop-value flex-fill border bg-white m-1" @change="applyColoring">
+                        <select v-model="currentViewColoring" class="prop-value flex-fill border bg-white m-1">
                             <option></option>
                             <option value="2">Status</option>
                             <option value="5">Priority</option>
                             <option value="6">Project</option>
                             <option v-if="this.currentProject" value="4">Assignee</option>
                             <option v-if="this.currentProject" value="8">Category</option>
-                            <option v-if="this.currentProject" value="9">MileStone</option>
+                            <option v-if="this.currentProject" value="9">Milestone</option>
                         </select>
                     </div>
 
                     <div class="row px-3" v-if="view.coloring">
                         <div class="col-6 text-nowrap legend-item p-1" v-for="(item,i) of coloringLegend">
-                            <div class="py-1 px-2" :style="{color:colorTable[i%colorTable.length].color, 'background-color':colorTable[i%colorTable.length].bgColor}">{{item.title}}</div>
+                            <div class="py-1 px-2 overflow-hidden" :style="{color:colorTable[i%colorTable.length].color, 'background-color':colorTable[i%colorTable.length].bgColor}">{{item.title}}</div>
                         </div>
                     </div>
                 </div>
@@ -223,6 +229,11 @@
                             <!--  Clock -->
                             <button v-if="currentTaskDueDate" @click="toggleSetTime" type="button" class="btn btn-link mx-2 p-0" title="Set/Unset Due Time">
                                 <i :class="{'fa-lg fa-clock':1,'fal':!currentTaskDueDate.setTime,'fad':currentTaskDueDate.setTime}"></i>
+                            </button>
+
+                            <!-- Assign to me -->
+                            <button @click="assignCurrentTaskToMe" type="button" class="btn btn-link mx-2 p-0" title="Assign to me">
+                                <i class="fal fa-lg fa-hand-holding-magic"></i>
                             </button>
 
                         </div>
@@ -274,7 +285,7 @@
     import {GetTaskDto, ID, Keys, LogType, ObjectDec, Pair, Project, ProjectView, Task, TaskConcern, TaskDueDate, TaskInboxGroup, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
     import TaskGroup from "../components/TaskGroup.vue";
     import {ItemChangeEventArg, MenuItem, TaskEvent, TaskGroupData} from "../types";
-    import {ajax, call, clone, equalID, glob, markDown, notify, question, showCmenu} from "../main";
+    import {ajax, assignNullToEmptyProperty, call, clone, equalID, glob, markDown, newID, notify, question, showCmenu} from "../main";
     import SwitchBox from "./SwitchBox.vue";
 
     declare let $, moment: any;
@@ -316,21 +327,32 @@
         private dragOffset = null;
         private groupItems: { title: string, value: any, icon?: string }[] = [];
         private colorTable = [
-            {color: 'white', bgColor: '#0083d9'},
-            {color: 'white', bgColor: '#ff6a00'},
-            {color: '#905000', bgColor: 'orange'},
-            {color: 'white', bgColor: 'green'},
-            {color: 'white', bgColor: '#721786'},
-            {color: 'white', bgColor: '#0083d9'},
-            {color: 'white', bgColor: '#ff6a00'},
-            {color: 'white', bgColor: '#aaa'},
-            {color: 'white', bgColor: 'orange'},
-            {color: 'white', bgColor: 'green'}
+            {color: '#fff', bgColor: '#29e'},
+            {color: '#fff', bgColor: '#f74'},
+            {color: '#fff', bgColor: '#080'},
+            {color: '#fff', bgColor: '#b5b'},
+            {color: '#fff', bgColor: '#669'},
+            {color: '#fff', bgColor: '#e55'},
+            {color: '#740', bgColor: '#eb4'},
+            {color: '#fff', bgColor: '#999'},
+            {color: '#fff', bgColor: '#86e'},
+            {color: '#fff', bgColor: '#087'}
         ]
 
         created() {
+            this.reload();
+            window.onhashchange = () => {
+                this.checkHashAddress();
+            };
+        }
+
+        reload() {
             call('getTasks', {}, (err, res) => {
                 let data: GetTaskDto = res.data;
+                if (!data) {
+                    notify(res.message || `Error on loading tasks, please refresh the app or try again later!`, LogType.Error);
+                    return;
+                }
 
                 // Users
                 this.users = data.users;
@@ -348,6 +370,7 @@
                 this.tasksDec = data.tasksDec;
                 this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "project", "description", "time", "status", "owner", "priority", "assignees"].indexOf(p.name) > -1);
                 this.dueDatesDec = data.dueDatesDec;
+                this.tasks.forEach(task => this.assignNullToEmptyTaskProperty(task));
 
                 // Projects
                 this.projects = data.projects;
@@ -363,14 +386,12 @@
 
                 this.checkHashAddress();
             });
-
-            window.onhashchange = () => {
-                this.checkHashAddress();
-            };
         }
 
-        get currentProjectKey() {
-            return this.currentProject ? '' + this.currentProject._id : null;
+        assignNullToEmptyTaskProperty(task: Task) {
+            for (const prop of this.tasksDec.properties) {
+                assignNullToEmptyProperty(task, prop);
+            }
         }
 
         dragEnterGroup(e) {
@@ -427,7 +448,7 @@
 
                     let indexOnTarget = task.dueDates.findIndex(d => group.value.diff(d.time) == 0);
                     if (indexOnTarget == -1) // Check if it does not already exists
-                        task.dueDates.push({_id: ID.generateByBrowser(), time: group.value.toDate()});
+                        this.addDueDate(task, group.value.toDate());
                 }
                     break;
 
@@ -463,32 +484,6 @@
                     }
                     break;
 
-                // case TaskConcern.Start:
-                //     switch (group.value as TaskInboxGroup) {
-                //         case TaskInboxGroup.Doing:
-                //         case TaskInboxGroup.Todo:
-                //             task.status = group.value == TaskInboxGroup.Todo ? TaskStatus.Todo : TaskStatus.Doing;
-                //
-                //             task.assignees = task.assignees || [];
-                //             if (!task.assignees.some(a => equalID(a, this.currentUser)))
-                //                 task.assignees.push(this.currentUser);
-                //
-                //             task.dueDates = task.dueDates || [];
-                //             let today = moment().startOf('day');
-                //             if (!task.dueDates.some(d => this.datePeriodContains(d.time, today)))
-                //                 task.dueDates.push({_id: ID.generateByBrowser(), time: today.toDate()});
-                //             break;
-                //
-                //         case TaskInboxGroup.Urgent:
-                //             task.priority = TaskPriority.Urgent;
-                //             break;
-                //
-                //         case TaskInboxGroup.Favorite:
-                //             task.favorite = true;
-                //             break;
-                //     }
-                //     break;
-                //
                 default:
                     task[this.concernProperty] = group.value;
                     break;
@@ -521,7 +516,7 @@
 
         addNote() {
             if (!this.addNoteContent) return;
-            this.currentTask.comments.push({_id: ID.generateByBrowser(), content: this.addNoteContent, user: this.currentUser, time: new Date()});
+            this.currentTask.comments.push({_id: newID(), content: this.addNoteContent, user: this.currentUser, time: new Date()});
             this.addNoteContent = "";
             this.saveTask(this.currentTask, {comments: this.currentTask.comments} as Task);
         }
@@ -547,7 +542,7 @@
         newView() {
             if (!this.newViewName) return;
             let view = clone(this.view) as ProjectView;
-            Object.assign(view, {_id: ID.generateByBrowser(), title: this.newViewName, primary: false, _new: true});
+            Object.assign(view, {_id: newID(), title: this.newViewName, primary: false, _new: true});
             this.newViewName = "";
             this.saveView(view, (err, res) => {
                 if (res.code == 200) {
@@ -592,8 +587,12 @@
             this.$forceUpdate();
         }
 
-        applyColoring(ev) {
-            this.view.coloring = ev.target.value ? parseInt(ev.target.value) : null;
+        get currentViewColoring() {
+            return this.view.coloring ? this.view.coloring.toString() : null;
+        }
+
+        set currentViewColoring(value) {
+            this.view.coloring = value ? parseInt(value) : null;
             this.refreshTaskColoring();
             this.saveView(this.view);
         }
@@ -703,10 +702,14 @@
             return false;
         }
 
-        selectProject(ev) {
+        get currentProjectValue() {
+            return this.currentProject ? this.currentProject._id : null;
+        }
+
+        set currentProjectValue(value) {
             glob.notify = null;
 
-            this.currentProject = ev.target.value ? this.projects.find(p => "" + p._id == ev.target.value) : null;
+            this.currentProject = value ? this.projects.find(p => equalID(p._id, value)) : null;
             this.view.project = this.currentProject ? this.currentProject._id : null;
             this.saveView(this.view);
 
@@ -915,11 +918,11 @@
             });
 
             tasks.sort((t1, t2) => {
+                if (t1._.parent == t2) return 1;
+                if (t2._.parent == t1) return -1;
                 let z1 = t1._.parent ? t1._.parent._z : t1._z;
                 let z2 = t2._.parent ? t2._.parent._z : t2._z;
                 if (z1 != z2) return z1 - z2;
-                if (t1._.parent == t2) return 1;
-                if (t2._.parent == t1) return -1;
                 return t1._z - t2._z;
             });
 
@@ -1014,12 +1017,15 @@
                                 case TaskInboxGroup.Favorite:
                                     return !!task.favorite;
 
+                                case TaskInboxGroup.Urgent:
+                                    return task.priority == TaskPriority.Urgent;
+
                                 case TaskInboxGroup.Brainstorm:
-                                    return !task.assignees;
+                                    return !task.assignees || !task.assignees.length;
                             }
 
                             // Other tasks must belong to current user
-                            if (!task.assignees || !task.assignees.find(a => equalID(a, this.currentUser)))
+                            if (!task.assignees || !task.assignees.some(a => equalID(a, this.currentUser)))
                                 return false;
 
                             let today = moment().startOf('day');
@@ -1029,15 +1035,15 @@
 
                                 case TaskInboxGroup.Todo:
                                     return task.status == TaskStatus.Todo && task.dueDates &&
-                                        task.dueDates.find(d => this.datePeriodContains(d.time, today));
+                                        task.dueDates.some(d => this.datePeriodContains(d.time, today));
 
                                 case TaskInboxGroup.Doing:
                                     return task.status == TaskStatus.Doing && task.dueDates &&
-                                        task.dueDates.find(d => this.datePeriodContains(d.time, today));
+                                        task.dueDates.some(d => this.datePeriodContains(d.time, today));
 
                                 case TaskInboxGroup.Overdue:
                                     if (task.status == TaskStatus.Done || task.status == TaskStatus.OnHold || !task.dueDates) return false;
-                                    return task.dueDates.find(d => moment(d.time).diff(today) < 0) && !task.dueDates.find(d => moment(d.time).diff(today, 'days') >= 0);
+                                    return task.dueDates.some(d => moment(d.time).diff(today) < 0) && !task.dueDates.some(d => moment(d.time).diff(today, 'days') >= 0);
                             }
                             break;
 
@@ -1052,6 +1058,10 @@
                                 return equalID(task[this.concernProperty], group.value);
                     }
                 });
+
+                if (this.view.concern == TaskConcern.Start && groupTasks.length == 0 &&
+                    [TaskInboxGroup.Favorite, TaskInboxGroup.Urgent, TaskInboxGroup.Overdue].indexOf(group.value) > -1) continue;
+
                 groupTasks = this.organizeGroupTasks(groupTasks);
 
                 let groupData = {
@@ -1095,13 +1105,21 @@
         }
 
         focusTask(ev: TaskEvent) {
+            console.log(ev.task._z);
             this.currentTask = ev.task;
             this.currentGroup = ev.group;
-            if (this.view.concern == TaskConcern.DueDate) {
-                let date = this.currentGroup.value;
-                this.currentTaskDueDate = ev.task.dueDates ? ev.task.dueDates.find(d => this.datePeriodContains(d.time, date)) : null;
-            } else
+
+            let checkDate = null;
+            if (this.view.concern == TaskConcern.DueDate)
+                checkDate = this.currentGroup.value;
+            else if (this.view.concern == TaskConcern.Start && (this.currentGroup.value == TaskInboxGroup.Todo || this.currentGroup.value == TaskInboxGroup.Doing))
+                checkDate = this.today();
+
+            if (checkDate && ev.task.dueDates)
+                this.currentTaskDueDate = ev.task.dueDates.find(d => this.datePeriodContains(d.time, checkDate));
+            else
                 this.currentTaskDueDate = null;
+
             this.$forceUpdate();
         }
 
@@ -1300,11 +1318,33 @@
             this.activateView(view);
         }
 
+        addDueDate(task: Task, date: Date) {
+            task.dueDates = task.dueDates || [];
+            task.dueDates.push({_id: newID(), time: date});
+        }
+
+        assignCurrentTaskToMe() {
+            this.assignToMe(this.currentTask);
+            this.saveTask(this.currentTask, {assignees: this.currentTask.assignees} as Task, () => {
+                this.$forceUpdate();
+                this.refreshTaskColoring();
+            });
+        }
+
+        assignToMe(task: Task) {
+            task.assignees = [this.currentUser];
+        }
+
+        today() {
+            let today = moment().startOf('day');
+            return today;
+        }
+
         newTask(e: TaskEvent) {
             if (e.ev.target.value) {
                 let newTask = {
                     title: e.ev.target.value,
-                    _id: ID.generateByBrowser(),
+                    _id: newID(),
                     status: TaskStatus.Todo,
                     project: this.currentProject ? this.currentProject._id : null,
                     priority: TaskPriority.Normal,
@@ -1314,6 +1354,8 @@
                 newTask["_new"] = true;
 
                 e.ev.target.value = "";
+
+                // If previous task is SubTask
                 let lastTaskInGroup = null;
                 if (e.group.tasks.length) lastTaskInGroup = e.group.tasks[e.group.tasks.length - 1];
                 if (lastTaskInGroup && lastTaskInGroup.parent) {
@@ -1329,10 +1371,8 @@
                         break;
 
                     case TaskConcern.DueDate:
-                        if (e.group.value) {
-                            newTask.dueDates = newTask.dueDates || [];
-                            newTask.dueDates.push({_id: ID.generateByBrowser(), time: e.group.value.toDate()});
-                        }
+                        if (e.group.value)
+                            this.addDueDate(newTask, e.group.value.toDate());
                         break;
 
                     case TaskConcern.Category:
@@ -1348,21 +1388,49 @@
                         break;
 
                     case TaskConcern.Start:
+                        let today = moment().startOf('day');
+                        switch (e.group.value) {
+                            case TaskInboxGroup.Brainstorm:
+                                break;
+                            case TaskInboxGroup.Todo:
+                                newTask.status = TaskStatus.Todo;
+                                this.addDueDate(newTask, today.toDate());
+                                this.assignToMe(newTask);
+                                break;
+                            case TaskInboxGroup.Doing:
+                                newTask.status = TaskStatus.Doing;
+                                this.addDueDate(newTask, today.toDate());
+                                this.assignToMe(newTask);
+                                break;
+                            case TaskInboxGroup.Urgent:
+                                newTask.priority = TaskPriority.Urgent;
+                                break;
+                            case TaskInboxGroup.Overdue:
+                                this.addDueDate(newTask, moment(today).add(-1, 'days').toDate());
+                                this.assignToMe(newTask);
+                                break;
+                            case TaskInboxGroup.Favorite:
+                                newTask.favorite = true;
+                                break;
+                        }
                         newTask[this.concernProperty] = e.group.value;
+
                         break;
 
                     case TaskConcern.Status:
                         newTask.status = e.group.value;
                         break;
                 }
-                this.tasks.push(newTask);
                 ajax(`/tasks`, newTask, {method: WebMethod.post}, (res) => {
                     console.log("Saved!");
                     Object.assign(newTask, res.modifyResult);
                     delete newTask["_new"];
 
                     if (lastTaskInGroup && lastTaskInGroup.parent)
-                        newTask._.parent = lastTaskInGroup.parent;
+                        newTask._.parent = lastTaskInGroup._.parent;
+
+                    this.assignNullToEmptyTaskProperty(newTask);
+                    this.tasks.push(newTask);
 
                     this.applyTaskColoring(newTask);
                     this.refreshTasks();

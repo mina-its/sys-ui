@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'main-body h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level}">
+    <div :class="{'main-body h-100 grid-view-container d-flex flex-column flex-fill overflow-auto':1, 'root': !level}">
         <!-- Toolbar -->
         <div v-if="!level" :class="{'d-flex align-items-center p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
             <Breadcrumb :count="dec.count"/>
@@ -25,16 +25,26 @@
             <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
 
             <!-- Object Menu -->
-            <a class="text-secondary px-2" href="javascript:void(0);" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></a>
+            <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
         </div>
 
         <!-- Table -->
         <div class="w-100 h-100 overflow-auto d-flex">
             <div :class="{'d-flex w-100 overflow-auto':true, 'bg-white':level}" @scroll="onScroll()">
                 <!--  Side Menu -->
-                <aside v-if="!level && dec.filterDec" class="border-right separator-line bg-white sidenav sidenav-filter p-3 d-none d-md-block">
-                    <label class="text-muted small"><i class="fal fa-filter p-1"></i>Filter {{glob.form.breadcrumbLast}}:</label>
-                    <DetailsView :dec="dec.filterDec" :data="dec.filterData" :level="level?level+1:1" @changed="objectFilterChanged"></DetailsView>
+                <aside v-if="!level && (recentItems || dec.filterDec)" class="border-right separator-line bg-white d-none d-md-block">
+                    <div v-if="dec.filterDec" class="sidenav-filter p-3">
+                        <label class="text-muted small"><i class="fal fa-filter p-1"></i>Filter {{glob.form.breadcrumbLast}}:</label>
+                        <DetailsView :dec="dec.filterDec" :data="dec.filterData" :level="level?level+1:1" @changed="objectFilterChanged"></DetailsView>
+                    </div>
+                    <div v-if="recentItems" class="recent-items pt-3">
+                        <label class="text-muted small mx-3 mt-3 font-weight-bold">Recent  {{glob.form.breadcrumbLast}}:</label>
+                        <ul class="nav flex-column">
+                            <li v-for="item in recentItems" class="nav-item">
+                                <a @click="clickRecentItem(item)" class="text-nowrap nav-link" :href="item.ref">{{item.title}}</a>
+                            </li>
+                        </ul>
+                    </div>
                 </aside>
 
                 <!--  Main -->
@@ -102,7 +112,7 @@
 
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {$t, call, getQs, glob, load, notify, setQs, showCmenu} from '../main';
+    import {$t, call, getQs, glob, load, notify, pushToGridViewRecentList, setQs, showCmenu} from '../main';
     import {parse, stringify} from 'bson-util';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
     import * as main from '../main';
@@ -119,6 +129,7 @@
         @Prop() private level: number;
 
         private rowHeaderStyle = GridRowHeaderStyle.empty;
+        private recentItems: Pair[] = null;
         private mainChecked = false;
         private filter = null;
         private filterDoc = {};
@@ -141,6 +152,16 @@
         onUriReset() {
             this.resetFilterParameters();
             this.resetHeadFuncs();
+            this.resetRecentItems();
+        }
+
+        clickRecentItem(item: Pair) {
+            pushToGridViewRecentList(location.pathname.replace(/^\//, ""), item.ref, item.title);
+        }
+
+        resetRecentItems() {
+            let recent = localStorage.getItem("gridView-recentItems-" + location.pathname.replace(/^\//, ""));
+            this.recentItems = recent ? JSON.parse(recent) : null;
         }
 
         get showFilter() {
@@ -173,6 +194,7 @@
         mounted() {
             // console.log("this.items", this.items);
             this.resetHeadFuncs();
+            this.resetRecentItems();
 
             if (!this.dec.filterDec) {
                 this.filterDoc = {};
@@ -588,6 +610,12 @@
 
     .grid-view-box tfoot td {
         border: 1px solid var(--object-border) !important;
+    }
+
+    .grid-view-container {
+        aside {
+            min-width: 12rem;
+        }
     }
 
     .grid-view {

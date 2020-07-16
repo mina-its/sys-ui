@@ -154,15 +154,15 @@ function vueResetFormData(res: WebResponse) {
 
             for (const prop of dec.properties) {
                 if (Array.isArray(data))
-                    data.forEach(item => setUndefinedToNull(item, prop));
+                    data.forEach(item => assignNullToEmptyProperty(item, prop));
                 else
-                    setUndefinedToNull(data, prop);
+                    assignNullToEmptyProperty(data, prop);
             }
         }
     }
 }
 
-function setUndefinedToNull(item, prop: Property) {
+export function assignNullToEmptyProperty(item, prop: Property) {
     if (!item) return;
     if (item[prop.name] === undefined) item[prop.name] = null;
 
@@ -240,7 +240,7 @@ export function loadOutboundData(prop: Property, item: any) {
 
         for (const prop of dec.properties) {
             if (Array.isArray(data))
-                data.forEach(item => setUndefinedToNull(item, prop));
+                data.forEach(item => assignNullToEmptyProperty(item, prop));
         }
 
         glob.data[prop._.ref] = data;
@@ -470,6 +470,22 @@ export function showCmenu(state, items: MenuItem[], event, handler: (state, item
 
 export function hideCmenu() {
     glob.cmenu.show = false;
+}
+
+export function newID(){
+    return ID.generateByBrowser();
+}
+
+export function pushToGridViewRecentList(path: string, ref: string, title: string) {
+    let recent = localStorage.getItem("gridView-recentItems-" + path);
+    let recentItems = recent ? JSON.parse(recent) : [];
+    let index = recentItems.findIndex(i => i.ref == ref);
+    if (index > -1)
+        recentItems.splice(index, 1);
+    recentItems.unshift({title, ref});
+    if (recentItems.length > 6)
+        recentItems.pop();
+    localStorage.setItem("gridView-recentItems-" + path, JSON.stringify(recentItems));
 }
 
 function handleWindowEvents() {

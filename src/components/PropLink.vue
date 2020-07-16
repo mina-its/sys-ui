@@ -1,11 +1,12 @@
 <template>
-    <a @focus="$emit('focus', $event)" :href="ref" @keydown="keydown">{{value}}</a>
+    <a @focus="$emit('focus', $event)" :href="ref" @click="click" @keydown="keydown">{{value}}</a>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
     import * as main from '../main';
+    import {pushToGridViewRecentList} from "../main";
 
     @Component({name: 'PropLink'})
     export default class PropLink extends Vue {
@@ -15,6 +16,10 @@
         @Emit('keydown')
         keydown(e) {
             return {e};
+        }
+
+        click() {
+            pushToGridViewRecentList(this.path, this.ref, this.value);
         }
 
         get value() {
@@ -29,10 +34,14 @@
                 return val;
         }
 
+        get path() {
+            return this.prop._.ref.replace(new RegExp(`\/${this.prop.name}$`), "");
+        }
+
         get ref() {
             if (!this.doc._id)
                 return "/";
-            return "/" + this.prop._.ref.replace(new RegExp(`\/${this.prop.name}$`), "") + "/" + this.doc._id;
+            return "/" + this.path + "/" + this.doc._id;
         }
     }
 </script>
