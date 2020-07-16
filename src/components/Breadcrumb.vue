@@ -1,6 +1,9 @@
 <template>
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb p-0 m-0 bg-transparent">
+        <ol class="breadcrumb p-0 m-0 bg-transparent d-flex align-items-center">
+            <li class="mr-3">
+                <button title="Go Back" @click="goBack" class="btn hover-opacity btn-link p-0"><i class="fal text-secondary fa-arrow-circle-left fa-2x"></i></button>
+            </li>
             <li v-for="item in glob.form.breadcrumb" class="breadcrumb-item">
                 <a :href="item.ref">{{item.title}}</a>
                 <i :class="{'fa my-1':1 ,'fa-chevron-right ml-2':ltr, 'fa-chevron-left mr-2':rtl}"></i>
@@ -18,12 +21,16 @@
     export default class Breadcrumb extends Vue {
         @Prop() private count?: number;
 
-        get countTitle(){
+        goBack() {
+            history.back();
+        }
+
+        get countTitle() {
             return digitGroup(this.count);
         }
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 
 </style>

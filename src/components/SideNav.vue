@@ -1,15 +1,6 @@
 <template>
     <div :class="{'side-nav sidenav d-none d-lg-block':1,'collapse':collapse}" v-if="glob.config.navmenu.length">
-        <div @click="toggleSideNav" class="btn" style="padding: .8rem"><i :class="{'fal fa-arrow-to-left text-white':1,'fa-arrow-to-right':collapse}"></i></div>
-        <!-- Search  -->
-        <!--        <div class="input-group p-3 w-100">-->
-        <!--            <input type="text" class="form-control border-right-0" placeholder="Search">-->
-        <!--            <span class="input-group-append bg-white rounded border-left-0">-->
-        <!--     	        <span class="input-group-text bg-transparent">-->
-        <!--                    <span class="fal fa-search text-muted"></span>-->
-        <!--		        </span>-->
-        <!--            </span>-->
-        <!--        </div>-->
+        <div @click="toggleSideNav" class="btn w-100 text-right" style="padding: .8rem"><i :class="{'fal fa-arrow-to-left text-white':1,'fa-arrow-to-right':collapse}"></i></div>
         <ul class="list-unstyled">
             <li v-for="item of glob.config.navmenu" class="nav-item">
                 <a v-if="item.title=='-'" class="d-block border-bottom border-secondary"></a>

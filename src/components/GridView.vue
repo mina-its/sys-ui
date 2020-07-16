@@ -12,14 +12,14 @@
                 <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
             </div>
 
+            <div class="mr-auto"></div>
+
             <!-- Head functions -->
             <template v-for="func in headFuncs">
                 <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-2'}`" v-if="func.ref">{{func.title}}</a>
                 <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
             </template>
-            <button v-if="newItem" class="btn btn-success mx-1" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>{{newItem}}</button>
-
-            <div class="mr-auto"></div>
+            <button v-if="newItem" class="btn btn-success mx-1 px-4" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>Add</button>
 
             <!--  Refresh -->
             <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>

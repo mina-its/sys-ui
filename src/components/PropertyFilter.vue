@@ -24,7 +24,7 @@
                 on: {click: $this.changeOperator}
             }, $t(`opr-${this.filterOperator}`));
             let propValue = this.renderValue(ce, `filter-prop-value d-flex align-items-center px-1 border-0`);
-            return ce('div', {attrs: {"class": "d-flex align-self-center"}}, [propTitle, propOper, propValue]);
+            return ce('div', {attrs: {"class": "d-flex align-items-center"}}, [propTitle, propOper, propValue]);
         }
 
         @Watch('prop')
