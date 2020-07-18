@@ -100,7 +100,7 @@
         }
 
         .ref-multi-item {
-            background-color: whitesmoke;
+            background-color: #f0f1f5;
         }
 
         .rmV {

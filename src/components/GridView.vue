@@ -19,7 +19,9 @@
                 <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-2'}`" v-if="func.ref">{{func.title}}</a>
                 <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
             </template>
-            <button v-if="newItem" class="btn btn-success mx-1 px-4" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>Add</button>
+
+            <!-- Add button -->
+            <button v-if="addButton" class="btn btn-success mx-1 px-4" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>Add</button>
 
             <!--  Refresh -->
             <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
@@ -28,17 +30,17 @@
             <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
         </div>
 
-        <!-- Table -->
-        <div class="w-100 h-100 overflow-auto d-flex">
+        <!-- Content -->
+        <div class="w-100 h-100 grid-content-panel overflow-auto d-flex">
             <div :class="{'d-flex w-100 overflow-auto':true, 'bg-white':level}" @scroll="onScroll()">
                 <!--  Side Menu -->
-                <aside v-if="!level && (recentItems || dec.filterDec)" class="border-right separator-line bg-white d-none d-md-block">
+                <aside v-if="!level && (recentItems || dec.filterDec)" class="overflow-hidden border-right separator-line bg-white d-none d-md-block">
                     <div v-if="dec.filterDec" class="sidenav-filter p-3">
                         <label class="text-muted small"><i class="fal fa-filter p-1"></i>Filter {{glob.form.breadcrumbLast}}:</label>
                         <DetailsView :dec="dec.filterDec" :data="dec.filterData" :level="level?level+1:1" @changed="objectFilterChanged"></DetailsView>
                     </div>
                     <div v-if="recentItems" class="recent-items pt-3">
-                        <label class="text-muted small mx-3 mt-3 font-weight-bold">Recent  {{glob.form.breadcrumbLast}}:</label>
+                        <label class="text-muted small mx-3 mt-3 font-weight-bold">Recent {{glob.form.breadcrumbLast}}:</label>
                         <ul class="nav flex-column">
                             <li v-for="item in recentItems" class="nav-item">
                                 <a @click="clickRecentItem(item)" class="text-nowrap nav-link" :href="item.ref">{{item.title}}</a>
@@ -48,7 +50,7 @@
                 </aside>
 
                 <!--  Main -->
-                <div :class="{'w-100 grid-view':true, 'p-4':!level}">
+                <div :class="{'w-100 grid-view':1, 'p-4 main-bg-image':!level}">
 
                     <!-- Filter Items -->
                     <div v-if="filter && filteringProp && (filteredProps || []).length" class="pb-2 d-flex">
@@ -112,11 +114,11 @@
 
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {$t, call, getQs, glob, load, notify, pushToGridViewRecentList, setQs, showCmenu} from '../main';
+    import {$t, call, getNewItemTitle, getQs, glob, load, notify, pushToGridViewRecentList, setQs, showCmenu} from '../main';
     import {parse, stringify} from 'bson-util';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
     import * as main from '../main';
-    import {EntityMeta, FileType, GridRowHeaderStyle, IData, Keys, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
+    import {EntityMeta, FileType, GridRowHeaderStyle, AccessPermission, IData, Keys, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
 
     declare let $: JQuery;
 
@@ -125,11 +127,11 @@
         @Prop() private uri: string;
         @Prop() private data: IData[];
         @Prop() private dec: ObjectDec;
-        @Prop() private newItem: string;
         @Prop() private level: number;
 
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private recentItems: Pair[] = null;
+        private addButton: boolean = false;
         private mainChecked = false;
         private filter = null;
         private filterDoc = {};
@@ -153,6 +155,11 @@
             this.resetFilterParameters();
             this.resetHeadFuncs();
             this.resetRecentItems();
+            this.checkForAddButton();
+        }
+
+        checkForAddButton() {
+            this.addButton = (this.dec.access & AccessPermission.NewItem) && this.dec.newItemMode == NewItemMode.newPage;
         }
 
         clickRecentItem(item: Pair) {
@@ -185,7 +192,7 @@
         resetHeadFuncs() {
             this.headFuncs = [];
             if (this.dec.links) {
-                this.headFuncs = this.dec.links.filter(link => !link.disable).map(link => {
+                this.headFuncs = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
                     return {title: link.title as string, ref: link.address};
                 });
             }
@@ -195,6 +202,7 @@
             // console.log("this.items", this.items);
             this.resetHeadFuncs();
             this.resetRecentItems();
+            this.checkForAddButton();
 
             if (!this.dec.filterDec) {
                 this.filterDoc = {};
@@ -428,7 +436,10 @@
         insert() {
             switch (this.dec.newItemMode) {
                 case NewItemMode.newPage:
-                    main.load(location.pathname + '?n=1', true);
+                    let ref = "/" + this.uri + '?n=1';
+                    if (this.dec.newItemDefaults)
+                        ref += "&d=" + this.dec.newItemDefaults;
+                    main.load(ref, true);
                     break;
 
                 default:
@@ -437,6 +448,10 @@
                         return;
                     }
                     let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec: this.dec} as EntityMeta};
+                    if (this.dec.newItemDefaults) {
+                        let defaults = parse(this.dec.newItemDefaults, true, ID);
+                        Object.assign(newItem, defaults);
+                    }
                     this.dec.properties.forEach(prop => newItem[prop.name] = null);
                     if (this.dec.reorderable)
                         newItem['_z'] = (Math.max(...this.items.map(item => item._z)) || 0) + 1;

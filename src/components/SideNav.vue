@@ -2,7 +2,7 @@
     <div :class="{'side-nav sidenav d-none d-lg-block':1,'collapse':collapse}" v-if="glob.config.navmenu.length">
         <div @click="toggleSideNav" class="btn w-100 text-right" style="padding: .8rem"><i :class="{'fal fa-arrow-to-left text-white':1,'fa-arrow-to-right':collapse}"></i></div>
         <ul class="list-unstyled">
-            <li v-for="item of glob.config.navmenu" class="nav-item">
+            <li v-for="item of glob.config.navmenu" :title="item.title" class="nav-item">
                 <a v-if="item.title=='-'" class="d-block border-bottom border-secondary"></a>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
                 <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-nowrap px-2 nav-link':1,'has-child':item.items}">

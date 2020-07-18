@@ -1,7 +1,7 @@
 <template>
     <div v-if="glob.dirty" class="mx-2" role="group">
         <button class="btn btn-primary mx-2 px-4" @click="apply"><i class="fal fa-check-circle"></i>  {{$t('apply')}}</button>
-        <button class="btn btn-outline-primary" @click="cancel" name="cancel">{{$t('cancel')}}</button>
+        <button class="btn btn-outline-secondary" @click="cancel" name="cancel">{{$t('cancel')}}</button>
     </div>
 </template>
 

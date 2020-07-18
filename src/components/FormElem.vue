@@ -16,7 +16,7 @@
 
             switch (this.elem.type) {
                 case ElemType.Object:
-                    return ce('object-view', {props: {"elem": this.elem}});
+                    return ce('object-view', {props: {uri: this.elem.obj._.ref}});
 
                 case ElemType.Function: {
                     console.assert(this.elem.func.ref, `ref is expected for the function:`, this.elem.func);

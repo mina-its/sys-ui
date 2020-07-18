@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'checkbox-wrapper text-center mr-2':1}" @click="changed">
+    <div class="checkbox-wrapper text-center mr-2 outline-0" @click="changed">
         <input class="checkbox" @keyup.space="changed" @keydown="keydown" type="checkbox" :checked="checked" tabindex="0" @input="changed">
         <label :class="{'checkbox-label':true, 'no-label':!label}">{{label}}</label>
     </div>
@@ -26,11 +26,6 @@
 </script>
 
 <style lang="scss">
-    .checkbox-wrapper {
-        outline: none;
-        display: inline-block;
-    }
-
     td > .checkbox-wrapper {
         display: flex;
         justify-content: center;

@@ -24,7 +24,7 @@
         </div>
 
         <!--  Content -->
-        <div class="w-100 h-100 overflow-auto d-flex">
+        <div class="w-100 h-100 main-bg-image overflow-auto d-flex">
             <div :class="{'d-flex overflow-auto details-view':true, 'bg-white':level}" @scroll="onScroll()">
 
                 <!--  Side Menu -->
@@ -38,8 +38,13 @@
                     </ul>
                 </aside>
 
+                <!--  Group Property Link -->
+                <div v-if="groupPropertyLink" class="p-4 group-property-link grid-view-box">
+                    <object-view :level="2" :uri="groupPropertyLink"></object-view>
+                </div>
+
                 <!--  Main -->
-                <div :class="{'p-4':!level, 'border rounded': level && dec.detailsViewType===ObjectDetailsViewType_Tabular}">
+                <div v-else :class="{'p-4':!level, 'border rounded': level && dec.detailsViewType===ObjectDetailsViewType_Tabular}">
                     <div v-if="groupVisible(group)" :class="groupPanelStyle(group)" v-for="group in groups" :id="getGroupId(group)">
                         <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
                         <div class="group">
@@ -60,15 +65,16 @@
 </template>
 
 <script lang="ts">
-    import {ChangeType, HeadFunc, ID, ItemChangeEventArg, JQuery, MenuItem, StateChange} from '@/types';
-    import {Component, Prop, Vue, Watch, Emit} from 'vue-property-decorator';
-    import {Context, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, EntityMeta, GlobalType, PropertyReferType, AccessPermission} from "../../../sys/src/types";
-    import {$t, glob, getNewItemTitle, loadOutboundData} from '@/main';
+    import {ChangeType, HeadFunc, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
+    import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
+    import {AccessPermission, Context, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
+    import {$t, ajax, assignNullToEmptyProperty, getNewItemTitle, getQs, glob, loadObjectViewData, notify, setQs} from '../main';
     import * as main from '../main';
+    import ObjectView from "./ObjectView.vue";
 
-    declare let $: JQuery;
+    declare let $: any;
 
-    @Component({name: 'DetailsView', components: {}})
+    @Component({name: 'DetailsView', components: {ObjectView}})
     export default class DetailsView extends Vue {
         @Prop() private uri: string;
         @Prop() private data: any;
@@ -76,6 +82,7 @@
         @Prop() private level: number;
 
         private currentGroup: string = this.groups[0];
+        private groupPropertyLink: string = null;
         private headFuncs: HeadFunc[] = [];
         private AccessPermission_Edit = AccessPermission.Edit;
         private ObjectDetailsViewType_Tabular = ObjectDetailsViewType.Tabular;
@@ -104,7 +111,7 @@
         resetHeadFuncs() {
             this.headFuncs = [];
             if (this.dec.links) {
-                this.headFuncs = this.dec.links.filter(link => !link.disable).map(link => {
+                this.headFuncs = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
                     return {title: link.title as string, ref: link.address};
                 });
             }
@@ -142,6 +149,8 @@
         @Watch('uri')
         onPropertyChanged(value: string, oldValue: string) {
             this.currentGroup = this.groups[0];
+            this.groupPropertyLink = null;
+            this.resetHeadFuncs();
         }
 
         saveLastGroup(item) {
@@ -158,9 +167,21 @@
                 this.currentGroup = this.groups[0];
         }
 
+        loadPropertyGroupLinkData(address: string) {
+            loadObjectViewData(address, this.data, (err, res) => {
+                this.groupPropertyLink = res.ref;
+            });
+        }
+
         selectGroup(item) {
             this.currentGroup = item.title;
             this.saveLastGroup(item);
+
+            // Property Group Link
+            if (/^\//.test(item.uri))
+                return this.loadPropertyGroupLinkData(item.uri);
+            else
+                this.groupPropertyLink = null;
 
             if (this.dec.detailsViewType == ObjectDetailsViewType.Tabular) {
                 let $dv = $(".details-view");
@@ -197,11 +218,6 @@
                                     } as StateChange);
                             }
                         });
-                        break;
-
-                    case PropertyReferType.outbound:
-                        let items = this.item[prop.name];
-                        if (items == null) loadOutboundData(prop, this.item);
                         break;
                 }
             }
@@ -284,6 +300,13 @@
             for (const grp of this.groups) {
                 menus.push({uri: "#gp-" + grp.replace(/\s/g, "-"), title: grp});
             }
+
+            let propertyGroupLinks = this.dec.links ? this.dec.links.filter(link => !link.disable && link.type == LinkType.PropertyGroupLink).map(link => {
+                return {title: link.title as string, uri: link.address};
+            }) : [];
+
+            menus = [...menus, ...propertyGroupLinks];
+
             if (menus.length <= 1) menus = null;
             return menus;
         }
@@ -312,6 +335,17 @@
     .details-view {
         scroll-behavior: smooth;
         min-width: 100%;
+
+
+        .group-property-link {
+            .grid-content-panel {
+                height: auto !important;
+            }
+        }
+
+        .form-group {
+            margin-bottom: .5rem;
+        }
 
         .sidenav {
             background-color: white;

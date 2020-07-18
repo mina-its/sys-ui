@@ -63,15 +63,8 @@
 
         renderDetailsView(ce) {
             let valueClass = `prop-value border`;
-            if (this.prop._.gtype == GlobalType.object && !this.prop.documentView) {
-                return ce('object-view', {
-                    props: {
-                        root: false,
-                        level: this.level,
-                        elem: {type: ElemType.Object, obj: {_: {ref: this.prop._.ref}}} as Elem
-                    },
-                });
-            }
+            if (this.prop._.gtype == GlobalType.object && !this.prop.documentView)
+                return ce('object-view', {props: {level: this.level, uri: this.prop._.ref}});
 
             let vl = this.renderValue(ce, valueClass);
             let embedErr = getPropertyEmbedError(this.item, this.prop.name);
@@ -252,16 +245,16 @@
     $right: right;
 
     .prop-label {
-        width: 160px;
+        width: 10rem;
     }
 
     .prop-value {
         display: inline-block;
-        width: 320px;
+        width: 20rem;
         padding: 0.25rem 0.5rem;
 
         &-wide {
-            width: 500px;
+            width: 30rem;
         }
     }
 

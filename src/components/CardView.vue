@@ -1,8 +1,8 @@
 <template>
-    <div :class="{'card-view w-100':true,'p-2':!level}">
+    <div :class="{'card-view':1,'p-2':!level}">
         <div class="d-flex flex-wrap">
             <div class="" v-for="item in items">
-                <div class="card mr-4 mb-4" style="width: 540px;" tabindex="0">
+                <div class="card mr-4 mb-4 outline-0" tabindex="0">
                     <div @click="clickMenu($event, item)" class="card-header">
                         <span>{{getTitle(item)}}</span>
                         <i class="fa fa-cog fa-lg text-muted float-right mt-1"></i>
@@ -18,10 +18,10 @@
 </template>
 
 <script lang="ts">
-    import {ItemChangeEventArg, StateChange, ChangeType, JQuery, MenuItem} from '@/types';
+    import {ItemChangeEventArg, StateChange, ChangeType, MenuItem} from '../types';
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {ObjectDec, IData, LogType} from "../../../sys/src/types";
-    import {$t, showCmenu} from '@/main';
+    import {$t, showCmenu} from '../main';
     import * as main from '../main';
 
     @Component({name: 'CardView', components: {}})
@@ -102,12 +102,15 @@
     }
 </script>
 
-<style scoped lang="scss">
-    .card-view figure {
-        text-align: right;
-    }
+<style lang="scss">
+    .card-view {
 
-    .card-view .card {
-        outline: none;
+        .card {
+            width: 33rem;
+        }
+
+        figure {
+            text-align: right;
+        }
     }
 </style>

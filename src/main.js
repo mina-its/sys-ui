@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadOutboundData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -14,6 +14,7 @@ let index = {
     "Start Vue                      ": startVue,
     // Global
     "Handle Response                ": handleResponse,
+    "Handle Window Events           ": handleWindowEvents,
     "Load                           ": load,
     "Ajax                           ": ajax,
 };
@@ -56,31 +57,6 @@ function $t(text) {
     return getText(text, true);
 }
 exports.$t = $t;
-// export function getNavmenu(res: WebResponse) {
-// 	let _navmenu = localStorage.getItem('_navmenu');
-// 	// if (_navmenu)
-// 	// 	dispatchState({navmenu : JSON.parse(_navmenu)});
-// 	// else
-// 	return res.navmenu;
-// }
-//
-// export function setNavmenu() {
-// 	let ref = location.pathname;
-// 	let title = document.title;
-// 	// if (glob.form.breadcrumb && glob.form.breadcrumb.length > 0) {
-// 	// 	let rootref = glob.form.breadcrumb[0].ref;
-// 	// 	let rootItem = glob.navmenu.filter(item => item.ref == rootref).pop();
-// 	// 	if (!rootItem)
-// 	// 		rootItem = {ref: rootref, title: glob.form.breadcrumb[0].title};
-// 	//
-// 	// 	dispatchState({navmenu : glob.navmenu.filter(item => item.ref != rootItem).slice(0, 3);
-// 	// 	glob.navmenu.unshift(rootItem);
-// 	// } else {
-// 	//glob.navmenu = glob.navmenu.filter(item => item.ref != ref).slice(0, 8);
-// 	//glob.navmenu.unshift({title, ref});
-// 	//}
-// 	localStorage.setItem('_navmenu', JSON.stringify(glob.config.navmenu));
-// }
 function clone(obj) {
     return bson_util_1.parse(bson_util_1.stringify(obj, true), true, types_1.ID);
 }
@@ -211,25 +187,26 @@ function prepareServerUrl(ref) {
     return ref;
 }
 exports.prepareServerUrl = prepareServerUrl;
-function loadOutboundData(prop, item) {
-    let ref = "/" + prop._.ref;
-    if (prop.filter) {
-        let query = processThisExpression(item, prop.filter);
-        ref += `?q=${query}`;
-    }
-    ajax(setQs('m', types_2.RequestMode.inline, false, ref), null, null, res => {
+function loadObjectViewData(address, item, done) {
+    address = processThisExpression(item, address);
+    ajax(setQs('m', types_2.RequestMode.inline, false, address), null, null, res => {
         if (!res.data)
-            return;
+            return done(null);
         const setDataMeta = (ref, item, dec) => {
             item._ = item._ || {};
             item._.ref = ref;
             item._.dec = dec;
             return item._;
         };
-        let dec = exports.glob.form.declarations[prop._.ref];
-        let data = res.data[prop._.ref];
-        if (!data || !dec || !Array.isArray(data))
-            return;
+        let ref = res.form.elems[0].obj._.ref;
+        let dec = res.form.declarations[ref];
+        let data = res.data[ref];
+        if (dec)
+            dec.newItemDefaults = getQs("d", address);
+        if (!data || !dec)
+            return done(null, { ref });
+        exports.glob.data[ref] = res.data[ref];
+        exports.glob.form.declarations[ref] = res.form.declarations[ref];
         data.forEach((item) => {
             let meta = setDataMeta(ref + "/" + item._id, item, dec);
             meta.marked = null;
@@ -237,11 +214,14 @@ function loadOutboundData(prop, item) {
         for (const prop of dec.properties) {
             if (Array.isArray(data))
                 data.forEach(item => assignNullToEmptyProperty(item, prop));
+            else
+                assignNullToEmptyProperty(data, prop);
         }
-        exports.glob.data[prop._.ref] = data;
+        exports.glob.data[ref] = data;
+        done(null, { ref });
     }, err => notify(err));
 }
-exports.loadOutboundData = loadOutboundData;
+exports.loadObjectViewData = loadObjectViewData;
 function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
@@ -520,7 +500,7 @@ function handleWindowEvents() {
         if (!href || href.match(/^javascript/) || /^#/.test(href) || /^http/.test(href))
             return; // if (/^#/.test(href)) return false;
         e.preventDefault();
-        if (!/\bf=\d/.test(href)) // push state on not function link
+        if (!/\bf=\d/.test(href)) // push state on not function link / new item
             history.pushState(null, null, href);
         load(href);
     });
@@ -577,8 +557,16 @@ function handleCmenuKeys(e) {
     }
 }
 exports.handleCmenuKeys = handleCmenuKeys;
-function getQs(key) {
-    let search = location.search;
+function getQs(key, href) {
+    let search, el;
+    if (href) {
+        el = document.createElement('a');
+        el.href = href;
+        search = el.search;
+    }
+    else {
+        search = location.search;
+    }
     let query = new URLSearchParams(search);
     return query.get(key);
 }
@@ -1172,7 +1160,9 @@ function _dispatchRequestServerModify(store, done) {
         commitServerChangeResponse(store, modify, res.modifyResult);
         if (getQs("n")) {
             clearModifies();
-            load("/" + modify.ref + "/" + res.modifyResult._id, true);
+            let ref = "/" + modify.ref + "/" + res.modifyResult._id;
+            history.replaceState(null, null, ref);
+            load(ref, false);
         }
         else if (res.redirect && exports.glob.modifies.length == 0)
             return handleResponseRedirect(res);

@@ -8,7 +8,7 @@
                 <button @click="selectPrimaryView(TaskView_Home)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Home===view.concern&&view.primary}">
                     <i class="fal fa-home fa-lg"></i>
-                    <label>Home</label>
+                    <label>Mine</label>
                 </button>
                 <button @click="selectPrimaryView(TaskView_Status)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Status===view.concern&&view.primary}">
@@ -131,13 +131,16 @@
                 <option :value="project._id" v-for="project of projects">{{project.title}}</option>
             </select>
 
-            <!--  Refresh -->
-            <button title="Refresh" class="btn btn-link text-secondary px-2" @click="reload"><i class="fas fa-sync"></i></button>
 
             <!--  Configurations -->
             <div class="dropdown">
                 <button title="Configurations" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button" class="btn btn-link text-secondary px-2"><i class="fal fa-cog fa-lg"></i></button>
                 <div class="dropdown-menu">
+                    <!--  Refresh -->
+                    <a class="dropdown-item" href="#" @click="reload"><i class="fas fa-sync"></i> Refresh</a>
+
+                    <div class="dropdown-divider"></div>
+
                     <a class="dropdown-item" href="/projects">Configure projects</a>
                 </div>
             </div>
@@ -167,7 +170,7 @@
                         @dragEnterGroup="dragEnterGroup" @dragStart="dragStart" @ondragover="ondragover" @newTask="newTask"
                         @focusTask="focusTask" @taskkeypress="taskKeypress" @drop="drop" @dragovergroup="ondragover"/>
 
-            <div class="flex-grow-1"></div>
+            <div class="flex-grow-1 main-bg-image"></div>
 
             <!--  Right Panel -->
             <div class="right-panel border-left bg-white p-3">
@@ -282,7 +285,7 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {GetTaskDto, ID, Keys, LogType, ObjectDec, Pair, Project, ProjectView, Task, TaskConcern, TaskDueDate, TaskInboxGroup, TaskPriority, TaskStatus, WebMethod} from '../../../sys/src/types';
+    import {GetTaskDto, ID, Keys, LogType, ObjectDec, Pair, Project, ProjectView, Task, TaskConcern, TaskDueDate, TaskInboxGroup, TaskPriority, TaskStatus, TimeFormat, WebMethod} from '../../../sys/src/types';
     import TaskGroup from "../components/TaskGroup.vue";
     import {ItemChangeEventArg, MenuItem, TaskEvent, TaskGroupData} from "../types";
     import {ajax, assignNullToEmptyProperty, call, clone, equalID, glob, markDown, newID, notify, question, showCmenu} from "../main";
@@ -346,6 +349,21 @@
             };
         }
 
+        prepareTaskInstance(task: Task, allTasks: Task[]) {
+            task._ = {dragging: false, color: null, bgColor: null};
+            task.comments = task.comments || [];
+            if (task.parent) task._.parent = allTasks.find(t => equalID(t._id, task.parent));
+
+            if (task.assignees && !Array.isArray(task.assignees)) {
+                console.warn('Invalid task assignee:', task);
+            }
+
+            if (task.dueDates)
+                for (let dueDate of task.dueDates) {
+                    dueDate.setTime = dueDate.setTime || false;
+                }
+        }
+
         reload() {
             call('getTasks', {}, (err, res) => {
                 let data: GetTaskDto = res.data;
@@ -360,15 +378,13 @@
 
                 // Tasks
                 for (let task of data.tasks) {
-                    task._ = {dragging: false, color: null, bgColor: null};
-                    task.comments = task.comments || [];
-                    if (task.parent) task._.parent = data.tasks.find(t => equalID(t._id, task.parent));
+                    this.prepareTaskInstance(task, data.tasks);
                 }
                 this.tasks = data.tasks;
 
                 // Task Properties
                 this.tasksDec = data.tasksDec;
-                this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "project", "description", "time", "status", "owner", "priority", "assignees"].indexOf(p.name) > -1);
+                this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "project", "categories", "description", "time", "status", "owner", "priority", "assignees"].indexOf(p.name) > -1);
                 this.dueDatesDec = data.dueDatesDec;
                 this.tasks.forEach(task => this.assignNullToEmptyTaskProperty(task));
 
@@ -427,10 +443,21 @@
                 this.$forceUpdate();
             })
 
-            //, status: task.status, assignees: task.assignees, dueDates: task.dueDates, priority: task.priority
             let patch = {_z: task._z} as Task;
-            patch[this.concernProperty] = task[this.concernProperty];
-            this.saveTask(task, patch);
+            switch (this.view.concern) {
+                case TaskConcern.Start:
+                    patch.status = task.status;
+                    patch.dueDates = task.dueDates;
+                    patch.priority = task.priority;
+                    break;
+
+                default:
+                    patch[this.concernProperty] = task[this.concernProperty];
+            }
+
+            this.saveTask(task, patch, () => {
+                this.reload();
+            });
         }
 
         moveTask(task: Task, z: number, ctrlKey: boolean, group: TaskGroupData) {
@@ -439,17 +466,20 @@
             }
             task._z = z;
             switch (this.view.concern) {
-                case TaskConcern.DueDate: {
-                    task.dueDates = task.dueDates || [];
-                    let indexInSource = task.dueDates.findIndex(d => this.currentGroup.value.diff(d.time) == 0);
-                    if (!ctrlKey) {
-                        if (indexInSource > -1) task.dueDates.splice(indexInSource, 1);
-                    }
+                case TaskConcern.DueDate:
+                    if (!this.currentGroup.value)
+                        task.dueDates = null;
+                    else {
+                        task.dueDates = task.dueDates || [];
+                        let indexInSource = task.dueDates.findIndex(d => this.currentGroup.value.diff(d.time) == 0);
+                        if (!ctrlKey) {
+                            if (indexInSource > -1) task.dueDates.splice(indexInSource, 1);
+                        }
 
-                    let indexOnTarget = task.dueDates.findIndex(d => group.value.diff(d.time) == 0);
-                    if (indexOnTarget == -1) // Check if it does not already exists
-                        this.addDueDate(task, group.value.toDate());
-                }
+                        let indexOnTarget = task.dueDates.findIndex(d => group.value.diff(d.time) == 0);
+                        if (indexOnTarget == -1) // Check if it does not already exists
+                            this.addDueDate(task, group.value.toDate());
+                    }
                     break;
 
                 case TaskConcern.Category:
@@ -484,6 +514,30 @@
                     }
                     break;
 
+                case TaskConcern.Start:
+                    switch (group.value as TaskInboxGroup) {
+                        case  TaskInboxGroup.Todo:
+                            task.status = TaskStatus.Todo;
+                            if (task.dueDates == null)
+                                task.dueDates = [this.today().toDate()];
+                            break;
+
+                        case  TaskInboxGroup.Doing:
+                            task.status = TaskStatus.Doing;
+                            if (task.dueDates == null)
+                                task.dueDates = [this.today().toDate()];
+                            break;
+
+                        case  TaskInboxGroup.Brainstorm:
+                            task.dueDates = null;
+                            break;
+
+                        case  TaskInboxGroup.Urgent:
+                            task.priority = TaskPriority.Urgent;
+                            break;
+                    }
+                    break;
+
                 default:
                     task[this.concernProperty] = group.value;
                     break;
@@ -507,6 +561,13 @@
 
         toggleSetTime() {
             this.currentTaskDueDate.setTime = !this.currentTaskDueDate.setTime;
+
+            let timeProp = this.dueDatesDec.properties.find(p => p.name == "time");
+            if (this.currentTaskDueDate.setTime)
+                timeProp.time.format = TimeFormat.YearMonthDayHourMinute;
+            else
+                timeProp.time.format = TimeFormat.YearMonthDay;
+
             this.$forceUpdate();
         }
 
@@ -933,9 +994,9 @@
                 }
             }
 
-            for (let task of tasks.filter(t => t._.dirty)) {
-                this.saveTask(task, {_z: task._z} as Task);
-            }
+            // for (let task of tasks.filter(t => t._.dirty)) {
+            //     this.saveTask(task, {_z: task._z} as Task);
+            // }
 
             return tasks;
         }
@@ -1016,12 +1077,6 @@
                             switch (group.value) {
                                 case TaskInboxGroup.Favorite:
                                     return !!task.favorite;
-
-                                case TaskInboxGroup.Urgent:
-                                    return task.priority == TaskPriority.Urgent;
-
-                                case TaskInboxGroup.Brainstorm:
-                                    return !task.assignees || !task.assignees.length;
                             }
 
                             // Other tasks must belong to current user
@@ -1030,6 +1085,9 @@
 
                             let today = moment().startOf('day');
                             switch (group.value) {
+                                case TaskInboxGroup.Brainstorm:
+                                    return !task.dueDates;
+
                                 case TaskInboxGroup.Urgent:
                                     return task.priority == TaskPriority.Urgent;
 
@@ -1124,11 +1182,6 @@
         }
 
         dragStart(e: TaskEvent) {
-            if (this.view.concern == this.TaskView_Home) {
-                e.ev.preventDefault();
-                return;
-            }
-
             e.ev.dataTransfer.setData("text", "" + e.task._id);
             e.ev.dataTransfer.effectAllowed = 'all';
             this.currentGroup = e.group;
@@ -1155,7 +1208,7 @@
                     break;
 
                 case TaskConcern.Start:
-                    e.ev.dataTransfer.dropEffect = 'none';
+                    e.ev.dataTransfer.dropEffect = 'move';
                     break;
 
                 default:
@@ -1272,7 +1325,7 @@
                 case TaskConcern.Start:
                     this.concernProperty = null;
                     this.groupItems = [
-                        {title: "Brainstorm", value: TaskInboxGroup.Brainstorm, icon: 'fad fa-fog fa-lg'},
+                        {title: "Unplanned", value: TaskInboxGroup.Brainstorm, icon: 'fad fa-fog fa-lg'},
                         {title: "To Do (Today)", value: TaskInboxGroup.Todo},
                         {title: "Doing (Today)", value: TaskInboxGroup.Doing},
                         {title: "Urgent", value: TaskInboxGroup.Urgent},
@@ -1356,18 +1409,24 @@
                 e.ev.target.value = "";
 
                 // If previous task is SubTask
-                let lastTaskInGroup = null;
+                let lastTaskInGroup: Task = null;
                 if (e.group.tasks.length) lastTaskInGroup = e.group.tasks[e.group.tasks.length - 1];
                 if (lastTaskInGroup && lastTaskInGroup.parent) {
                     newTask.parent = lastTaskInGroup.parent;
                     newTask.project = lastTaskInGroup.project;
                     newTask.status = lastTaskInGroup.status;
                     newTask.priority = lastTaskInGroup.priority;
+                    newTask.assignees = lastTaskInGroup.assignees;
+                    newTask.dueDates = lastTaskInGroup.dueDates;
                 }
+
+                if (!newTask.assignees)
+                    newTask.assignees = [this.currentUser];
 
                 switch (this.view.concern) {
                     case TaskConcern.Assignee:
-                        newTask[this.concernProperty] = e.group.value;
+                        if (e.group.value)
+                            newTask.assignees = [e.group.value];
                         break;
 
                     case TaskConcern.DueDate:
@@ -1376,38 +1435,37 @@
                         break;
 
                     case TaskConcern.Category:
-                        newTask[this.concernProperty] = e.group.value;
+                        newTask.categories = [e.group.value];
                         break;
 
                     case TaskConcern.MileStone:
-                        newTask[this.concernProperty] = e.group.value;
+                        newTask.milestone = e.group.value;
                         break;
 
                     case TaskConcern.Priority:
-                        newTask[this.concernProperty] = e.group.value;
+                        newTask.priority = e.group.value;
                         break;
 
                     case TaskConcern.Start:
                         let today = moment().startOf('day');
+                        this.assignToMe(newTask);
+
                         switch (e.group.value) {
                             case TaskInboxGroup.Brainstorm:
                                 break;
                             case TaskInboxGroup.Todo:
                                 newTask.status = TaskStatus.Todo;
                                 this.addDueDate(newTask, today.toDate());
-                                this.assignToMe(newTask);
                                 break;
                             case TaskInboxGroup.Doing:
                                 newTask.status = TaskStatus.Doing;
                                 this.addDueDate(newTask, today.toDate());
-                                this.assignToMe(newTask);
                                 break;
                             case TaskInboxGroup.Urgent:
                                 newTask.priority = TaskPriority.Urgent;
                                 break;
                             case TaskInboxGroup.Overdue:
                                 this.addDueDate(newTask, moment(today).add(-1, 'days').toDate());
-                                this.assignToMe(newTask);
                                 break;
                             case TaskInboxGroup.Favorite:
                                 newTask.favorite = true;
@@ -1485,11 +1543,6 @@
 
         .right-panel {
             width: 22rem;
-            font-size: .8rem;
-        }
-
-        .new-task {
-            outline: none;
             font-size: .8rem;
         }
 

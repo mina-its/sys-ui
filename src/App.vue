@@ -5,7 +5,7 @@
         </header>
         <main class="d-flex align-items-stretch overflow-auto">
             <SideNav/>
-            <ObjectView v-if="objectElem" :elem="objectElem" :level="0"/>
+            <object-view v-if="objectElemUri" :uri="objectElemUri" :level="0"/>
             <FormView v-else/>
         </main>
         <HelperObjects/>
@@ -20,7 +20,7 @@
 
     declare let $: JQuery;
 
-    @Component({name: "App", components: {}})
+    @Component({name: "App"})
     export default class App extends Vue {
         mounted() {
             console.log(
@@ -32,9 +32,9 @@
             $('[data-toggle="tooltip"]').tooltip();
         }
 
-        get objectElem() {
-            if (glob.form.elems && glob.form.elems.length == 1 && glob.form.elems[0].type == ElemType.Object)
-                return glob.form.elems[0];
+        get objectElemUri() {
+            if (glob.form.elems && glob.form.elems.length == 1 && glob.form.elems[0].type == ElemType.Object && glob.form.elems[0]._)
+                return glob.form.elems[0]._.ref;
             else
                 return null;
         }
@@ -70,14 +70,14 @@
         --link-color: #4285f4;
         --main-bg: #eee;
 
-        --font-size-base: 15px;
+        --font-size-base: 1rem;
         --badge-padding-x: 0.25rem;
 
         --left: left;
         --right: right;
 
-        --wide-props-width: 500px;
-        --text-multiline-height: 150px;
+        --wide-props-width: 30rem;
+        --text-multiline-height: 10rem;
     }
 
     $left: var(--left);
@@ -454,6 +454,13 @@
         user-select: none;
         /* Non-prefixed version, currently
                                          supported by Chrome, Edge, Opera and Firefox */
+    }
+
+    .main-bg-image {
+        background-repeat: no-repeat;
+        background-image: url('/@sys-ui/images/bg2.png');
+        background-position-y: bottom;
+        background-position-x: right;
     }
 
 </style>

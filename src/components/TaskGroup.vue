@@ -17,13 +17,13 @@
                 </div>
             </div>
         </div>
-        <input class="new-task mt-1 px-1 border-0 w-100 bg-transparent" @keydown.esc="$event.target.value=null" @change="newTask">
+        <input class="new-task outline-0 mt-1 px-1 border-0 w-100 bg-transparent mb-3" @keydown.esc="$event.target.value=null" @change="newTask">
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {ID, Keys, Task, TaskConcern, WebMethod} from "../../../sys/src/types";
+    import {ID, Keys, Task, TaskConcern, TaskDueDate, WebMethod} from "../../../sys/src/types";
     import {ajax, equalID} from "../main";
     import {TaskEvent, TaskGroupData} from "../types";
 
@@ -48,15 +48,34 @@
         }
 
         getTaskTime(task: Task) {
-            if (this.group.concern == TaskConcern.DueDate && this.group.value && task.dueDates) {
-                let dueDate = task.dueDates.find(d => d.setTime && this.group.value.diff(d.time) <= 0 && moment(this.group.value).add(1, 'days').diff(d.time) > 0);
-                if (dueDate) {
-                    return "<span>&nbsp;<span>" + moment(dueDate.time).format("HH:mm") + "<span>&nbsp;<span>";
-                } else {
-                    return "";
+            if (!task.dueDates) return "";
+
+            let dueDate: TaskDueDate = null;
+            if (task.dueDates.length == 1)
+                dueDate = task.dueDates[0].setTime ? task.dueDates[0] : null;
+            else {
+                switch (this.group.concern) {
+                    case TaskConcern.Start:
+                        dueDate = task.dueDates.find(d => d.setTime && this.datePeriodContains(d.time, this.today()));
+                        break;
+
+                    case TaskConcern.DueDate:
+                        if (this.group.value)
+                            dueDate = task.dueDates.find(d => d.setTime && this.group.value.diff(d.time) <= 0 && moment(this.group.value).add(1, 'days').diff(d.time) > 0);
+                        break;
                 }
             }
-            return "";
+
+            return dueDate ? "<span>&nbsp;<span>" + moment(dueDate.time).format("HH:mm") + "<span>&nbsp;<span>" : "";
+        }
+
+        today() {
+            let today = moment().startOf('day');
+            return today;
+        }
+
+        datePeriodContains(time: Date, date: any) {
+            return date.diff(time) <= 0 && moment(date).add(1, 'days').diff(time) > 0;
         }
 
         isVisible(task: Task) {
@@ -137,5 +156,8 @@
             }
         }
 
+        .new-task {
+            font-size: .8rem;
+        }
     }
 </style>

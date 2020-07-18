@@ -8,7 +8,9 @@
                 <a :href="item.ref">{{item.title}}</a>
                 <i :class="{'fa my-1':1 ,'fa-chevron-right ml-2':ltr, 'fa-chevron-left mr-2':rtl}"></i>
             </li>
-            <li class="breadcrumb-item font-weight-bold active" aria-current="page">{{glob.form.breadcrumbLast}}<span class="text-muted px-2" v-if="count">({{countTitle}})</span></li>
+            <li class="breadcrumb-item font-weight-bold active" aria-current="page">{{glob.form.breadcrumbLast}}
+                <span class="text-muted small" v-if="count">({{countTitle}})</span>
+            </li>
         </ol>
     </nav>
 </template>

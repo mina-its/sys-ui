@@ -12,10 +12,10 @@ let index = {
 
     // Global
     "Handle Response                ": handleResponse,
+    "Handle Window Events           ": handleWindowEvents,
     "Load                           ": load,
     "Ajax                           ": ajax,
 };
-
 
 import {getBsonValue, parse, stringify} from 'bson-util';
 import Vue from 'vue';
@@ -55,32 +55,6 @@ export function getText(text: string | MultilangText, useDictionary?: boolean): 
 export function $t(text: string): string {
     return getText(text, true);
 }
-
-// export function getNavmenu(res: WebResponse) {
-// 	let _navmenu = localStorage.getItem('_navmenu');
-// 	// if (_navmenu)
-// 	// 	dispatchState({navmenu : JSON.parse(_navmenu)});
-// 	// else
-// 	return res.navmenu;
-// }
-//
-// export function setNavmenu() {
-// 	let ref = location.pathname;
-// 	let title = document.title;
-// 	// if (glob.form.breadcrumb && glob.form.breadcrumb.length > 0) {
-// 	// 	let rootref = glob.form.breadcrumb[0].ref;
-// 	// 	let rootItem = glob.navmenu.filter(item => item.ref == rootref).pop();
-// 	// 	if (!rootItem)
-// 	// 		rootItem = {ref: rootref, title: glob.form.breadcrumb[0].title};
-// 	//
-// 	// 	dispatchState({navmenu : glob.navmenu.filter(item => item.ref != rootItem).slice(0, 3);
-// 	// 	glob.navmenu.unshift(rootItem);
-// 	// } else {
-// 	//glob.navmenu = glob.navmenu.filter(item => item.ref != ref).slice(0, 8);
-// 	//glob.navmenu.unshift({title, ref});
-// 	//}
-// 	localStorage.setItem('_navmenu', JSON.stringify(glob.config.navmenu));
-// }
 
 export function clone(obj: any) {
     return parse(stringify(obj, true), true, ID);
@@ -213,14 +187,10 @@ export function prepareServerUrl(ref: string): string {
     return ref;
 }
 
-export function loadOutboundData(prop: Property, item: any) {
-    let ref = "/" + prop._.ref;
-    if (prop.filter) {
-        let query = processThisExpression(item, prop.filter);
-        ref += `?q=${query}`;
-    }
-    ajax(setQs('m', RequestMode.inline, false, ref), null, null, res => {
-        if (!res.data) return;
+export function loadObjectViewData(address: string, item, done) {
+    address = processThisExpression(item, address);
+    ajax(setQs('m', RequestMode.inline, false, address), null, null, res => {
+        if (!res.data) return done(null);
 
         const setDataMeta = (ref: string, item: IData, dec: ObjectDec | FunctionDec) => {
             item._ = item._ || {} as any;
@@ -229,9 +199,17 @@ export function loadOutboundData(prop: Property, item: any) {
             return item._;
         };
 
-        let dec = glob.form.declarations[prop._.ref];
-        let data = res.data[prop._.ref];
-        if (!data || !dec || !Array.isArray(data)) return;
+        let ref = res.form.elems[0].obj._.ref;
+        let dec = res.form.declarations[ref];
+        let data = res.data[ref];
+
+        if (dec)
+            (dec as ObjectDec).newItemDefaults = getQs("d", address);
+
+        if (!data || !dec) return done(null, {ref});
+
+        glob.data[ref] = res.data[ref];
+        glob.form.declarations[ref] = res.form.declarations[ref];
 
         data.forEach((item: IData) => {
             let meta = setDataMeta(ref + "/" + item._id, item, dec);
@@ -241,9 +219,12 @@ export function loadOutboundData(prop: Property, item: any) {
         for (const prop of dec.properties) {
             if (Array.isArray(data))
                 data.forEach(item => assignNullToEmptyProperty(item, prop));
+            else
+                assignNullToEmptyProperty(data, prop);
         }
 
-        glob.data[prop._.ref] = data;
+        glob.data[ref] = data;
+        done(null, {ref});
     }, err => notify(err));
 }
 
@@ -472,7 +453,7 @@ export function hideCmenu() {
     glob.cmenu.show = false;
 }
 
-export function newID(){
+export function newID() {
     return ID.generateByBrowser();
 }
 
@@ -528,7 +509,7 @@ function handleWindowEvents() {
         if (!href || href.match(/^javascript/) || /^#/.test(href) || /^http/.test(href)) return; // if (/^#/.test(href)) return false;
 
         e.preventDefault();
-        if (!/\bf=\d/.test(href)) // push state on not function link
+        if (!/\bf=\d/.test(href)) // push state on not function link / new item
             history.pushState(null, null, href);
         load(href);
     });
@@ -587,8 +568,15 @@ export function handleCmenuKeys(e) {
     }
 }
 
-export function getQs(key: string): string {
-    let search = location.search;
+export function getQs(key: string, href?: string): string {
+    let search, el;
+    if (href) {
+        el = document.createElement('a');
+        el.href = href;
+        search = el.search;
+    } else {
+        search = location.search;
+    }
     let query = new URLSearchParams(search);
     return query.get(key);
 }
@@ -1216,7 +1204,9 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
 
         if (getQs("n")) {
             clearModifies();
-            load("/" + modify.ref + "/" + res.modifyResult._id, true);
+            let ref = "/" + modify.ref + "/" + res.modifyResult._id;
+            history.replaceState(null, null, ref);
+            load(ref, false);
         } else if (res.redirect && glob.modifies.length == 0)
             return handleResponseRedirect(res);
         else if (res.modifyResult)

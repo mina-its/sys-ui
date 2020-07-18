@@ -7,9 +7,9 @@
             </a>
         </div>
         <div v-else class="dropdown">
-            <button class="avatar dropdown-toggle" id="dropdownProfileBrief" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="avatar bg-transparent border-0 outline-0 dropdown-toggle" id="dropdownProfileBrief" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i v-if="buttonClass" :class="buttonClass"></i>
-                <span v-else role="img" :style="{'background-image':`url(${profilePhoto})`}" />
+                <span v-else role="img" class="d-flex cursor-pointer bg-transparent w-100 h-100" :style="{'background-image':`url(${profilePhoto})`}" />
             </button>
             <div :class="{'dropdown-menu text-center profile-brief':1,'dropdown-menu-right':ltr}" aria-labelledby="dropdownProfileBrief">
                 <img class="m-4 mx-5" :src="profilePhoto"/>
@@ -77,9 +77,6 @@
         .avatar {
             width: 38px;
             height: 28px;
-            background-color: transparent;
-            border: none;
-            outline: none;
 
             &::after {
                 display: none;
@@ -87,17 +84,12 @@
         }
 
         .avatar span {
-            background-color: transparent;
             background-position: center center;
             background-repeat: no-repeat;
             background-size: cover;
             border-radius: 50%;
-            display: flex;
             flex: 1 1 100%;
-            width: 100%;
-            height: 100%;
             border: 2px solid white;
-            cursor: pointer;
         }
 
         .profile-button {
