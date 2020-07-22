@@ -11,7 +11,7 @@
                      :class="{'task-item text-nowrap d-flex align-items-center border w-100 rounded': 1, 'multi-place':task._.multiPlace,'dragging': task._.dragging}"
                      :style="{'color':task._.color,'background-color':task._.bgColor}">
                     <i v-if="task.archive" class="px-1 fal fa-archive"></i>
-                    <div class="px-1 w-100 overflow-hidden" style="text-overflow: ellipsis">{{task.title}}</div>
+                    <div class="px-1 w-100 overflow-hidden" style="text-overflow: ellipsis">{{taskCaption(task)}}</div>
                     <div class="font-weight-bold" v-html="getTaskTime(task)"></div>
                     <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-angle-up':!task._.expand,'fas fa-angle-down':task._.expand}"></i>
                 </div>
@@ -23,7 +23,7 @@
 
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {ID, Keys, Task, TaskConcern, TaskDueDate, WebMethod} from "../../../sys/src/types";
+    import {ID, Task, TaskView, TaskDueDate, WebMethod} from "../../../sys/src/types";
     import {ajax, equalID} from "../main";
     import {TaskEvent, TaskGroupData} from "../types";
 
@@ -35,6 +35,18 @@
 
         hasChild(task: Task) {
             return this.group.tasks.filter(t => equalID(t.parent, task._id)).length > 0;
+        }
+
+        taskCaption(task: Task) {
+            let title = task.title || "";
+            if (title.split(" ").length < 6)
+                return title;
+            else {
+                title = `#${task.no}`;
+                if (task.categories && task.categories.length)
+                    title += " " + task.categories.map(c => `#${c}`).join(' ');
+            }
+            return title;
         }
 
         @Emit('dragEnterTask')
@@ -55,11 +67,11 @@
                 dueDate = task.dueDates[0].setTime ? task.dueDates[0] : null;
             else {
                 switch (this.group.concern) {
-                    case TaskConcern.Start:
+                    case TaskView.Start:
                         dueDate = task.dueDates.find(d => d.setTime && this.datePeriodContains(d.time, this.today()));
                         break;
 
-                    case TaskConcern.DueDate:
+                    case TaskView.DueDate:
                         if (this.group.value)
                             dueDate = task.dueDates.find(d => d.setTime && this.group.value.diff(d.time) <= 0 && moment(this.group.value).add(1, 'days').diff(d.time) > 0);
                         break;
@@ -140,6 +152,10 @@
             -ms-overflow-style: none; /* IE and Edge */
             scrollbar-width: none; /* Firefox */
             transition: background-color .2s;
+
+            &:not(.calendar-day) {
+                min-width: 12rem;
+            }
 
             &:hover {
                 -ms-overflow-style: unset;

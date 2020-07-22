@@ -8,7 +8,7 @@ import {
     FormDto,
     IData,
     Task,
-    TaskConcern
+    TaskView
 } from '../../sys/src/types';
 
 import Vue from 'vue'
@@ -282,7 +282,7 @@ export class TaskGroupData {
     _z: number;
     title: string;
     subtitle?: string;
-    concern: TaskConcern;
+    concern: TaskView;
     value: any;
     icon?: string;
     style?: string;

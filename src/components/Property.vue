@@ -167,15 +167,24 @@
                                 on: {keydown: this.keydown, focus: this.focused},
                                 props: pr,
                             });
-                        } else
-                            return ce('prop-text', {
-                                attrs: {
-                                    type: (this.prop.text && this.prop.text.password) ? 'password' : 'text',
-                                    "class": styles
-                                },
-                                on: {changed: this.changed, keydown: this.keydown, focus: this.focused},
-                                props: pr,
-                            });
+                        } else {
+                            if (pr.readOnly)
+                                return ce('div', {
+                                    attrs: {
+                                        type: (this.prop.text && this.prop.text.password) ? 'password' : 'text',
+                                        "class": styles
+                                    }
+                                }, this.item[this.prop.name]);
+                            else
+                                return ce('prop-text', {
+                                    attrs: {
+                                        type: (this.prop.text && this.prop.text.password) ? 'password' : 'text',
+                                        "class": styles
+                                    },
+                                    on: {changed: this.changed, keydown: this.keydown, focus: this.focused},
+                                    props: pr,
+                                });
+                        }
                     }
 
                 case GlobalType.number:

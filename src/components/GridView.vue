@@ -2,7 +2,7 @@
     <div :class="{'main-body h-100 grid-view-container d-flex flex-column flex-fill overflow-auto':1, 'root': !level}">
         <!-- Toolbar -->
         <div v-if="!level" :class="{'d-flex align-items-center p-2 btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
-            <Breadcrumb :count="dec.count"/>
+            <Breadcrumb :count="dec.count" :breadcrumb="glob.form.breadcrumb" :title="glob.form.breadcrumbLast"/>
 
             <ToolbarModifyButtons/>
 
@@ -25,6 +25,9 @@
 
             <!--  Refresh -->
             <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
+
+            <!--  Help -->
+            <a v-if="helpLink" title="Help" target="_blank" class="btn btn-link text-secondary px-2" :href="helpLink.address"><i class="fal fa-question-circle fa-lg"></i></a>
 
             <!-- Object Menu -->
             <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
@@ -73,7 +76,7 @@
                         </thead>
 
                         <tbody>
-                        <GridViewRow @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown" @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)" @changed="changed"></GridViewRow>
+                        <grid-view-row :dec="getDec(item)" @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown" @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)" @changed="changed"/>
                         </tbody>
 
                         <!-- Footer -->
@@ -114,15 +117,15 @@
 
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {$t, call, getNewItemTitle, getQs, glob, load, notify, pushToGridViewRecentList, setQs, showCmenu} from '../main';
+    import * as main from '../main';
+    import {$t, call, getQs, glob, load, notify, pushToGridViewRecentList, setQs, showCmenu} from '../main';
     import {parse, stringify} from 'bson-util';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
-    import * as main from '../main';
-    import {EntityMeta, FileType, GridRowHeaderStyle, AccessPermission, IData, Keys, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
+    import {AccessPermission, EntityMeta, EntityLink, FileType, GridRowHeaderStyle, IData, Keys, LinkType, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
 
     declare let $: JQuery;
 
-    @Component({name: 'GridView', components: {}})
+    @Component({name: 'GridView'})
     export default class GridView extends Vue {
         @Prop() private uri: string;
         @Prop() private data: IData[];
@@ -138,6 +141,11 @@
         private filteringProp: Property = null;
         private filteredProps: Property[] = [];
         private headFuncs: HeadFunc[] = [];
+        private helpLink: EntityLink = null;
+
+        getDec(item: IData) {
+            return this.dec || item._.dec;
+        }
 
         get items(): IData[] {
             if (this.data) // when we explicitly specify the data
@@ -196,6 +204,8 @@
                     return {title: link.title as string, ref: link.address};
                 });
             }
+
+            this.helpLink = this.dec.links.find(k => k.type == LinkType.Help);
         }
 
         mounted() {

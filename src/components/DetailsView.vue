@@ -4,7 +4,7 @@
         <div v-if="!level" :class="{'d-flex p-2 align-items-center btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
 
             <!--  Breadcrumb -->
-            <Breadcrumb/>
+            <Breadcrumb :breadcrumb="glob.form.breadcrumb" :title="glob.form.breadcrumbLast"/>
 
             <!--  Toolbar Apply/Cancel -->
             <ToolbarModifyButtons/>
@@ -18,6 +18,9 @@
 
             <!--  Refresh -->
             <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
+
+            <!--  Help -->
+            <a v-if="helpLink" title="Help" target="_blank" class="btn btn-link text-secondary px-2" :href="helpLink.address"><i class="fal fa-question-circle fa-lg"></i></a>
 
             <!--  Object Menu -->
             <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
@@ -67,8 +70,8 @@
 <script lang="ts">
     import {ChangeType, HeadFunc, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {AccessPermission, Context, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
-    import {$t, ajax, assignNullToEmptyProperty, getNewItemTitle, getQs, glob, loadObjectViewData, notify, setQs} from '../main';
+    import {AccessPermission, EntityLink, Context, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
+    import {$t, getNewItemTitle, glob, loadObjectViewData} from '../main';
     import * as main from '../main';
     import ObjectView from "./ObjectView.vue";
 
@@ -86,6 +89,7 @@
         private headFuncs: HeadFunc[] = [];
         private AccessPermission_Edit = AccessPermission.Edit;
         private ObjectDetailsViewType_Tabular = ObjectDetailsViewType.Tabular;
+        private helpLink: EntityLink = null;
 
         isNotAloneInlineDataGridProperty(group, prop) {
             return prop._.gtype == GlobalType.object && prop.isList && (this.level > 0);
@@ -115,6 +119,7 @@
                     return {title: link.title as string, ref: link.address};
                 });
             }
+            this.helpLink = this.dec.links.find(k => k.type == LinkType.Help);
         }
 
         mounted() {

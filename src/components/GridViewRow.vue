@@ -1,10 +1,10 @@
 <template>
     <tr :class="{'highlight': meta.marked}" @click="click">
         <th scope="row" v-if="selectable" class="text-center">
-            <CheckBox :checked="meta.marked"></CheckBox>
+            <CheckBox :checked="meta.marked" />
         </th>
         <th v-else @click="headerClick" class="text-center"></th>
-        <td v-for="(pMeta, index) in item._.dec.properties">
+        <td v-for="(pMeta, index) in dec.properties">
             <Property @focus="focused" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
                       :viewType="1" :indexInGrid="index" :readonly="readonly"/>
         </td>
@@ -14,12 +14,13 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, EntityMeta, IData} from "../../../sys/src/types";
-    import {ItemChangeEventArg, ItemEventArg, JQuery} from '@/types';
+    import {ItemChangeEventArg, ItemEventArg} from '../types';
 
-    declare let $: JQuery;
+    declare let $: any;
     @Component({name: 'GridViewRow', components: {}})
     export default class GridViewRow extends Vue {
         @Prop() private item: IData;
+        @Prop() private dec: any;
         @Prop() private selectable: boolean;
         @Prop() private readonly: boolean;
 

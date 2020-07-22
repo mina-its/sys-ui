@@ -20,6 +20,11 @@
                     <i class="fal fa-calendar-alt fa-lg"></i>
                     <label>Calendar</label>
                 </button>
+                <button @click="selectPrimaryView(TaskView_Grid)" type="button"
+                        :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Grid===view.concern&&view.primary}">
+                    <i class="fal fa-th fa-lg"></i>
+                    <label>Grid</label>
+                </button>
                 <button @click="selectPrimaryView(TaskView_Assignee)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Assignee===view.concern&&view.primary}">
                     <i class="fal fa-users fa-lg"></i>
@@ -76,35 +81,44 @@
                 <div v-if="view.filter" class="dropdown-menu filter-panel p-3" aria-labelledby="filterButton">
                     <form>
                         <div class="properties d-flex">
-                            <div class="filter-item mx-2">
+                            <div class="filter-item mx-2 text-left">
                                 <label class="font-weight-bold">Status</label>
-                                <check-box v-for="item of getFilterItems(TaskView_Status)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskView_Status)"
-                                           :label="item.title"></check-box>
+                                <div class="d-flex flex-column align-items-start">
+                                    <check-box v-for="item of getFilterItems(TaskView_Status)" :label="item.title" :checked="item.checked" class="p-1"
+                                               @changed="filterItemCheckChanged($event, item, TaskView_Status)"/>
+                                </div>
                             </div>
                             <div class="filter-item mx-2">
                                 <label class="font-weight-bold">Priority</label>
-                                <check-box v-for="item of getFilterItems(TaskView_Priority)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskView_Priority)"
-                                           :label="item.title"></check-box>
+                                <div class="d-flex flex-column align-items-start">
+                                    <check-box v-for="item of getFilterItems(TaskView_Priority)" :checked="item.checked" class="p-1"
+                                               @changed="filterItemCheckChanged($event, item, TaskView_Priority)"
+                                               :label="item.title"/>
+                                </div>
                             </div>
                             <div class="filter-item mx-2">
-                                <label class="font-weight-bold">Assignees</label>
-                                <check-box v-for="item of getFilterItems(TaskView_Assignee)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskView_Assignee)"
-                                           :label="item.title"></check-box>
+                                <label class="font-weight-bold">Assignee</label>
+                                <div class="d-flex flex-column align-items-start">
+                                    <check-box v-for="item of getFilterItems(TaskView_Assignee)" :checked="item.checked" class="p-1"
+                                               @changed="filterItemCheckChanged($event, item, TaskView_Assignee)"
+                                               :label="item.title"/>
+                                </div>
                             </div>
                             <div v-if="currentProject" class="filter-item mx-2">
                                 <label class="font-weight-bold">Milestones</label>
-                                <check-box v-for="item of getFilterItems(TaskView_MileStone)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskView_MileStone)"
-                                           :label="item.title"></check-box>
+                                <div class="d-flex flex-column align-items-start">
+                                    <check-box v-for="item of getFilterItems(TaskView_MileStone)" :checked="item.checked" class="p-1"
+                                               @changed="filterItemCheckChanged($event, item, TaskView_MileStone)"
+                                               :label="item.title"/>
+                                </div>
                             </div>
                             <div v-if="currentProject" class="filter-item mx-2">
                                 <label class="font-weight-bold">Categories</label>
-                                <check-box v-for="item of getFilterItems(TaskView_Category)" :checked="item.checked"
-                                           @changed="filterItemCheckChanged($event, item, TaskView_Category)"
-                                           :label="item.title"></check-box>
+                                <div class="d-flex flex-column align-items-start">
+                                    <check-box v-for="item of getFilterItems(TaskView_Category)" :checked="item.checked" class="p-1"
+                                               @changed="filterItemCheckChanged($event, item, TaskView_Category)"
+                                               :label="item.title"/>
+                                </div>
                             </div>
                         </div>
                         <hr>
@@ -131,7 +145,6 @@
                 <option :value="project._id" v-for="project of projects">{{project.title}}</option>
             </select>
 
-
             <!--  Configurations -->
             <div class="dropdown">
                 <button title="Configurations" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button" class="btn btn-link text-secondary px-2"><i class="fal fa-cog fa-lg"></i></button>
@@ -144,39 +157,105 @@
                     <a class="dropdown-item" href="/projects">Configure projects</a>
                 </div>
             </div>
+
+            <button title="Toggle right panel" @click="showRightPanel=!showRightPanel" class="btn btn-link outline-0">
+                <i :class="{'fal fa-chevron-square-left fa-lg':!showRightPanel, 'fal fa-lg fa-chevron-square-right':showRightPanel}"></i>
+            </button>
         </div>
 
-        <!--  Content -->
+        <!--  Content + Right Panel -->
         <div v-if="!showTaskDetails" class="w-100 h-100 overflow-auto d-flex task-manager-content">
 
-            <!--  Calendar -->
-            <div class="calendar w-100 h-100 d-flex" v-if="TaskView_DueDate===view.concern">
-                <task-group v-if="unscheduledTasksGroup && unscheduledTasksGroup.tasks.length"
-                            :group="unscheduledTasksGroup" class="bg-light px-2 py-1" @newTask="newTask" @dragStart="dragStart"
+            <div class="flex-grow-1 overflow-auto d-flex">
+
+                <!--  Calendar -->
+                <div class="calendar w-100 h-100 d-flex" v-if="TaskView_DueDate===view.concern">
+                    <task-group v-if="unscheduledTasksGroup && unscheduledTasksGroup.tasks.length"
+                                :group="unscheduledTasksGroup" class="bg-light px-2 py-1" @newTask="newTask" @dragStart="dragStart"
+                                @focusTask="focusTask" @taskkeypress="taskKeypress" @drop="drop" @dragovergroup="ondragover"/>
+                    <table class="w-100 h-100 flex-fill" @wheel="calendarWheel">
+                        <tr v-for="row of calendarRows" class="">
+                            <td v-for="day of row.days" :class="day.style">
+                                <task-group class="h-100 w-100 calendar-day" :group="day" @dragEnterTask="dragEnterTask" @dragEnterGroup="dragEnterGroup"
+                                            @dragStart="dragStart" @ondragover="ondragover" @newTask="newTask"
+                                            @focusTask="focusTask" @taskkeypress="taskKeypress" @drop="drop" @dragovergroup="ondragover"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!--  Grid -->
+                <div class="view-grid w-100 h-100" v-else-if="TaskView_Grid===view.concern">
+                    <table class="w-100">
+                        <thead>
+                        <tr class="text-primary bg-light">
+                            <th class="border p-2">No</th>
+                            <th class="border p-2">Task Headline</th>
+                            <th class="border text-center p-2">Status</th>
+                            <th class="border text-center p-2">Assignee</th>
+                            <th v-if="!currentProject" class="border text-center p-2">Project</th>
+                            <th v-if="currentProject" class="border p-2">Categories</th>
+                            <th class="border text-center p-2">Due Dates</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="task of getGridTasks()" @focus="focusTask({task,group:null})" tabindex="0">
+                            <th class="border text-black-50 bg-light p-1 px-2">{{task.no}}</th>
+                            <td class="border bg-white">
+                                <div class="d-flex align-items-center px-2">
+                                    <i v-if="task.parent" class="fal fa-genderless fa-xs mx-2 text-black-50"></i>
+                                    <div :class="{'font-weight-bold flex-grow-1':!task.parent}">{{task.title}}</div>
+                                    <i @click="toggleExpand(task)" v-if="hasGridTaskChild(task)" :class="{'font-weight-bold fa-lg px-1':1,'fal fa-angle-up':!task._.expand,'fas fa-angle-down':task._.expand}"></i>
+                                </div>
+                            </td>
+                            <td class="border bg-white">
+                                <div class="d-flex">
+                                    <div class="m-auto text-center rounded px-1 cell-badge" :style="getTaskStatusStyle(task)">
+                                        {{getTaskStatusTitle(task)}}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="border bg-white">
+                                <div class="d-flex">
+                                    <div v-if="task.assignee" class="text-center m-auto cell-badge px-1 rounded" :style="getTaskAssigneeStyle(task)">
+                                        {{getTaskAssigneeTitle(task)}}
+                                    </div>
+                                </div>
+                            </td>
+                            <td v-if="!currentProject" class="border bg-white">
+                                <div v-if="task.project" class="d-flex">
+                                    <div class="m-auto text-center px-1 rounded cell-badge" :style="getTaskProjectStyle(task)">
+                                        {{getTaskProjectTitle(task)}}
+                                    </div>
+                                </div>
+                            </td>
+                            <td v-if="currentProject" class="border bg-white px-2">
+                                <div class="d-flex">
+                                    <div class="px-1 text-center mr-1 rounded cell-badge" :style="getTaskCategoryStyle(task, category)" v-for="category of task.categories">{{category}}</div>
+                                </div>
+                            </td>
+                            <td class="border text-nowrap bg-white text-center p-1">
+                                {{getTaskDueDateTitle(task)}}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="w-100 mt-4">
+                        <textarea placeholder="New task ..." class="outline-0 p-2 w-100 border-top border-right-0 border-left-0 border-bottom-0" style="height: 5rem"></textarea>
+                    </div>
+                </div>
+
+                <!--  Columns -->
+                <task-group v-else v-for="group in taskGroups" class="border-right bg-light px-2 py-1" :group="group" @dragEnterTask="dragEnterTask"
+                            @dragEnterGroup="dragEnterGroup" @dragStart="dragStart" @ondragover="ondragover" @newTask="newTask"
                             @focusTask="focusTask" @taskkeypress="taskKeypress" @drop="drop" @dragovergroup="ondragover"/>
-                <table class="w-100 h-100 flex-fill" @wheel="calendarWheel">
-                    <tr v-for="row of calendarRows" class="">
-                        <td v-for="day of row.days" :class="day.style">
-                            <task-group class="h-100 w-100 calendar-day" :group="day" @dragEnterTask="dragEnterTask" @dragEnterGroup="dragEnterGroup"
-                                        @dragStart="dragStart" @ondragover="ondragover" @newTask="newTask"
-                                        @focusTask="focusTask" @taskkeypress="taskKeypress" @drop="drop" @dragovergroup="ondragover"/>
-                        </td>
-                    </tr>
-                </table>
             </div>
 
-            <!--  Columns -->
-            <task-group v-else v-for="group in taskGroups" class="border-right bg-light px-2 py-1" :group="group" @dragEnterTask="dragEnterTask"
-                        @dragEnterGroup="dragEnterGroup" @dragStart="dragStart" @ondragover="ondragover" @newTask="newTask"
-                        @focusTask="focusTask" @taskkeypress="taskKeypress" @drop="drop" @dragovergroup="ondragover"/>
-
-            <div class="flex-grow-1 main-bg-image"></div>
-
             <!--  Right Panel -->
-            <div class="right-panel border-left bg-white p-3">
+            <div :class="{'right-panel border-left bg-white p-3':1,'hide-panel':!showRightPanel}">
 
                 <!--  Coloring legend -->
-                <div class="coloring-legend details-view border-bottom pb-3 mb-2">
+                <div v-if="TaskView_Grid!==view.concern" class="coloring-legend details-view border-bottom pb-3 mb-2">
                     <div class="d-flex align-items-center">
                         <label class="prop-label px-1">Coloring</label>
                         <select v-model="currentViewColoring" class="prop-value flex-fill border bg-white m-1">
@@ -285,20 +364,24 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {GetTaskDto, ID, Keys, LogType, ObjectDec, Pair, Project, ProjectView, Task, TaskConcern, TaskDueDate, TaskInboxGroup, TaskPriority, TaskStatus, TimeFormat, WebMethod} from '../../../sys/src/types';
+    import {GetTaskDto, ID, Keys, LogType, ObjectDec, Pair, Project, ProjectView, Task, TaskDueDate, TaskInboxGroup, TaskPriority, TaskStatus, TaskView, TimeFormat, WebMethod} from '../../../sys/src/types';
     import TaskGroup from "../components/TaskGroup.vue";
     import {ItemChangeEventArg, MenuItem, TaskEvent, TaskGroupData} from "../types";
     import {ajax, assignNullToEmptyProperty, call, clone, equalID, glob, markDown, newID, notify, question, showCmenu} from "../main";
     import SwitchBox from "./SwitchBox.vue";
+    import ObjectView from "./ObjectView.vue";
+    import GridView from "./GridView.vue";
+    import PropReference from "./PropReference.vue";
 
     declare let $, moment: any;
 
-    @Component({name: 'TaskManager', components: {SwitchBox, TaskGroup}})
+    @Component({name: 'TaskManager', components: {PropReference, GridView, ObjectView, SwitchBox, TaskGroup}})
     export default class TaskManager extends Vue {
         private tasks: Task[] = [];
         private view: ProjectView = {} as ProjectView;
         private projects: Project[] = [];
         private newViewName = "";
+        private showRightPanel = true;
         private addNoteContent = "";
         private coloringLegend: Pair[] = [];
         private views: ProjectView[] = [];
@@ -310,16 +393,16 @@
         private dueDatesDec: ObjectDec = null;
         private showArchivedTasks: boolean = false;
         private unscheduledTasksGroup: TaskGroupData = null;
-        private concernProperty: string;
         private showTaskDetails: boolean = false;
-        private TaskView_Home = TaskConcern.Start;
-        private TaskView_Status = TaskConcern.Status;
-        private TaskView_Project = TaskConcern.Project;
-        private TaskView_DueDate = TaskConcern.DueDate;
-        private TaskView_Assignee = TaskConcern.Assignee;
-        private TaskView_Priority = TaskConcern.Priority;
-        private TaskView_Category = TaskConcern.Category;
-        private TaskView_MileStone = TaskConcern.MileStone;
+        private TaskView_Home = TaskView.Start;
+        private TaskView_Status = TaskView.Status;
+        private TaskView_Project = TaskView.Project;
+        private TaskView_DueDate = TaskView.DueDate;
+        private TaskView_Grid = TaskView.Grid;
+        private TaskView_Assignee = TaskView.Assignee;
+        private TaskView_Priority = TaskView.Priority;
+        private TaskView_Category = TaskView.Category;
+        private TaskView_MileStone = TaskView.MileStone;
         private searchPhrase = null;
         private users: Pair[];
         private currentUser: ID;
@@ -342,6 +425,76 @@
             {color: '#fff', bgColor: '#087'}
         ]
 
+        toggleExpand(task: Task) {
+            task._.expand = !task._.expand;
+            this.tasks.filter(t => equalID(t.parent, task._id)).forEach(t => t._.expand = task._.expand);
+            this.$forceUpdate();
+        }
+
+        hasGridTaskChild(task: Task) {
+            return this.tasks.some(t => equalID(t.parent, task._id));
+        }
+
+        getGridTasks() {
+            let tasks = this.showArchivedTasks ? this.tasks : this.tasks.filter(task => !task.archive);
+            if (this.currentProject)
+                tasks = tasks.filter(task => task.project && equalID(task.project, this.currentProject._id));
+
+            tasks = tasks.filter(t => !t.parent || !t._.expand);
+            return tasks;
+        }
+
+        getTaskStatusStyle(task: Task) {
+            let {color, bgColor} = this.getTaskColor(task, TaskView.Status);
+            return {color, backgroundColor: bgColor + "!important"};
+        }
+
+        getTaskCategoryStyle(task: Task, category: string) {
+            if (this.currentProject && this.currentProject.categories) {
+                let index = this.currentProject.categories.indexOf(category);
+                if (index == -1) return null;
+
+                let colorItem = this.colorTable[index % this.colorTable.length];
+                return {color: colorItem.color, backgroundColor: colorItem.bgColor + "!important"};
+            }
+
+            return null;
+        }
+
+        getTaskProjectStyle(task: Task) {
+            let {color, bgColor} = this.getTaskColor(task, TaskView.Project);
+            return {color, backgroundColor: bgColor + "!important"};
+        }
+
+        getTaskAssigneeStyle(task: Task) {
+            let {color, bgColor} = this.getTaskColor(task, TaskView.Assignee);
+            return {color, backgroundColor: bgColor + "!important"};
+        }
+
+        getTaskDueDateTitle(task: Task) {
+            if (!task.dueDates || task.dueDates.length == 0) return "";
+            if (task.dueDates.length == 1)
+                return moment(task.dueDates[0].time).format("DD MMM") + (task.dueDates[0].setTime ? ` (${moment(task.dueDates[0].time).format("HH:mm")})` : "");
+            else
+                return moment(task.dueDates[0].time).format("DD MMM") + " - " + moment(task.dueDates[task.dueDates.length - 1].time).format("DD MMM");
+        }
+
+        getTaskProjectTitle(task: Task) {
+            if (!task.project) return null;
+            let project = this.projects.find(u => equalID(u._id, task.project));
+            return project.title;
+        }
+
+        getTaskAssigneeTitle(task: Task) {
+            if (!task.assignee) return null;
+            let user = this.users.find(u => equalID(u.ref, task.assignee));
+            return user.title.split(" ")[0];
+        }
+
+        getTaskStatusTitle(task: Task) {
+            return TaskStatus[task.status];
+        }
+
         created() {
             this.reload();
             window.onhashchange = () => {
@@ -352,11 +505,8 @@
         prepareTaskInstance(task: Task, allTasks: Task[]) {
             task._ = {dragging: false, color: null, bgColor: null};
             task.comments = task.comments || [];
+            task.assignee = task.assignee || null;
             if (task.parent) task._.parent = allTasks.find(t => equalID(t._id, task.parent));
-
-            if (task.assignees && !Array.isArray(task.assignees)) {
-                console.warn('Invalid task assignee:', task);
-            }
 
             if (task.dueDates)
                 for (let dueDate of task.dueDates) {
@@ -384,7 +534,7 @@
 
                 // Task Properties
                 this.tasksDec = data.tasksDec;
-                this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "project", "categories", "description", "time", "status", "owner", "priority", "assignees"].indexOf(p.name) > -1);
+                this.tasksDec.properties = this.tasksDec.properties.filter(p => ["no", "title", "project", "categories", "description", "time", "status", "owner", "priority", "assignee"].indexOf(p.name) > -1);
                 this.dueDatesDec = data.dueDatesDec;
                 this.tasks.forEach(task => this.assignNullToEmptyTaskProperty(task));
 
@@ -445,14 +595,35 @@
 
             let patch = {_z: task._z} as Task;
             switch (this.view.concern) {
-                case TaskConcern.Start:
+                case TaskView.Start:
                     patch.status = task.status;
                     patch.dueDates = task.dueDates;
                     patch.priority = task.priority;
                     break;
 
-                default:
-                    patch[this.concernProperty] = task[this.concernProperty];
+                case TaskView.Assignee:
+                    patch.assignee = task.assignee;
+                    break;
+
+                case TaskView.Category:
+                    patch.categories = task.categories;
+                    break;
+
+                case TaskView.DueDate:
+                    patch.dueDates = task.dueDates;
+                    break;
+
+                case TaskView.MileStone:
+                    patch.milestone = task.milestone;
+                    break;
+
+                case TaskView.Priority:
+                    patch.priority = task.priority;
+                    break;
+
+                case TaskView.Status:
+                    patch.status = task.status;
+                    break;
             }
 
             this.saveTask(task, patch, () => {
@@ -466,7 +637,7 @@
             }
             task._z = z;
             switch (this.view.concern) {
-                case TaskConcern.DueDate:
+                case TaskView.DueDate:
                     if (!this.currentGroup.value)
                         task.dueDates = null;
                     else {
@@ -482,7 +653,7 @@
                     }
                     break;
 
-                case TaskConcern.Category:
+                case TaskView.Category:
                     if (!group.value) {
                         task.categories = null;
                     } else {
@@ -498,23 +669,7 @@
                     }
                     break;
 
-                case TaskConcern.Assignee:
-                    if (!group.value) {
-                        task.assignees = null;
-                    } else {
-                        task.assignees = task.assignees || [];
-                        let indexInSource = task.assignees.findIndex(d => equalID(d, this.currentGroup.value));
-                        if (!ctrlKey) {
-                            if (indexInSource > -1) task.assignees.splice(indexInSource, 1);
-                        }
-
-                        let indexOnTarget = task.assignees.findIndex(d => equalID(d, group.value));
-                        if (indexOnTarget == -1) // Check if it does not already exists
-                            task.assignees.push(group.value);
-                    }
-                    break;
-
-                case TaskConcern.Start:
+                case TaskView.Start:
                     switch (group.value as TaskInboxGroup) {
                         case  TaskInboxGroup.Todo:
                             task.status = TaskStatus.Todo;
@@ -538,8 +693,28 @@
                     }
                     break;
 
-                default:
-                    task[this.concernProperty] = group.value;
+                case TaskView.Assignee:
+                    task.assignee = group.value;
+                    break;
+
+                case TaskView.Category:
+                    task.categories = group.value;
+                    break;
+
+                case TaskView.DueDate:
+                    task.dueDates = group.value;
+                    break;
+
+                case TaskView.MileStone:
+                    task.milestone = group.value;
+                    break;
+
+                case TaskView.Priority:
+                    task.priority = group.value;
+                    break;
+
+                case TaskView.Status:
+                    task.status = group.value;
                     break;
             }
 
@@ -666,9 +841,9 @@
             this.$forceUpdate();
         }
 
-        getConcernItems(concern: TaskConcern): Pair[] {
+        getConcernItems(concern: TaskView): Pair[] {
             switch (concern) {
-                case TaskConcern.Status:
+                case TaskView.Status:
                     return [
                         {title: "To Do", ref: TaskStatus.Todo},
                         {title: "Doing", ref: TaskStatus.Doing},
@@ -677,12 +852,12 @@
                         {title: "On Hold", ref: TaskStatus.OnHold}
                     ];
 
-                case TaskConcern.Project:
+                case TaskView.Project:
                     return this.projects.map(project => {
                         return {title: project.title, ref: project._id} as Pair;
                     });
 
-                case TaskConcern.Priority:
+                case TaskView.Priority:
                     return [
                         {title: "Normal", ref: TaskPriority.Normal},
                         {title: "Urgent", ref: TaskPriority.Urgent},
@@ -690,57 +865,66 @@
                         {title: "High", ref: TaskPriority.High}
                     ];
 
-                case TaskConcern.Assignee:
+                case TaskView.Assignee:
                     return this.users;
 
-                case TaskConcern.MileStone:
+                case TaskView.MileStone:
                     return this.currentProject.milestones.map(item => {
                         return {title: item.title, ref: item._id} as Pair;
                     });
 
-                case TaskConcern.Category:
+                case TaskView.Category:
                     return this.currentProject.categories.map(item => {
                         return {title: item, ref: item} as Pair;
                     });
             }
         }
 
-        applyTaskColoring(task: Task) {
-            let items = this.getConcernItems(this.view.coloring);
+        getTaskColor(task: Task, view: TaskView) {
+            let items = this.getConcernItems(view);
             let index = -1;
 
-            switch (this.view.coloring) {
-                case TaskConcern.Status:
+            switch (view) {
+                case TaskView.Status:
                     index = items.findIndex(item => item.ref == task.status);
                     break;
 
-                case TaskConcern.Project:
+                case TaskView.Project:
                     index = items.findIndex(item => equalID(item.ref, task.project));
                     break;
 
-                case TaskConcern.MileStone:
+                case TaskView.MileStone:
                     index = items.findIndex(item => equalID(item.ref, task.milestone));
                     break;
 
-                case TaskConcern.Category:
+                case TaskView.Category:
                     index = items.findIndex(item => task.categories && task.categories.indexOf(item.ref) > -1);
                     break;
 
-                case TaskConcern.Priority:
+                case TaskView.Priority:
                     index = items.findIndex(item => item.ref == task.priority);
                     break;
 
-                case TaskConcern.Assignee:
-                    index = this.users.findIndex(user => Array.isArray(task.assignees) && task.assignees.find(a => equalID(a, user.ref)));
+                case TaskView.Assignee:
+                    index = this.users.findIndex(user => equalID(user.ref, task.assignee));
                     break;
             }
-            if (index == -1) {
-                task._.color = '#333';
-                task._.bgColor = 'white';
-            } else {
-                task._.color = this.colorTable[index % this.colorTable.length].color;
-                task._.bgColor = this.colorTable[index % this.colorTable.length].bgColor;
-            }
+            if (index == -1)
+                return {
+                    color: '#333',
+                    bgColor: 'white'
+                };
+            else
+                return {
+                    color: this.colorTable[index % this.colorTable.length].color,
+                    bgColor: this.colorTable[index % this.colorTable.length].bgColor
+                };
+        }
+
+        applyTaskColoring(task: Task) {
+            let {color, bgColor} = this.getTaskColor(task, this.view.coloring);
+            task._.color = color;
+            task._.bgColor = bgColor;
         }
 
         taskChanged(e: ItemChangeEventArg) {
@@ -753,7 +937,7 @@
         }
 
         checkConcernNeedsSelectedProject() {
-            if (!this.currentProject && (this.view.concern == TaskConcern.MileStone || this.view.concern == TaskConcern.Category || this.view.concern == TaskConcern.Assignee)) {
+            if (!this.currentProject && (this.view.concern == TaskView.MileStone || this.view.concern == TaskView.Category || this.view.concern == TaskView.Assignee)) {
                 notify(`Please select the project for this view`, LogType.Warning);
                 this.taskGroups = [];
                 this.groupItems = [];
@@ -777,7 +961,7 @@
             if (this.checkConcernNeedsSelectedProject())
                 return;
 
-            if (this.currentProject && (this.view.concern == TaskConcern.MileStone || this.view.concern == TaskConcern.Category || this.view.concern == TaskConcern.Assignee))
+            if (this.currentProject && (this.view.concern == TaskView.MileStone || this.view.concern == TaskView.Category || this.view.concern == TaskView.Assignee))
                 this.activateView(this.view);
 
             this.refreshTasks();
@@ -832,10 +1016,10 @@
             });
         }
 
-        getFilterItems(concern: TaskConcern) {
+        getFilterItems(concern: TaskView) {
             let items;
             switch (concern) {
-                case TaskConcern.Status:
+                case TaskView.Status:
                     items = [];
                     for (let item in TaskStatus) {
                         if (!isNaN(Number(item)))
@@ -847,7 +1031,7 @@
                     }
                     break;
 
-                case TaskConcern.Priority:
+                case TaskView.Priority:
                     items = [];
                     for (let item in TaskPriority) {
                         if (!isNaN(Number(item)))
@@ -859,7 +1043,7 @@
                     }
                     break;
 
-                case TaskConcern.Assignee:
+                case TaskView.Assignee:
                     items = [{title: 'All', checked: this.view.filter.assignees == null, value: null}];
                     if (this.view.filter.assignees) {
                         for (let user of this.users) {
@@ -872,7 +1056,7 @@
                     }
                     break;
 
-                case TaskConcern.MileStone:
+                case TaskView.MileStone:
                     items = [{title: 'All', checked: this.view.filter.milestones == null, value: null}];
                     if (this.view.filter.milestones) {
                         for (let milestone of this.currentProject.milestones) {
@@ -885,7 +1069,7 @@
                     }
                     break;
 
-                case TaskConcern.Category:
+                case TaskView.Category:
                     items = [{title: 'All', checked: this.view.filter.categories == null, value: null}];
                     if (this.view.filter.categories) {
                         for (let category of this.currentProject.categories) {
@@ -901,9 +1085,9 @@
             return items;
         }
 
-        filterItemCheckChanged($event, item, concern: TaskConcern) {
+        filterItemCheckChanged($event, item, concern: TaskView) {
             switch (concern) {
-                case TaskConcern.Status:
+                case TaskView.Status:
                     if (this.view.filter.statuses == null)
                         this.view.filter.statuses = [TaskStatus.Todo, TaskStatus.Doing, TaskStatus.Done, TaskStatus.OnHold, TaskStatus.Verify];
 
@@ -917,7 +1101,7 @@
                     }
                     break;
 
-                case TaskConcern.Assignee:
+                case TaskView.Assignee:
                     if (item.value == null) // All
                         this.view.filter.assignees = $event.val ? null : [];
                     else {
@@ -932,7 +1116,7 @@
                     }
                     break;
 
-                case TaskConcern.MileStone:
+                case TaskView.MileStone:
                     if (item.value == null) // All
                         this.view.filter.milestones = $event.val ? null : [];
                     else {
@@ -947,7 +1131,7 @@
                     }
                     break;
 
-                case TaskConcern.Category:
+                case TaskView.Category:
                     if (item.value == null) // All
                         this.view.filter.categories = $event.val ? null : [];
                     else {
@@ -1028,7 +1212,7 @@
 
                     let day = {
                         _z: i * 7 + d + 1,
-                        concern: TaskConcern.DueDate,
+                        concern: TaskView.DueDate,
                         subtitle,
                         tasks: groupTasks,
                         value: moment(date),
@@ -1056,7 +1240,7 @@
             tasks.forEach(t => t._.multiPlace = false);
 
             // Calendar tasks
-            if (this.view.concern == TaskConcern.DueDate) {
+            if (this.view.concern == TaskView.DueDate) {
                 this.refreshTasksForCalendar(tasks);
                 return;
             }
@@ -1066,21 +1250,21 @@
 
                 // Hide columns if needed
                 switch (this.view.concern) {
-                    case TaskConcern.Status:
+                    case TaskView.Status:
                         if (this.view.filter.statuses && this.view.filter.statuses.indexOf(group.value) == -1)
                             continue;
                 }
 
                 let groupTasks = tasks.filter(task => {
                     switch (this.view.concern) {
-                        case TaskConcern.Start:
+                        case TaskView.Start:
                             switch (group.value) {
                                 case TaskInboxGroup.Favorite:
                                     return !!task.favorite;
                             }
 
                             // Other tasks must belong to current user
-                            if (!task.assignees || !task.assignees.some(a => equalID(a, this.currentUser)))
+                            if (!task.assignee || equalID(task.assignee, this.currentUser))
                                 return false;
 
                             let today = moment().startOf('day');
@@ -1105,19 +1289,24 @@
                             }
                             break;
 
-                        default:
-                            if (Array.isArray(task[this.concernProperty])) {
-                                for (let item of task[this.concernProperty]) {
-                                    if (equalID(item, group.value))
-                                        return true;
-                                }
-                                return false;
-                            } else
-                                return equalID(task[this.concernProperty], group.value);
+                        case TaskView.Assignee:
+                            return equalID(task.assignee, group.value);
+
+                        case TaskView.Category:
+                            return task.categories && task.categories.indexOf(group.value) > -1;
+
+                        case TaskView.MileStone:
+                            return task.milestone == group.value;
+
+                        case TaskView.Priority:
+                            return task.priority == group.value;
+
+                        case TaskView.Status:
+                            return task.status == group.value;
                     }
                 });
 
-                if (this.view.concern == TaskConcern.Start && groupTasks.length == 0 &&
+                if (this.view.concern == TaskView.Start && groupTasks.length == 0 &&
                     [TaskInboxGroup.Favorite, TaskInboxGroup.Urgent, TaskInboxGroup.Overdue].indexOf(group.value) > -1) continue;
 
                 groupTasks = this.organizeGroupTasks(groupTasks);
@@ -1131,7 +1320,7 @@
                     concern: this.view.concern
                 } as TaskGroupData;
 
-                if (this.view.concern == TaskConcern.MileStone && group.value) {
+                if (this.view.concern == TaskView.MileStone && group.value) {
                     groupData.subtitle = markDown(this.currentProject.milestones.find(m => equalID(m._id, group.value)).objectives);
                 }
 
@@ -1163,14 +1352,13 @@
         }
 
         focusTask(ev: TaskEvent) {
-            console.log(ev.task._z);
             this.currentTask = ev.task;
             this.currentGroup = ev.group;
 
             let checkDate = null;
-            if (this.view.concern == TaskConcern.DueDate)
+            if (this.view.concern == TaskView.DueDate)
                 checkDate = this.currentGroup.value;
-            else if (this.view.concern == TaskConcern.Start && (this.currentGroup.value == TaskInboxGroup.Todo || this.currentGroup.value == TaskInboxGroup.Doing))
+            else if (this.view.concern == TaskView.Start && (this.currentGroup.value == TaskInboxGroup.Todo || this.currentGroup.value == TaskInboxGroup.Doing))
                 checkDate = this.today();
 
             if (checkDate && ev.task.dueDates)
@@ -1196,18 +1384,18 @@
 
         ondragover(e: TaskEvent) {
             switch (this.view.concern) {
-                case TaskConcern.Status:
+                case TaskView.Status:
                     e.ev.dataTransfer.dropEffect = 'move';
                     break;
 
-                case TaskConcern.DueDate:
+                case TaskView.DueDate:
                     if (!e.group.value)
                         e.ev.dataTransfer.dropEffect = 'none';
                     else
                         e.ev.dataTransfer.dropEffect = e.ev.ctrlKey ? 'copy' : 'move';
                     break;
 
-                case TaskConcern.Start:
+                case TaskView.Start:
                     e.ev.dataTransfer.dropEffect = 'move';
                     break;
 
@@ -1229,21 +1417,11 @@
             switch (e.ev.which) {
                 case Keys.del:
                     switch (this.view.concern) {
-                        case TaskConcern.DueDate:
+                        case TaskView.DueDate:
                             if (e.task.dueDates && e.task.dueDates.length > 1) {
                                 let indexOnTarget = e.task.dueDates.findIndex(d => this.datePeriodContains(d.time, e.group.value));
                                 this.currentTask.dueDates.splice(indexOnTarget, 1);
                                 this.saveTask(this.currentTask, {dueDates: this.currentTask.dueDates} as Task);
-                                this.refreshTasks();
-                                return;
-                            }
-                            break;
-
-                        case TaskConcern.Assignee:
-                            if (e.task.assignees && e.task.assignees.length > 1) {
-                                let indexOnTarget = e.task.assignees.findIndex(d => equalID(d, e.group.value));
-                                this.currentTask.assignees.splice(indexOnTarget, 1);
-                                this.saveTask(this.currentTask, {assignees: this.currentTask.assignees} as Task);
                                 this.refreshTasks();
                                 return;
                             }
@@ -1311,8 +1489,7 @@
             }
 
             switch (view.concern) {
-                case TaskConcern.Status:
-                    this.concernProperty = "status";
+                case TaskView.Status:
                     this.groupItems = [
                         {title: "To Do", value: TaskStatus.Todo},
                         {title: "Doing", value: TaskStatus.Doing},
@@ -1322,10 +1499,9 @@
                     ];
                     break;
 
-                case TaskConcern.Start:
-                    this.concernProperty = null;
+                case TaskView.Start:
                     this.groupItems = [
-                        {title: "Unplanned", value: TaskInboxGroup.Brainstorm, icon: 'fad fa-fog fa-lg'},
+                        {title: "Brainstorm", value: TaskInboxGroup.Brainstorm, icon: 'fad fa-fog fa-lg'},
                         {title: "To Do (Today)", value: TaskInboxGroup.Todo},
                         {title: "Doing (Today)", value: TaskInboxGroup.Doing},
                         {title: "Urgent", value: TaskInboxGroup.Urgent},
@@ -1334,28 +1510,21 @@
                     ];
                     break;
 
-                case TaskConcern.DueDate:
-                    this.concernProperty = "dueDates";
-                    break;
-
-                case TaskConcern.Assignee:
-                    this.concernProperty = "assignees";
+                case TaskView.Assignee:
                     this.groupItems = this.users.map(user => {
                         return {title: user.title, value: user.ref}
                     });
                     this.groupItems.unshift({title: "[ Unassigned ]", value: null});
                     break;
 
-                case TaskConcern.MileStone:
-                    this.concernProperty = "milestone";
+                case TaskView.MileStone:
                     this.groupItems = (this.currentProject.milestones || []).map(milestone => {
                         return {title: milestone.title, value: milestone._id}
                     });
                     this.groupItems.unshift({title: "[ Unplanned ]", value: null});
                     break;
 
-                case TaskConcern.Category:
-                    this.concernProperty = "categories";
+                case TaskView.Category:
                     this.groupItems = (this.currentProject.categories || []).map(category => {
                         return {title: category, value: category}
                     });
@@ -1365,7 +1534,7 @@
             this.refreshTasks();
         }
 
-        selectPrimaryView(concern: TaskConcern) {
+        selectPrimaryView(concern: TaskView) {
             glob.notify = null;
             let view = this.views.find(view => view.primary && view.concern == concern);
             this.activateView(view);
@@ -1378,14 +1547,13 @@
 
         assignCurrentTaskToMe() {
             this.assignToMe(this.currentTask);
-            this.saveTask(this.currentTask, {assignees: this.currentTask.assignees} as Task, () => {
-                this.$forceUpdate();
+            this.saveTask(this.currentTask, {assignee: this.currentTask.assignee} as Task, () => {
                 this.refreshTaskColoring();
             });
         }
 
         assignToMe(task: Task) {
-            task.assignees = [this.currentUser];
+            task.assignee = this.currentUser;
         }
 
         today() {
@@ -1396,8 +1564,8 @@
         newTask(e: TaskEvent) {
             if (e.ev.target.value) {
                 let newTask = {
-                    title: e.ev.target.value,
                     _id: newID(),
+                    title: e.ev.target.value,
                     status: TaskStatus.Todo,
                     project: this.currentProject ? this.currentProject._id : null,
                     priority: TaskPriority.Normal,
@@ -1405,7 +1573,6 @@
                     _z: (Math.max(...e.group.tasks.map(t => t._z)) | 0) + 1
                 } as Task;
                 newTask["_new"] = true;
-
                 e.ev.target.value = "";
 
                 // If previous task is SubTask
@@ -1416,37 +1583,36 @@
                     newTask.project = lastTaskInGroup.project;
                     newTask.status = lastTaskInGroup.status;
                     newTask.priority = lastTaskInGroup.priority;
-                    newTask.assignees = lastTaskInGroup.assignees;
+                    newTask.assignee = lastTaskInGroup.assignee;
                     newTask.dueDates = lastTaskInGroup.dueDates;
                 }
 
-                if (!newTask.assignees)
-                    newTask.assignees = [this.currentUser];
+                if (!newTask.assignee)
+                    newTask.assignee = this.currentUser;
 
                 switch (this.view.concern) {
-                    case TaskConcern.Assignee:
-                        if (e.group.value)
-                            newTask.assignees = [e.group.value];
+                    case TaskView.Assignee:
+                        newTask.assignee = e.group.value;
                         break;
 
-                    case TaskConcern.DueDate:
+                    case TaskView.DueDate:
                         if (e.group.value)
                             this.addDueDate(newTask, e.group.value.toDate());
                         break;
 
-                    case TaskConcern.Category:
+                    case TaskView.Category:
                         newTask.categories = [e.group.value];
                         break;
 
-                    case TaskConcern.MileStone:
+                    case TaskView.MileStone:
                         newTask.milestone = e.group.value;
                         break;
 
-                    case TaskConcern.Priority:
+                    case TaskView.Priority:
                         newTask.priority = e.group.value;
                         break;
 
-                    case TaskConcern.Start:
+                    case TaskView.Start:
                         let today = moment().startOf('day');
                         this.assignToMe(newTask);
 
@@ -1471,11 +1637,9 @@
                                 newTask.favorite = true;
                                 break;
                         }
-                        newTask[this.concernProperty] = e.group.value;
-
                         break;
 
-                    case TaskConcern.Status:
+                    case TaskView.Status:
                         newTask.status = e.group.value;
                         break;
                 }
@@ -1544,6 +1708,10 @@
         .right-panel {
             width: 22rem;
             font-size: .8rem;
+
+            &.hide-panel {
+                display: none;
+            }
         }
 
         .task-item {
@@ -1580,23 +1748,26 @@
             }
         }
 
-        .form-group.p_description {
-            textarea {
-                width: 100%;
-            }
-        }
-
         .right-panel .details-view {
             .prop-label {
                 width: 5rem;
             }
 
             .prop-value {
-                width: 10rem;
+                width: 14rem;
             }
 
             .form-group {
-                width: 15rem;
+                &.p_title {
+                    textarea {
+                        width: 100% !important;
+                        min-height: 5rem !important;
+                    }
+                }
+
+                &.p_description {
+                    display: none;
+                }
             }
         }
 
@@ -1664,6 +1835,26 @@
                 &:focus {
                     width: 10rem;
                 }
+            }
+        }
+
+        .view-grid {
+            font-size: .8rem;
+
+            tbody tr:hover td, tbody tr:hover th {
+                background-color: #eee !important;
+            }
+
+            .cell-badge {
+                min-width: 5rem;
+                white-space: nowrap;
+            }
+
+            .cell-assignee {
+                width: 2rem;
+                font-weight: bold;
+                padding: .1rem .2rem;
+                border-radius: 50%;
             }
         }
 

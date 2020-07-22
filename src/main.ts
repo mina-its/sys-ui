@@ -505,7 +505,10 @@ function handleWindowEvents() {
         });
 
     $(document).on("click", "a[href]", e => {
-        let href = $(e.target).closest("a").attr("href");
+        let anchor = $(e.target).closest("a");
+        if (anchor.attr("target")) return;
+
+        let href = anchor.attr("href");
         if (!href || href.match(/^javascript/) || /^#/.test(href) || /^http/.test(href)) return; // if (/^#/.test(href)) return false;
 
         e.preventDefault();
