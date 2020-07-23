@@ -5,7 +5,7 @@
   "main": "./public/js/sys.main.js",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --report src/index.js & copy dist\\sys-ui.umd.min.js public\\js\\sys.main.js & copy dist\\sys-ui.css public\\css\\sys.main.css",
+    "build": "vue-cli-service build --target lib --report src/index.js & cp dist/sys-ui.umd.min.js public/js/sys.main.js & cp dist/sys-ui.css public/css/sys.main.css",
     "lint": "vue-cli-service lint"
   },
   "keywords": [

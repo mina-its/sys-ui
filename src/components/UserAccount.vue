@@ -16,12 +16,10 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {LogType, ObjectDec, StatusCode, User, WebMethod} from "../../../sys/src/types";
-    import sys from "../../../sys-ui";
-    import {ItemChangeEventArg, Modify} from "@/types";
-    import {$t, prepareServerUrl} from "@/main";
-    import * as main from '../main';
+    import {ItemChangeEventArg, Modify} from "../types";
+    import {$t, ajax, call, notify, prepareServerUrl} from "../main";
 
-    @Component({name: 'UserAccount', components: {}})
+    @Component({name: 'UserAccount'})
     export default class UserAccount extends Vue {
         private userDec: ObjectDec = null;
         private user: User = null;
@@ -34,17 +32,17 @@
         }
 
         apply(e) {
-            main.ajax(prepareServerUrl(this.modify.ref), this.modify.data, {method: WebMethod.patch}, (res) => {
+            ajax(prepareServerUrl(this.modify.ref), this.modify.data, {method: WebMethod.patch}, (res) => {
                 this.modify = null;
-                main.notify($t('saved'), LogType.Debug);
-            }, main.notify);
+                notify($t('saved'), LogType.Debug);
+            }, notify);
         }
 
         created() {
             let ref = 'getUserAccountInfo';
-            sys.call(ref, null, (err, res) => {
+            call(ref, null, (err, res) => {
                 if (err || !res)
-                    return sys.notify(err, LogType.Error);
+                    return notify(err, LogType.Error);
 
                 if (res.code == StatusCode.Unauthorized) {
                     location.href = "/signin";
@@ -58,6 +56,6 @@
     }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 
 </style>
