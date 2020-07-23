@@ -8,7 +8,7 @@
                 <button @click="selectPrimaryView(TaskView_Home)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Home===view.concern&&view.primary}">
                     <i class="fal fa-home fa-lg"></i>
-                    <label>Mine</label>
+                    <label>Today</label>
                 </button>
                 <button @click="selectPrimaryView(TaskView_Status)" type="button"
                         :class="{'btn btn-secondary toolbar-button':1,'active':TaskView_Status===view.concern&&view.primary}">
@@ -78,7 +78,7 @@
                     <i class="fal fa-filter fa-lg"></i>
                     <label>Filters</label>
                 </button>
-                <div v-if="view.filter" class="dropdown-menu filter-panel p-3" aria-labelledby="filterButton">
+                <div v-if="view.filter" class="dropdown-menu filter-panel p-5" aria-labelledby="filterButton">
                     <form>
                         <div class="properties d-flex">
                             <div class="filter-item mx-2 text-left">
@@ -1502,8 +1502,8 @@
                 case TaskView.Start:
                     this.groupItems = [
                         {title: "Brainstorm", value: TaskInboxGroup.Brainstorm, icon: 'fad fa-fog fa-lg'},
-                        {title: "To Do (Today)", value: TaskInboxGroup.Todo},
-                        {title: "Doing (Today)", value: TaskInboxGroup.Doing},
+                        {title: "To Do", value: TaskInboxGroup.Todo},
+                        {title: "Doing", value: TaskInboxGroup.Doing},
                         {title: "Urgent", value: TaskInboxGroup.Urgent},
                         {title: "Overdue", value: TaskInboxGroup.Overdue},
                         {title: "Favorite", value: TaskInboxGroup.Favorite, icon: 'fal fa-heart mr-1'},

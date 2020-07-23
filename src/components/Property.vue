@@ -168,12 +168,9 @@
                                 props: pr,
                             });
                         } else {
-                            if (pr.readOnly)
+                            if (pr.readOnly && !(this.prop.text && this.prop.text.password) && this.item[this.prop.name])
                                 return ce('div', {
-                                    attrs: {
-                                        type: (this.prop.text && this.prop.text.password) ? 'password' : 'text',
-                                        "class": styles
-                                    }
+                                    attrs: {"class": styles}
                                 }, this.item[this.prop.name]);
                             else
                                 return ce('prop-text', {

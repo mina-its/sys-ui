@@ -109,6 +109,11 @@
                         </tfoot>
                     </table>
                 </div>
+
+                <div v-if="dec.comment" class="help-side p-4 overflow-hidden border-left separator-line bg-white d-none d-md-block">
+                    <h4>{{glob.form.breadcrumbLast}}</h4>
+                    <div v-html="comment()"></div>
+                </div>
             </div>
         </div>
 
@@ -118,7 +123,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import * as main from '../main';
-    import {$t, call, getQs, glob, load, notify, pushToGridViewRecentList, setQs, showCmenu} from '../main';
+    import {$t, call, getQs, glob, load, markDown, notify, pushToGridViewRecentList, setQs, showCmenu} from '../main';
     import {parse, stringify} from 'bson-util';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
     import {AccessPermission, EntityMeta, EntityLink, FileType, GridRowHeaderStyle, IData, Keys, LinkType, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
@@ -145,6 +150,10 @@
 
         getDec(item: IData) {
             return this.dec || item._.dec;
+        }
+
+        comment() {
+            return markDown(this.dec.comment);
         }
 
         get items(): IData[] {
@@ -640,6 +649,10 @@
     .grid-view-container {
         aside {
             min-width: 12rem;
+        }
+
+        .help-side {
+            min-width: 15rem;
         }
     }
 
