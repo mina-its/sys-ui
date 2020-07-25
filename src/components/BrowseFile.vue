@@ -1,6 +1,5 @@
 <template>
-    <input id="file-browse" type="file" class="d-none" @change="fileBrowsed" style="width: 0;height: 0;"
-           multiple="true">
+    <input id="file-browse" type="file" class="d-none" @change="fileBrowsed" style="width: 0;height: 0;" multiple="true">
 </template>
 
 <script lang="ts">

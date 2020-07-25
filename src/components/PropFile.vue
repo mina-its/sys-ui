@@ -133,7 +133,7 @@
                 if (!files || !files.length) return;
 
                 for (let file of files) {
-                    file.path = this.prop.file.path;
+                    file.path = this.prop.file ? this.prop.file.path : "";
                     file.name = ID.generateByBrowser() + "__" + file.name;
                 }
 
