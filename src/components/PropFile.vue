@@ -30,9 +30,8 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {DirFile, IData, LogType, mFile, Property, RequestMode, ObjectViewType} from "../../../sys/src/types";
-    import {Constants, ItemChangeEventArg, FunctionExecEventArg, ID, MenuItem, ChangeType} from '@/types';
-    import {$t, glob, joinUri, notify} from '@/main';
-    import * as main from '../main';
+    import {Constants, ItemChangeEventArg, FunctionExecEventArg, ID, MenuItem, ChangeType} from '../types';
+    import main, {$t, browseFile, glob, hideCmenu, joinUri, notify, openFileGallery, showCmenu, toFriendlyFileSizeString} from '../main';
 
     @Component({name: 'PropFile', components: {}})
     export default class PropFile extends Vue {
@@ -43,9 +42,7 @@
         @Prop() private readOnly: boolean;
 
         mounted() {
-            if (!this.prop.file) {
-                notify(`Drive must be configured for property '${this.prop.title}'`, LogType.Error);
-            }
+            // if (!this.prop.file) notify(`Drive must be configured for property '${this.prop.title}'`, LogType.Error);
         }
 
         showMenu(file, e) {
@@ -59,12 +56,12 @@
                     {title: '-'},
                     {ref: "remove", title: $t('remove')}
                 ];
-                main.showCmenu(file, items, e, this.selectMenu);
+                showCmenu(file, items, e, this.selectMenu);
             }
         }
 
         selectMenu(file: mFile, item) {
-            main.hideCmenu();
+            hideCmenu();
             if (!item) return;
             switch (item.ref) {
                 case "preview":
@@ -110,15 +107,15 @@
             if (e) e.stopProgress();
             let val = this.getVal();
             if (!this.prop.file || !this.prop.file.drive) {
-                notify(`Drive must be configured for the file.`, LogType.Error);
+                this.openFileBrowse(val);
                 return;
             }
 
             if (this.prop.file.gallery) {
                 let path = val && val.path ? val.path : this.prop.file.path;
-                main.openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
+                openFileGallery(this.prop.file.drive, val ? val.name : null, path, !!this.prop.file.path, this.selectFromGallery);
             } else {
-                this.browseFile(val);
+                this.openFileBrowse(val);
             }
         }
 
@@ -131,8 +128,8 @@
             return val;
         }
 
-        browseFile(val: mFile | mFile[]) {
-            main.browseFile((files: mFile[]) => {
+        openFileBrowse(val: mFile | mFile[]) {
+            browseFile((files: mFile[]) => {
                 if (!files || !files.length) return;
 
                 for (let file of files) {
@@ -142,7 +139,7 @@
 
                 if (this.prop.file && this.prop.file.sizeLimit) {
                     if (files.find(item => item.size > this.prop.file.sizeLimit)) {
-                        main.notify(`File size must be less than ${this.prop.file.sizeLimit}`, LogType.Error);
+                        notify(`File size must be less than ${this.prop.file.sizeLimit}`, LogType.Error);
                         return;
                     }
                 }
@@ -178,7 +175,7 @@
 
         size(file) {
             if (file.size)
-                return main.toFriendlyFileSizeString(file.size);
+                return toFriendlyFileSizeString(file.size);
             else
                 return null;
         }
@@ -190,7 +187,7 @@
             if (Constants.uniqueFilenameRegex.test(file.name))
                 return file.name.replace(Constants.uniqueFilenameRegex, "");
 
-            return file.path ? main.joinUri(file.path, file.name) : file.name;
+            return file.path ? joinUri(file.path, file.name) : file.name;
         }
 
         resetFileInfo(e, file: mFile) {

@@ -4,8 +4,8 @@
         <div class="d-flex align-items-center p-2 px-4 btn-toolbar toolbar">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb p-0 m-0 bg-transparent d-flex align-items-center">
-                    <li class="mr-3">
-                        <button title="Go Back" class="btn hover-opacity btn-link p-0"><i class="fal text-secondary fa-arrow-circle-left fa-2x"></i></button>
+                    <li :class="{'ml-3':rtl,'mr-3':ltr}">
+                        <button title="Go Back" class="btn hover-opacity btn-link p-0"><i :class="{'fal text-secondary fa-2x':1,'fa-arrow-circle-left':ltr, 'fa-arrow-circle-right':rtl}"></i></button>
                     </li>
                     <li v-for="item in breadcrumb" class="breadcrumb-item">
                         <a :href="item.ref">{{item.title}}</a>
@@ -102,8 +102,8 @@
                             break;
                     }
                 }
-            )
-            ;
+            );
+
             e.stopPropagation();
             e.preventDefault();
         }
