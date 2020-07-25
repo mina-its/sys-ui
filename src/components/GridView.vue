@@ -110,7 +110,7 @@
                     </table>
                 </div>
 
-                <div v-if="dec.comment" class="help-side p-4 overflow-hidden border-left separator-line bg-white d-none d-md-block">
+                <div v-if="dec.comment" class="help-side p-3 overflow-hidden border-left separator-line bg-white d-none d-md-block">
                     <h4>{{glob.form.breadcrumbLast}}</h4>
                     <div v-html="comment()"></div>
                 </div>
@@ -212,9 +212,9 @@
                 this.headFuncs = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
                     return {title: link.title as string, ref: link.address};
                 });
-            }
 
-            this.helpLink = this.dec.links.find(k => k.type == LinkType.Help);
+                this.helpLink = this.dec.links.find(k => k.type == LinkType.Help);
+            }
         }
 
         mounted() {
@@ -652,7 +652,8 @@
         }
 
         .help-side {
-            min-width: 15rem;
+            min-width: 10rem;
+            font-size: smaller;
         }
     }
 

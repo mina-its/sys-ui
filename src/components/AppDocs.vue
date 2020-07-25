@@ -35,7 +35,7 @@
                     <hr class="my-5">
 
                     <!-- Feedback -->
-                    <div class="ml-5 pb-5 feedback-part" style="margin-bottom: 10rem">
+                    <div class="ml-5 pb-5 feedback-part" style="margin-bottom: 30rem">
                         <div class="container">
                             <i class="fal fa-comment-alt-exclamation fa-2x px-1 m-2"></i>
                             <div v-if="showHelpUseful" class="d-flex align-items-center flex-wrap">

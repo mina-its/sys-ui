@@ -678,7 +678,7 @@ export function invoke(pack: string, name: string, args: any[]) {
 
 export function toFriendlyFileSizeString(size: number): string {
     if (size < 1024) {
-        return size + ' B';
+        return size.toString();
     } else if (size < 1024 * 1024) {
         return (size / 1024).toFixed(1) + ' KB';
     } else {

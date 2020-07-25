@@ -1,5 +1,5 @@
 <template>
-    <div class="p-2 log-terminal w-100 bg-dark" @contextmenu="openMenu">
+    <div class="p-2 log-terminal w-100 bg-dark" @contextmenu="onContextMenu" @mouseup="openMenu">
         <template v-for="log in glob.logs">
             <div v-if="log" v-focus="true" tabindex="1" :class="'log-terminal-item type-'+log.type">{{log.message}}
             </div>
@@ -24,7 +24,14 @@
             // WebSocket.call("emit", 'cmd', ClientCommand.Ping);
         }
 
+        onContextMenu(e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+
         openMenu(e) {
+            if (e.which != 3) return;
+
             let items: MenuItem[] = [{ref: "clear", title: $t('clear')} as MenuItem];
             main.showCmenu(null, items, e, (state, item: MenuItem) => {
                 switch (item.ref) {
@@ -42,6 +49,7 @@
     .log-terminal {
         font-family: monospace;
         height: 100%;
+        font-size: small;
         overflow: auto;
 
         .log-terminal-item {
