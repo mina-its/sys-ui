@@ -1,10 +1,11 @@
 <template>
-    <div class="p-2 log-terminal w-100 bg-dark" @contextmenu="onContextMenu" @mouseup="openMenu">
+    <div class="p-2 log-terminal w-100 bg-dark position-relative">
         <template v-for="log in glob.logs">
             <div v-if="log" v-focus="true" tabindex="1" :class="'log-terminal-item type-'+log.type">{{log.message}}
             </div>
             <div v-else class="mb-5"></div>
         </template>
+        <button title="Clear the terminal" class="btn btn-link text-white clear-button position-absolute" @click="clear"><i class="fal fa-trash"></i></button>
     </div>
 </template>
 
@@ -24,23 +25,8 @@
             // WebSocket.call("emit", 'cmd', ClientCommand.Ping);
         }
 
-        onContextMenu(e) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-
-        openMenu(e) {
-            if (e.which != 3) return;
-
-            let items: MenuItem[] = [{ref: "clear", title: $t('clear')} as MenuItem];
-            main.showCmenu(null, items, e, (state, item: MenuItem) => {
-                switch (item.ref) {
-                    case "clear":
-                        glob.logs = [];
-                        break;
-                }
-            });
-            e.preventDefault();
+        clear() {
+            glob.logs = [];
         }
     }
 </script>
@@ -51,6 +37,11 @@
         height: 100%;
         font-size: small;
         overflow: auto;
+
+        .clear-button {
+            right: 1rem;
+            top: 1rem;
+        }
 
         .log-terminal-item {
             white-space: pre-wrap;
