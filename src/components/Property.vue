@@ -161,7 +161,7 @@
                             props: pr,
                         });
                     else {
-                        if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && !this.item._new) {
+                        if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && !this.item._new) { // we need _new to allow first column to edit
                             return ce('prop-link', {
                                 attrs: {"class": styles},
                                 on: {keydown: this.keydown, focus: this.focused},

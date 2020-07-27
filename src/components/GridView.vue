@@ -142,6 +142,7 @@
         private addButton: boolean = false;
         private mainChecked = false;
         private filter = null;
+        private latest_z = 0;
         private filterDoc = {};
         private filteringProp: Property = null;
         private filteredProps: Property[] = [];
@@ -173,6 +174,7 @@
             this.resetHeadFuncs();
             this.resetRecentItems();
             this.checkForAddButton();
+            this.latest_z = this.items.length ? Math.max(...this.items.map(item => item._z || 0)) : 0;
         }
 
         checkForAddButton() {
@@ -222,6 +224,7 @@
             this.resetHeadFuncs();
             this.resetRecentItems();
             this.checkForAddButton();
+            this.latest_z = this.items.length ? Math.max(...this.items.map(item => item._z || 0)) : 0;
 
             if (!this.dec.filterDec) {
                 this.filterDoc = {};
@@ -466,14 +469,15 @@
                         notify("Please save your changes before!", LogType.Warning);
                         return;
                     }
-                    let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec: this.dec} as EntityMeta};
+                    let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec: this.dec} as EntityMeta} as any;
+
                     if (this.dec.newItemDefaults) {
                         let defaults = parse(this.dec.newItemDefaults, true, ID);
                         Object.assign(newItem, defaults);
                     }
                     this.dec.properties.forEach(prop => newItem[prop.name] = null);
                     if (this.dec.reorderable)
-                        newItem['_z'] = (Math.max(...this.items.map(item => item._z)) || 0) + 1;
+                        newItem._z = ++this.latest_z;
 
                     main.dispatchStoreModify(this, {
                         type: ChangeType.InsertItem, item: newItem, uri: this.uri, vue: this
