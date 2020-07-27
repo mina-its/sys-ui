@@ -6,17 +6,15 @@
             <div class="main-title font-weight-bold">{{glob.question.title}}</div>
             <div class="main-message" v-html="message"></div>
             <div class="main-footer text-right pt-3">
-                <button @click="select(button.ref)" :class="button._cs || 'btn btn-primary mx-2'" v-for="button in glob.question.buttons">{{button.title}}</button>
+                <button @click="select(button.ref)" :class="button._cs || 'btn btn-primary ml-2'" v-for="button in glob.question.buttons">{{button.title}}</button>
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-    import {FunctionExecEventArg} from '@/types';
     import {Component, Vue} from 'vue-property-decorator';
-    import {glob} from '@/main';
-    import {Pair} from '../../../sys/src/types';
+    import {glob} from '../main';
 
     declare let $, marked: any;
 
@@ -71,6 +69,7 @@
 
         .btn {
             border-radius: 0.1rem;
+            min-width: 5rem;
         }
 
         .main {
