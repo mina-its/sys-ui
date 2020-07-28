@@ -18,6 +18,8 @@
     import {MenuItem} from "../types";
     import * as main from "../main";
 
+    declare let moment: any;
+
     @Component({name: 'UrlNotes'})
     export default class UrlNotes extends Vue {
         private newNote: string = null;
