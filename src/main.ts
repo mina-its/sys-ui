@@ -384,11 +384,12 @@ export function showPropRefMenu(prop: Property, instance: any, phrase: string, c
     };
 
     if (prop._.isRef) {
-        let query = prop.filter ? parse(processThisExpression(instance, prop.filter), true, ID) : null;
         if (prop.referType == PropertyReferType.InnerSelectType) {
             let match = prop._.ref.match(/^(\w+\/\w+)/);
             instance = glob.data[match[1]];
         }
+
+        let query = prop.filter ? parse(processThisExpression(instance, prop.filter), true, ID) : null;
         let data = {prop, instance, phrase, query};
 
         call('getPropertyReferenceValues', data, (err, res) => {
@@ -821,7 +822,17 @@ export function load(href: string, pushState = false) {
     }
 
     glob.notify = null;
-    ajax(setQs('m', RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
+    ajax(setQs('m', RequestMode.inline, false, href), null, null, (res) => {
+        handleResponse(res);
+        loadNotes(href);
+    }, err => notify(err));
+}
+
+export function loadNotes(url) {
+    glob.getNotes = [];
+    ajax("/getNotes?m=1", {url}, null, (res) => {
+        glob.notes = res.data || [];
+    });
 }
 
 export function ajax(url: string, data, config: AjaxConfig, done: (res: WebResponse) => void, fail?: (err: { code: StatusCode, message: string }) => void) {

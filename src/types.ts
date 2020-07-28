@@ -8,7 +8,8 @@ import {
     FormDto,
     IData,
     Task,
-    TaskView
+    TaskView,
+    Note
 } from '../../sys/src/types';
 
 import Vue from 'vue'
@@ -199,6 +200,7 @@ export class Global {
 
     data: any = {};
     form: FormDto;
+    notes: Note[] = [];
     question = new AppStateQuestion();
     fileGallery = new AppStateFileGallery();
     fileBrowsed: (files: FileList) => void;

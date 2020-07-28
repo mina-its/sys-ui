@@ -97,6 +97,7 @@ exports.TreeViewAttribute = TreeViewAttribute;
 class Global {
     constructor() {
         this.data = {};
+        this.notes = [];
         this.question = new AppStateQuestion();
         this.fileGallery = new AppStateFileGallery();
         this.imagePreview = { show: false, url: null };

@@ -110,9 +110,12 @@
                     </table>
                 </div>
 
-                <div v-if="dec.comment" class="help-side p-3 overflow-hidden border-left separator-line bg-white d-none d-md-block">
-                    <h4>{{glob.form.breadcrumbLast}}</h4>
-                    <div v-html="comment()"></div>
+                <div v-if="dec.comment" class="help-panel overflow-hidden border-left separator-line bg-white d-none d-md-block">
+                    <button class="btn btn-link py-0"><i class="pt-3 fa-lg fal fa-info-circle"></i></button>
+                    <url-notes class="p-3"></url-notes>
+                    <div class="py-2 px-3">
+                        <div v-html="comment()"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -655,7 +658,7 @@
             min-width: 12rem;
         }
 
-        .help-side {
+        .help-panel {
             min-width: 10rem;
             font-size: smaller;
         }

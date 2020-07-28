@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.loadNotes = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -376,11 +376,11 @@ function showPropRefMenu(prop, instance, phrase, ctrl, removeCurrentValues, item
         });
     };
     if (prop._.isRef) {
-        let query = prop.filter ? bson_util_1.parse(processThisExpression(instance, prop.filter), true, types_1.ID) : null;
         if (prop.referType == types_2.PropertyReferType.InnerSelectType) {
             let match = prop._.ref.match(/^(\w+\/\w+)/);
             instance = exports.glob.data[match[1]];
         }
+        let query = prop.filter ? bson_util_1.parse(processThisExpression(instance, prop.filter), true, types_1.ID) : null;
         let data = { prop, instance, phrase, query };
         call('getPropertyReferenceValues', data, (err, res) => {
             if (err)
@@ -808,9 +808,19 @@ function load(href, pushState = false) {
         history.pushState(null, null, href);
     }
     exports.glob.notify = null;
-    ajax(setQs('m', types_2.RequestMode.inline, false, href), null, null, handleResponse, err => notify(err));
+    ajax(setQs('m', types_2.RequestMode.inline, false, href), null, null, (res) => {
+        handleResponse(res);
+        loadNotes(href);
+    }, err => notify(err));
 }
 exports.load = load;
+function loadNotes(url) {
+    exports.glob.getNotes = [];
+    ajax("/getNotes?m=1", { url }, null, (res) => {
+        exports.glob.notes = res.data || [];
+    });
+}
+exports.loadNotes = loadNotes;
 function ajax(url, data, config, done, fail) {
     startProgress();
     config = config || {};
