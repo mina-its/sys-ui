@@ -59,15 +59,15 @@
                 <tr class="border-bottom bg-light cursor-pointer" v-for="item of files" @dblclick="select({}, item)" @focus="focus(item)"
                     @mouseup="openMenu($event, item)" v-focus="isSelected(item)" tabindex="0">
 
-                    <td class="py-2 px-4 d-flex align-items-center">
+                    <td class="no-select py-2 px-4 d-flex align-items-center">
                         <div style="width: 3rem;">
                             <i :class="icon(item)"></i>
                         </div>
-                        <div>
+                        <div class="">
                             {{item.name}}
                         </div>
                     </td>
-                    <td class="py-2 px-4 text-right">
+                    <td class="py-2 px-4 text-right no-select">
                         {{size(item)}}
                     </td>
                 </tr>
