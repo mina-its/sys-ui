@@ -28,7 +28,7 @@
 
         <!--  Content -->
         <div class="w-100 h-100 main-bg-image overflow-auto d-flex">
-            <div :class="{'d-flex overflow-auto details-view':true, 'bg-white':level}" @scroll="onScroll()">
+            <div :class="{'d-flex w-100 overflow-auto details-view':true, 'bg-white':level}" @scroll="onScroll()">
 
                 <!--  Side Menu -->
                 <aside v-if="sideMenuVisible" class="border-right separator-line sidenav py-4 d-none d-md-block">
@@ -47,7 +47,7 @@
                 </div>
 
                 <!--  Main -->
-                <div v-else :class="{'p-4':!level, 'border rounded': level && dec.detailsViewType===ObjectDetailsViewType_Tabular}">
+                <div v-else :class="{'p-4 flex-grow-1':!level, 'border rounded': level && dec.detailsViewType===ObjectDetailsViewType_Tabular}">
                     <div v-if="groupVisible(group)" :class="groupPanelStyle(group)" v-for="group in groups" :id="getGroupId(group)">
                         <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
                         <div class="group">
@@ -62,6 +62,14 @@
                     </div>
                     <div v-if="!level" class="h-25"></div>
                 </div>
+
+                <!-- Help panel -->
+                <div v-if="!level" class="help-panel overflow-hidden border-left separator-line bg-white d-none d-md-block">
+                    <url-notes></url-notes>
+                    <div v-if="dec.comment" class="py-2 px-3">
+                        <div v-html="comment()"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -71,7 +79,7 @@
     import {ChangeType, HeadFunc, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
     import {AccessPermission, EntityLink, Context, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
-    import {$t, getNewItemTitle, glob, loadObjectViewData} from '../main';
+    import {$t, getNewItemTitle, glob, loadObjectViewData, markDown} from '../main';
     import * as main from '../main';
     import ObjectView from "./ObjectView.vue";
 
@@ -90,6 +98,10 @@
         private AccessPermission_Edit = AccessPermission.Edit;
         private ObjectDetailsViewType_Tabular = ObjectDetailsViewType.Tabular;
         private helpLink: EntityLink = null;
+
+        comment() {
+            return markDown(this.dec.comment);
+        }
 
         isNotAloneInlineDataGridProperty(group, prop) {
             return prop._.gtype == GlobalType.object && prop.isList && (this.level > 0);

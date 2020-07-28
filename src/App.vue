@@ -456,6 +456,11 @@
                                          supported by Chrome, Edge, Opera and Firefox */
     }
 
+    .help-panel {
+        min-width: 15rem;
+        font-size: smaller;
+    }
+
     .main-bg-image {
         background-repeat: no-repeat;
         background-image: url('/@sys-ui/images/bg2.webp');

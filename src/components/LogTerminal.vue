@@ -1,11 +1,11 @@
 <template>
-    <div class="p-2 log-terminal w-100 bg-dark position-relative">
+    <div class="p-2 log-terminal w-100 bg-dark overflow-auto h-100 small">
         <template v-for="log in glob.logs">
             <div v-if="log" v-focus="true" tabindex="1" :class="'log-terminal-item type-'+log.type">{{log.message}}
             </div>
             <div v-else class="mb-5"></div>
         </template>
-        <button title="Clear the terminal" class="btn btn-link text-white clear-button position-absolute" @click="clear"><i class="fal fa-trash"></i></button>
+        <button title="Clear the terminal" class="btn btn-secondary clear-button position-absolute" @click="clear"><i class="fal fa-trash"></i></button>
     </div>
 </template>
 
@@ -34,13 +34,10 @@
 <style lang="scss">
     .log-terminal {
         font-family: monospace;
-        height: 100%;
-        font-size: small;
-        overflow: auto;
 
         .clear-button {
-            right: 1rem;
-            top: 1rem;
+            right: 1.5rem;
+            top: 12.5rem;
         }
 
         .log-terminal-item {

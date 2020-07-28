@@ -1,9 +1,9 @@
 <template>
-    <div class="url-notes mb-2" style="border-bottom: 2px solid #ccc">
-        <div class="glob.notes.length">
+    <div class="url-notes px-3 mb-2 pt-3" style="border-bottom: 2px solid #ccc">
+        <div v-if="glob.notes.length">
             <div v-for="note of glob.notes">
+                <button @click="menu($event,note)" class="btn btn-link p-0 pr-1"><i class="fad fa-tags text-primary"></i></button>
                 {{note.content}}
-                <button @click="menu($event,note)" class="btn btn-link p-0 "><i class="fal fa-ellipsis-h-alt text-black-50"></i></button>
                 <hr class="my-2 border-primary" style="border-width: 2px">
             </div>
         </div>

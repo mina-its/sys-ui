@@ -36,7 +36,7 @@
         <!-- Content -->
         <div class="w-100 h-100 grid-content-panel overflow-auto d-flex">
             <div :class="{'d-flex w-100 overflow-auto':true, 'bg-white':level}" @scroll="onScroll()">
-                <!--  Side Menu -->
+                <!-- Side Menu -->
                 <aside v-if="!level && (recentItems || dec.filterDec)" class="overflow-hidden border-right separator-line bg-white d-none d-md-block">
                     <div v-if="dec.filterDec" class="sidenav-filter p-3">
                         <label class="text-muted small"><i class="fal fa-filter p-1"></i>Filter {{glob.form.breadcrumbLast}}:</label>
@@ -52,7 +52,7 @@
                     </div>
                 </aside>
 
-                <!--  Main -->
+                <!-- Main -->
                 <div :class="{'w-100 grid-view':1, 'p-4 main-bg-image':!level}">
 
                     <!-- Filter Items -->
@@ -110,10 +110,10 @@
                     </table>
                 </div>
 
-                <div v-if="dec.comment" class="help-panel overflow-hidden border-left separator-line bg-white d-none d-md-block">
-                    <button class="btn btn-link py-0"><i class="pt-3 fa-lg fal fa-info-circle"></i></button>
-                    <url-notes class="p-3"></url-notes>
-                    <div class="py-2 px-3">
+                <!-- Help panel -->
+                <div v-if="!level" class="help-panel overflow-hidden border-left separator-line bg-white d-none d-md-block">
+                    <url-notes></url-notes>
+                    <div v-if="dec.comment" class="py-2 px-3">
                         <div v-html="comment()"></div>
                     </div>
                 </div>
@@ -656,11 +656,6 @@
     .grid-view-container {
         aside {
             min-width: 12rem;
-        }
-
-        .help-panel {
-            min-width: 10rem;
-            font-size: smaller;
         }
     }
 
