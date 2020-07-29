@@ -3,10 +3,11 @@
         <header>
             <NavBar/>
         </header>
-        <main class="d-flex align-items-stretch overflow-auto">
-            <SideNav/>
+        <main class="d-flex align-items-stretch">
+            <SideNav />
             <object-view v-if="objectElemUri" :uri="objectElemUri" :level="0"/>
             <FormView v-else/>
+            <InfoPanel />
         </main>
         <HelperObjects/>
     </div>
@@ -454,11 +455,6 @@
         user-select: none;
         /* Non-prefixed version, currently
                                          supported by Chrome, Edge, Opera and Firefox */
-    }
-
-    .help-panel {
-        min-width: 15rem;
-        font-size: smaller;
     }
 
     .main-bg-image {

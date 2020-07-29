@@ -829,9 +829,9 @@ export function load(href: string, pushState = false) {
 }
 
 export function loadNotes(url) {
-    glob.getNotes = [];
+    glob.infoPanel.notes = [];
     ajax("/getNotes?m=1", {url}, null, (res) => {
-        glob.notes = res.data || [];
+        glob.infoPanel.notes = res.data || [];
     });
 }
 

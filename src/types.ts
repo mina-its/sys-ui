@@ -194,16 +194,20 @@ export class TreeViewAttribute {
 }
 
 export class Global {
-    constructor() {
-        this.fileBrowsed = null;
-    }
-
     data: any = {};
     form: FormDto;
-    notes: Note[] = [];
+    infoPanel: {
+        notes: Note[];
+        show: boolean;
+        currentComment: string;
+    } = {
+        notes: [],
+        show: true,
+        currentComment: null
+    };
     question = new AppStateQuestion();
     fileGallery = new AppStateFileGallery();
-    fileBrowsed: (files: FileList) => void;
+    fileBrowsed: (files: FileList) => void = null;
     imagePreview = {show: false, url: null};
     logs: AppStateLog[] = [];
     modal: boolean = false;

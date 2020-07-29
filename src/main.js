@@ -815,9 +815,9 @@ function load(href, pushState = false) {
 }
 exports.load = load;
 function loadNotes(url) {
-    exports.glob.getNotes = [];
+    exports.glob.infoPanel.notes = [];
     ajax("/getNotes?m=1", { url }, null, (res) => {
-        exports.glob.notes = res.data || [];
+        exports.glob.infoPanel.notes = res.data || [];
     });
 }
 exports.loadNotes = loadNotes;

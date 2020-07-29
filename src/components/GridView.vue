@@ -31,6 +31,9 @@
 
             <!-- Object Menu -->
             <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
+
+            <!-- Info Panel -->
+            <button title="Show info panel" v-if="!glob.infoPanel.show" @click="glob.infoPanel.show=true" class="btn close-panel btn-link px-2"><i class="fal fa-info-circle fa-lg"></i></button>
         </div>
 
         <!-- Content -->
@@ -109,14 +112,6 @@
                         </tfoot>
                     </table>
                 </div>
-
-                <!-- Help panel -->
-                <div v-if="!level" class="help-panel overflow-hidden border-left separator-line bg-white d-none d-md-block">
-                    <url-notes></url-notes>
-                    <div v-if="dec.comment" class="py-2 px-3">
-                        <div v-html="comment()"></div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -156,10 +151,6 @@
             return this.dec || item._.dec;
         }
 
-        comment() {
-            return markDown(this.dec.comment);
-        }
-
         get items(): IData[] {
             if (this.data) // when we explicitly specify the data
                 return this.data;
@@ -178,6 +169,7 @@
             this.resetRecentItems();
             this.checkForAddButton();
             this.latest_z = this.items.length ? Math.max(...this.items.map(item => item._z || 0)) : 0;
+            glob.infoPanel.currentComment = this.dec.comment;
         }
 
         checkForAddButton() {
@@ -228,6 +220,7 @@
             this.resetRecentItems();
             this.checkForAddButton();
             this.latest_z = this.items.length ? Math.max(...this.items.map(item => item._z || 0)) : 0;
+            glob.infoPanel.currentComment = this.dec.comment;
 
             if (!this.dec.filterDec) {
                 this.filterDoc = {};
