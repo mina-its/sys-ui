@@ -1,9 +1,9 @@
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {Elem, ElemType, GlobalType, ObjectViewType, Property as ObjectProperty, PropertyEditMode} from "../../../sys/src/types";
+    import {GlobalType, ObjectViewType, Property as ObjectProperty, PropertyEditMode, TextEditor} from "../../../sys/src/types";
     import {ChangeType, Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '../types';
-    import {getPropertyEmbedError} from '../main';
     import * as main from '../main';
+    import {getPropertyEmbedError} from '../main';
 
     @Component({name: 'Property', components: {}})
     export default class Property extends Vue {
@@ -72,7 +72,7 @@
             if (embedErr) msg = ce('prop-message', {props: {message: embedErr}});
 
             let title = this.prop.title || this.prop.name;
-            let labelNoWrap = (this.prop.text && this.prop.text.htmlEditor);
+            let labelNoWrap = (this.prop.text && this.prop.text.editor);
             let label = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top pt-2" + (labelNoWrap ? " text-nowrap" : "")}}, title);
             let children = [label, vl, msg];
 
@@ -142,16 +142,21 @@
                         return ce('span', {attrs: {"class": styles + " text-success"}}, text.substring(0, 30) + (text.length > 30 ? "..." : ""));
                     }
 
-                    if (this.viewType != ObjectViewType.GridView && this.prop.text && this.prop.text.multiLine)
+                    if (this.viewType != ObjectViewType.GridView && this.prop.text && this.prop.text.editor == TextEditor.Html)
+                        return ce('prop-html-editor', {
+                            on: {changed: this.changed, focus: this.focused},
+                            props: pr,
+                        });
+                    else if (this.viewType != ObjectViewType.GridView && this.prop.text && this.prop.text.editor)
+                        return ce('prop-text-editor', {
+                            on: {changed: this.changed, focus: this.focused},
+                            props: pr,
+                        });
+                    else if (this.viewType != ObjectViewType.GridView && this.prop.text && this.prop.text.multiLine)
                         return ce('prop-text-multiline', {
                             attrs: {
                                 "class": `prop-text-multiline prop-value border`
                             },
-                            on: {changed: this.changed, focus: this.focused},
-                            props: pr,
-                        });
-                    else if (this.viewType != ObjectViewType.GridView && this.prop.text && this.prop.text.htmlEditor)
-                        return ce('prop-html-editor', {
                             on: {changed: this.changed, focus: this.focused},
                             props: pr,
                         });

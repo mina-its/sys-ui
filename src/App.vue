@@ -4,10 +4,10 @@
             <NavBar/>
         </header>
         <main class="d-flex align-items-stretch">
-            <SideNav />
+            <SideNav/>
             <object-view v-if="objectElemUri" :uri="objectElemUri" :level="0"/>
             <FormView v-else/>
-            <InfoPanel />
+            <InfoPanel/>
         </main>
         <HelperObjects/>
     </div>
@@ -462,6 +462,20 @@
         background-image: url('/@sys-ui/images/bg2.webp');
         background-position-y: bottom;
         background-position-x: right;
+    }
+
+    .database-shell-command {
+        .prop-text-editor {
+            height: 20rem;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .log-terminal {
+            height: 20rem !important;
+        }
     }
 
 </style>

@@ -25,16 +25,16 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <NavbarMenu :menu="glob.config.menu" :currentRef="currentRef"/>
+            <NavbarMenu :menu="glob.config.menu" :currentRef="currentRef" />
 
             <!-- Feedback -->
-            <AppFeedback />
+            <AppFeedback class="mx-2" />
 
             <!-- Language -->
-            <AppLocaleMenu class="mx-3" />
+            <AppLocaleMenu class="mx-2" />
 
             <!-- Login -->
-            <AppUserLoginMenu/>
+            <AppUserLoginMenu class="mx-2" />
 
             <!-- <AppChangeRegion/> -->
         </div>

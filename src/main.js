@@ -941,6 +941,7 @@ function startVue(res, params) {
             }
         });
         handleResponse(res);
+        console.log('glob.socket initing ...');
         if (typeof io != "undefined")
             exports.glob.socket = io();
         Object.assign(vue_1.default.config, { productionTip: false, devtools: true });

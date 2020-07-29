@@ -11,7 +11,7 @@
                     <hr class="my-2 border-primary" style="border-width: 2px">
                 </div>
             </div>
-            <textarea v-model="newNote" rows="4" class="bg-transparent new-note border-0 w-100" placeholder="Quick note ..."></textarea>
+            <textarea v-model="newNote" rows="4" class="bg-transparent new-note border-0 w-100" placeholder="Write your Quick note here ..."></textarea>
             <button @click="submit" v-if="newNote" class="btn btn-outline-primary py-0 w-100 my-2">Submit</button>
         </div>
 

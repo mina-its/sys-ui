@@ -20,7 +20,10 @@
         mounted() {
             if (glob.config.interactive) {
                 console.log("web-socket initing ...");
-                glob.socket.on('cmd', this.handleCommand);
+                if (glob.socket)
+                    glob.socket.on('cmd', this.handleCommand);
+                else
+                    console.warn('WebSocket: glob.socket is null!');
             }
         }
 

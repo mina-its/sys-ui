@@ -1,11 +1,17 @@
 <template>
-    <div class="p-2 log-terminal w-100 bg-dark overflow-auto h-100 small">
-        <template v-for="log in glob.logs">
-            <div v-if="log" v-focus="true" tabindex="1" :class="'log-terminal-item type-'+log.type">{{log.message}}
+    <div class="log-terminal w-100 bg-dark overflow-auto h-100 small">
+        <div class="d-flex w-100 h-100">
+            <div class="p-2 flex-fill overflow-auto h-100">
+                <template v-for="log in glob.logs">
+                    <div v-if="log" v-focus="true" tabindex="1" :class="'log-terminal-item type-'+log.type">{{log.message}}
+                    </div>
+                    <div v-else class="mb-5"></div>
+                </template>
             </div>
-            <div v-else class="mb-5"></div>
-        </template>
-        <button title="Clear the terminal" class="btn btn-secondary clear-button position-absolute" @click="clear"><i class="fal fa-trash"></i></button>
+            <div class="p-2">
+                <button title="Clear the terminal" class="btn btn-secondary clear-button" @click="clear"><i class="fal fa-trash"></i></button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -21,7 +27,10 @@
         @Prop() private prop!: string;
 
         mounted() {
-            glob.socket.emit(ClientCommand.Ping);
+            if (glob.socket)
+                glob.socket.emit(ClientCommand.Ping);
+            else
+                console.warn('glob.socket is null!');
             // WebSocket.call("emit", 'cmd', ClientCommand.Ping);
         }
 
