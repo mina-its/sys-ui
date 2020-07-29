@@ -157,9 +157,16 @@
                 min-width: 12rem;
             }
 
-            &:hover {
-                -ms-overflow-style: unset;
-                scrollbar-width: unset;
+            &.calendar-day:hover {
+                overflow: visible;
+                position: absolute;
+                height: unset!important;
+                max-width: 15rem;
+                background-color: #f5f5f5;
+                border-right: 1px solid #bbb;
+                border-bottom: 1px solid #bbb;
+                /*-ms-overflow-style: unset;*/
+                /*scrollbar-width: unset;*/
             }
 
 
@@ -167,9 +174,9 @@
                 display: none;
             }
 
-            &:hover::-webkit-scrollbar {
-                display: unset;
-            }
+            /*&:hover::-webkit-scrollbar {*/
+            /*    display: unset;*/
+            /*}*/
         }
 
         .new-task {

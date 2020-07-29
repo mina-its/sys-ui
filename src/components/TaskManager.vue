@@ -496,6 +496,7 @@
         }
 
         created() {
+            glob.infoPanel.show = false;
             this.reload();
             window.onhashchange = () => {
                 this.checkHashAddress();
