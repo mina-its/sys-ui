@@ -459,7 +459,7 @@
 
     .main-bg-image {
         background-repeat: no-repeat;
-        background-image: url('/@sys-ui/images/bg2.webp');
+        /*background-image: url('/@sys-ui/images/bg2.webp');*/
         background-position-y: bottom;
         background-position-x: right;
     }

@@ -2,24 +2,23 @@
     <div class="prop-time">
         <div class="d-flex">
             <input ref="ctrl" @focus="$emit('focus', $event)" type="text" :value="value"
-                   :placeholder="placeHolder"
+                   :placeholder="placeHolder" @keydown.esc="escape" @keydown.enter="update"
                    :name="viewType!=1 ? prop.name : null" :readonly="readOnly" @input="dirty=true"
-                   @blur="update" class="w-100 flex-grow-1 border-0">
+                   @blur="update" :class="{'w-100 flex-grow-1 border-0':1,'prop-error':hasError}">
             <div class="dropdown" v-if="!readOnly">
-                <i :class="{'fa text-muted':true, 'ml-1': ltr, 'mr-1':rtl, 'fa-clock': !datePick, 'fa-calendar-alt': datePick}" @click="click"></i>
+                <i :class="{'fa text-muted':1,'ml-1':ltr,'mr-1':rtl,'fa-clock':!datePick, 'fa-calendar-alt': datePick}" @click="click"></i>
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-    import {AppStateCmenu, ItemChangeEventArg, ItemEventArg, MenuItem, Moment} from '@/types';
+    import {AppStateCmenu, ItemChangeEventArg} from '../types';
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {Property, LogType, Keys, TimeFormat} from "../../../sys/src/types";
-    import * as main from '../main';
-    import {glob} from "../main";
+    import {Property, LogType, TimeFormat} from "../../../sys/src/types";
+    import {$t, glob, notify} from "../main";
 
-    declare let $, moment: Moment;
+    declare let $, moment: any;
     @Component({name: 'PropTime', components: {}})
     export default class PropTime extends Vue {
         @Prop() private doc: any;
@@ -29,6 +28,12 @@
         @Prop() private placeHolder: string;
 
         private dirty = false;
+        private hasError = false;
+
+        escape() {
+            this.hasError = false;
+            this.$forceUpdate();
+        }
 
         update(e) {
             // Ignore if not change
@@ -37,10 +42,11 @@
             let val = e.target.value ? moment(e.target.value, this.format) : null;
             let date: Date = val && val.isValid() ? val.toDate() : null;
             if (!date && e.target.value) {
-                main.notify('invalid-date' + ": " + e.target.value, LogType.Error);
-                this.$forceUpdate();
-            } else
+                this.hasError = true;
+            } else {
+                this.hasError = false;
                 this.changed({value: date});
+            }
         }
 
         @Emit('changed')
@@ -91,6 +97,7 @@
         }
 
         get value(): string {
+            if (this.hasError) return $(this.$refs.ctrl).val();
             let val = this.doc[this.prop.name];
             return val ? moment(val).format(this.format) : "";
         }

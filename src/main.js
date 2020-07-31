@@ -866,7 +866,7 @@ function ajax(url, data, config, done, fail) {
     if (!multipart)
         params.data = bson_util_1.stringify(data, true);
     // if (params.data) console.log(params.data);
-    console.log("ajax params :", params);
+    //console.log("ajax params :", params);
     // Ajax call
     axios(params).then(res => {
         stopProgress();
@@ -888,8 +888,13 @@ function ajax(url, data, config, done, fail) {
         stopProgress();
         console.error(`error on ajax '${url}'`, err);
         if (err.response && err.response.data) {
-            let er = bson_util_1.parse(err.response.data, true, types_1.ID);
-            fail(er);
+            try {
+                let er = bson_util_1.parse(err.response.data, true, types_1.ID);
+                fail(er);
+            }
+            catch (e) { // sometimes data is html which is wrong!
+                fail(e);
+            }
         }
         else
             fail({ message: err.toString(), code: types_2.StatusCode.UnknownError });
@@ -1153,11 +1158,11 @@ function markDown(html) {
 exports.markDown = markDown;
 function _dispatchRequestServerModify(store, done) {
     if (exports.glob.modifies.length == 0) {
-        notify($t('saved'), types_2.LogType.Debug);
+        notify($t('nothing-todo'), types_2.LogType.Debug);
         exports.glob.dirty = false;
         return done();
     }
-    let modify = exports.glob.modifies.shift();
+    let modify = exports.glob.modifies[0];
     //main.log(modify.type, modify.ref, modify.data);
     let method = types_2.WebMethod.patch;
     switch (modify.type) {
@@ -1172,23 +1177,38 @@ function _dispatchRequestServerModify(store, done) {
     // console.log(stringify(modify.data, true));
     ajax(prepareServerUrl(modify.ref), modify.data, { method }, (res) => {
         commitServerChangeResponse(store, modify, res.modifyResult);
+        // New Item Page
         if (getQs("n")) {
+            notify($t('saved'), types_2.LogType.Debug);
+            exports.glob.dirty = false;
             clearModifies();
             let ref = "/" + modify.ref + "/" + res.modifyResult._id;
             history.replaceState(null, null, ref);
             load(ref, false);
+            done();
         }
-        else if (res.redirect && exports.glob.modifies.length == 0)
+        // Redirect
+        else if (res.redirect && exports.glob.modifies.length == 1) {
+            clearModifies();
             return handleResponseRedirect(res);
-        else if (res.modifyResult)
-            dispatchRequestServerModify(store, done);
+        }
+        // Successful Modify
+        else if (res.modifyResult) {
+            exports.glob.modifies.shift(modify);
+            if (exports.glob.modifies.length == 0) {
+                notify($t('saved'), types_2.LogType.Debug);
+                exports.glob.dirty = false;
+                done();
+            }
+            else
+                dispatchRequestServerModify(store, done);
+        }
+        // Error in saving
         else {
-            exports.glob.modifies.unshift(modify); // insert the modify again
             notify("A problem happened. Please refresh the page to check if your modifies have been saved or not!", types_2.LogType.Error);
             done("A problem happened. Please refresh the page to check if your modifies have been saved or not!");
         }
     }, (err) => {
-        exports.glob.modifies.unshift(modify);
         notify(err, types_2.LogType.Error);
         done(err);
     });

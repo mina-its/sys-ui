@@ -883,8 +883,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
     if (!multipart)
         params.data = stringify(data, true);
     // if (params.data) console.log(params.data);
-
-    console.log("ajax params :", params);
+    //console.log("ajax params :", params);
 
     // Ajax call
     axios(params).then(res => {
@@ -905,8 +904,12 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         stopProgress();
         console.error(`error on ajax '${url}'`, err);
         if (err.response && err.response.data) {
-            let er = parse(err.response.data, true, ID);
-            fail(er);
+            try {
+                let er = parse(err.response.data, true, ID);
+                fail(er);
+            } catch (e) { // sometimes data is html which is wrong!
+                fail(e);
+            }
         } else
             fail({message: err.toString(), code: StatusCode.UnknownError});
     });
@@ -1194,12 +1197,12 @@ export function markDown(html: string): string {
 
 function _dispatchRequestServerModify(store, done: (err?) => void) {
     if (glob.modifies.length == 0) {
-        notify($t('saved'), LogType.Debug);
+        notify($t('nothing-todo'), LogType.Debug);
         glob.dirty = false;
         return done();
     }
 
-    let modify = glob.modifies.shift();
+    let modify = glob.modifies[0];
     //main.log(modify.type, modify.ref, modify.data);
     let method = WebMethod.patch;
     switch (modify.type) {
@@ -1217,22 +1220,37 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
     ajax(prepareServerUrl(modify.ref), modify.data, {method}, (res) => {
         commitServerChangeResponse(store, modify, res.modifyResult);
 
+        // New Item Page
         if (getQs("n")) {
+            notify($t('saved'), LogType.Debug);
+            glob.dirty = false;
             clearModifies();
             let ref = "/" + modify.ref + "/" + res.modifyResult._id;
             history.replaceState(null, null, ref);
             load(ref, false);
-        } else if (res.redirect && glob.modifies.length == 0)
+            done();
+        }
+        // Redirect
+        else if (res.redirect && glob.modifies.length == 1) {
+            clearModifies();
             return handleResponseRedirect(res);
-        else if (res.modifyResult)
-            dispatchRequestServerModify(store, done);
+        }
+        // Successful Modify
+        else if (res.modifyResult) {
+            glob.modifies.shift(modify);
+            if (glob.modifies.length == 0) {
+                notify($t('saved'), LogType.Debug);
+                glob.dirty = false;
+                done();
+            } else
+                dispatchRequestServerModify(store, done);
+        }
+        // Error in saving
         else {
-            glob.modifies.unshift(modify);  // insert the modify again
             notify("A problem happened. Please refresh the page to check if your modifies have been saved or not!", LogType.Error);
             done("A problem happened. Please refresh the page to check if your modifies have been saved or not!");
         }
     }, (err) => {
-        glob.modifies.unshift(modify);
         notify(err, LogType.Error);
         done(err);
     });

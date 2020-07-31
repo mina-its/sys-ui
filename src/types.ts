@@ -161,7 +161,7 @@ export class AppStateCmenu {
     left: number;
     right: number;
     event: any;
-    handler: (state, item) => void;
+    handler: (state: any, item) => void;
 
     constructor() {
         this.show = false;

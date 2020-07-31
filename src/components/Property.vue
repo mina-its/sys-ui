@@ -267,6 +267,10 @@
         &-wide {
             width: 30rem;
         }
+
+        .prop-error {
+            color: red;
+        }
     }
 
     .prop-message {

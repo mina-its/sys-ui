@@ -2,8 +2,9 @@
     <div v-if="glob.infoPanel.show" class="info-panel overflow-hidden border-left bg-light separator-line d-none d-md-block">
         <button @click="glob.infoPanel.show=false" class="btn m-2 close-panel btn-link p-2"><i class="fal fa-times fa-lg"></i></button>
 
-        <!-- Notes -->
+        <!-- Quick Notes -->
         <div class="url-notes px-3 mb-2" style="border-bottom: 2px solid #ccc">
+            <h6>Quick Notes</h6>
             <div v-if="glob.infoPanel.notes.length">
                 <div v-for="note of glob.infoPanel.notes">
                     <button @click="menu($event,note)" class="btn btn-link p-0 pr-1"><i class="fad fa-tags text-primary"></i></button>
@@ -17,6 +18,7 @@
 
         <!-- Help -->
         <div v-if="glob.infoPanel.currentComment" class="py-2 px-3">
+            <h6>Help</h6>
             <div v-html="comment()"></div>
         </div>
     </div>

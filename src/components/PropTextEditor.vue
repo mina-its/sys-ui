@@ -1,6 +1,6 @@
 <template>
     <div class="prop-text-editor">
-        <textarea @focus="focus" ref="area" class="d-none"></textarea>
+        <textarea @focus="focus" value="XXXX" ref="area" class="d-none"></textarea>
     </div>
 </template>
 
@@ -23,13 +23,13 @@
             if ($(this.$el).next('.CodeMirror').length !== 0) return; // to prevent duplicate editor
 
             this.codeMirror = CodeMirror.fromTextArea(this.$refs.area, {
-                value: this.doc[this.prop.name],
                 tabSize: 4,
                 readOnly: this.readOnly,
                 lineNumbers: true,
                 mode: "javascript"
             });
 
+            this.codeMirror.getDoc().setValue(this.doc[this.prop.name]);
             this.codeMirror.on("change", this.changed);
             this.codeMirror.on("focus", this.focus);
         }

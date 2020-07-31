@@ -20,7 +20,7 @@
             }, this.prop.title || this.prop.name);
 
             let propOper = ce('a', {
-                attrs: {"class": "filter-prop-oper py-1 px-2 font-weight-bold", "href": "javascript:void(0);"},
+                attrs: {"class": "filter-prop-oper border bg-white px-2 font-weight-bold", "href": "javascript:void(0);"},
                 on: {click: $this.changeOperator}
             }, $t(`opr-${this.filterOperator}`));
             let propValue = this.renderValue(ce, `filter-prop-value d-flex align-items-center px-1 border-0`);
@@ -291,7 +291,7 @@
     }
 
     .filter-prop-oper {
-        background-color: #ddd;
+        border-radius: 5px;
         color: #666;
 
         &:hover {

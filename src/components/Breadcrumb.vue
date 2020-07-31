@@ -2,7 +2,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb p-0 m-0 bg-transparent d-flex align-items-center">
             <li class="mr-3">
-                <button title="Go Back" @click="goBack" class="btn hover-opacity btn-link p-0"><i class="fal text-secondary fa-arrow-circle-left fa-2x"></i></button>
+                <button title="Go Back" @click="goBack" class="btn hover-opacity btn-link px-1 py-0"><i class="fal text-secondary fa-arrow-circle-left fa-2x"></i></button>
             </li>
             <li v-for="item in breadcrumb" class="breadcrumb-item">
                 <a :href="item.ref">{{item.title}}</a>

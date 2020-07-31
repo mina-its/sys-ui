@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'main-body details-view-container h-100 d-flex flex-column flex-fill overflow-auto':1, 'root': !level}">
+    <div :class="{'details-view-container h-100 d-flex w-100 flex-column':1, 'root': !level}">
         <!--  Toolbar -->
         <div v-if="!level" :class="{'d-flex p-2 align-items-center btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
 
@@ -18,9 +18,6 @@
 
             <!--  Refresh -->
             <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
-
-            <!--  Help -->
-            <a v-if="helpLink" title="Help" target="_blank" class="btn btn-link text-secondary px-2" :href="helpLink.address"><i class="fal fa-question-circle fa-lg"></i></a>
 
             <!--  Object Menu -->
             <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
@@ -92,7 +89,6 @@
         private headFuncs: HeadFunc[] = [];
         private AccessPermission_Edit = AccessPermission.Edit;
         private ObjectDetailsViewType_Tabular = ObjectDetailsViewType.Tabular;
-        private helpLink: EntityLink = null;
 
         comment() {
             return markDown(this.dec.comment);
@@ -126,7 +122,6 @@
                     return {title: link.title as string, ref: link.address};
                 });
             }
-            this.helpLink = this.dec.links.find(k => k.type == LinkType.Help);
         }
 
         mounted() {
