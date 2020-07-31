@@ -478,4 +478,14 @@
         }
     }
 
+    .cm-header.cm-header-1 {
+        font-size: 2rem;
+        color: #000;
+    }
+
+    .cm-header.cm-header-2 {
+        font-size: 1.5rem;
+        color: #000;
+    }
+
 </style>

@@ -1,12 +1,12 @@
 <template>
     <div class="prop-text-editor">
-        <textarea @focus="focus" value="XXXX" ref="area" class="d-none"></textarea>
+        <textarea @focus="focus" ref="area" class="d-none"></textarea>
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {Property} from "../../../sys/src/types";
+    import {Component, Prop, Vue, Emit, Watch} from 'vue-property-decorator';
+    import {Property, TextEditor} from "../../../sys/src/types";
     import {ItemChangeEventArg, PropEventArg} from '../types';
 
     declare let $, CodeMirror: any;
@@ -17,21 +17,65 @@
         @Prop() private prop: Property;
         @Prop() private readOnly: boolean;
 
+        @Watch('value')
+        onValueChanged(value: string, oldValue: string) {
+            if (value != this.codeMirror.getValue()) {
+                this.codeMirror.setValue(value);
+            }
+        }
+
         private codeMirror: any = null;
 
         mounted() {
             if ($(this.$el).next('.CodeMirror').length !== 0) return; // to prevent duplicate editor
 
+            let mode = null;
+            let tags = null;
+            switch (this.prop.text.editor) {
+                case TextEditor.HtmlText:
+                    mode = "htmlmixed";
+                    tags = {
+                        style: [["type", /^text\/(x-)?scss$/, "text/x-scss"], [null, null, "css"]],
+                        custom: [[null, null, "customMode"]]
+                    }
+                    break;
+
+                case TextEditor.Javascript:
+                    mode = "javascript";
+                    break;
+
+                case TextEditor.Css:
+                    mode = "text/x-scss";
+                    break;
+
+                case TextEditor.Json:
+                    mode = "javascript";
+                    break;
+
+                case TextEditor.Xml:
+                    mode = "application/xml";
+                    break;
+
+                case TextEditor.Markdown:
+                    mode = "text/x-markdown";
+                    break;
+            }
+
             this.codeMirror = CodeMirror.fromTextArea(this.$refs.area, {
                 tabSize: 4,
                 readOnly: this.readOnly,
                 lineNumbers: true,
-                mode: "javascript"
+                autoCloseTags: true,
+                mode,
+                tags
             });
-
-            this.codeMirror.getDoc().setValue(this.doc[this.prop.name]);
+            this.codeMirror.setValue(this.value);
             this.codeMirror.on("change", this.changed);
             this.codeMirror.on("focus", this.focus);
+        }
+
+        get value() {
+            return this.doc[this.prop.name] || "";
         }
 
         @Emit('changed')

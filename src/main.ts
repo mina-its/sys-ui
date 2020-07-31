@@ -1054,12 +1054,11 @@ function _commitServerChangeResponse(store, arg: { modify: Modify, res: any }) {
             break;
 
         case ChangeType.InsertItem:
-            if (!arg.modify.state._id.equals(arg.res._id))
+            if (!equalID(arg.modify.state._id, arg.res._id))
                 notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._id}' are not same`, LogType.Error);
             for (let key in arg.res) {
                 arg.modify.state[key] = arg.res[key];
             }
-            //Object.assign(arg.modify.state, arg.res);
             break;
     }
 }
@@ -1202,7 +1201,7 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
         return done();
     }
 
-    let modify = glob.modifies[0];
+    let modify = glob.modifies.shift();
     //main.log(modify.type, modify.ref, modify.data);
     let method = WebMethod.patch;
     switch (modify.type) {
@@ -1231,13 +1230,11 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
             done();
         }
         // Redirect
-        else if (res.redirect && glob.modifies.length == 1) {
-            clearModifies();
+        else if (res.redirect && glob.modifies.length == 0) {
             return handleResponseRedirect(res);
         }
         // Successful Modify
         else if (res.modifyResult) {
-            glob.modifies.shift(modify);
             if (glob.modifies.length == 0) {
                 notify($t('saved'), LogType.Debug);
                 glob.dirty = false;
@@ -1247,10 +1244,12 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
         }
         // Error in saving
         else {
+            glob.modifies.unshift(modify);
             notify("A problem happened. Please refresh the page to check if your modifies have been saved or not!", LogType.Error);
             done("A problem happened. Please refresh the page to check if your modifies have been saved or not!");
         }
     }, (err) => {
+        glob.modifies.unshift(modify);
         notify(err, LogType.Error);
         done(err);
     });

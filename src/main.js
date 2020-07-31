@@ -1026,12 +1026,11 @@ function _commitServerChangeResponse(store, arg) {
             }
             break;
         case types_1.ChangeType.InsertItem:
-            if (!arg.modify.state._id.equals(arg.res._id))
+            if (!equalID(arg.modify.state._id, arg.res._id))
                 notify(`data save error: state id '${arg.modify.state._id}' and request id '${arg.res._id}' are not same`, types_2.LogType.Error);
             for (let key in arg.res) {
                 arg.modify.state[key] = arg.res[key];
             }
-            //Object.assign(arg.modify.state, arg.res);
             break;
     }
 }
@@ -1162,7 +1161,7 @@ function _dispatchRequestServerModify(store, done) {
         exports.glob.dirty = false;
         return done();
     }
-    let modify = exports.glob.modifies[0];
+    let modify = exports.glob.modifies.shift();
     //main.log(modify.type, modify.ref, modify.data);
     let method = types_2.WebMethod.patch;
     switch (modify.type) {
@@ -1188,13 +1187,11 @@ function _dispatchRequestServerModify(store, done) {
             done();
         }
         // Redirect
-        else if (res.redirect && exports.glob.modifies.length == 1) {
-            clearModifies();
+        else if (res.redirect && exports.glob.modifies.length == 0) {
             return handleResponseRedirect(res);
         }
         // Successful Modify
         else if (res.modifyResult) {
-            exports.glob.modifies.shift(modify);
             if (exports.glob.modifies.length == 0) {
                 notify($t('saved'), types_2.LogType.Debug);
                 exports.glob.dirty = false;
@@ -1205,10 +1202,12 @@ function _dispatchRequestServerModify(store, done) {
         }
         // Error in saving
         else {
+            exports.glob.modifies.unshift(modify);
             notify("A problem happened. Please refresh the page to check if your modifies have been saved or not!", types_2.LogType.Error);
             done("A problem happened. Please refresh the page to check if your modifies have been saved or not!");
         }
     }, (err) => {
+        exports.glob.modifies.unshift(modify);
         notify(err, types_2.LogType.Error);
         done(err);
     });
