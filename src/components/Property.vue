@@ -78,15 +78,17 @@
 
             // Property comment
             if (this.prop.comment) {
+                let style = "prop-comment " + (this.prop.commentStyle || "");
+                let comment = main.markDown(this.prop.comment);
                 let cmt = this.prop.commentStyle ?
-                    ce('span', {attrs: {"class": "prop-comment " + this.prop.commentStyle}, domProps: {'innerHTML': main.markDown(this.prop.comment)}})
+                    ce('div', {attrs: {"class": style}, domProps: {'innerHTML': main.markDown(this.prop.comment)}})
                     :
                     ce('p', {attrs: {"class": "prop-comment prop-comment-default mt-3 p-2"}}, [
                         ce('i', {attrs: {"class": "fa fa-info-circle m-1 fa-lg"}},),
                         ce('span', {attrs: {"class": "ml-3"}, domProps: {'innerHTML': main.markDown(this.prop.comment)}}),
                     ]);
 
-                if (this.prop.commentStyle && this.prop.commentStyle.indexOf(Constants.commentBeforeTag) > -1) // Comment before
+                if (this.prop.commentStyle && /\bbefore\b/.test(this.prop.commentStyle)) // Comment before
                     children.unshift(cmt);
                 else
                     children.push(cmt);
@@ -279,19 +281,46 @@
     }
 
     .prop-comment {
-        display: block;
-    }
-
-    .prop-comment.prop-comment-default {
-        background-color: #fef6e0;
-        border: 1px solid #FFDE80;
-        border-radius: 6px;
         color: rgba(0, 0, 0, 0.87);
-        display: flex;
         font-size: 12px;
 
-        .fa {
-            color: #f4b400;
+        &.tip {
+            background-color: #fef6e0;
+            border: 1px solid #FFDE80;
+            border-radius: 6px;
+            display: flex;
+            padding: 1rem;
+            margin-top: 1rem;
+
+            .fa {
+                color: #f4b400;
+            }
+        }
+
+        &.note {
+            border: 1px solid rgba(0, 115, 187, .35);
+            background-color: rgba(241, 250, 255, .8);
+            border-radius: 6px;
+            display: flex;
+            padding: 1rem;
+            margin-top: 1rem;
+
+            .fa {
+                color: rgba(0, 115, 187, 1);
+            }
+        }
+
+        &.warn {
+            background-color: #fef6e0;
+            border: 1px solid #FF8080;
+            border-radius: 6px;
+            display: flex;
+            padding: 1rem;
+            margin-top: 1rem;
+
+            .fa {
+                color: #FF3030;
+            }
         }
     }
 

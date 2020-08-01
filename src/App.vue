@@ -478,14 +478,47 @@
         }
     }
 
-    .cm-header.cm-header-1 {
-        font-size: 2rem;
-        color: #000;
+    /* Comments and Help documents */
+    .inline-note {
+        padding: 1rem;
+        border-radius: 5px;
+        border: 1px solid rgba(0, 115, 187, .35);
+        background-color: rgba(241, 250, 255, .8);
     }
 
-    .cm-header.cm-header-2 {
-        font-size: 1.5rem;
-        color: #000;
+    .h-0 {
+        height: 0;
     }
 
+    .w-0 {
+        width: 0;
+    }
+
+    .inline-tip {
+        padding: 1rem;
+        border-radius: 5px;
+        border: 1px solid #FFDE80;
+        background-color: #fef6e0;
+    }
+
+    /* Code mirror markdown style */
+    .cm-header {
+        font-weight: 500;
+        line-height: 1.2;
+        font-family: Roboto;
+
+        &.cm-header-1 {
+            font-size: 2.5rem;
+            color: #212529;
+        }
+
+        &.cm-header-2 {
+            font-size: 2rem;
+            color: #212529;
+        }
+    }
+
+    .cm-em {
+        color: red;
+    }
 </style>

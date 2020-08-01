@@ -10,25 +10,28 @@
 
             <!--  Preferences -->
             <button class="btn btn-link text-secondary px-2" @click="clickpreferences"><i class="fal fa-cog fa-lg"></i></button>
+
+            <!-- Info Panel -->
+            <button title="Show info panel" v-if="!glob.infoPanel.show" @click="glob.infoPanel.show=true" class="btn close-panel btn-link px-2"><i class="fal fa-info-circle fa-lg"></i></button>
         </div>
 
         <!--  Content -->
-        <div class="w-100 d-flex overflow-auto">
+        <div class="w-100 d-flex overflow-auto h-100">
             <!--  Side Menu -->
-            <aside v-if="directory" class="border-right separator-line p-4 bg-white d-none d-md-block">
+            <aside v-if="directory" class="border-right separator-line p-4 bg-white d-none d-xl-block">
                 <div class="font-weight-bold py-3">{{directoryTitle}}</div>
                 <tree :items="directory" @select="goto"/>
             </aside>
 
             <!--  Main -->
-            <div class="border-left ml-5 w-100 separator-line bg-white overflow-auto d-flex">
+            <div class="border-left ml-md-5 w-100 separator-line bg-white overflow-auto d-flex">
                 <h4 class="text-danger font-weight-bold" v-if="!doc">
                     Document not found!
                 </h4>
 
-                <div class="w-100 h-100">
+                <div class="w-100 h-0">
                     <!-- Content -->
-                    <div class="container p-5">
+                    <div class="container p-md-5 p-sm-0">
                         <div class="text-justify" v-html="docContent"></div>
                     </div>
 
@@ -59,13 +62,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!--  Inside doc -->
-                <div v-if="onThisPage" class="inside-doc sticky-top border-left text-dark py-4" style="min-width: 15rem">
-                    <h6 class="text-nowrap font-weight-bold px-4 py-2">On this page</h6>
-                    <hr>
-                    <tree class="" :items="onThisPage" @select="goto"/>
-                </div>
             </div>
         </div>
     </div>
@@ -73,7 +69,7 @@
 
 <script lang="ts">
     import {Component, Vue} from "vue-property-decorator";
-    import {call, markDown} from "../main";
+    import {call, glob, markDown} from "../main";
     import {TreePair, Pair, Document} from '../../../sys/src/types';
 
     @Component({name: 'AppDocs'})
@@ -81,7 +77,6 @@
         private doc = new Document();
         private directoryTitle: string = null;
         private directory: TreePair[] = [];
-        private onThisPage: TreePair[] = null;
         private breadcrumb: Pair[];
 
         private showHelpUseful: boolean = true;
@@ -124,14 +119,14 @@
 
                 this.breadcrumb = [{title: this.directoryTitle, ref: null}];
 
-                this.onThisPage = null;
                 let content = (this.doc && this.doc.content) ? this.doc.content as string : "";
                 let reg = /## (.+)\b/g;
+                let onThisPage = "##### On this page: <br><br>\r\n";
                 let result;
                 while ((result = reg.exec(content)) !== null) {
-                    this.onThisPage = this.onThisPage || [];
-                    this.onThisPage.push({title: result[1], ref: '#' + result[1].toLowerCase().replace(/\s/, '-')});
+                    onThisPage += `###### [${result[1]}](${'#' + result[1].toLowerCase().replace(/\s/, '-')})\r\n`;
                 }
+                glob.infoPanel.currentComment = onThisPage;
             });
         }
 
@@ -140,12 +135,8 @@
         }
 
         get docContent() {
-            let content = (this.doc && this.doc.content) ? this.doc.content as string : "";
-            content = content.replace(/\*\*Note\*\*(\s+.+\s)/g, "<div class='document-note'><i class='fal text-primary mr-2 fa-info-circle'></i><strong>Note</strong>\r\n$1</div>");
-            content = content.replace(/\*\*Tip\*\*(\s+.+\s)/g, "<div class='document-note'><i class='fal text-primary mr-2 fa-info-circle'></i><strong>Tip</strong>\r\n$1</div>");
-
-            content = content ? markDown(content) : "Empty Docuemnt";
-            return content;
+            let content = this.doc ? this.doc.content as string : "";
+            return markDown(content, true) || "Empty Document";
         }
 
         clickpreferences() {
@@ -170,12 +161,6 @@
 
         .nav-link {
             padding-left: 0;
-        }
-
-        .document-note {
-            padding: 1rem;
-            border: 1px solid rgba(0, 115, 187, .35);
-            background-color: rgba(241, 250, 255, .8);
         }
     }
 </style>

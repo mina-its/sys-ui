@@ -8,6 +8,8 @@
     import {Component, Prop, Vue, Emit, Watch} from 'vue-property-decorator';
     import {Property, TextEditor} from "../../../sys/src/types";
     import {ItemChangeEventArg, PropEventArg} from '../types';
+    import * as main from "../main";
+    import {getPropTextValue} from "../main";
 
     declare let $, CodeMirror: any;
 
@@ -75,7 +77,7 @@
         }
 
         get value() {
-            return this.doc[this.prop.name] || "";
+            return getPropTextValue(this.prop, this.doc) || "";
         }
 
         @Emit('changed')

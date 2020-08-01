@@ -1,5 +1,5 @@
 <template>
-    <div @focus="focus" class="prop-html-editor"></div>
+    <div @focus="focus" class="prop-html-editor w-0 h-0"></div>
 </template>
 
 <script lang="ts">
@@ -41,7 +41,5 @@
 
 <style lang="scss">
     .prop-html-editor {
-        width: 0;
-        height: 0;
     }
 </style>

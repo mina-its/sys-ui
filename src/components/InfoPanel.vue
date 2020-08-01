@@ -4,7 +4,7 @@
 
         <!-- Quick Notes -->
         <div class="url-notes px-3 mb-2" style="border-bottom: 2px solid #ccc">
-            <h6>Quick Notes</h6>
+            <h5>Quick Notes</h5>
             <div v-if="glob.infoPanel.notes.length">
                 <div v-for="note of glob.infoPanel.notes">
                     <button @click="menu($event,note)" class="btn btn-link p-0 pr-1"><i class="fad fa-tags text-primary"></i></button>
@@ -12,13 +12,12 @@
                     <hr class="my-2 border-primary" style="border-width: 2px">
                 </div>
             </div>
-            <textarea v-model="newNote" rows="4" class="bg-transparent new-note border-0 w-100" placeholder="Write your Quick note here ..."></textarea>
+            <textarea v-model="newNote" rows="4" class="bg-transparent new-note border-0 w-100" placeholder="Write your Quick Note here ..."></textarea>
             <button @click="submit" v-if="newNote" class="btn btn-outline-primary py-0 w-100 my-2">Submit</button>
         </div>
 
         <!-- Help -->
         <div v-if="glob.infoPanel.currentComment" class="py-2 px-3">
-            <h6>Help</h6>
             <div v-html="comment()"></div>
         </div>
     </div>
