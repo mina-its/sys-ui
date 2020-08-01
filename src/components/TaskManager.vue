@@ -1041,7 +1041,7 @@
 
         undoArchive(task: Task) {
             task.archive = false;
-            this.saveTask(task, {archive: true} as Task, (res) => {
+            this.saveTask(task, {archive: false} as Task, (res) => {
                 this.refreshTasks();
             });
         }
@@ -1678,6 +1678,7 @@
                     _id: newID(),
                     title: e.ev.target.value,
                     status: TaskStatus.Todo,
+                    collapse: false,
                     project: this.currentProject ? this.currentProject._id : null,
                     priority: TaskPriority.Normal,
                     _: {dragging: false, color: null, bgColor: null},
