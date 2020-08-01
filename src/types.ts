@@ -288,6 +288,7 @@ export class TaskGroupData {
     subtitle?: string;
     concern: TaskView;
     value: any;
+    milestone: string;
     icon?: string;
     style?: string;
     tasks: Task[];
