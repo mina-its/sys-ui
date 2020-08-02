@@ -443,6 +443,8 @@
         autoSetMilestone(task: Task) {
             if (!task.project || !task.dueDates || task.dueDates.length == 0) return;
             let project = this.projects.find(p => equalID(task.project, p._id));
+            if (!project || !project.milestones) return;
+
             let dueDate = task.dueDates[task.dueDates.length - 1].time;
 
             let milestone = null;
@@ -542,7 +544,7 @@
                 }
         }
 
-        reload() {
+        reload(done?) {
             call('getTasks', {}, (err, res) => {
                 let data: GetTaskDto = res.data;
                 if (!data) {
@@ -580,6 +582,7 @@
                 this.activateView(this.view);
 
                 this.checkHashAddress();
+                if (done) done();
             });
         }
 
@@ -616,7 +619,6 @@
             e.ev.preventDefault();
             task._.dragging = false;
             this.applyTaskColoring(task);
-            this.currentTask = null;
 
             this.$forceUpdate();
             this.$nextTick(() => {
@@ -666,7 +668,9 @@
             }
 
             this.saveTask(task, patch, () => {
-                this.reload();
+                this.reload(() => {
+                    this.currentTask = this.tasks.find(t => equalID(t._id, this.currentTask._id));
+                });
             });
         }
 
@@ -713,13 +717,13 @@
                         case  TaskInboxGroup.Todo:
                             task.status = TaskStatus.Todo;
                             if (task.dueDates == null)
-                                task.dueDates = [this.today().toDate()];
+                                this.addDueDate(task, this.today().toDate());
                             break;
 
                         case  TaskInboxGroup.Doing:
                             task.status = TaskStatus.Doing;
                             if (task.dueDates == null)
-                                task.dueDates = [this.today().toDate()];
+                                this.addDueDate(task, this.today().toDate());
                             break;
 
                         case  TaskInboxGroup.Brainstorm:
@@ -976,6 +980,7 @@
         taskChanged(e: ItemChangeEventArg) {
             let change = new Task();
             change[e.prop.name] = e.val;
+            this.autoSetMilestone(this.currentTask);
             this.applyTaskColoring(this.currentTask);
             this.saveTask(this.currentTask, change, (res) => {
                 this.refreshTasks();
@@ -1276,7 +1281,7 @@
                     groupTasks = this.organizeGroupTasks(groupTasks);
 
                     let milestone = null;
-                    if (this.currentProject) {
+                    if (this.currentProject && this.currentProject.milestones) {
                         let milestoneItem = this.currentProject.milestones.find(m => this.datePeriodContains(m.dueDate, moment(date)));
                         if (milestoneItem) milestone = milestoneItem.title;
                     }
@@ -1653,7 +1658,7 @@
 
         addDueDate(task: Task, date: Date) {
             task.dueDates = task.dueDates || [];
-            task.dueDates.push({_id: newID(), time: date});
+            task.dueDates.push({_id: newID(), time: date, setTime: false});
         }
 
         assignCurrentTaskToMe() {
@@ -1710,6 +1715,8 @@
                     case TaskView.DueDate:
                         if (e.group.value)
                             this.addDueDate(newTask, e.group.value.toDate());
+                        if (moment().diff(e.group.value) > 0) // Make previous tasks as done!
+                            newTask.status = TaskStatus.Done;
                         break;
 
                     case TaskView.Category:
@@ -1755,6 +1762,8 @@
                         newTask.status = e.group.value;
                         break;
                 }
+
+                this.autoSetMilestone(newTask);
                 ajax(`/tasks`, newTask, {method: WebMethod.post}, (res) => {
                     console.log("Saved!");
                     Object.assign(newTask, res.modifyResult);
