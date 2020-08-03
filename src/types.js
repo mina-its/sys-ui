@@ -11,7 +11,7 @@ exports.Constants = {
     defaultAddress: '/_default',
     contextMenuVisibleItems: 10,
     delayToStartProgressBar: 300,
-    imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg"],
+    imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg", "svg"],
     uniqueFilenameRegex: /^[a-fA-F0-9]{24}__/,
     QUERY_LOCALE: 'e',
     QUERY_NEW: 'n',

@@ -165,7 +165,7 @@
         }
 
         icon(item: DirFile) {
-            const root = '/@sys-ui/images/gallery/';
+            const root = '/public/images/gallery/';
             if (item.type == DirFileType.Folder)
                 return root + 'folder2.png';
 
