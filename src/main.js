@@ -1155,9 +1155,9 @@ function markDown(text, extraProcess = false) {
     if (!text)
         return "";
     if (extraProcess) {
-        text = text.replace(/\*\*Note\*\*(\s+.+\s)/g, "<div class='inline-note'><i class='fal text-primary mr-2 fa-info-circle'></i><strong>Note</strong>\r\n$1</div>");
-        text = text.replace(/\*\*Tip\*\*(\s+.+\s)/g, "<div class='inline-tip'><i class='fal text-primary mr-2 fa-info-circle'></i><strong>Tip</strong>\r\n$1</div>");
-        text = text.replace(/\*\*Warning\*\*(\s+.+\s)/g, "<div class='inline-warn'><i class='fal text-primary mr-2 fa-info-circle'></i><strong>Warning</strong>\r\n$1</div>");
+        text = text.replace(/\*\*Note\*\*(\s+.+\s)/ig, "<div class='inline-note'><i class='fal text-primary mr-2 fa-info-circle'></i><strong>Note</strong>\r\n$1</div>");
+        text = text.replace(/\*\*Tip\*\*(\s+.+\s)/ig, "<div class='inline-tip'><i class='fal text-primary mr-2 fa-info-circle'></i><strong>Tip</strong>\r\n$1</div>");
+        text = text.replace(/\*\*Warning\*\*(\s+.+\s)/ig, "<div class='inline-warn'><i class='fal text-primary mr-2 fa-info-circle'></i><strong>Warning</strong>\r\n$1</div>");
     }
     return marked(text).replace(/^\<p\>|\<\/p\>\s*$/g, "");
 }

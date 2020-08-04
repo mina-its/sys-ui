@@ -3,17 +3,21 @@
         <div v-if="group.title" class="font-weight-bold py-1 text-primary">
             <i v-if="group.icon" :class="group.icon"></i>{{group.title}}
         </div>
-        <label v-if="group.subtitle" class="small mb-0 font-weight-bold" v-html="group.subtitle"></label>
+        <div v-if="group.subtitle" class="d-flex">
+            <label class="small mb-0 font-weight-bold" v-html="group.subtitle"></label>
+            <div class="mr-auto"></div>
+            <i v-if="milestone" :title="milestone" class="fad text-danger fa-pennant"></i>
+        </div>
         <div class="tasks-panel">
             <div v-for="task in group.tasks" v-if="isVisible(task)" class="w-100 d-flex align-items-center" @dragenter="dragEnterTask($event,task)">
                 <i v-if="task.parent" class="fal fa-genderless fa-xs mx-2 text-black-50"></i>
-                <div tabindex="0" draggable="true" @dragstart="dragStart($event,task)" @keydown="taskkeypress($event,task)" @focus="focusTask(task)"
+                <div tabindex="0" draggable="true" @dragend="dragEnd($event,task)" @dragstart="dragStart($event,task)" @keydown="taskkeypress($event,task)" @focus="focusTask(task)"
                      :class="{'task-item text-nowrap d-flex align-items-center border w-100 rounded': 1, 'multi-place':task._.multiPlace,'dragging': task._.dragging}"
                      :style="{'color':task._.color,'background-color':task._.bgColor}">
                     <i v-if="task.archive" class="px-1 fal fa-archive"></i>
                     <div class="px-1 w-100 overflow-hidden" style="text-overflow: ellipsis">{{taskCaption(task)}}</div>
                     <div class="font-weight-bold" v-html="getTaskTime(task)"></div>
-                    <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-angle-up':!task._.expand,'fas fa-angle-down':task._.expand}"></i>
+                    <i @click="toggleExpand(task)" v-if="hasChild(task)" :class="{'fa-lg px-1':1,'fal fa-angle-up':task.collapse,'fas fa-angle-down':!task.collapse}"></i>
                 </div>
             </div>
         </div>
@@ -32,6 +36,12 @@
     @Component({name: 'TaskGroup'})
     export default class TaskGroup extends Vue {
         @Prop() private group: TaskGroupData;
+        @Prop() private milestone: string;
+
+        @Emit('dragEnd')
+        dragEnd(ev, task) {
+            return {ev, task, group: this.group} as TaskEvent;
+        }
 
         hasChild(task: Task) {
             return this.group.tasks.filter(t => equalID(t.parent, task._id)).length > 0;
@@ -91,16 +101,17 @@
         }
 
         isVisible(task: Task) {
-            return !task._.expand || !task.parent;
+            return task.collapse || !task.parent;
         }
 
+        @Emit('toggleExpand')
         toggleExpand(task: Task) {
-            task._.expand = !task._.expand;
-            this.group.tasks.filter(t => equalID(t.parent, task._id)).forEach(t => t._.expand = task._.expand);
-            this.$forceUpdate();
+            return task;
         }
 
         clickGroup(ev) {
+            $(".task-group.active").removeClass("active");
+            $(ev.target).closest(".task-group").addClass("active");
             $(ev.target).find(".new-task").focus();
         }
 
@@ -157,10 +168,10 @@
                 min-width: 12rem;
             }
 
-            &.calendar-day:hover {
+            &.calendar-day.active {
                 overflow: visible;
                 position: absolute;
-                height: unset!important;
+                height: unset !important;
                 max-width: 15rem;
                 background-color: #f5f5f5;
                 border-right: 1px solid #bbb;

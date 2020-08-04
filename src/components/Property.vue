@@ -79,15 +79,8 @@
             // Property comment
             if (this.prop.comment) {
                 let style = "prop-comment " + (this.prop.commentStyle || "");
-                let comment = main.markDown(this.prop.comment);
-                let cmt = this.prop.commentStyle ?
-                    ce('div', {attrs: {"class": style}, domProps: {'innerHTML': main.markDown(this.prop.comment)}})
-                    :
-                    ce('p', {attrs: {"class": "prop-comment prop-comment-default mt-3 p-2"}}, [
-                        ce('i', {attrs: {"class": "fa fa-info-circle m-1 fa-lg"}},),
-                        ce('span', {attrs: {"class": "ml-3"}, domProps: {'innerHTML': main.markDown(this.prop.comment)}}),
-                    ]);
-
+                let comment = `<i class="fa"></i><div>${main.markDown(this.prop.comment)}</div>`;
+                let cmt = ce('div', {attrs: {"class": style}, domProps: {'innerHTML': comment}});
                 if (this.prop.commentStyle && /\bbefore\b/.test(this.prop.commentStyle)) // Comment before
                     children.unshift(cmt);
                 else
@@ -284,6 +277,10 @@
         color: rgba(0, 0, 0, 0.87);
         font-size: 12px;
 
+        ul {
+            padding-left: 0;
+        }
+
         &.tip {
             background-color: #fef6e0;
             border: 1px solid #FFDE80;
@@ -292,8 +289,14 @@
             padding: 1rem;
             margin-top: 1rem;
 
-            .fa {
+            i.fa {
                 color: #f4b400;
+                font-size: 1.4em;
+                margin-right: .8rem;
+
+                &:before {
+                    content: "\f05a";
+                }
             }
         }
 
@@ -305,21 +308,33 @@
             padding: 1rem;
             margin-top: 1rem;
 
-            .fa {
+            i.fa {
                 color: rgba(0, 115, 187, 1);
+                font-size: 1.4em;
+                margin-right: .8rem;
+
+                &:before {
+                    content: "\f05a";
+                }
             }
         }
 
         &.warn {
-            background-color: #fef6e0;
-            border: 1px solid #FF8080;
+            background-color: #f9e4e4;
+            border: 1px solid #e8b6b6;
             border-radius: 6px;
             display: flex;
             padding: 1rem;
             margin-top: 1rem;
 
-            .fa {
-                color: #FF3030;
+            i.fa {
+                color: #ea8989;
+                font-size: 1.4em;
+                margin-right: .8rem;
+
+                &:before {
+                    content: "\f071";
+                }
             }
         }
     }
