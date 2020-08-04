@@ -1,5 +1,5 @@
 <template>
-    <div v-if="glob.infoPanel.show" class="info-panel overflow-hidden border-left bg-light separator-line d-none d-md-block">
+    <div v-if="glob.infoPanel.show" class="info-panel overflow-hidden border-left bg-light separator-line d-none d-lg-block">
         <button @click="glob.infoPanel.show=false" class="btn m-2 close-panel btn-link p-2"><i class="fal fa-times fa-lg"></i></button>
 
         <!-- Quick Notes -->
@@ -77,5 +77,11 @@
         min-width: 15rem;
         width: 20rem;
         font-size: smaller;
+    }
+
+    @media (min-width: 1200px) {
+        .info-panel {
+            width: 30rem;
+        }
     }
 </style>

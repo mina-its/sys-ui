@@ -287,7 +287,7 @@
             border-radius: 6px;
             display: flex;
             padding: 1rem;
-            margin-top: 1rem;
+            margin: .5rem 0;
 
             i.fa {
                 color: #f4b400;
@@ -306,7 +306,7 @@
             border-radius: 6px;
             display: flex;
             padding: 1rem;
-            margin-top: 1rem;
+            margin: .5rem 0;
 
             i.fa {
                 color: rgba(0, 115, 187, 1);
@@ -325,7 +325,7 @@
             border-radius: 6px;
             display: flex;
             padding: 1rem;
-            margin-top: 1rem;
+            margin: .5rem 0;
 
             i.fa {
                 color: #ea8989;

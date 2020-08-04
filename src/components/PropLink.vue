@@ -6,7 +6,7 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
     import * as main from '../main';
-    import {pushToGridViewRecentList} from "../main";
+    import {glob, pushToGridViewRecentList} from "../main";
 
     @Component({name: 'PropLink'})
     export default class PropLink extends Vue {
@@ -41,7 +41,11 @@
         get ref() {
             if (!this.doc._id)
                 return "/";
-            return "/" + this.path + "/" + this.doc._id;
+            let url = "/" + this.path + "/" + this.doc._id;
+            if (glob.config.prefix)
+                url = `/${glob.config.prefix}${url}`;
+
+            return url;
         }
     }
 </script>

@@ -105,9 +105,9 @@
         loadDoc(ref: string) {
             this.showHelpUseful = true;
 
-            let parts = ref.split('/');
-            if (parts.length != 3) return;
-            call('getDocument', {name: parts[2]}, (err, res) => {
+            let name = ref.replace(/.+\/docs\/([\w-]+).*/, "$1");
+            if (!name) return;
+            call('getDocument', {name}, (err, res) => {
                 if (!res.data) {
                     this.doc = null;
                     return;

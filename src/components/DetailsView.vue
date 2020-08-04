@@ -351,12 +351,12 @@
         }
 
         .form-group {
-            margin-bottom: .5rem;
+            margin: .5rem 0;
         }
 
         .sidenav {
             background-color: white;
-            min-width: 220px;
+            min-width: 12rem;
         }
 
         label {
