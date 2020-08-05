@@ -470,6 +470,11 @@ export function pushToGridViewRecentList(path: string, ref: string, title: strin
     localStorage.setItem("gridView-recentItems-" + path, JSON.stringify(recentItems));
 }
 
+export function urlInsertPrefix(url) {
+    if (glob.config.prefix)
+        return `/${glob.config.prefix}${url}`;
+}
+
 function handleWindowEvents() {
     $(window)
         .on("popstate", (e) => {

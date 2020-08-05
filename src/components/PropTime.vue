@@ -105,4 +105,7 @@
 </script>
 
 <style lang="scss">
+    .prop-time input {
+        min-width: 6rem;
+    }
 </style>

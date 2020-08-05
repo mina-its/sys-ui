@@ -256,6 +256,7 @@
 
             <!--  Right Panel -->
             <div :class="{'right-panel border-left bg-white px-3':1,'hide-panel':!showRightPanel}">
+                <!--  Close button -->
                 <div class="d-flex py-1">
                     <div class="mr-auto"></div>
                     <button @click="showRightPanel=false" title="Hide info panel" class="btn close-panel btn-link p-2"><i class="fal fa-times fa-lg"></i></button>

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.loadNotes = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.loadNotes = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.urlInsertPrefix = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -463,6 +463,11 @@ function pushToGridViewRecentList(path, ref, title) {
     localStorage.setItem("gridView-recentItems-" + path, JSON.stringify(recentItems));
 }
 exports.pushToGridViewRecentList = pushToGridViewRecentList;
+function urlInsertPrefix(url) {
+    if (exports.glob.config.prefix)
+        return `/${exports.glob.config.prefix}${url}`;
+}
+exports.urlInsertPrefix = urlInsertPrefix;
 function handleWindowEvents() {
     $(window)
         .on("popstate", (e) => {

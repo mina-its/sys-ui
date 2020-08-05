@@ -6,10 +6,9 @@
         <div class="url-notes px-3 mb-2" style="border-bottom: 2px solid #ccc">
             <h5>Quick Notes</h5>
             <div v-if="glob.infoPanel.notes.length">
-                <div v-for="note of glob.infoPanel.notes">
+                <div class="border-primary border border-2 p-1 mb-2" v-for="note of glob.infoPanel.notes">
                     <button @click="menu($event,note)" class="btn btn-link p-0 pr-1"><i class="fad fa-tags text-primary"></i></button>
                     {{note.content}}
-                    <hr class="my-2 border-primary" style="border-width: 2px">
                 </div>
             </div>
             <textarea v-model="newNote" rows="4" class="bg-transparent new-note border-0 w-100" placeholder="Write your Quick Note here ..."></textarea>

@@ -271,15 +271,15 @@
         visibility: hidden; /* Hidden by default. Visible on click */
         min-width: 250px; /* Set a default minimum width */
         margin-#{$left}: -125px; /* Divide value of min-width by 2 */
-        background-color: #333; /* Black background color */
-        color: #fff; /* White text color */
+        background-color: white;
+        color: black;
         text-align: center; /* Centered text */
         border-radius: 2px; /* Rounded borders */
-        padding: 3rem;
+        padding: .8rem;
         position: fixed; /* Sit on top of the screen */
         z-index: 1; /* Add a z-index if needed */
         left: 50%; /* Center the snackbar */
-        bottom: 30px; /* 30px from the bottom */
+        top: 4px;
 
         .visible {
             visibility: visible; /* Show the snackbar */
@@ -499,6 +499,10 @@
         border-radius: 5px;
         border: 1px solid #FFDE80;
         background-color: #fef6e0;
+    }
+
+    border-2 {
+        border-width: 2px !important;
     }
 
     /* Code mirror markdown style */

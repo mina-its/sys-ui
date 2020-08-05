@@ -71,7 +71,7 @@
     import {ChangeType, HeadFunc, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
     import {AccessPermission, EntityLink, Context, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
-    import {$t, getNewItemTitle, glob, loadObjectViewData, markDown} from '../main';
+    import {$t, getNewItemTitle, glob, loadObjectViewData, markDown, urlInsertPrefix} from '../main';
     import * as main from '../main';
     import ObjectView from "./ObjectView.vue";
 
@@ -119,7 +119,7 @@
             this.headFuncs = [];
             if (this.dec.links) {
                 this.headFuncs = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
-                    return {title: link.title as string, ref: link.address};
+                    return {title: link.title as string, ref: urlInsertPrefix(link.address)};
                 });
             }
         }
