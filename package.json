@@ -7,7 +7,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --report src/index.js",
     "lint": "vue-cli-service lint",
-    "buildcopy" : "cp dist/sys-ui.umd.min.js public/js/sys.main.js & cp dist/sys-ui.css public/css/sys.main.css"
+    "buildcopy": "cp dist/sys-ui.umd.min.js public/js/sys.main.js & cp dist/sys-ui.css public/css/sys.main.css",
+    "buildcopywin": "copy dist\\sys-ui.umd.min.js \"public/js/sys.main.js\"  & copy dist\\sys-ui.css \"public/css/sys.main.css\" "
   },
   "keywords": [
     "sys-ui"
