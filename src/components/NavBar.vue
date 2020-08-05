@@ -87,7 +87,7 @@
 <style lang="scss">
     nav.navbar {
         .business-app:hover {
-            border: none !important;
+            border: 1px solid white!important;
             box-shadow: rgba(0, 0, 0, 0.22) 0px 25.6px 57.6px 0px, rgba(0, 0, 0, 0.18) 0px 4.8px 14.4px 0px;
         }
 
