@@ -1,10 +1,10 @@
 <template>
     <tr :class="{'highlight': meta.marked}" @click="click">
         <th scope="row" v-if="selectable" class="text-center">
-            <CheckBox :checked="meta.marked" />
+            <CheckBox :checked="meta.marked"/>
         </th>
         <th v-else @click="headerClick" class="text-center"></th>
-        <td v-for="(pMeta, index) in dec.properties">
+        <td @click="clickCell" v-for="(pMeta, index) in dec.properties">
             <Property @focus="focused" :item="item" :prop="pMeta" @changed="changed" @keydown="keydown"
                       :viewType="1" :indexInGrid="index" :readonly="readonly"/>
         </td>
@@ -13,8 +13,8 @@
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {Property, EntityMeta, IData} from "../../../sys/src/types";
-    import {ItemChangeEventArg, ItemEventArg} from '../types';
+    import {EntityMeta, IData} from "../../../sys/src/types";
+    import {PropEventArg, ItemChangeEventArg, ItemEventArg} from '../types';
 
     declare let $: any;
     @Component({name: 'GridViewRow', components: {}})
@@ -24,9 +24,14 @@
         @Prop() private selectable: boolean;
         @Prop() private readonly: boolean;
 
-        focused(e, prop: Property) {
-            $(".prop-focused").removeClass("prop-focused");
-            $(e.target).closest("td").addClass("prop-focused");
+        focused(e: PropEventArg) {
+            $("td.active").removeClass("active");
+            $(e.event.target).closest("td").addClass("active");
+        }
+
+        clickCell(e){
+            $("td.active").removeClass("active");
+            $(e.target).closest("td").addClass("active");
         }
 
         @Emit('changed')
@@ -80,6 +85,10 @@
 
             &:hover th, &.highlight th {
                 background-color: var(--grid-row-header-highlight);
+            }
+
+            td.active {
+                outline: 1px solid var(--dark);
             }
         }
     }

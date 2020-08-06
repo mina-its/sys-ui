@@ -1,34 +1,11 @@
 <template>
-    <div :class="{'details-view-container h-100 d-flex w-100 flex-column':1, 'root': !level}">
-        <!--  Toolbar -->
-        <div v-if="!level" :class="{'d-flex p-2 align-items-center btn-toolbar separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
-
-            <!--  Breadcrumb -->
-            <Breadcrumb :breadcrumb="glob.form.breadcrumb" :title="glob.form.breadcrumbLast"/>
-
-            <!--  Toolbar Apply/Cancel -->
-            <ToolbarModifyButtons/>
-
-            <!--  Head Functions -->
-            <div class="mr-auto"></div>
-            <template v-for="func in headFuncs">
-                <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-2'}`" v-if="func.ref">{{func.title}}</a>
-                <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
-            </template>
-
-            <!--  Refresh -->
-            <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
-
-            <!--  Object Menu -->
-            <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
-
-            <!-- Info Panel -->
-            <button title="Show info panel" v-if="!glob.infoPanel.show" @click="glob.infoPanel.show=true" class="btn close-panel btn-link px-2"><i class="fal fa-info-circle fa-lg"></i></button>
-        </div>
+    <div :class="{'h-100 d-flex w-100 flex-column':1, 'root': !level}">
+        <layout-default :hideToolbar="!!level" :globalFunctions="headFuncs">
+        </layout-default>
 
         <!--  Content -->
         <div class="w-100 h-100 main-bg-image overflow-auto d-flex">
-            <div :class="{'d-flex w-100 overflow-auto details-view':true, 'bg-white':level}" @scroll="onScroll()">
+            <div :class="{'d-flex w-100 overflow-auto details-view':1, 'bg-white':level}" @scroll="onScroll()">
 
                 <!--  Side Menu -->
                 <aside v-if="sideMenuVisible" class="border-right separator-line sidenav py-4 d-none d-md-block">
@@ -74,10 +51,11 @@
     import {$t, getNewItemTitle, glob, loadObjectViewData, markDown, urlInsertPrefix} from '../main';
     import * as main from '../main';
     import ObjectView from "./ObjectView.vue";
+    import LayoutDefault from "./LayoutDefault.vue";
 
     declare let $: any;
 
-    @Component({name: 'DetailsView', components: {ObjectView}})
+    @Component({name: 'DetailsView', components: {LayoutDefault, ObjectView}})
     export default class DetailsView extends Vue {
         @Prop() private uri: string;
         @Prop() private data: any;
@@ -127,23 +105,6 @@
         mounted() {
             this.resetHeadFuncs();
             this.reloadLastGroup();
-        }
-
-        refresh() {
-            main.load(location.pathname, false);
-        }
-
-        clickObjectMenu(e) {
-            let items: MenuItem[] = [
-                {ref: "print", title: $t('print')}
-            ];
-            main.showCmenu(null, items, e, (state, item: MenuItem) => {
-                switch (item.ref) {
-                    case "print":
-                        window.print();
-                        break;
-                }
-            });
         }
 
         getGroupId(group: string) {

@@ -1,12 +1,13 @@
 <template>
     <div class="checkbox-wrapper text-center mr-2 outline-0" @click="changed">
-        <input class="checkbox" @keyup.space="changed" @keydown="keydown" type="checkbox" :checked="checked" tabindex="0" @input="changed">
+        <input @focus="focus" class="checkbox" @keyup.space="changed" @keydown="keydown" type="checkbox" :checked="checked" tabindex="0" @input="changed">
         <label :class="{'checkbox-label':true, 'no-label':!label}">{{label}}</label>
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
+    import {PropEventArg} from "../types";
 
     @Component({name: 'CheckBox'})
     export default class CheckBox extends Vue {
@@ -16,6 +17,11 @@
         @Emit('changed')
         changed() {
             return {val: !this.checked};
+        }
+
+        @Emit('focus')
+        focus(e): PropEventArg {
+            return e;
         }
 
         @Emit('keydown')

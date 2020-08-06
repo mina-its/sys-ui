@@ -1,11 +1,11 @@
 <template>
-    <check-box v-else :label="label" :checked="checked" @changed="change" />
+    <check-box @focus="focus" :label="label" :checked="checked" @changed="change"/>
 </template>
 
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
-    import {ItemChangeEventArg} from '../types';
+    import {ItemChangeEventArg, PropEventArg} from '../types';
 
     @Component({name: 'PropBoolean'})
     export default class PropBoolean extends Vue {
@@ -17,6 +17,11 @@
         @Emit('keydown')
         keydown(e) {
             return {e};
+        }
+
+        @Emit('focus')
+        focus(e): PropEventArg {
+            return {prop: this.prop, event: e};
         }
 
         @Emit('changed')

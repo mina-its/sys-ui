@@ -9,7 +9,8 @@ import {
     IData,
     Task,
     TaskView,
-    Note
+    Note,
+    mFile
 } from '../../sys/src/types';
 
 import Vue from 'vue'
@@ -205,7 +206,7 @@ export class Global {
     };
     question = new AppStateQuestion();
     fileGallery = new AppStateFileGallery();
-    fileBrowsed: (files: FileList) => void = null;
+    fileBrowsed: (files: mFile[]) => void = null;
     imagePreview = {show: false, url: null};
     logs: AppStateLog[] = [];
     modal: boolean = false;

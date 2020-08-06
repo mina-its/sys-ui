@@ -100,17 +100,8 @@
         }
     }
 
-    .btn-light {
-        background-color: #ededed;
-        border-color: #ededed;
-    }
-
     html {
         height: 100%;
-    }
-
-    .rtl {
-        direction: rtl;
     }
 
     body {
@@ -120,36 +111,15 @@
         font-size: 15px;
     }
 
-    .table {
-        width: inherit;
-    }
-
     main {
         flex: 1 1 auto;
         scroll-behavior: smooth;
         background-color: var(--main-bg);
     }
 
-    input {
-        &[type=date],
-        &[type=time],
-        &[type=datetime-local],
-        &[type=month] {
-            -webkit-appearance: normal;
-        }
-    }
-
-    header {
-        flex: 0 1 auto;
-
-        nav {
-            background-color: var(--header-bg);
-        }
-
-        .btn-toolbar {
-            border-color: var(--layout-border);
-        }
-    }
+    /*header {*/
+    /*    flex: 0 1 auto;*/
+    /*}*/
 
     a {
         color: var(--link-color);
@@ -163,62 +133,18 @@
         }
     }
 
-    td {
-        .prop-focused {
-            outline: 1px solid var(--primary);
-        }
+    /* Bootstrap extensions */
+    .btn-light {
+        background-color: #ededed;
+        border-color: #ededed;
     }
 
-    // todo: disable print
-    /*#print{display:none!important;}@media print{*{display:none;}}*/
-
-    /* Animations to fade the snackbar in and out */
-    @-webkit-keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
+    .rtl {
+        direction: rtl;
     }
 
-    @keyframes fadein {
-        from {
-            bottom: 0;
-            opacity: 0;
-        }
-        to {
-            bottom: 30px;
-            opacity: 1;
-        }
-    }
-
-    @-webkit-keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
-
-    @keyframes fadeout {
-        from {
-            bottom: 30px;
-            opacity: 1;
-        }
-        to {
-            bottom: 0;
-            opacity: 0;
-        }
-    }
-
-    .nav {
-        padding: 0;
+    .table {
+        width: inherit;
     }
 
     .no-select {
@@ -249,95 +175,13 @@
         /*!*margin-top: .55rem;*! I removed this because of multi reference problem*/
     }
 
-    .breadcrumb-item {
-        font-weight: 500;
-
-        + .breadcrumb-item {
-            padding-#{$left}: 0.5rem;
-
-            &::before {
-                padding-#{$right}: 0.5rem;
-                padding-#{$left}: 0;
-                content: "";
-            }
-        }
-
-        i {
-            color: var(--breadcrumb-separator);
-        }
-    }
-
-    #snackbar {
-        visibility: hidden; /* Hidden by default. Visible on click */
-        min-width: 250px; /* Set a default minimum width */
-        margin-#{$left}: -125px; /* Divide value of min-width by 2 */
-        background-color: white;
-        color: black;
-        text-align: center; /* Centered text */
-        border-radius: 2px; /* Rounded borders */
-        padding: .8rem;
-        position: fixed; /* Sit on top of the screen */
-        z-index: 1; /* Add a z-index if needed */
-        left: 50%; /* Center the snackbar */
-        top: 4px;
-
-        .visible {
-            visibility: visible; /* Show the snackbar */
-            /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
-            However, delay the fade out process for 2.5 seconds */
-            -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
-        }
-    }
-
-    .fa-chevron- {
-        &left:before {
-            //@if var(--left) == left {
-            //    content: "\f053" !important;
-            //} @else {
-            //    content: "\f054" !important;
-            //}
-        }
-
-        &right:before {
-            //@if var(--right) == right {
-            //    content: "\f054" !important;
-            //} @else {
-            //    content: "\f053" !important;
-            //}
-        }
-    }
-
     .token {
         white-space: pre;
-    }
-
-    .fade- {
-        &enter-active {
-            transition: opacity .1s;
-        }
-
-        &leave-active {
-            transition: opacity .8s;
-        }
-
-        &enter, &leave-to {
-            opacity: 0;
-        }
     }
 
     .aside {
         position: sticky;
         top: 0;
-    }
-
-    .modal {
-        .prop-comment {
-            //background-color: inherit;
-            //border: none;
-            //padding: 0 !important;
-            //color: gray;
-        }
     }
 
     .modal-mask {
@@ -356,6 +200,105 @@
         display: table-cell;
     }
 
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #ccc;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .outline-0 {
+        outline: none;
+    }
+
+    .hover-opacity:hover {
+        opacity: .5;
+    }
+
+    .noselect {
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none;
+        /* Non-prefixed version, currently
+                                         supported by Chrome, Edge, Opera and Firefox */
+    }
+
+    .main-bg-image {
+        background-repeat: no-repeat;
+        /*background-image: url('//public/images/bg2.webp');*/
+        background-position-y: bottom;
+        background-position-x: right;
+    }
+
+    /* Comments and Help documents */
+    .inline-note {
+        padding: 1rem;
+        border-radius: 5px;
+        border: 1px solid rgba(0, 115, 187, .35);
+        background-color: rgba(241, 250, 255, .8);
+    }
+
+    .h-0 {
+        height: 0;
+    }
+
+    .w-0 {
+        width: 0;
+    }
+
+    .inline-tip {
+        padding: 1rem;
+        border-radius: 5px;
+        border: 1px solid #FFDE80;
+        background-color: #fef6e0;
+    }
+
+    border-2 {
+        border-width: 2px !important;
+    }
+
+    /* Code mirror markdown style */
+    .cm-header {
+        font-weight: 500;
+        line-height: 1.2;
+        font-family: Roboto;
+
+        &.cm-header-1 {
+            font-size: 2.5rem;
+            color: #212529;
+        }
+
+        &.cm-header-2 {
+            font-size: 2rem;
+            color: #212529;
+        }
+    }
+
+    .cm-em {
+        color: red;
+    }
+
+    /* Specific forms styles */
     .user-forget-password-comment {
         display: block;
         color: gray;
@@ -414,56 +357,6 @@
         }
     }
 
-    ::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
-    }
-
-    /* Track */
-    ::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    /* Handle */
-    ::-webkit-scrollbar-thumb {
-        background: #ccc;
-    }
-
-    /* Handle on hover */
-    ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
-    .cursor-pointer {
-        cursor: pointer;
-    }
-
-    .outline-0 {
-        outline: none;
-    }
-
-    .hover-opacity:hover {
-        opacity: .5;
-    }
-
-    .noselect {
-        -webkit-touch-callout: none; /* iOS Safari */
-        -webkit-user-select: none; /* Safari */
-        -khtml-user-select: none; /* Konqueror HTML */
-        -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-        user-select: none;
-        /* Non-prefixed version, currently
-                                         supported by Chrome, Edge, Opera and Firefox */
-    }
-
-    .main-bg-image {
-        background-repeat: no-repeat;
-        /*background-image: url('//public/images/bg2.webp');*/
-        background-position-y: bottom;
-        background-position-x: right;
-    }
-
     .database-shell-command {
         .prop-text-editor {
             height: 20rem;
@@ -478,51 +371,4 @@
         }
     }
 
-    /* Comments and Help documents */
-    .inline-note {
-        padding: 1rem;
-        border-radius: 5px;
-        border: 1px solid rgba(0, 115, 187, .35);
-        background-color: rgba(241, 250, 255, .8);
-    }
-
-    .h-0 {
-        height: 0;
-    }
-
-    .w-0 {
-        width: 0;
-    }
-
-    .inline-tip {
-        padding: 1rem;
-        border-radius: 5px;
-        border: 1px solid #FFDE80;
-        background-color: #fef6e0;
-    }
-
-    border-2 {
-        border-width: 2px !important;
-    }
-
-    /* Code mirror markdown style */
-    .cm-header {
-        font-weight: 500;
-        line-height: 1.2;
-        font-family: Roboto;
-
-        &.cm-header-1 {
-            font-size: 2.5rem;
-            color: #212529;
-        }
-
-        &.cm-header-2 {
-            font-size: 2rem;
-            color: #212529;
-        }
-    }
-
-    .cm-em {
-        color: red;
-    }
 </style>

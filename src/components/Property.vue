@@ -1,7 +1,7 @@
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
     import {GlobalType, ObjectViewType, Property as ObjectProperty, PropertyEditMode, TextEditor} from "../../../sys/src/types";
-    import {ChangeType, Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode} from '../types';
+    import {ChangeType, Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode, PropEventArg} from '../types';
     import * as main from '../main';
     import {getPropertyEmbedError} from '../main';
 
@@ -52,8 +52,8 @@
         }
 
         @Emit("focus")
-        focused(e) {
-            return {e, prop: this.prop};
+        focused(e): PropEventArg {
+            return e;
         }
 
         @Emit('keydown')

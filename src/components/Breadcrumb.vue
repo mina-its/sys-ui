@@ -37,5 +37,21 @@
 </script>
 
 <style lang="scss">
+    .breadcrumb-item {
+        font-weight: 500;
 
+        + .breadcrumb-item {
+            padding-left: 0.5rem;
+
+            &::before {
+                padding-right: 0.5rem;
+                padding-left: 0;
+                content: "";
+            }
+        }
+
+        i {
+            color: var(--breadcrumb-separator);
+        }
+    }
 </style>

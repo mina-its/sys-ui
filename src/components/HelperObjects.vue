@@ -1,6 +1,5 @@
 <template>
     <section class="helpers-objects">
-        <div id="snackbar"></div>
         <FileGallery/>
         <BrowseFile/>
         <NotifyBox/>

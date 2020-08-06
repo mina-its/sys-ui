@@ -28,7 +28,7 @@
             <aside class="overflow-hidden border-right separator-line bg-white d-none d-md-block py-3">
                 <ul class="nav flex-column">
                     <li v-for="node in dec.nodes" class="nav-item px-3">
-                        <button draggable="true" @dragstart="dragNodeDec($event,node)" class="text-nowrap px-0 rounded-0 bg-secondary w-100 text-left my-1 nav-link btn btn-link text-white" :href="node.ref">
+                        <button draggable="true" @dragstart="dragNodeDec($event,node)" class="text-nowrap px-0 bg-secondary w-100 text-left my-1 nav-link btn btn-link text-white" :href="node.ref">
                             <i :class="'text-center px-3 fa-lg fal fa-' + node.icon" style="width: 3rem"></i>
                             <span class="small font-weight-bold">{{node.title}}</span>
                         </button>
@@ -105,7 +105,7 @@
     @Component({name: 'FlowchartDesigner'})
     export default class FlowchartDesigner extends Vue {
         private flowchart: Flowchart = {nodes: [], title: "Loading ..."} as Flowchart;
-        private dec: FlowchartDeclaration = {type: {nodes: []}} as FlowchartDeclaration;
+        private dec: FlowchartDeclaration = {nodes: []} as FlowchartDeclaration;
         private draggingNodeDec: FlowchartNodeDeclare = null;
         private currentNode: FlowchartNode = null;
         private currentLink: any = null;

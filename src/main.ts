@@ -26,7 +26,7 @@ import App from './App.vue';
 import pluralize = require('pluralize');
 
 declare let $: JQuery, axios: Axios, io: Socket, marked: any;
-export let glob = window["__glob"] || new Global();
+export let glob: Global = window["__glob"] || new Global();
 export {parse, stringify, getBsonValue};
 window["__glob"] = glob;
 let store;
@@ -471,8 +471,7 @@ export function pushToGridViewRecentList(path: string, ref: string, title: strin
 }
 
 export function urlInsertPrefix(url) {
-    if (glob.config.prefix)
-        return `/${glob.config.prefix}${url}`;
+    return glob.config.prefix ? `/${glob.config.prefix}${url}` : url;
 }
 
 function handleWindowEvents() {
@@ -717,10 +716,10 @@ export function notify(content: string | IError, type?: LogType) {
         $("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
     else {
         if (type == LogType.Debug) {
-            $("#snackbar").addClass("visible").text(message);
+            $(".inline-message-box").text(message).show();
             setTimeout(function () {
-                $("#snackbar").removeClass("visible");
-            }, 3000);
+                $(".inline-message-box").hide();
+            }, 5000);
         } else if ($(".notify-message-container").length) {
             $(".notify-message-container").html(`<div class="notify-message-type-${type}">${message}</div>`);
         } else

@@ -45,7 +45,7 @@
                     switch (menu.ref) {
                         case "delete":
                             call("deleteNote", {note: state._id}, (err, res) => {
-                                glob.notes.splice(glob.notes.indexOf(note), 1);
+                                glob.infoPanel.notes.splice(glob.infoPanel.notes.indexOf(note), 1);
                             });
                             break;
 

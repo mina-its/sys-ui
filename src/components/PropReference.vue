@@ -1,5 +1,5 @@
 <template>
-    <input @focus="$emit('focus', $event)" ref="ctrl" v-bind:type="type" @keydown="keydown" :readonly="readOnly"
+    <input @focus="focus" ref="ctrl" v-bind:type="type" @keydown="keydown" :readonly="readOnly"
            :value="value" @blur="refreshText" @input="update" @click="click" class="form-control">
 </template>
 
@@ -26,6 +26,11 @@
 
             if (!glob.cmenu.show)
                 return {prop: this.prop, event: e};
+        }
+
+        @Emit('focus')
+        focus(e): PropEventArg {
+            return {prop: this.prop, event: e};
         }
 
         click(e) {

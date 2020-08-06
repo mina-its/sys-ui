@@ -16,6 +16,8 @@
 
             <div class="mr-auto"></div>
 
+            <div class="inline-message-box small px-2 hide"></div>
+
             <!-- Head functions -->
             <template v-for="func in headFuncs">
                 <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-2'}`" v-if="func.ref">{{func.title}}</a>

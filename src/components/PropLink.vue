@@ -1,5 +1,5 @@
 <template>
-    <a @focus="$emit('focus', $event)" :href="ref" @click="click" @keydown="keydown">{{value}}</a>
+    <a :href="ref" @click="click" @keydown="keydown">{{value}}</a>
 </template>
 
 <script lang="ts">
@@ -7,6 +7,7 @@
     import {Property} from "../../../sys/src/types";
     import * as main from '../main';
     import {glob, pushToGridViewRecentList, urlInsertPrefix} from "../main";
+    import {PropEventArg} from "../types";
 
     @Component({name: 'PropLink'})
     export default class PropLink extends Vue {
