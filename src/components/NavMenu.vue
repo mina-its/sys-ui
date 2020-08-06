@@ -1,10 +1,10 @@
 <template>
-    <div :class="{'side-nav sidenav d-none d-lg-block':1,'collapse':collapse}" v-if="glob.config.navmenu.length">
-        <div @click="toggleSideNav" class="btn w-100 text-right" style="padding: .8rem"><i
+    <div :class="{'nav-menu d-none d-lg-block':1,'collapse':collapse}" v-if="glob.config.navmenu.length">
+        <div @click="toggleSideNav" :class="{'btn w-100':1,'text-right':!collapse,'text-center':collapse}" style="padding: .8rem"><i
                 :class="{'fal text-white':1,'fa-times':!collapse,'fa-bars':collapse}"></i></div>
         <ul class="list-unstyled">
             <li v-for="item of glob.config.navmenu" :title="item.title" class="nav-item">
-                <a v-if="item.title=='-'" class="d-block border-bottom border-secondary"></a>
+                <a v-if="item.title=='-'" class="d-block m-3 separator border-bottom border-light"></a>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
                 <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-nowrap px-2 nav-link':1,'has-child':item.items}">
                     <i :class="item._cs"></i>{{item.title}}
@@ -25,8 +25,8 @@
 
     declare let $: any;
 
-    @Component({name: 'SideNav'})
-    export default class SideNav extends Vue {
+    @Component({name: 'NavMenu'})
+    export default class NavMenu extends Vue {
         private collapse = false;
 
         get glob() {
@@ -54,51 +54,65 @@
     $left: left;
     $right: right;
 
-    .side-nav {
-        overflow-y: scroll;
-        -ms-overflow-style: none;
-        background-color: var(--side-nav-bg);
-        min-width: 280px;
-        width: 280px;
+    .nav-menu {
+        overflow-y: auto;
+        background-color: var(--nav-menu-bg);
+        min-width: 15rem;
+        width: 15rem;
         transition: all .2s ease-in-out;
 
+        .separator {
+            transition: margin-right .2s ease-in-out, margin-left .2s ease-in-out;
+        }
+
         &.collapse {
-            min-width: 2.6rem;
-            width: 2.6rem;
+            min-width: 3rem;
+            width: 3rem;
+            text-align: center;
+
+            .nav-link {
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+
+                i {
+                    text-align: center;
+                }
+            }
+
+            .separator {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
         }
 
         a {
-            color: var(--side-nav-color);
-            border-left: 4px solid transparent;
+            color: var(--nav-menu-color);
 
             &:hover {
-                color: var(--side-nav-color);
+                color: var(--nav-menu-color);
                 background-color: #555;
             }
 
             &.active {
-                color: var(--side-nav-color);
+                color: var(--nav-menu-color);
                 background-color: #222;
             }
         }
 
         .nav-link {
-            padding-#{$left}: 0.2rem;
+            display: flex;
+            font-size: .8rem;
+            align-items: center;
+            transition: all .2s ease-in-out;
 
             i {
-                width: 30px;
+                text-align: right;
+                width: 3rem;
+                min-width: 3rem;
+                margin-right: .5rem;
+                font-size: 1.2rem;
+                transition: all .2s ease-in-out;
             }
         }
-
-        &::-webkit-scrollbar {
-            display: none;
-        }
-
-    }
-
-    .sidenav {
-        position: sticky;
-        overflow: hidden;
-        top: 0;
     }
 </style>

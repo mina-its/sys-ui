@@ -1,47 +1,43 @@
 <template>
-    <div :class="{'h-100 d-flex w-100 flex-column':1, 'root': !level}">
-        <layout-default :hideToolbar="!!level" :globalFunctions="headFuncs">
-        </layout-default>
+    <layout-default :justContent="!!level" :globalFunctions="headFuncs" :showSideMenu="showSideMenu">
 
-        <!--  Content -->
-        <div class="w-100 h-100 main-bg-image overflow-auto d-flex">
-            <div :class="{'d-flex w-100 overflow-auto details-view':1, 'bg-white':level}" @scroll="onScroll()">
+        <!--  Side Menu -->
+        <template slot="side-menu">
+            <ul class="nav flex-column" id="menus">
+                <li v-for="item in sideMenu" class="nav-item">
+                    <a @click="selectGroup(item)"
+                       :class="{'text-nowrap text-secondary nav-link': 1, 'font-weight-bold active': $data.currentGroup===item.title}"
+                       href="javascript:void(0);">{{item.title}}</a>
+                </li>
+            </ul>
+        </template>
 
-                <!--  Side Menu -->
-                <aside v-if="sideMenuVisible" class="border-right separator-line sidenav py-4 d-none d-md-block">
-                    <ul class="nav flex-column" id="menus">
-                        <li v-for="item in sideMenu" class="nav-item">
-                            <a @click="selectGroup(item)"
-                               :class="{'text-nowrap text-secondary nav-link': 1, 'font-weight-bold active': $data.currentGroup===item.title}"
-                               href="javascript:void(0);">{{item.title}}</a>
-                        </li>
-                    </ul>
-                </aside>
-
-                <!--  Group Property Link -->
-                <div v-if="groupPropertyLink" class="p-4 group-property-link grid-view-box">
-                    <object-view :level="2" :uri="groupPropertyLink"></object-view>
-                </div>
-
-                <!--  Main -->
-                <div v-else :class="{'p-4 flex-grow-1':!level, 'border rounded': level && dec.detailsViewType===ObjectDetailsViewType_Tabular}">
-                    <div v-if="groupVisible(group)" :class="groupPanelStyle(group)" v-for="group in groups" :id="getGroupId(group)">
-                        <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
-                        <div class="group">
-                            <template v-for="prop in getProps(group)">
-                                <label v-if="isNotAloneInlineDataGridProperty(group, prop, item)" class="prop-label from-outside-label pt-2">{{prop.title}}</label>
-                                <Property :level="level?level+1:1" :readonly="!(dec.access&AccessPermission_Edit)" :item="item" :prop="prop" @changed="changed" :viewType="ObjectDetailsViewType_Tabular"/>
-                            </template>
-                        </div>
-                    </div>
-                    <div v-if="nonGroupVisible()" :class="{'gp':!level}">
-                        <Property :level="level?level+1:1" :readonly="!(dec.access&AccessPermission_Edit)" v-for="prop in dec.properties" :item="item" :prop="prop" @changed="changed" :viewType="ObjectDetailsViewType_Tabular"/>
-                    </div>
-                    <div v-if="!level" class="h-25"></div>
-                </div>
+        <!--  Main Content -->
+        <template slot="main-content">
+            <!--  Group Property Link -->
+            <div v-if="groupPropertyLink" class="p-4 group-property-link grid-view-box">
+                <object-view :level="2" :uri="groupPropertyLink"></object-view>
             </div>
-        </div>
-    </div>
+
+            <!--  Main -->
+            <div v-else :class="{'details-view':1,'border rounded': level && dec.detailsViewType===ObjectDetailsViewType_Tabular}">
+                <div v-if="groupVisible(group)" :class="groupPanelStyle(group)" v-for="group in groups" :id="getGroupId(group)">
+                    <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
+                    <div class="group">
+                        <template v-for="prop in getProps(group)">
+                            <label v-if="isNotAloneInlineDataGridProperty(group, prop, item)" class="prop-label from-outside-label pt-2">{{prop.title}}</label>
+                            <Property :level="level?level+1:1" :readonly="!(dec.access&AccessPermission_Edit)" :item="item" :prop="prop" @changed="changed" :viewType="ObjectDetailsViewType_Tabular"/>
+                        </template>
+                    </div>
+                </div>
+                <div v-if="nonGroupVisible()" :class="{'gp':!level}">
+                    <Property :level="level?level+1:1" :readonly="!(dec.access&AccessPermission_Edit)" v-for="prop in dec.properties" :item="item" :prop="prop" @changed="changed" :viewType="ObjectDetailsViewType_Tabular"/>
+                </div>
+                <div v-if="!level" class="h-25"></div>
+            </div>
+        </template>
+
+    </layout-default>
 </template>
 
 <script lang="ts">
@@ -209,10 +205,6 @@
             return !this.level && this.dec.detailsViewType == ObjectDetailsViewType.Tabular;
         }
 
-        onScroll() {
-            main.hideCmenu();
-        }
-
         execLink(cn: Context) {
             let data = {data: this.item};
             main.ajax("/" + cn.name, data, null, main.handleResponse, (err) => {
@@ -257,7 +249,7 @@
             return props;
         }
 
-        get sideMenuVisible() {
+        get showSideMenu() {
             return this.sideMenu && !this.level && (!this.dec.detailsViewType ||
                 this.dec.detailsViewType == ObjectDetailsViewType.Grouped ||
                 this.dec.detailsViewType == ObjectDetailsViewType.Tabular);
@@ -302,8 +294,6 @@
 
     .details-view {
         scroll-behavior: smooth;
-        min-width: 100%;
-
 
         .group-property-link {
             .grid-content-panel {
@@ -313,11 +303,6 @@
 
         .form-group {
             margin: .5rem 0;
-        }
-
-        .sidenav {
-            background-color: white;
-            min-width: 12rem;
         }
 
         label {
@@ -331,6 +316,7 @@
 
         .gp {
             background: #fff;
+            min-width: 20rem;
             border: 1px solid var(--object-border);
             margin-bottom: 12px;
             margin-left: auto;
@@ -340,7 +326,7 @@
             padding: 30px;
         }
 
-        .active {
+        aside .active {
             background-color: #d8d8d8;
         }
     }

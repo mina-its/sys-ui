@@ -3,11 +3,10 @@
         <header>
             <NavBar/>
         </header>
-        <main class="d-flex align-items-stretch">
-            <SideNav/>
+        <main class="d-flex overflow-hidden">
+            <NavMenu />
             <object-view v-if="objectElemUri" :uri="objectElemUri" :level="0"/>
             <FormView v-else/>
-            <InfoPanel/>
         </main>
         <HelperObjects/>
     </div>
@@ -34,6 +33,7 @@
         }
 
         get objectElemUri() {
+            console.log('glob.form.elems', glob.form.elems);
             if (glob.form.elems && glob.form.elems.length == 1 && glob.form.elems[0].type == ElemType.Object && glob.form.elems[0]._)
                 return glob.form.elems[0]._.ref;
             else
@@ -65,8 +65,9 @@
         --grid-row-header-highlight: #FFE;
         --form-label: #666;
         --layout-border: #ddd;
-        --side-nav-bg: #3b3b3b;
-        --side-nav-color: #fff;
+        /*--nav-menu-bg: #1a486b;*/
+        --nav-menu-bg: #3b3b3b;
+        --nav-menu-color: #fff;
         --breadcrumb-separator: #aaa;
         --link-color: #4285f4;
         --main-bg: #eee;
@@ -273,7 +274,7 @@
         background-color: #fef6e0;
     }
 
-    border-2 {
+    .border-2 {
         border-width: 2px !important;
     }
 

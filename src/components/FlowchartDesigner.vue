@@ -1,9 +1,8 @@
 <template>
-    <div class="flowchart-designer w-100 h-100 d-flex flex-column">
-        <!-- Toolbar -->
-        <div :class="{'d-flex px-4 btn-toolbar p-2 align-items-center separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
+    <layout-default class="flowchart-designer" :showSideMenu="true">
 
-            <Breadcrumb :breadcrumb="glob.form.breadcrumb" :title="flowchart.title"/>
+        <!-- Toolbar -->
+        <template slot="toolbar-customs">
 
             <!-- Apply / Cancel -->
             <div v-if="dirty" class="mx-2" role="group">
@@ -11,90 +10,76 @@
                 <button class="btn btn-outline-secondary" @click="refresh" name="cancel">{{$t('cancel')}}</button>
             </div>
 
-            <div class="mr-auto"></div>
+        </template>
 
-            <!--  Refresh -->
-            <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
-
-            <!-- Object Menu -->
-            <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
-
-            <!-- Info Panel -->
-            <button title="Show info panel" v-if="!showRightPanel" @click="showRightPanel=true" class="btn close-panel btn-link px-2"><i class="fal fa-info-circle fa-lg"></i></button>
-        </div>
-
-        <!-- Content -->
-        <div class="d-flex w-100 flowchart-content overflow-auto" style="flex: auto;">
-            <aside class="overflow-hidden border-right separator-line bg-white d-none d-md-block py-3">
-                <ul class="nav flex-column">
-                    <li v-for="node in dec.nodes" class="nav-item px-3">
-                        <button draggable="true" @dragstart="dragNodeDec($event,node)" class="text-nowrap px-0 bg-secondary w-100 text-left my-1 nav-link btn btn-link text-white" :href="node.ref">
-                            <i :class="'text-center px-3 fa-lg fal fa-' + node.icon" style="width: 3rem"></i>
-                            <span class="small font-weight-bold">{{node.title}}</span>
-                        </button>
-                    </li>
-                </ul>
-            </aside>
-
-            <!-- Main -->
-            <div class="w-100 h-100 overflow-auto d-flex" @dragover="dragOver" @drop="dropNode">
-                <div class="p-4 bg-white main-canvas position-relative" style="width: 1000px;height: 10000px">
-                    <svg ref="svg" viewBox="0 0 10000 10000" width="10000" height="10000" class="position-absolute">
-                        <g v-for="link of links">
-                            <path fill="none" :d="link.path" stroke="#fff3" stroke-width="20" @click="selectLink(link)"/>
-                            <path fill="none" :d="link.path" stroke="black" :stroke-width="link.active?3:1" @click="selectLink(link)"/>
-                        </g>
-                    </svg>
-                    <div @focus="selectNode(node)" :tabindex="node.tag" @mousedown="startMoveNode($event,node)" :class="'cursor-pointer position-absolute node bg-light py-2 px-3 rounded ' + (node._.dec.nodeStyle || '') + (isSelected(node)?' active':'')" v-for="node of flowchart.nodes"
-                         :style="{top: node.point.y+'px', left: node.point.x+'px','background-color':node._.dec.nodeColor+'!important'}">
-                        <i :class="'text-center fa-lg fal fa-' + node._.dec.icon" style="width: 2rem"></i>
+        <!--  Side Menu -->
+        <template slot="side-menu">
+            <ul class="nav flex-column">
+                <li v-for="node in dec.nodes" class="nav-item px-3">
+                    <button draggable="true" @dragstart="dragNodeDec($event,node)" class="text-nowrap px-0 bg-secondary w-100 text-left my-1 nav-link btn btn-link text-white" :href="node.ref">
+                        <i :class="'text-center px-3 fa-lg fal fa-' + node.icon" style="width: 3rem"></i>
                         <span class="small font-weight-bold">{{node.title}}</span>
-                    </div>
+                    </button>
+                </li>
+            </ul>
+        </template>
+
+        <!--  Info Panel -->
+        <template slot="info-panel">
+            <!-- Actions: Archive -->
+            <div class="mb-2 d-flex p-2">
+                <!--  Delete Node -->
+                <button v-if="currentNode" @click="deleteNode" class="btn btn-link p-0 mx-2" title="Delete node">
+                    <i class="fal fa-trash-alt fa-lg"></i>
+                </button>
+
+                <!--  Delete Link -->
+                <button v-if="currentLink" @click="deleteLink" class="btn btn-link p-0 mx-2" title="Delete link">
+                    <i class="fal fa-trash-alt fa-lg"></i>
+                </button>
+
+                <!--  Duplicate -->
+                <button v-if="currentNode" @click="duplicateNode" class="btn btn-link p-0 mx-2" title="Duplicate">
+                    <i class="fal fa-copy fa-lg"></i>
+                </button>
+
+                <!-- Link -->
+                <button v-if="currentNode" @click="linkNode" type="button" class="btn btn-link mx-2 p-0" title="Link">
+                    <i class="fal fa-lg fa-external-link"></i>
+                </button>
+            </div>
+            <div class="px-3" v-if="currentNode">
+                <details-view v-if="nodeObjectDec" class="compress-view" :data="currentNode" :dec="nodeObjectDec" :level="1"></details-view>
+                <details-view v-if="currentNodeObjectDec" class="compress-view" :data="currentNode" :dec="currentNodeObjectDec" :level="1"></details-view>
+            </div>
+            <div class="px-3" v-else-if="currentLink">
+                <details-view v-if="linkObjectDec" class="compress-view" :data="currentLink" :dec="linkObjectDec" :level="1"></details-view>
+            </div>
+            <div v-if="!currentNode && !currentLink" class="px-3 mb-2">
+                Select the node for more details.
+            </div>
+            <div class="border-2 border-bottom mb-3">
+            </div>
+        </template>
+
+        <!--  Main Content -->
+        <template slot="main-content">
+            <div class="p-4 bg-white main-canvas position-relative" style="width: 10000px;height: 10000px;margin: -1.5rem;" @dragover="dragOver" @drop="dropNode">
+                <svg ref="svg" viewBox="0 0 10000 10000" width="10000" height="10000" class="position-absolute">
+                    <g v-for="link of links">
+                        <path fill="none" :d="link.path" stroke="#fff3" stroke-width="20" @click="selectLink(link)"/>
+                        <path fill="none" :d="link.path" stroke="black" :stroke-width="link.active?3:1" @click="selectLink(link)"/>
+                    </g>
+                </svg>
+                <div @focus="selectNode(node)" :tabindex="node.tag" @mousedown="startMoveNode($event,node)" :class="'cursor-pointer position-absolute node bg-light py-2 px-3 rounded ' + (node._.dec.nodeStyle || '') + (isSelected(node)?' active':'')" v-for="node of flowchart.nodes"
+                     :style="{top: node.point.y+'px', left: node.point.x+'px','background-color':node._.dec.nodeColor+'!important'}">
+                    <i :class="'text-center fa-lg fal fa-' + node._.dec.icon" style="width: 2rem"></i>
+                    <span class="small font-weight-bold">{{node.title}}</span>
                 </div>
             </div>
+        </template>
 
-            <!--  Right Panel -->
-            <div v-if="showRightPanel" :class="{'right-panel border-left bg-white':1,'hide-panel':!showRightPanel}" style="min-width: 22rem">
-                <!-- Actions: Archive -->
-                <div class="mb-2 d-flex p-2">
-                    <!--  Delete Node -->
-                    <button v-if="currentNode" @click="deleteNode" class="btn btn-link p-0 mx-2" title="Delete node">
-                        <i class="fal fa-trash-alt fa-lg"></i>
-                    </button>
-
-                    <!--  Delete Link -->
-                    <button v-if="currentLink" @click="deleteLink" class="btn btn-link p-0 mx-2" title="Delete link">
-                        <i class="fal fa-trash-alt fa-lg"></i>
-                    </button>
-
-                    <!--  Duplicate -->
-                    <button v-if="currentNode" @click="duplicateNode" class="btn btn-link p-0 mx-2" title="Duplicate">
-                        <i class="fal fa-copy fa-lg"></i>
-                    </button>
-
-                    <!-- Link -->
-                    <button v-if="currentNode" @click="linkNode" type="button" class="btn btn-link mx-2 p-0" title="Link">
-                        <i class="fal fa-lg fa-external-link"></i>
-                    </button>
-
-                    <div class="mr-auto"></div>
-
-                    <!--  Close button -->
-                    <button @click="showRightPanel=false" title="Hide info panel" class="btn close-panel btn-link p-2"><i class="fal fa-times fa-lg"></i></button>
-                </div>
-                <div class="px-3" v-if="currentNode">
-                    <details-view v-if="nodeObjectDec" class="compress-view" :data="currentNode" :dec="nodeObjectDec" :level="1"></details-view>
-                    <details-view v-if="currentNodeObjectDec" class="compress-view" :data="currentNode" :dec="currentNodeObjectDec" :level="1"></details-view>
-                </div>
-                <div class="px-3" v-else-if="currentLink">
-                    <details-view v-if="linkObjectDec" class="compress-view" :data="currentLink" :dec="linkObjectDec" :level="1"></details-view>
-                </div>
-                <div class="px-3">
-                    Select the node for more details.
-                </div>
-            </div>
-        </div>
-    </div>
+    </layout-default>
 </template>
 
 <script lang="ts">
@@ -115,7 +100,6 @@
         private dirty = false;
         private tag = 0;
         private dragOffset: Point;
-        private showRightPanel = true;
         private selectingLinkTarget = false;
         private links: {
             path: string,

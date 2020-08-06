@@ -257,6 +257,7 @@
     .prop-value {
         display: inline-block;
         width: 20rem;
+        max-width: 100%;
         padding: 0.25rem 0.5rem;
 
         &-wide {

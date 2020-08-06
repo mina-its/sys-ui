@@ -1,119 +1,90 @@
 <template>
-    <div :class="{'w-100 h-100 grid-view d-flex flex-column':1, 'root': !level}">
+    <layout-default class="grid-view" :justContent="!!level" :globalFunctions="headFuncs" :showSideMenu="!level && (recentItems || dec.filterDec)">
         <!-- Toolbar -->
-        <div v-if="!level" :class="{'d-flex px-4 btn-toolbar p-2 align-items-center separator-line toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
-            <!-- Breadcrumb -->
-            <Breadcrumb :count="dec.count" :breadcrumb="glob.form.breadcrumb" :title="glob.form.breadcrumbLast"/>
-
+        <template slot="toolbar-customs">
             <!-- Filter -->
             <div v-if="showFilter" class="border d-flex align-items-center px-2 mx-4 bg-light rounded">
                 <i class="fal fa-filter p-1 d-inline-block text-muted"></i>
                 <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
             </div>
 
-            <!-- Apply / Cancel -->
-            <ToolbarModifyButtons/>
-
-            <div class="mr-auto"></div>
-
-            <div class="inline-message-box small px-2 hide"></div>
-
-            <!-- Head functions -->
-            <template v-for="func in headFuncs">
-                <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-2'}`" v-if="func.ref">{{func.title}}</a>
-                <Function v-else styles="btn-primary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
-            </template>
-
             <!-- Add button -->
             <button v-if="addButton" class="btn btn-success mx-1 px-4" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>Add</button>
+        </template>
 
-            <!--  Refresh -->
-            <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
-
-            <!-- Object Menu -->
-            <button class="btn btn-link text-secondary px-2" @click="clickObjectMenu"><i class="fal fa-cog fa-lg"></i></button>
-
-            <!-- Info Panel -->
-            <button title="Show info panel" v-if="!glob.infoPanel.show" @click="glob.infoPanel.show=true" class="btn close-panel btn-link px-2"><i class="fal fa-info-circle fa-lg"></i></button>
-        </div>
-
-        <!-- Content -->
-        <div class="d-flex w-100 grid-view-content overflow-auto" style="flex: auto;" @scroll="onScroll()">
-            <!-- Side Menu -->
-            <aside v-if="!level && (recentItems || dec.filterDec)" class="overflow-hidden border-right separator-line bg-white d-none d-md-block">
-                <div v-if="dec.filterDec" class="sidenav-filter p-3">
-                    <label class="text-muted small"><i class="fal fa-filter p-1"></i>Filter {{glob.form.breadcrumbLast}}:</label>
-                    <DetailsView :dec="dec.filterDec" :data="dec.filterData" :level="level?level+1:1" @changed="objectFilterChanged"></DetailsView>
-                </div>
-                <div v-if="recentItems" class="recent-items pt-3">
-                    <label class="text-muted small mx-3 mt-3 font-weight-bold">Recent {{glob.form.breadcrumbLast}}:</label>
-                    <ul class="nav flex-column">
-                        <li v-for="item in recentItems" class="nav-item">
-                            <a @click="clickRecentItem(item)" class="text-nowrap nav-link" :href="item.ref">{{item.title}}</a>
-                        </li>
-                    </ul>
-                </div>
-            </aside>
-
-            <!-- Main -->
-            <div :class="{'w-100 h-100':1, 'p-4 main-bg-image':!level}">
-
-                <!-- Filter Items -->
-                <div v-if="filter && filteringProp && (filteredProps || []).length" class="pb-2 d-flex">
-                    <div v-for="prop of filteredProps" class="filter-chip border d-flex align-items-center px-2 bg-white mr-2">
-                        <PropertyFilter :allowPropChange="false" :prop="prop" :filter="filter" @changed="filterValueChanged" :filterDoc="filterDoc"/>
-                        <i @click="removeFilter(prop)" class="fas fa-times p-1 text-dark"></i>
-                    </div>
-                </div>
-
-                <!-- Grid View -->
-                <table :class="{'bg-white':1,'mb-5':!level, 'grid-view-box':!level || level<2}">
-                    <thead>
-                    <tr>
-                        <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
-                            <CheckBox :checked="mainChecked" @changed="mainCheckChange"></CheckBox>
-                        </th>
-                        <th scope="col" v-else></th>
-                        <th scope="col" class="text-nowrap" @click="showColumnMenu(prop, $event)" v-for="prop in dec.properties"> {{prop.title || prop.name}}</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    <grid-view-row :dec="getDec(item)" @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown" @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)" @changed="changed"/>
-                    </tbody>
-
-                    <!-- Footer -->
-                    <tfoot>
-                    <tr>
-                        <td class="border-0" colspan="100">
-                            <div class="align-items-center d-flex">
-                                <!-- Add -->
-                                <Function v-if="dec.access & 4" styles="m-1 fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"></Function>
-
-                                <!-- Delete -->
-                                <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
-
-                                <!-- Paging -->
-                                <div class="flex-grow-1 d-flex align-items-center">
-                                    <ul v-if="dec.pages > 1" class="m-2 pagination ">
-                                        <li class="page-item" data-toggle="tooltip" title="Previous Page">
-                                            <a @click="goBack" href="javascript:;" class="page-link"> <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i> </a>
-                                        </li>
-                                        <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') ">
-                                            <a class="page-link" :href="page.ref">{{page.title}}</a></li>
-                                        <li class="page-item" data-toggle="tooltip" title="Next Page">
-                                            <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i> </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    </tfoot>
-                </table>
+        <!-- Side Menu -->
+        <template slot="side-menu">
+            <div v-if="dec.filterDec" class="sidenav-filter p-3">
+                <label class="text-muted small"><i class="fal fa-filter p-1"></i>Filter {{glob.form.breadcrumbLast}}:</label>
+                <DetailsView :dec="dec.filterDec" :data="dec.filterData" :level="level?level+1:1" @changed="objectFilterChanged"></DetailsView>
             </div>
-        </div>
-    </div>
+            <div v-if="recentItems" class="recent-items pt-3">
+                <label class="text-muted small mx-3 mt-3 font-weight-bold">Recent {{glob.form.breadcrumbLast}}:</label>
+                <ul class="nav flex-column">
+                    <li v-for="item in recentItems" class="nav-item">
+                        <a @click="clickRecentItem(item)" class="text-nowrap nav-link" :href="item.ref">{{item.title}}</a>
+                    </li>
+                </ul>
+            </div>
+        </template>
+
+        <!-- Main Content -->
+        <template slot="main-content">
+            <!-- Filter Items -->
+            <div v-if="filter && filteringProp && (filteredProps || []).length" class="pb-2 d-flex">
+                <div v-for="prop of filteredProps" class="filter-chip border d-flex align-items-center px-2 bg-white mr-2">
+                    <PropertyFilter :allowPropChange="false" :prop="prop" :filter="filter" @changed="filterValueChanged" :filterDoc="filterDoc"/>
+                    <i @click="removeFilter(prop)" class="fas fa-times p-1 text-dark"></i>
+                </div>
+            </div>
+
+            <!-- Grid View -->
+            <table :class="{'bg-white':1,'mb-5':!level, 'grid-view-box':!level || level<2}">
+                <thead>
+                <tr>
+                    <th scope="col" v-if="rowHeaderStyle===2" class="text-center">
+                        <CheckBox :checked="mainChecked" @changed="mainCheckChange"></CheckBox>
+                    </th>
+                    <th scope="col" v-else></th>
+                    <th scope="col" class="text-nowrap" @click="showColumnMenu(prop, $event)" v-for="prop in dec.properties"> {{prop.title || prop.name}}</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <grid-view-row :dec="getDec(item)" @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown" @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)" @changed="changed"/>
+                </tbody>
+
+                <!-- Footer -->
+                <tfoot>
+                <tr>
+                    <td class="border-0" colspan="100">
+                        <div class="align-items-center d-flex">
+                            <!-- Add -->
+                            <Function v-if="dec.access & 4" styles="m-1 fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"></Function>
+
+                            <!-- Delete -->
+                            <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
+
+                            <!-- Paging -->
+                            <div class="flex-grow-1 d-flex align-items-center">
+                                <ul v-if="dec.pages > 1" class="m-2 pagination ">
+                                    <li class="page-item" data-toggle="tooltip" title="Previous Page">
+                                        <a @click="goBack" href="javascript:;" class="page-link"> <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i> </a>
+                                    </li>
+                                    <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') ">
+                                        <a class="page-link" :href="page.ref">{{page.title}}</a></li>
+                                    <li class="page-item" data-toggle="tooltip" title="Next Page">
+                                        <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i> </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </template>
+    </layout-default>
 </template>
 
 <script lang="ts">

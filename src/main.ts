@@ -716,7 +716,8 @@ export function notify(content: string | IError, type?: LogType) {
         $("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
     else {
         if (type == LogType.Debug) {
-            $(".inline-message-box").text(message).show();
+            $(".inline-message-box span").text(message);
+            $(".inline-message-box").show();
             setTimeout(function () {
                 $(".inline-message-box").hide();
             }, 5000);
