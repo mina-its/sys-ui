@@ -369,6 +369,18 @@
         }
     }
 
+    @media (max-width: 576px) {
+        .function-open-page {
+            margin: 0 auto;
+            background-color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 0;
+            height: 100%;
+        }
+    }
+
+
     .function-login-comment {
         color: gray;
         font-size: smaller;
