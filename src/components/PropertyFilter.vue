@@ -1,8 +1,8 @@
 <script lang="ts">
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
     import {GlobalType, Keys, ObjectViewType, Property as ObjectProperty} from "../../../sys/src/types";
-    import {FilterChangeEventArg, FilterOperator, ItemChangeEventArg, ItemEventArg, MenuItem} from '@/types';
-    import {$t, glob, showCmenu} from '@/main';
+    import {FilterChangeEventArg, FilterOperator, ItemChangeEventArg, ItemEventArg, MenuItem} from '../types';
+    import {$t, showCmenu} from '../main';
 
     @Component({name: 'PropertyFilter', components: {}})
     export default class PropertyFilter extends Vue {
@@ -20,7 +20,7 @@
             }, this.prop.title || this.prop.name);
 
             let propOper = ce('a', {
-                attrs: {"class": "filter-prop-oper border bg-white px-2 font-weight-bold", "href": "javascript:void(0);"},
+                attrs: {"class": "filter-prop-oper border bg-white px-4 px-md-2 py-1 py-md-0 font-weight-bold", "href": "javascript:void(0);"},
                 on: {click: $this.changeOperator}
             }, $t(`opr-${this.filterOperator}`));
             let propValue = this.renderValue(ce, `filter-prop-value d-flex align-items-center px-1 border-0`);

@@ -2,10 +2,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark" :style="{'background-color':navColor}">
 
         <!-- Apps Menu -->
-        <div v-if="glob.config.apps.length>1" class="dropdown">
-            <button class="btn btn-link" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <a class="apps-menu py-1 mr-3" href="#">
-                    <svg viewBox="0 0 32 32">
+        <div v-if="glob.config.apps.length>1" class="dropdown apps-menu">
+            <button class="btn btn-link mx-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="py-1" href="#">
+                    <svg viewBox="0 0 32 32" width="20" height="20">
                         <rect height="6" width="6" x="1" y="1"/>
                         <rect height="6" width="6" x="25" y="1"/>
                         <rect height="6" width="6" x="13" y="1"/>
@@ -18,9 +18,9 @@
                     </svg>
                 </a>
             </button>
-            <div class="dropdown-menu mt-2">
-                <div class="d-flex flex-wrap p-5" style="width: 50rem">
-                    <a target="_self" :href="'/'+(app.prefix||'')" class="small m-3 business-app rounded border cursor-pointer" v-for="app of glob.config.apps" style="width: 8rem">
+            <div :class="{'dropdown-menu mt-2':1, 'dropdown-menu-right':rtl}">
+                <div class="d-flex apps-list flex-wrap p-5">
+                    <a target="_self" :href="getAppUrl(app)" class="small m-3 business-app rounded border cursor-pointer" v-for="app of glob.config.apps" style="width: 8rem">
                         <div class="text-center p-2">
                             <div class="app-icon p-3 text-white" :style="{'background-color':app.iconColor}"><i :class="app.iconStyle + ' fa-4x'"></i></div>
                             <label class="pt-2 font-weight-bold text-black-50">{{app.title}}</label>
@@ -47,13 +47,13 @@
             <div class="mr-auto"></div>
 
             <!-- Feedback -->
-            <AppFeedback class="mx-2"/>
+            <AppFeedback class="mx-0 mx-lg-2 my-2 my-lg-0" />
 
             <!-- Language -->
-            <AppLocaleMenu class="mx-2"/>
+            <AppLocaleMenu class="mx-0 mx-lg-2 my-2 my-lg-0" />
 
             <!-- Login -->
-            <AppUserLoginMenu class="mx-2"/>
+            <AppUserLoginMenu class="mx-0 mx-lg-2 my-2 my-lg-0" />
 
             <!-- <AppChangeRegion/> -->
         </div>
@@ -62,10 +62,15 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {glob} from "../main";
+    import {glob, prepareServerUrl} from "../main";
 
     @Component({name: 'NavBar'})
     export default class NavBar extends Vue {
+
+        getAppUrl(app) {
+            return prepareServerUrl(app.prefix);
+        }
+
         get navColor() {
             let app = glob.config.apps.find(a => a.prefix == glob.config.prefix);
             if (app && app.navColor)
@@ -93,22 +98,45 @@
             box-shadow: rgba(0, 0, 0, 0.22) 0px 25.6px 57.6px 0px, rgba(0, 0, 0, 0.18) 0px 4.8px 14.4px 0px;
         }
 
-        .apps-menu {
-            width: 16px;
+        .dropdown-toggle::after {
+            vertical-align: 0.1em;
+            margin-inline-start: 0.255em;
+        }
 
-            rect {
-                fill: none;
-                stroke: white;
-                stroke-linejoin: round;
-                stroke-width: 2px;
+        .apps-menu {
+            .apps-list {
+                width: 50rem
             }
 
-            &:hover {
+            button a {
+                width: 16px;
+
                 rect {
-                    stroke: gray;
+                    fill: none;
+                    stroke: white;
+                    stroke-linejoin: round;
+                    stroke-width: 2px;
+                }
+
+                &:hover {
+                    rect {
+                        stroke: gray;
+                    }
+                }
+
+            }
+
+        }
+    }
+
+    @media (max-width: 768px) {
+        nav.navbar {
+            .apps-menu {
+                .apps-list {
+                    width: 30rem;
+                    padding: 1rem !important;
                 }
             }
-
         }
     }
 

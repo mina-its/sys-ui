@@ -3,7 +3,7 @@
 
         <!--  Side Menu -->
         <template slot="side-menu">
-            <ul class="nav flex-column" id="menus">
+            <ul class="details-view nav flex-column" id="menus">
                 <li v-for="item in sideMenu" class="nav-item">
                     <a @click="selectGroup(item)"
                        :class="{'text-nowrap text-secondary nav-link': 1, 'font-weight-bold active': $data.currentGroup===item.title}"
@@ -20,7 +20,7 @@
             </div>
 
             <!--  Main -->
-            <div v-else :class="{'details-view':1,'border rounded': level && dec.detailsViewType===ObjectDetailsViewType_Tabular}">
+            <div v-else :class="{'details-view d-inline-block':1,'border rounded': level && dec.detailsViewType===ObjectDetailsViewType_Tabular}">
                 <div v-if="groupVisible(group)" :class="groupPanelStyle(group)" v-for="group in groups" :id="getGroupId(group)">
                     <h3 v-if="groupHeadVisible(group)" class="text-secondary mb-4">{{group}}</h3>
                     <div class="group">
@@ -325,10 +325,10 @@
             position: relative;
             padding: 30px;
         }
+    }
 
-        aside .active {
-            background-color: #d8d8d8;
-        }
+    .nav-panel .details-view .active {
+        background-color: #d8d8d8 !important;
     }
 
     .compress-view {

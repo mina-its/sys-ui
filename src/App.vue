@@ -4,7 +4,7 @@
             <NavBar/>
         </header>
         <main class="d-flex overflow-hidden">
-            <NavMenu />
+            <NavMenu/>
             <object-view v-if="objectElemUri" :uri="objectElemUri" :level="0"/>
             <FormView v-else/>
         </main>
@@ -110,12 +110,17 @@
         overflow: hidden;
         font-family: Roboto, IRANSans, RobotoDraft, Calibri, Helvetica, Arial, sans-serif;
         font-size: 15px;
+        text-align: start;
     }
 
     main {
         flex: 1 1 auto;
         scroll-behavior: smooth;
         background-color: var(--main-bg);
+    }
+
+    ul {
+        padding-inline-start: 0;
     }
 
     /*header {*/
@@ -174,6 +179,22 @@
         border-radius: 0 0 .25rem .25rem;
         border: none !important;
         /*!*margin-top: .55rem;*! I removed this because of multi reference problem*/
+    }
+
+    .text-end {
+        text-align: end;
+    }
+
+    .border-end {
+        border-inline-end: 1px solid #dee2e6 !important;
+    }
+
+    .border-start {
+        border-inline-start: 1px solid #dee2e6 !important;
+    }
+
+    .text-start {
+        text-align: start;
     }
 
     .token {

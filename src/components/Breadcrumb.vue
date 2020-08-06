@@ -1,8 +1,10 @@
 <template>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb p-0 m-0 bg-transparent d-flex align-items-center">
-            <li class="mr-3">
-                <button title="Go Back" @click="goBack" class="btn hover-opacity btn-link px-1 py-0"><i class="fal text-secondary fa-arrow-circle-left fa-2x"></i></button>
+            <li style="margin-inline-end: 1rem">
+                <button title="Go Back" @click="goBack" class="btn hover-opacity btn-link px-1 py-0">
+                    <i :class="{'fal text-secondary fa-2x':1,'fa-arrow-circle-left':ltr, 'fa-arrow-circle-right':rtl}"></i>
+                </button>
             </li>
             <li v-for="item in breadcrumb" class="breadcrumb-item">
                 <a :href="item.ref">{{item.title}}</a>
@@ -41,7 +43,7 @@
         font-weight: 500;
 
         + .breadcrumb-item {
-            padding-left: 0.5rem;
+            padding-left: 0rem;
 
             &::before {
                 padding-right: 0.5rem;

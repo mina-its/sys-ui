@@ -1,5 +1,5 @@
 <template>
-    <div v-if="glob.cmenu.show" :style="style" :class="{'dropdown-menu py-0 show overflow-auto context-menu':1,'text-left':rtl}">
+    <div v-if="glob.cmenu.show" :style="style" class="dropdown-menu py-0 show overflow-auto context-menu text-start">
         <DateTimePicker v-if="glob.cmenu.datePicker" :format="glob.cmenu.datePicker.format" :value="glob.cmenu.datePicker.value" @changed="dateChanged" @canceled="glob.cmenu.show=false" />
         <div v-else class="py-2">
             <template v-for="item in glob.cmenu.items">

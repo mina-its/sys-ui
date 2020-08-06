@@ -10,7 +10,7 @@ import BrowseFile from "./components/BrowseFile.vue";
 import ContextMenu from "./components/ContextMenu.vue";
 import ToolbarModifyButtons from "./components/ToolbarModifyButtons.vue";
 import HelperObjects from "./components/HelperObjects.vue";
-import SideNav from "./components/SideNav.vue";
+import NavMenu from "./components/NavMenu.vue";
 import App from "./App.vue";
 import DashboardInfoBox from "./components/DashboardInfoBox.vue";
 import AppChangeRegion from "./components/AppChangeRegion.vue";
@@ -21,4 +21,4 @@ import NavbarMenu from "./components/NavbarMenu.vue";
 import Function from "./components/Function.vue";
 import TaskManager from "./components/TaskManager.vue";
 
-export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons, HelperObjects, SideNav, App, DashboardInfoBox, AppChangeRegion, ImagePreview, DetailsView, GridView, NavbarMenu, Function, TaskManager};
+export default {FormView, ...main, ...types, NavBar, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons, HelperObjects, NavMenu, App, DashboardInfoBox, AppChangeRegion, ImagePreview, DetailsView, GridView, NavbarMenu, Function, TaskManager};

@@ -4,7 +4,7 @@
 
         <div v-else class="h-100 d-flex w-100 flex-column">
             <!--  Toolbar -->
-            <div :class="{'d-flex p-2 align-items-center btn-toolbar toolbar':1, 'pl-4':ltr, 'pr-4':rtl}" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="d-flex p-2 align-items-center btn-toolbar toolbar" role="toolbar" aria-label="Toolbar with button groups">
 
                 <!--  Breadcrumb -->
                 <Breadcrumb :breadcrumb="glob.form.breadcrumb" :title="glob.form.breadcrumbLast"/>
@@ -23,7 +23,6 @@
                 <div class="mr-auto"></div>
 
                 <!--  Global functions -->
-                <div class="p-2"></div>
                 <template v-for="func in globalFunctions">
                     <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-4'}`" v-if="func.ref">{{func.title}}</a>
                     <Function v-else styles="btn-outline-secondary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
@@ -31,20 +30,22 @@
 
                 <div class="mr-auto"></div>
 
-                <!--  Refresh -->
-                <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
+                <div>
+                    <!--  Refresh -->
+                    <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
 
-                <!--  Object Menu -->
-                <button class="btn btn-link text-secondary px-2" @click="clickConfigMenu"><i class="fal fa-cog fa-lg"></i></button>
+                    <!--  Object Menu -->
+                    <button class="btn btn-link text-secondary px-2" @click="clickConfigMenu"><i class="fal fa-cog fa-lg"></i></button>
 
-                <!-- Info Panel -->
-                <button title="Show info panel" v-if="!glob.infoPanel.show" @click="glob.infoPanel.show=true" class="btn close-panel btn-link px-2"><i class="fal fa-info-circle fa-lg"></i></button>
+                    <!-- Info Panel -->
+                    <button title="Show info panel" v-if="!showInfoPanel" @click="toggleShowInfoPanel(true)" class="btn close-panel btn-link px-2"><i class="fal fa-info-circle fa-lg"></i></button>
+                </div>
             </div>
 
             <!--  Content -->
             <div class="w-100 d-flex h-100 overflow-auto">
                 <!-- Nav Panel -->
-                <aside v-if="showSideMenu" class="nav-panel bg-white border-right separator-line py-4 d-none d-md-block">
+                <aside v-if="showSideMenu" class="nav-panel bg-white border-end separator-line py-4 d-none d-md-block">
                     <slot name="side-menu"></slot>
                 </aside>
 
@@ -53,7 +54,13 @@
                     <slot name="main-content"></slot>
                 </div>
 
-                <aside class="info-panel border-left py-4 separator-line bg-white">
+                <aside v-if="showInfoPanel" class="info-panel border-start separator-line bg-white">
+                    <!--  Close button -->
+                    <div class="d-flex py-1">
+                        <div class="mr-auto"></div>
+                        <button @click="toggleShowInfoPanel(false)" title="Hide info panel" class="btn close-panel btn-link p-2"><i class="fal fa-times fa-lg"></i></button>
+                    </div>
+
                     <slot name="info-panel"></slot>
 
                     <!-- Quick Notes -->
@@ -84,13 +91,25 @@
     import {HeadFunc, MenuItem} from "../types";
     import {$t, call, glob, hideCmenu, load, markDown, showCmenu} from "../main";
 
+    declare let moment: any;
+
     @Component({name: "LayoutDefault"})
     export default class LayoutDefault extends Vue {
         @Prop() private globalFunctions: HeadFunc[];
         @Prop() private configMenu: MenuItem[];
         @Prop() private justContent: boolean;
         @Prop() private showSideMenu: boolean;
+        private showInfoPanel = true;
         private newNote: string = null;
+
+        created() {
+            this.showInfoPanel = localStorage.getItem('show-info-panel') != "hide";
+        }
+
+        toggleShowInfoPanel(show) {
+            this.showInfoPanel = show;
+            localStorage.setItem('show-info-panel', !show ? "hide" : null);
+        }
 
         @Emit('selectConfigMenuItem')
         selectConfigMenuItem(ref: string) {
@@ -166,5 +185,12 @@
     .info-panel {
         min-width: 20rem;
         width: 20rem;
+    }
+
+    @media (max-width: 576px) {
+        aside.info-panel {
+            min-width: 80% !important;
+            width: 80%;
+        }
     }
 </style>

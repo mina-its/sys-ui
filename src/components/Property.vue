@@ -3,7 +3,7 @@
     import {GlobalType, ObjectViewType, Property as ObjectProperty, PropertyEditMode, TextEditor} from "../../../sys/src/types";
     import {ChangeType, Constants, ItemChangeEventArg, ItemEventArg, PropertyLabelMode, PropEventArg} from '../types';
     import * as main from '../main';
-    import {getPropertyEmbedError} from '../main';
+    import {getPropertyEmbedError, getPropTextValue} from '../main';
 
     @Component({name: 'Property', components: {}})
     export default class Property extends Vue {
@@ -161,7 +161,10 @@
                             props: pr,
                         });
                     else {
-                        if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && !this.item._new) { // we need _new to allow first column to edit
+                        if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && !getPropTextValue(this.prop, this.item))
+                            this.item._.emptyFirstColumn = true;
+
+                        if (this.viewType == ObjectViewType.GridView && this.indexInGrid === 0 && !this.item._new && !this.item._.emptyFirstColumn) { // we need _new to allow first column to edit
                             return ce('prop-link', {
                                 attrs: {"class": styles},
                                 on: {keydown: this.keydown, focus: this.focused},

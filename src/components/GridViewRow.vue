@@ -29,7 +29,7 @@
             $(e.event.target).closest("td").addClass("active");
         }
 
-        clickCell(e){
+        clickCell(e) {
             $("td.active").removeClass("active");
             $(e.target).closest("td").addClass("active");
         }
@@ -88,7 +88,7 @@
             }
 
             td.active {
-                outline: 1px solid var(--dark);
+                outline: auto;
             }
         }
     }

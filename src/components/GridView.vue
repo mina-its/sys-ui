@@ -3,7 +3,7 @@
         <!-- Toolbar -->
         <template slot="toolbar-customs">
             <!-- Filter -->
-            <div v-if="showFilter" class="border d-flex align-items-center px-2 mx-4 bg-light rounded">
+            <div v-if="showFilter" class="border d-flex align-items-center toolbar-filter px-2 mx-sm-4 mx-1 bg-light rounded">
                 <i class="fal fa-filter p-1 d-inline-block text-muted"></i>
                 <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
             </div>
@@ -686,6 +686,16 @@
                 border-top-#{$right}-radius: inherit;
                 border-bottom-#{$right}-radius: inherit;
             }
+        }
+    }
+
+    @media (max-width: 576px) {
+        .toolbar {
+            flex: none;
+        }
+        .toolbar-filter {
+            width: 100%;
+            margin: .5rem 0;
         }
     }
 </style>

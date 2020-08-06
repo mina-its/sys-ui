@@ -1,6 +1,6 @@
 <template>
-    <div :class="{'nav-menu d-none d-lg-block':1,'collapse':collapse}" v-if="glob.config.navmenu.length">
-        <div @click="toggleSideNav" :class="{'btn w-100':1,'text-right':!collapse,'text-center':collapse}" style="padding: .8rem"><i
+    <div :class="{'nav-menu':1,'collapse':collapse}" v-if="glob.config.navmenu.length">
+        <div @click="toggleSideNav" :class="{'btn w-100':1,'text-end':!collapse,'text-center':collapse}" style="padding: .8rem"><i
                 :class="{'fal text-white':1,'fa-times':!collapse,'fa-bars':collapse}"></i></div>
         <ul class="list-unstyled">
             <li v-for="item of glob.config.navmenu" :title="item.title" class="nav-item">
@@ -34,12 +34,12 @@
         }
 
         mounted() {
-            this.collapse = localStorage.getItem('sys-sidenav-collapse') == "1";
+            // this.collapse = localStorage.getItem('sys-sidenav-collapse') == "1";
         }
 
         toggleSideNav() {
             this.collapse = !this.collapse;
-            localStorage.setItem('sys-sidenav-collapse', this.collapse ? "1" : null);
+            // localStorage.setItem('sys-sidenav-collapse', this.collapse ? "1" : null);
         }
 
         clickLink(ev, item) {
@@ -50,9 +50,6 @@
 </script>
 
 <style lang="scss">
-
-    $left: left;
-    $right: right;
 
     .nav-menu {
         overflow-y: auto;
@@ -106,10 +103,10 @@
             transition: all .2s ease-in-out;
 
             i {
-                text-align: right;
+                text-align: end;
                 width: 3rem;
                 min-width: 3rem;
-                margin-right: .5rem;
+                margin-inline-end: .5rem;
                 font-size: 1.2rem;
                 transition: all .2s ease-in-out;
             }

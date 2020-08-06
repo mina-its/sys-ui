@@ -39,7 +39,8 @@ export function getText(text: string | MultilangText, useDictionary?: boolean): 
         if (glob.texts[text]) return glob.texts[text];
 
         if (text.indexOf('.') == -1) {
-            return glob.texts["sys." + text] || text.replace(/-/g, " ");
+            text = glob.texts["sys." + text] || text.replace(/-/g, " ");
+            if (typeof text == "string") return text;
         } else {
             return text.replace(/^.+\./, "").replace(/-/g, " ");
         }
@@ -179,7 +180,7 @@ export function someProps(prop): boolean {
 }
 
 export function prepareServerUrl(ref: string): string {
-    ref = '/' + ref;
+    ref = '/' + (ref || "").replace(/^\//, "");
     let locale = getQs('e');
     if (locale) {
         ref += '?e=' + locale;

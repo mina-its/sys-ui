@@ -16,7 +16,7 @@
         <template slot="side-menu">
             <ul class="nav flex-column">
                 <li v-for="node in dec.nodes" class="nav-item px-3">
-                    <button draggable="true" @dragstart="dragNodeDec($event,node)" class="text-nowrap px-0 bg-secondary w-100 text-left my-1 nav-link btn btn-link text-white" :href="node.ref">
+                    <button draggable="true" @dragstart="dragNodeDec($event,node)" class="text-nowrap px-0 bg-secondary w-100 text-start my-1 nav-link btn btn-link text-white" :href="node.ref">
                         <i :class="'text-center px-3 fa-lg fal fa-' + node.icon" style="width: 3rem"></i>
                         <span class="small font-weight-bold">{{node.title}}</span>
                     </button>
@@ -64,7 +64,7 @@
 
         <!--  Main Content -->
         <template slot="main-content">
-            <div class="p-4 bg-white main-canvas position-relative" style="width: 10000px;height: 10000px;margin: -1.5rem;" @dragover="dragOver" @drop="dropNode">
+            <div class="bg-white main-canvas position-relative" style="width: 10000px;height: 10000px;margin: -1.5rem;" @dragover="dragOver" @drop="dropNode">
                 <svg ref="svg" viewBox="0 0 10000 10000" width="10000" height="10000" class="position-absolute">
                     <g v-for="link of links">
                         <path fill="none" :d="link.path" stroke="#fff3" stroke-width="20" @click="selectLink(link)"/>
@@ -86,6 +86,8 @@
     import {Component, Vue} from "vue-property-decorator";
     import {assignNullToEmptyProperty, call, clone, glob, notify, question} from "../main";
     import {Flowchart, Property, FlowchartDeclaration, FlowchartNodeLink, AccessPermission, FlowchartNode, FlowchartNodeDeclare, GlobalType, LogType, ObjectDec, Point, PropertyEditMode} from '../../../sys/src/types';
+
+    declare let $: any;
 
     @Component({name: 'FlowchartDesigner'})
     export default class FlowchartDesigner extends Vue {
@@ -310,9 +312,20 @@
                             continue;
                         }
 
+                        let $node = $(`.node[tabindex=${node.tag}]`);
+                        node.width = $node.width();
+                        node.height = $node.height();
+
+                        let $target = $(`.node[tabindex=${target.tag}]`);
+                        target.width = $target.width();
+                        target.height = $target.height();
+
                         // Calculate path
-                        let path = `M${node.point.x},${node.point.y} L${target.point.x},${node.point.y} L${target.point.x},${target.point.y}`;
-                        this.links.push({path, active: false, node, next});
+                        let paths = [
+                            `M${node.point.x + node.width / 2},${node.point.y + node.height / 2}`,
+                            `L${target.point.x + target.width / 2},${node.point.y + node.height / 2}`,
+                            `L${target.point.x + target.width / 2},${target.point.y + target.height / 2}`];
+                        this.links.push({path: paths.join(' '), active: false, node, next});
                     }
                 }
             }

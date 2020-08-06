@@ -40,7 +40,9 @@ function getText(text, useDictionary) {
         if (exports.glob.texts[text])
             return exports.glob.texts[text];
         if (text.indexOf('.') == -1) {
-            return exports.glob.texts["sys." + text] || text.replace(/-/g, " ");
+            text = exports.glob.texts["sys." + text] || text.replace(/-/g, " ");
+            if (typeof text == "string")
+                return text;
         }
         else {
             return text.replace(/^.+\./, "").replace(/-/g, " ");
@@ -179,7 +181,7 @@ function someProps(prop) {
 }
 exports.someProps = someProps;
 function prepareServerUrl(ref) {
-    ref = '/' + ref;
+    ref = '/' + (ref || "").replace(/^\//, "");
     let locale = getQs('e');
     if (locale) {
         ref += '?e=' + locale;

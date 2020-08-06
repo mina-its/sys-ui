@@ -1,62 +1,46 @@
 html[dir='rtl'] {
-  body {
-    text-align: right;
-  }
-
-  .ml-auto {
-    margin-right: auto !important;
-    margin-left: 0 !important;
-  }
-
-  .mr-auto {
-    margin-left: auto !important;
-    margin-right: 0 !important;
-  }
-
-  .text-right {
-    text-align: left !important;
-  }
-
-  .text-left {
-    text-align: right !important;
-  }
-
-  .side-nav {
-    &.sidenav {
-      padding-right: 0;
-    }
-
-    .nav-link {
-      padding-right: 0.2rem;
-    }
-  }
-
-  .details-view .active {
-    border-width: 0 3px 0 0;
-    margin-left: 0px;
-    margin-right: -3px;
-  }
-
-  .input-group > .form-control:not(:last-child), .input-group > .custom-select:not(:last-child) {
-    border-radius: 0px 4px 4px 0px;
-  }
-
-  .input-group > .input-group-append > .btn, .input-group > .input-group-append > .input-group-text, .input-group > .input-group-prepend:not(:first-child) > .btn, .input-group > .input-group-prepend:not(:first-child) > .input-group-text, .input-group > .input-group-prepend:first-child > .btn:not(:first-child), .input-group > .input-group-prepend:first-child > .input-group-text:not(:first-child) {
-    border-radius: 4px 0px 0px 4px;
-  }
-
-  .checkbox + .checkbox-label:before {
+  .navbar-brand {
     margin-right: 0;
-    margin-left: 0.5rem;
+    margin-left: 1rem;
   }
 
-  .details-view .active {
-    border-right: 3px solid var(--link-color);
-  }
-
-  .change-region {
-    .modal-header .close {
-      margin: -1rem auto -1rem -1rem;
-    }
-  }
+  //.ml-auto {
+  //  margin-right: auto !important;
+  //  margin-left: 0 !important;
+  //}
+  //
+  //.mr-auto {
+  //  margin-left: auto !important;
+  //  margin-right: 0 !important;
+  //}
+  //
+  //
+  //.details-view .active {
+  //  border-width: 0 3px 0 0;
+  //  margin-left: 0px;
+  //  margin-right: -3px;
+  //}
+  //
+  //.input-group > .form-control:not(:last-child), .input-group > .custom-select:not(:last-child) {
+  //  border-radius: 0px 4px 4px 0px;
+  //}
+  //
+  //.input-group > .input-group-append > .btn, .input-group > .input-group-append > .input-group-text, .input-group > .input-group-prepend:not(:first-child) > .btn, .input-group > .input-group-prepend:not(:first-child) > .input-group-text, .input-group > .input-group-prepend:first-child > .btn:not(:first-child), .input-group > .input-group-prepend:first-child > .input-group-text:not(:first-child) {
+  //  border-radius: 4px 0px 0px 4px;
+  //}
+  //
+  //.checkbox + .checkbox-label:before {
+  //  margin-right: 0;
+  //  margin-left: 0.5rem;
+  //}
+  //
+  //.details-view .active {
+  //  border-right: 3px solid var(--link-color);
+  //}
+  //
+  //.change-region {
+  //  .modal-header .close {
+  //    margin: -1rem auto -1rem -1rem;
+  //  }
+  //}
 }
