@@ -104,6 +104,7 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator';
   import axios from "axios";
+  import {WebMethod} from '../../../sys/src/types';
 
   @Component({name: 'ApiDoc'})
   export default class ApiDoc extends Vue {
@@ -115,20 +116,29 @@
     }
 
     getClick(href,opr) {
-      for(let param of opr.params)
-      {
-        href=href.replace(param.name,param.value).replace(/{/,'').replace(/}/,'');
+      for (let param of opr.params) {
+        href = href.replace(param.name, param.value).replace(/{/, '').replace(/}/, '');
       }
       // call(href,{},(err,res)=>{
       //   console.log(res.data);
       //   this.getObject=res.data;
       // });
-      let res = axios.get(href).then(response => {
-          console.log(response.data);
-          this.responseApi =  JSON.stringify(response.data);
-        }
-      );
+      switch (opr.method) {
+        case WebMethod.get:
+          axios.get(href).then(response => {
+            console.log(response.data);
+            this.responseApi = JSON.stringify(response.data);
+          });
+          break;
+        case WebMethod.del:
+          axios.delete(href).then(response => {
+            console.log('delete' + response.data);
+            this.responseApi = JSON.stringify(response.data);
+          });
+          break;
 
+
+      }
     }
   }
 </script>
@@ -163,6 +173,10 @@
 
             &.method-PUT {
                 background-color: #fca130;
+            }
+
+            &.method-PATCH {
+                background-color: #faaaaa;
             }
 
             &.method-DELETE {
