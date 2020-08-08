@@ -73,7 +73,8 @@
 
             let title = this.prop.title || this.prop.name;
             let labelNoWrap = (this.prop.text && this.prop.text.editor);
-            let label = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "prop-label align-top pt-2" + (labelNoWrap ? " text-nowrap" : "")}}, title);
+            let labelClass = "prop-label align-top pt-2" + (labelNoWrap ? " text-nowrap" : "") + (this.prop._.gtype == GlobalType.boolean ? " prop-label-boolean" : "");
+            let label = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": labelClass}}, title);
             let children = [label, vl, msg];
 
             // Property comment
@@ -348,7 +349,7 @@
     }
 
     @media (max-width: 576px) {
-        .prop-label {
+        .prop-label:not(.prop-label-boolean) {
             width: auto;
             display: block;
         }

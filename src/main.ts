@@ -1267,11 +1267,24 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
     });
 }
 
+function startServiceWorker() {
+    // if ('serviceWorker' in navigator) {
+    //     navigator.serviceWorker.register('/public/js/sw.js').then(registration => {
+    //         // Registration was successful
+    //         console.log('ServiceWorker registration successful with scope: ', registration.scope);
+    //     }, function (err) {
+    //         // registration failed :(
+    //         console.warn('ServiceWorker registration failed: ', err);
+    //     });
+    // }
+}
+
 export function start(params?: StartParams) {
     console.log('Starting ...');
     const mainState = $('#main-state').html();
     // console.log('mainState', mainState);
     const res: WebResponse = parse(mainState, true, ID);
+    startServiceWorker();
 
     if (res)
         startVue(res, params);

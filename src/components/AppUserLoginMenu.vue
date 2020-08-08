@@ -1,9 +1,9 @@
 <template>
     <div class="app-user-login">
         <div v-if="glob.config.user.loginUrl">
-            <a class="my-2 my-sm-0" :href="glob.config.user.loginUrl">
+            <a class="my-2 my-sm-0 text-white" :href="glob.config.user.loginUrl">
+                <i class="fal fa-user mx-1"></i>
                 <span v-if="glob.config.user.loginTitle">{{glob.config.user.loginTitle}}</span>
-                <i v-else class="fal fa-user"></i>
             </a>
         </div>
         <div v-else class="dropdown">

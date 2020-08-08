@@ -1696,7 +1696,7 @@
                 // If previous task is SubTask
                 let lastTaskInGroup: Task = null;
                 if (e.group.tasks.length) lastTaskInGroup = e.group.tasks[e.group.tasks.length - 1];
-                if (lastTaskInGroup && lastTaskInGroup.parent) {
+                if (lastTaskInGroup && lastTaskInGroup.parent && !lastTaskInGroup.collapse) {
                     newTask.parent = lastTaskInGroup.parent;
                     newTask.project = lastTaskInGroup.project;
                     newTask.status = lastTaskInGroup.status;

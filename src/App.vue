@@ -3,7 +3,7 @@
         <header>
             <NavBar/>
         </header>
-        <main class="d-flex overflow-hidden">
+        <main class="d-flex overflow-auto">
             <NavMenu/>
             <object-view v-if="objectElemUri" :uri="objectElemUri" :level="0"/>
             <FormView v-else/>
@@ -33,7 +33,6 @@
         }
 
         get objectElemUri() {
-            console.log('glob.form.elems', glob.form.elems);
             if (glob.form.elems && glob.form.elems.length == 1 && glob.form.elems[0].type == ElemType.Object && glob.form.elems[0]._)
                 return glob.form.elems[0]._.ref;
             else
@@ -139,6 +138,15 @@
         }
     }
 
+    /* Bootstrap overwrites */
+    .form-group {
+        margin-bottom: .5rem;
+    }
+
+    .table {
+        width: inherit;
+    }
+
     /* Bootstrap extensions */
     .btn-light {
         background-color: #ededed;
@@ -147,10 +155,6 @@
 
     .rtl {
         direction: rtl;
-    }
-
-    .table {
-        width: inherit;
     }
 
     .no-select {
@@ -372,6 +376,7 @@
     @media (max-width: 576px) {
         .function-open-page {
             margin: 0 auto;
+            overflow: auto;
             background-color: white;
             padding: 1rem;
             border: none;

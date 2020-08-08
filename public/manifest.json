@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "MinaOffice",
+  "short_name": "MinaOffice",
+  "scope": "/",
+  "fullscreen": "true",
+  "display": "standalone",
+  "standalone": "true",
+  "scope_url": "/",
+  "start_url": "/",
+  "description": "This app helps you donate to worthy causes.",
+  "version": "0.1",
+  "orientation": "portrait",
+  "icons": [{
+    "src": "/public/images/logo.png",
+    "sizes": "144x144"
+  }]
+}

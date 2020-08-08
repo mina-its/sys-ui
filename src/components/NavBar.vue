@@ -3,7 +3,7 @@
 
         <!-- Apps Menu -->
         <div v-if="glob.config.apps.length>1" class="dropdown apps-menu">
-            <button class="btn btn-link mx-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-link" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-inline-start: 0rem;">
                 <a class="py-1" href="#">
                     <svg viewBox="0 0 32 32" width="20" height="20">
                         <rect height="6" width="6" x="1" y="1"/>
@@ -47,14 +47,15 @@
             <div class="mr-auto"></div>
 
             <!-- Feedback -->
-            <AppFeedback class="mx-0 mx-lg-2 my-2 my-lg-0" />
+            <AppFeedback class="mx-0 mx-lg-2 my-2 my-lg-0"/>
 
             <!-- Language -->
-            <AppLocaleMenu class="mx-0 mx-lg-2 my-2 my-lg-0" />
+            <AppLocaleMenu class="mx-0 mx-lg-2 my-2 my-lg-0"/>
 
             <!-- Login -->
-            <AppUserLoginMenu class="mx-0 mx-lg-2 my-2 my-lg-0" />
+            <AppUserLoginMenu class="mx-0 mx-lg-2 my-2 my-lg-0"/>
 
+            <div class="px-2"></div>
             <!-- <AppChangeRegion/> -->
         </div>
     </nav>
@@ -88,6 +89,7 @@
 <style lang="scss">
     nav.navbar {
         background-color: var(--header-bg);
+        padding: .5rem;
 
         .btn-toolbar {
             border-color: var(--layout-border);

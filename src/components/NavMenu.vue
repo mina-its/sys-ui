@@ -4,7 +4,7 @@
                 :class="{'fal text-white':1,'fa-times':!collapse,'fa-bars':collapse}"></i></div>
         <ul class="list-unstyled">
             <li v-for="item of glob.config.navmenu" :title="item.title" class="nav-item">
-                <a v-if="item.title=='-'" class="d-block m-3 separator border-bottom border-light"></a>
+                <a v-if="item.title=='-'" class="d-block my-2 separator"></a>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
                 <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-nowrap px-2 nav-link':1,'has-child':item.items}">
                     <i :class="item._cs"></i>{{item.title}}
@@ -59,7 +59,7 @@
         transition: all .2s ease-in-out;
 
         .separator {
-            transition: margin-right .2s ease-in-out, margin-left .2s ease-in-out;
+            border-bottom: 6px solid #7777;
         }
 
         &.collapse {
@@ -74,11 +74,6 @@
                 i {
                     text-align: center;
                 }
-            }
-
-            .separator {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
             }
         }
 

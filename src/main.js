@@ -1226,11 +1226,23 @@ function _dispatchRequestServerModify(store, done) {
         done(err);
     });
 }
+function startServiceWorker() {
+    // if ('serviceWorker' in navigator) {
+    //     navigator.serviceWorker.register('/public/js/sw.js').then(registration => {
+    //         // Registration was successful
+    //         console.log('ServiceWorker registration successful with scope: ', registration.scope);
+    //     }, function (err) {
+    //         // registration failed :(
+    //         console.warn('ServiceWorker registration failed: ', err);
+    //     });
+    // }
+}
 function start(params) {
     console.log('Starting ...');
     const mainState = $('#main-state').html();
     // console.log('mainState', mainState);
     const res = bson_util_1.parse(mainState, true, types_1.ID);
+    startServiceWorker();
     if (res)
         startVue(res, params);
     else {
