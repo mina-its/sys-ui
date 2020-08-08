@@ -34,6 +34,7 @@ export interface Axios {
 export interface Socket {
     (): any;
 
+    close: any;
     on: any;
     emit: any;
 }

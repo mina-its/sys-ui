@@ -487,6 +487,8 @@ function handleWindowEvents() {
                     e.returnValue = $t('save-before');
                 return $t('save-before');
             }
+            if (glob.socket)
+                glob.socket.close();
         })
         .on("resize", (e) => {
             hideCmenu();

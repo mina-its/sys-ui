@@ -45,7 +45,7 @@
             <!--  Content -->
             <div class="w-100 d-flex h-100 overflow-auto">
                 <!-- Nav Panel -->
-                <aside v-if="showSideMenu" class="nav-panel bg-white border-end separator-line py-4 d-none d-md-block">
+                <aside v-if="showSideMenu" class="nav-panel bg-white border-end separator-line py-4 d-none overflow-auto d-md-block">
                     <slot name="side-menu"></slot>
                 </aside>
 

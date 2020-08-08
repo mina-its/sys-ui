@@ -105,18 +105,10 @@
         loadDoc(ref: string) {
             this.showHelpUseful = true;
 
-            let name = ref.replace(/.+\/docs\/([\w-]+).*/, "$1");
-            if (!name) return;
-            call('getDocument', {name}, (err, res) => {
-                if (!res.data) {
-                    this.doc = null;
-                    return;
-                }
-
-                this.doc = res.data.doc;
-                this.directory = res.data.directory;
-                this.directoryTitle = res.data.directoryTitle;
-
+            let makeDocumentReady = (data) => {
+                this.doc = data.doc;
+                this.directory = data.directory;
+                this.directoryTitle = data.directoryTitle;
                 this.breadcrumb = [{title: this.directoryTitle, ref: null}];
 
                 let content = (this.doc && this.doc.content) ? this.doc.content as string : "";
@@ -127,7 +119,20 @@
                     onThisPage += `###### [${result[1]}](${'#' + result[1].toLowerCase().replace(/\s/, '-')})\r\n`;
                 }
                 glob.infoPanel.currentComment = onThisPage;
-            });
+            };
+
+            let name = ref.replace(/\/docs\//, "");
+            if (!name) return;
+
+            if (glob.data["docs-data"])
+                makeDocumentReady(glob.data["docs-data"]);
+            else
+                call('getDocument', {name}, (err, res) => {
+                    if (!res.data)
+                        this.doc = null;
+                    else
+                        makeDocumentReady(res.data);
+                });
         }
 
         goto(item: TreePair) {
