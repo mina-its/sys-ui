@@ -19,10 +19,15 @@
         <div class="w-100 bg-dark">
             <div class="d-block separator"></div>
 
-            <a class="cursor-pointer text-nowrap py-4 nav-link">
+            <a v-if="glob.config.user.loginUrl" :href="glob.config.user.loginUrl" class="cursor-pointer text-nowrap py-4 nav-link">
+                <i class="fal fa-user-circle"></i>
+                <span v-if="glob.config.user.loginTitle">{{glob.config.user.loginTitle}}</span>
+            </a>
+            <a v-else :href="glob.config.user.loginUrl" class="cursor-pointer text-nowrap py-4 nav-link">
                 <i class="fal fa-user-circle"></i>
                 <span>{{glob.config.user.title}}</span>
             </a>
+
         </div>
 
     </div>
