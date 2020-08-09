@@ -996,6 +996,8 @@ function startVue(res: WebResponse, params?: StartParams) {
     } catch (err) {
         console.error(err);
         notify("<strong>Starting Vue failed:</strong> " + err.message, LogType.Fatal);
+    } finally {
+        $("#splash").remove();
     }
 }
 

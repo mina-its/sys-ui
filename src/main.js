@@ -979,6 +979,9 @@ function startVue(res, params) {
         console.error(err);
         notify("<strong>Starting Vue failed:</strong> " + err.message, types_2.LogType.Fatal);
     }
+    finally {
+        $("#splash").remove();
+    }
 }
 function _commitReloadData(state, data) {
     state.data = data;
