@@ -1,12 +1,10 @@
 <template>
-    <div :class="{'nav-menu':1,'collapse':collapse}" v-if="glob.config.navmenu.length">
-        <div @click="toggleSideNav" :class="{'btn w-100':1,'text-end':!collapse,'text-center':collapse}" style="padding: .8rem"><i
-                :class="{'fal text-white':1,'fa-times':!collapse,'fa-bars':collapse}"></i></div>
-        <ul class="list-unstyled">
-            <li v-for="item of glob.config.navmenu" :title="item.title" class="nav-item">
+    <div :class="{'nav-menu d-flex align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="!glob.config.headerMenu" style="overflow-x: hidden;overflow-y: auto">
+        <ul class="pt-4 mb-auto w-100">
+            <li v-for="item of glob.config.menu" :title="item.title" class="nav-item">
                 <div v-if="item.title=='-'" class="d-block separator"></div>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
-                <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-nowrap px-2 nav-link':1,'has-child':item.items}">
+                <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-nowrap nav-link':1,'has-child':item.items}">
                     <i :class="item._cs"></i>{{item.title}}
                 </a>
                 <ul class="list-unstyled">
@@ -16,6 +14,17 @@
                 </ul>
             </li>
         </ul>
+
+
+        <div class="w-100 bg-dark">
+            <div class="d-block separator"></div>
+
+            <a class="cursor-pointer text-nowrap py-4 nav-link">
+                <i class="fal fa-user-circle"></i>
+                <span>{{glob.config.user.title}}</span>
+            </a>
+        </div>
+
     </div>
 </template>
 
@@ -27,18 +36,8 @@
 
     @Component({name: 'NavMenu'})
     export default class NavMenu extends Vue {
-        private collapse = false;
-
-        get glob() {
-            return glob;
-        }
-
-        mounted() {
-            // this.collapse = localStorage.getItem('sys-sidenav-collapse') == "1";
-        }
-
         toggleSideNav() {
-            this.collapse = !this.collapse;
+            glob.showNavMenu = false;
             // localStorage.setItem('sys-sidenav-collapse', this.collapse ? "1" : null);
         }
 
@@ -62,9 +61,9 @@
             border-bottom: 1rem solid #7773;
         }
 
-        &.collapse {
-            min-width: 3rem;
-            width: 3rem;
+        &.collapse-nav {
+            min-width: 3.2rem;
+            width: 3.2rem;
             text-align: center;
 
             .nav-link {
@@ -94,16 +93,26 @@
         .nav-link {
             display: flex;
             font-size: .8rem;
+            padding: .5rem 0;
             align-items: center;
             transition: all .2s ease-in-out;
 
             i {
-                text-align: end;
-                width: 2rem;
-                min-width: 2rem;
+                text-align: center;
+                width: 3.2rem;
+                min-width: 3.2rem;
                 margin-inline-end: .5rem;
                 font-size: 1.2rem;
                 transition: all .2s ease-in-out;
+            }
+        }
+    }
+
+    @media (max-width: 576px) {
+        .nav-menu {
+            &.collapse-nav {
+                min-width: 0rem;
+                width: 0;
             }
         }
     }

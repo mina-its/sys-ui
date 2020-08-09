@@ -830,7 +830,7 @@ export function load(href: string, pushState = false) {
     }
 
     glob.notify = null;
-    ajax(setQs('m', RequestMode.inline, false, href), null, null, (res) => {
+    ajax(setQs('m', RequestMode.inline, false, href), null, {showProgress: true}, (res) => {
         handleResponse(res);
         loadNotes(href);
     }, err => notify(err));
@@ -844,8 +844,9 @@ export function loadNotes(url) {
 }
 
 export function ajax(url: string, data, config: AjaxConfig, done: (res: WebResponse) => void, fail?: (err: { code: StatusCode, message: string }) => void) {
-    startProgress();
-    config = config || {};
+    config = config || new AjaxConfig();
+    if (config.showProgress)
+        glob.showProgress = true;
     fail = fail || notify;
     if (glob.config.host) url = joinUri(glob.config.host, url);
 
@@ -895,7 +896,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
 
     // Ajax call
     axios(params).then(res => {
-        stopProgress();
+        glob.showProgress = false;
         if (res.status && res.status !== StatusCode.Ok) {
             fail({code: res.status, message: res.statusText});
         } else {
@@ -909,7 +910,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
             }
         }
     }).catch(err => {
-        stopProgress();
+        glob.showProgress = false;
         console.error(`error on ajax '${url}'`, err);
         if (err.response && err.response.data) {
             try {
@@ -921,21 +922,6 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         } else
             fail({message: err.toString(), code: StatusCode.UnknownError});
     });
-}
-
-function startProgress() {
-    glob.progress = 0;
-    setTimeout(() => {
-        if (glob.progress != null) {
-            glob.progress = 1;
-            setTimeout(() => glob.progress = glob.progress ? 50 : 0, 0);
-            setTimeout(() => glob.progress = glob.progress ? 95 : 0, 1000);
-        }
-    }, Constants.delayToStartProgressBar);
-}
-
-function stopProgress() {
-    glob.progress = null;
 }
 
 function registerComponents(vue, components) {
@@ -996,8 +982,6 @@ function startVue(res: WebResponse, params?: StartParams) {
     } catch (err) {
         console.error(err);
         notify("<strong>Starting Vue failed:</strong> " + err.message, LogType.Fatal);
-    } finally {
-        $("#splash").remove();
     }
 }
 

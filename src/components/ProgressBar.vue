@@ -1,9 +1,6 @@
 <template>
-    <div class="progress" v-if="glob.progress">
-        <div class="progress-bar" role="progressbar" :style="{'width': glob.progress+'%'}"
-             :aria-valuenow="glob.progress"
-             aria-valuemin="0"
-             aria-valuemax="100"></div>
+    <div :class="{'progress w-100 position-absolute':1, 'start':glob.showProgress}">
+        <div class="progress-bar" role="progressbar"></div>
     </div>
 </template>
 
@@ -17,10 +14,37 @@
 
 <style lang="scss">
     .progress {
-        height: 3px !important;
+        height: 5px !important;
         top: 0;
-        background-color: inherit!important;
-        position: absolute;
-        width: 100%;
+        background-color: inherit !important;
+
+        .progress-bar {
+            width: 0;
+            opacity: 0;
+        }
+
+        &.start .progress-bar {
+            animation-name: progress-bar-anim;
+            animation-duration: 5s;
+        }
+    }
+
+    @keyframes progress-bar-anim {
+        0% {
+            width: 0;
+            opacity: 1;
+        }
+        5% {
+            width: 0;
+        }
+        10% {
+            width: 50%;
+        }
+        50% {
+            width: 75%;
+        }
+        100% {
+            width: 100%;
+        }
     }
 </style>

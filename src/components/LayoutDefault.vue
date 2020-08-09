@@ -31,14 +31,16 @@
                 <div class="mr-auto"></div>
 
                 <div>
-                    <!--  Refresh -->
-                    <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>
+                    <!--                    &lt;!&ndash;  Refresh &ndash;&gt;-->
+                    <!--                    <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>-->
 
                     <!--  Object Menu -->
                     <button class="btn btn-link text-secondary px-2" @click="clickConfigMenu"><i class="fal fa-cog fa-lg"></i></button>
 
                     <!-- Info Panel -->
-                    <button title="Show info panel" v-if="!showInfoPanel" @click="toggleShowInfoPanel(true)" class="btn close-panel btn-link px-2"><i class="fal fa-info-circle fa-lg"></i></button>
+                    <button title="Show info panel" v-if="!showInfoPanel" @click="toggleShowInfoPanel(true)" class="btn close-panel btn-link px-2">
+                        <i class="fal fa-info-circle fa-lg"></i>
+                    </button>
                 </div>
             </div>
 
@@ -171,9 +173,9 @@
             });
         }
 
-        refresh() {
-            load(location.pathname, false);
-        }
+        // refresh() {
+        //     load(location.pathname, false);
+        // }
     }
 </script>
 
@@ -183,7 +185,7 @@
     }
 
     .info-panel {
-        min-width: 20rem;
+        min-width: 20rem !important;
         width: 20rem;
     }
 

@@ -817,7 +817,7 @@ function load(href, pushState = false) {
         history.pushState(null, null, href);
     }
     exports.glob.notify = null;
-    ajax(setQs('m', types_2.RequestMode.inline, false, href), null, null, (res) => {
+    ajax(setQs('m', types_2.RequestMode.inline, false, href), null, { showProgress: true }, (res) => {
         handleResponse(res);
         loadNotes(href);
     }, err => notify(err));
@@ -831,8 +831,9 @@ function loadNotes(url) {
 }
 exports.loadNotes = loadNotes;
 function ajax(url, data, config, done, fail) {
-    startProgress();
-    config = config || {};
+    config = config || new types_2.AjaxConfig();
+    if (config.showProgress)
+        exports.glob.showProgress = true;
     fail = fail || notify;
     if (exports.glob.config.host)
         url = joinUri(exports.glob.config.host, url);
@@ -878,7 +879,7 @@ function ajax(url, data, config, done, fail) {
     //console.log("ajax params :", params);
     // Ajax call
     axios(params).then(res => {
-        stopProgress();
+        exports.glob.showProgress = false;
         if (res.status && res.status !== types_2.StatusCode.Ok) {
             fail({ code: res.status, message: res.statusText });
         }
@@ -894,7 +895,7 @@ function ajax(url, data, config, done, fail) {
             }
         }
     }).catch(err => {
-        stopProgress();
+        exports.glob.showProgress = false;
         console.error(`error on ajax '${url}'`, err);
         if (err.response && err.response.data) {
             try {
@@ -910,19 +911,6 @@ function ajax(url, data, config, done, fail) {
     });
 }
 exports.ajax = ajax;
-function startProgress() {
-    exports.glob.progress = 0;
-    setTimeout(() => {
-        if (exports.glob.progress != null) {
-            exports.glob.progress = 1;
-            setTimeout(() => exports.glob.progress = exports.glob.progress ? 50 : 0, 0);
-            setTimeout(() => exports.glob.progress = exports.glob.progress ? 95 : 0, 1000);
-        }
-    }, types_1.Constants.delayToStartProgressBar);
-}
-function stopProgress() {
-    exports.glob.progress = null;
-}
 function registerComponents(vue, components) {
     const requireComponent = require.context('./components', false, /\.vue$/);
     requireComponent.keys().forEach(fileName => {
@@ -978,9 +966,6 @@ function startVue(res, params) {
     catch (err) {
         console.error(err);
         notify("<strong>Starting Vue failed:</strong> " + err.message, types_2.LogType.Fatal);
-    }
-    finally {
-        $("#splash").remove();
     }
 }
 function _commitReloadData(state, data) {

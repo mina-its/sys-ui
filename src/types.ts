@@ -51,7 +51,6 @@ export const Constants = {
     redirectSelf: '_self',
     defaultAddress: '/_default',
     contextMenuVisibleItems: 10,
-    delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg", "svg"],
     uniqueFilenameRegex: /^[a-fA-F0-9]{24}__/,
     QUERY_LOCALE: 'e',
@@ -219,8 +218,8 @@ export class Global {
     geoMap = new AppStateGeoMap();
     modifies: Modify[] = [];
     socket: Socket;
-    packageGlobal: any;
-    progress: number = null;
+    showProgress: boolean = false;
+    showNavMenu: boolean = true;
 }
 
 export class Modify {

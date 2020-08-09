@@ -10,7 +10,6 @@ exports.Constants = {
     redirectSelf: '_self',
     defaultAddress: '/_default',
     contextMenuVisibleItems: 10,
-    delayToStartProgressBar: 300,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg", "svg"],
     uniqueFilenameRegex: /^[a-fA-F0-9]{24}__/,
     QUERY_LOCALE: 'e',
@@ -113,7 +112,8 @@ class Global {
         this.cmenu = new AppStateCmenu();
         this.geoMap = new AppStateGeoMap();
         this.modifies = [];
-        this.progress = null;
+        this.showProgress = false;
+        this.showNavMenu = true;
     }
 }
 exports.Global = Global;

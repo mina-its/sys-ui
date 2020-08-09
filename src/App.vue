@@ -1,8 +1,6 @@
 <template>
     <div class="d-flex h-100 flex-column">
-        <header>
-            <NavBar/>
-        </header>
+        <app-header />
         <main class="d-flex overflow-auto">
             <NavMenu/>
             <object-view v-if="objectElemUri" :uri="objectElemUri" :level="0"/>
