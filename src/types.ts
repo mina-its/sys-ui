@@ -220,6 +220,14 @@ export class Global {
     socket: Socket;
     showProgress: boolean = false;
     showNavMenu: boolean = true;
+    screen: ScreenSize = ScreenSize.md;
+}
+
+export enum ScreenSize {
+    xs = 1, // (for phones - screens less than 768px wide)
+    sm = 2, // (for tablets - screens equal to or greater than 768px wide)
+    md = 3,//  (for small laptops - screens equal to or greater than 992px wide)
+    lg = 4,// (for laptops and desktops - screens equal to or greater than 1200px wide)
 }
 
 export class Modify {

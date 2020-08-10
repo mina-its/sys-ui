@@ -925,9 +925,20 @@ function registerComponents(vue, components) {
     }
     vue.component("SysApp", App_vue_1.default);
 }
+function checkScreenSize() {
+    if (window.innerWidth < 768)
+        exports.glob.screen = types_1.ScreenSize.xs;
+    else if (window.innerWidth < 992)
+        exports.glob.screen = types_1.ScreenSize.sm;
+    else if (window.innerWidth < 1200)
+        exports.glob.screen = types_1.ScreenSize.md;
+    else
+        exports.glob.screen = types_1.ScreenSize.lg;
+}
 function startVue(res, params) {
     try {
         handleWindowEvents();
+        checkScreenSize();
         vue_1.default.use(vuex_1.default);
         store = new vuex_1.default.Store({
             state: { data: null },

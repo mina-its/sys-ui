@@ -1,14 +1,15 @@
 <template>
-    <div :class="{'nav-menu d-flex align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="!glob.config.headerMenu" style="overflow-x: hidden;overflow-y: auto">
+    <div :class="{'nav-menu d-flex align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="!glob.config.headerMenu || glob.screen==1" style="overflow-x: hidden;overflow-y: auto">
         <ul class="pt-4 mb-auto w-100">
-            <li v-for="item of glob.config.menu" :title="item.title" class="nav-item">
+            <li v-for="item of glob.config.menu" :title="item.title" class="nav-item text-uppercase">
                 <div v-if="item.title=='-'" class="d-block separator"></div>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
                 <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-nowrap nav-link':1,'has-child':item.items}">
-                    <i :class="item._cs"></i>{{item.title}}
+                    <i :class="item._cs"></i>
+                    <span>{{item.title}}</span>
                 </a>
-                <ul class="list-unstyled">
-                    <li v-for="subitem of item.items" class="mr-2 nav-item">
+                <ul class="list-unstyled" style="padding-inline-start: 6rem">
+                    <li v-for="subitem of item.items" class="nav-item px-3">
                         <a :href="subitem.ref" :class="{'text-nowrap nav-link':1}">{{subitem.title}}</a>
                     </li>
                 </ul>
@@ -58,9 +59,13 @@
     .nav-menu {
         overflow-y: auto;
         background-color: var(--nav-menu-bg);
-        min-width: 15rem;
-        width: 15rem;
+        min-width: 17rem;
+        width: 17rem;
         transition: all .2s ease-in-out;
+
+        li {
+            display: unset;
+        }
 
         .separator {
             border-bottom: 1rem solid #7773;
@@ -97,7 +102,7 @@
 
         .nav-link {
             display: flex;
-            font-size: .8rem;
+            font-size: 1rem;
             padding: .5rem 0;
             align-items: center;
             transition: all .2s ease-in-out;
@@ -115,6 +120,9 @@
 
     @media (max-width: 576px) {
         .nav-menu {
+            min-width: 100%;
+            width: 100%;
+
             &.collapse-nav {
                 min-width: 0rem;
                 width: 0;

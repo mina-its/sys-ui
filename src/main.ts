@@ -20,8 +20,8 @@ let index = {
 import {getBsonValue, parse, stringify} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {Axios, ChangeType, Constants, ItemChangeEventArg, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, Socket, StartParams, StateChange} from './types';
-import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, NotificationInfo, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
+import {Axios, ChangeType, Constants, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, ScreenSize, Socket, StartParams, StateChange} from './types';
+import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
 import App from './App.vue';
 import pluralize = require('pluralize');
 
@@ -941,9 +941,17 @@ function registerComponents(vue, components) {
     vue.component("SysApp", App);
 }
 
+function checkScreenSize() {
+    if (window.innerWidth < 768) glob.screen = ScreenSize.xs;
+    else if (window.innerWidth < 992) glob.screen = ScreenSize.sm;
+    else if (window.innerWidth < 1200) glob.screen = ScreenSize.md;
+    else glob.screen = ScreenSize.lg;
+}
+
 function startVue(res: WebResponse, params?: StartParams) {
     try {
         handleWindowEvents();
+        checkScreenSize();
 
         Vue.use(Vuex);
         store = new Vuex.Store({
