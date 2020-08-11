@@ -6,7 +6,7 @@
                 <span v-if="glob.config.user.loginTitle">{{glob.config.user.loginTitle}}</span>
             </a>
         </div>
-        <div v-else class="dropdown">
+        <div v-else class="dropdown d-flex">
             <button class="avatar bg-transparent border-0 outline-0 dropdown-toggle" id="dropdownProfileBrief" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i v-if="buttonClass" :class="buttonClass"></i>
                 <span v-else role="img" class="d-flex cursor-pointer bg-transparent w-100 h-100" :style="{'background-image':`url(${profilePhoto})`}" />

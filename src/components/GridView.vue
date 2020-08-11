@@ -3,7 +3,7 @@
         <!-- Toolbar -->
         <template slot="toolbar-customs">
             <!-- Filter -->
-            <div v-if="showFilter" class="border d-flex align-items-center toolbar-filter px-2 mx-sm-4 mx-1 bg-light rounded">
+            <div v-if="showFilter" class="border d-flex align-items-center toolbar-filter px-2 mx-sm-4 mx-1 bg-light">
                 <i class="fal fa-filter p-1 d-inline-block text-muted"></i>
                 <PropertyFilter :allowPropChange="true" @changed="filterValueChanged" @changeFilterProp="changeFilterProp" :prop="filteringProp" :filter="filter" :filterDoc="filterDoc"/>
             </div>
@@ -60,7 +60,7 @@
                     <td class="border-0" colspan="100">
                         <div class="align-items-center d-flex">
                             <!-- Add -->
-                            <Function v-if="dec.access & 4" styles="m-1 fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"></Function>
+                            <Function v-if="dec.access & 4" styles="text-secondary fa-lg fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"></Function>
 
                             <!-- Delete -->
                             <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
@@ -69,12 +69,12 @@
                             <div class="flex-grow-1 d-flex align-items-center">
                                 <ul v-if="dec.pages > 1" class="m-2 pagination ">
                                     <li class="page-item" data-toggle="tooltip" title="Previous Page">
-                                        <a @click="goBack" href="javascript:;" class="page-link"> <i :class="{'fa':1,'fa-chevron-right':rtl,'fa fa-chevron-left':ltr}"></i> </a>
+                                        <a @click="goBack" href="javascript:;" class="page-link"> <i :class="{'fal fa-lg':1,'fa-chevron-right':rtl,'fa-chevron-left':ltr}"></i> </a>
                                     </li>
                                     <li v-for="page in dec.pageLinks" :class="'page-item' + (page.active ? ' active':'') ">
                                         <a class="page-link" :href="page.ref">{{page.title}}</a></li>
                                     <li class="page-item" data-toggle="tooltip" title="Next Page">
-                                        <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fa':1,'fa-chevron-left':rtl,'fa fa-chevron-right':ltr}"></i> </a>
+                                        <a href="javascript:;" class="page-link" @click="goForward"> <i :class="{'fal fa-lg':1,'fa-chevron-left':rtl,'fa-chevron-right':ltr}"></i> </a>
                                     </li>
                                 </ul>
                             </div>
@@ -609,6 +609,17 @@
     $right: var(--right);
 
     .grid-view {
+        .toolbar-filter {
+            border-radius: 18px;
+
+            .filter-prop-title {
+                &:hover {
+                    text-decoration: none;
+                    background-color: #ddd !important;
+                }
+            }
+        }
+
         .sidenav-filter {
             min-width: 360px;
         }

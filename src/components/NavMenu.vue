@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'nav-menu d-flex align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="!glob.config.headerMenu || glob.screen==1" style="overflow-x: hidden;overflow-y: auto">
+    <div :class="{'nav-menu d-flex align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="!glob.config.headerMenu || glob.screen==1">
         <ul class="pt-4 mb-auto w-100">
             <li v-for="item of glob.config.menu" :title="item.title" class="nav-item text-uppercase">
                 <div v-if="item.title=='-'" class="d-block separator"></div>
@@ -15,22 +15,6 @@
                 </ul>
             </li>
         </ul>
-
-
-        <div class="w-100 bg-dark">
-            <div class="d-block separator"></div>
-
-            <a v-if="glob.config.user.loginUrl" :href="glob.config.user.loginUrl" class="cursor-pointer text-nowrap py-4 nav-link">
-                <i class="fal fa-user-circle"></i>
-                <span v-if="glob.config.user.loginTitle">{{glob.config.user.loginTitle}}</span>
-            </a>
-            <a v-else :href="glob.config.user.loginUrl" class="cursor-pointer text-nowrap py-4 nav-link">
-                <i class="fal fa-user-circle"></i>
-                <span>{{glob.config.user.title}}</span>
-            </a>
-
-        </div>
-
     </div>
 </template>
 
@@ -57,6 +41,7 @@
 <style lang="scss">
 
     .nav-menu {
+        overflow-x: hidden;
         overflow-y: auto;
         background-color: var(--nav-menu-bg);
         min-width: 17rem;

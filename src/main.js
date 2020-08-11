@@ -460,7 +460,7 @@ function pushToGridViewRecentList(path, ref, title) {
     if (index > -1)
         recentItems.splice(index, 1);
     recentItems.unshift({ title, ref });
-    if (recentItems.length > 6)
+    if (recentItems.length > 5)
         recentItems.pop();
     localStorage.setItem("gridView-recentItems-" + path, JSON.stringify(recentItems));
 }
@@ -818,6 +818,9 @@ function load(href, pushState = false) {
     }
     exports.glob.notify = null;
     ajax(setQs('m', types_2.RequestMode.inline, false, href), null, { showProgress: true }, (res) => {
+        // Hide menu on mobile mode after load object
+        if (exports.glob.screen == types_1.ScreenSize.xs)
+            exports.glob.showNavMenu = false;
         handleResponse(res);
         loadNotes(href);
     }, err => notify(err));

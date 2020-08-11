@@ -466,7 +466,7 @@ export function pushToGridViewRecentList(path: string, ref: string, title: strin
     if (index > -1)
         recentItems.splice(index, 1);
     recentItems.unshift({title, ref});
-    if (recentItems.length > 6)
+    if (recentItems.length > 5)
         recentItems.pop();
     localStorage.setItem("gridView-recentItems-" + path, JSON.stringify(recentItems));
 }
@@ -831,6 +831,9 @@ export function load(href: string, pushState = false) {
 
     glob.notify = null;
     ajax(setQs('m', RequestMode.inline, false, href), null, {showProgress: true}, (res) => {
+
+        // Hide menu on mobile mode after load object
+        if (glob.screen == ScreenSize.xs) glob.showNavMenu = false;
         handleResponse(res);
         loadNotes(href);
     }, err => notify(err));

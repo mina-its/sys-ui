@@ -1,6 +1,6 @@
 <template>
     <header class="app-header">
-        <nav class="d-flex h-100 text-white align-items-center" :style="{'background-color':navColor}">
+        <nav class="d-flex h-100 text-white align-items-center" :style="{'background-color':navColor || 'black'}">
 
             <!-- Nav Menu Toggle -->
             <a v-if="!glob.config.headerMenu || glob.screen==1" title="Toggle navigation menu" class="px-3 header-link align-items-center d-flex" @click="glob.showNavMenu=!glob.showNavMenu">
@@ -30,14 +30,11 @@
 
             <div class="mr-auto"></div>
 
-            <!-- Feedback -->
-            <AppFeedback v-if="glob.config.headerMenu && glob.screen>1" class="mx-0 mx-lg-2 my-2 my-lg-0"/>
-
             <!-- Language -->
-            <AppLocaleMenu v-if="glob.config.headerMenu && glob.screen>1" class="mx-0 mx-lg-2 my-2 my-lg-0"/>
+            <AppLocaleMenu v-if="glob.config.headerMenu && glob.screen>1" class="mx-0 mx-lg-2" />
 
             <!-- Login -->
-            <AppUserLoginMenu v-if="glob.config.headerMenu && glob.screen>1" class="mx-0 mx-lg-2 my-2 my-lg-0"/>
+            <AppUserLoginMenu class="header-link align-items-center d-flex" />
 
             <!-- Apps Menu -->
             <div v-if="glob.config.apps.length>1" class="dropdown h-100 apps-menu">

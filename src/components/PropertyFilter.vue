@@ -20,7 +20,7 @@
             }, this.prop.title || this.prop.name);
 
             let propOper = ce('a', {
-                attrs: {"class": "filter-prop-oper border bg-white px-4 px-md-2 py-1 py-md-0 font-weight-bold", "href": "javascript:void(0);"},
+                attrs: {"class": "filter-prop-oper border rounded bg-white px-4 px-md-2 py-1 py-md-1 font-weight-bold mx-1", "href": "javascript:void(0);"},
                 on: {click: $this.changeOperator}
             }, $t(`opr-${this.filterOperator}`));
             let propValue = this.renderValue(ce, `filter-prop-value d-flex align-items-center px-1 border-0`);
@@ -291,11 +291,12 @@
     }
 
     .filter-prop-oper {
-        border-radius: 5px;
         color: #666;
 
         &:hover {
-
+            text-decoration: none;
+            background-color: #ddd !important;
+            border-color: #ddd !important;
         }
     }
 
