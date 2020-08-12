@@ -6,7 +6,7 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property} from "../../../sys/src/types";
     import * as main from '../main';
-    import {glob, prepareServerUrl, pushToGridViewRecentList, urlInsertPrefix} from "../main";
+    import {glob, prepareServerUrl, pushToGridViewRecentList} from "../main";
     import {PropEventArg} from "../types";
 
     @Component({name: 'PropLink'})
@@ -43,8 +43,7 @@
             if (!this.doc._id)
                 return "/";
             let url = "/" + this.path + "/" + this.doc._id;
-            url = urlInsertPrefix(url);
-            return prepareServerUrl(url);
+            return prepareServerUrl(url, true);
         }
     }
 </script>

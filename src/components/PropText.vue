@@ -37,7 +37,6 @@
 
         @Emit("changed")
         update(e): ItemChangeEventArg {
-            console.log(1);
             let text = (e.target as any).value;
             if (text === "") text = null;
             let val = this.doc[this.prop.name];

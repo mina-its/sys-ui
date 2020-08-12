@@ -44,7 +44,7 @@
     import {ChangeType, HeadFunc, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
     import {AccessPermission, EntityLink, Context, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
-    import {$t, getNewItemTitle, glob, loadObjectViewData, markDown, urlInsertPrefix} from '../main';
+    import {$t, getNewItemTitle, glob, loadObjectViewData, markDown, prepareServerUrl} from '../main';
     import * as main from '../main';
     import ObjectView from "./ObjectView.vue";
     import LayoutDefault from "./LayoutDefault.vue";
@@ -93,7 +93,7 @@
             this.headFuncs = [];
             if (this.dec.links) {
                 this.headFuncs = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
-                    return {title: link.title as string, ref: urlInsertPrefix(link.address)};
+                    return {title: link.title as string, ref: prepareServerUrl(link.address, true)};
                 });
             }
         }
@@ -125,10 +125,14 @@
         reloadLastGroup() {
             if (typeof (Storage) === "undefined") return;
             let item = localStorage.getItem("_gp" + location.pathname);
-            if (item)
-                this.selectGroup(JSON.parse(item));
-            else
-                this.currentGroup = this.groups[0];
+            if (item) {
+                let grp = JSON.parse(item);
+                if (this.groups.indexOf(grp.title) > -1) {
+                    this.selectGroup(grp);
+                    return;
+                }
+            }
+            this.currentGroup = this.groups[0];
         }
 
         loadPropertyGroupLinkData(address: string) {

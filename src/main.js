@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.loadNotes = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.urlInsertPrefix = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.loadNotes = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.getBsonValue = exports.stringify = exports.parse = exports.glob = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -180,13 +180,15 @@ function someProps(prop) {
     return Array.isArray(prop.properties) && prop.properties.length;
 }
 exports.someProps = someProps;
-function prepareServerUrl(ref) {
-    ref = '/' + (ref || "").replace(/^\//, "");
+function prepareServerUrl(ref, addPrefix = false) {
+    ref = (ref || "").replace(/^\//, "");
     let locale = getQs('e');
     if (locale) {
         ref += '?e=' + locale;
     }
-    return ref;
+    if (addPrefix && exports.glob.config.prefix)
+        ref = exports.glob.config.prefix + "/" + ref;
+    return "/" + ref;
 }
 exports.prepareServerUrl = prepareServerUrl;
 function loadObjectViewData(address, item, done) {
@@ -271,7 +273,8 @@ function handleResponse(res) {
 exports.handleResponse = handleResponse;
 function initializeModifyForQueryNew(res) {
     exports.glob.dirty = true;
-    let ref = location.pathname.replace(/\//g, "");
+    let parts = location.pathname.split('/');
+    let ref = parts[parts.length - 1];
     let data = res.data[ref];
     let modifyData = { _id: types_1.ID.generateByBrowser(), _new: true };
     for (let prop in data) {
@@ -465,10 +468,6 @@ function pushToGridViewRecentList(path, ref, title) {
     localStorage.setItem("gridView-recentItems-" + path, JSON.stringify(recentItems));
 }
 exports.pushToGridViewRecentList = pushToGridViewRecentList;
-function urlInsertPrefix(url) {
-    return exports.glob.config.prefix ? `/${exports.glob.config.prefix}${url}` : url;
-}
-exports.urlInsertPrefix = urlInsertPrefix;
 function handleWindowEvents() {
     $(window)
         .on("popstate", (e) => {
@@ -805,7 +804,7 @@ function call(funcName, data, done) {
     data = data || {};
     data._ = data._ || {};
     data._.ref = location.href;
-    ajax(setQs('m', types_2.RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res), err => done(err));
+    ajax(setQs('m', types_2.RequestMode.inline, false, prepareServerUrl(funcName, true)), data, null, res => done(null, res), err => done(err));
 }
 exports.call = call;
 function load(href, pushState = false) {
@@ -1192,14 +1191,14 @@ function _dispatchRequestServerModify(store, done) {
     }
     // console.log(modify.data);
     // console.log(stringify(modify.data, true));
-    ajax(prepareServerUrl(modify.ref), modify.data, { method }, (res) => {
+    ajax(prepareServerUrl(modify.ref, true), modify.data, { method }, (res) => {
         commitServerChangeResponse(store, modify, res.modifyResult);
         // New Item Page
         if (getQs("n")) {
             notify($t('saved'), types_2.LogType.Debug);
             exports.glob.dirty = false;
             clearModifies();
-            let ref = "/" + modify.ref + "/" + res.modifyResult._id;
+            let ref = prepareServerUrl(modify.ref + "/" + res.modifyResult._id, true);
             history.replaceState(null, null, ref);
             load(ref, false);
             done();

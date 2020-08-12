@@ -179,13 +179,15 @@ export function someProps(prop): boolean {
     return Array.isArray(prop.properties) && prop.properties.length;
 }
 
-export function prepareServerUrl(ref: string): string {
-    ref = '/' + (ref || "").replace(/^\//, "");
+export function prepareServerUrl(ref: string, addPrefix: boolean = false): string {
+    ref = (ref || "").replace(/^\//, "");
     let locale = getQs('e');
     if (locale) {
         ref += '?e=' + locale;
     }
-    return ref;
+    if (addPrefix && glob.config.prefix)
+        ref = glob.config.prefix + "/" + ref;
+    return "/" + ref;
 }
 
 export function loadObjectViewData(address: string, item, done) {
@@ -280,7 +282,8 @@ export function handleResponse(res: WebResponse) {
 
 function initializeModifyForQueryNew(res: WebResponse) {
     glob.dirty = true;
-    let ref = location.pathname.replace(/\//g, "");
+    let parts = location.pathname.split('/');
+    let ref = parts[parts.length - 1];
     let data = res.data[ref];
     let modifyData = {_id: ID.generateByBrowser(), _new: true};
     for (let prop in data) {
@@ -469,10 +472,6 @@ export function pushToGridViewRecentList(path: string, ref: string, title: strin
     if (recentItems.length > 5)
         recentItems.pop();
     localStorage.setItem("gridView-recentItems-" + path, JSON.stringify(recentItems));
-}
-
-export function urlInsertPrefix(url) {
-    return glob.config.prefix ? `/${glob.config.prefix}${url}` : url;
 }
 
 function handleWindowEvents() {
@@ -816,7 +815,7 @@ export function call(funcName: string, data: any, done: (err, res?) => void) {
     data = data || {};
     data._ = data._ || {};
     data._.ref = location.href;
-    ajax(setQs('m', RequestMode.inline, false, "/" + funcName), data, null, res => done(null, res), err => done(err));
+    ajax(setQs('m', RequestMode.inline, false, prepareServerUrl(funcName, true)), data, null, res => done(null, res), err => done(err));
 }
 
 export function load(href: string, pushState = false) {
@@ -1227,7 +1226,7 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
     // console.log(modify.data);
     // console.log(stringify(modify.data, true));
 
-    ajax(prepareServerUrl(modify.ref), modify.data, {method}, (res) => {
+    ajax(prepareServerUrl(modify.ref, true), modify.data, {method}, (res) => {
         commitServerChangeResponse(store, modify, res.modifyResult);
 
         // New Item Page
@@ -1235,7 +1234,7 @@ function _dispatchRequestServerModify(store, done: (err?) => void) {
             notify($t('saved'), LogType.Debug);
             glob.dirty = false;
             clearModifies();
-            let ref = "/" + modify.ref + "/" + res.modifyResult._id;
+            let ref = prepareServerUrl(modify.ref + "/" + res.modifyResult._id, true);
             history.replaceState(null, null, ref);
             load(ref, false);
             done();

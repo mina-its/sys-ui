@@ -23,12 +23,12 @@
                 <div class="mr-auto"></div>
 
                 <!--  Global functions -->
-                <template v-for="func in globalFunctions">
-                    <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-4'}`" v-if="func.ref">{{func.title}}</a>
-                    <Function v-else styles="btn-outline-secondary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
-                </template>
-
-                <div class="mr-auto"></div>
+                <div class="mx-2 global-funcs">
+                    <template v-for="func in globalFunctions">
+                        <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-4'}`" v-if="func.ref">{{func.title}}</a>
+                        <Function v-else styles="btn-outline-secondary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
+                    </template>
+                </div>
 
                 <div>
                     <!--                    &lt;!&ndash;  Refresh &ndash;&gt;-->

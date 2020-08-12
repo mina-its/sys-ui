@@ -18,5 +18,7 @@ import DetailsView from "./components/DetailsView.vue";
 import GridView from "./components/GridView.vue";
 import Function from "./components/Function.vue";
 import TaskManager from "./components/TaskManager.vue";
+import NavMenu from "./components/NavMenu.vue";
 
-export default {FormView, ...main, ...types, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, ToolbarModifyButtons, HelperObjects, AppHeader, App, DashboardInfoBox, AppChangeRegion, ImagePreview, DetailsView, GridView, Function, TaskManager};
+export default {FormView, ...main, ...types, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu,
+    ToolbarModifyButtons, HelperObjects, AppHeader, App, DashboardInfoBox, AppChangeRegion, ImagePreview, DetailsView, GridView, Function, TaskManager, NavMenu};

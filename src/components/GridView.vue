@@ -90,7 +90,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import * as main from '../main';
-    import {$t, call, getQs, glob, load, markDown, notify, pushToGridViewRecentList, setQs, showCmenu, urlInsertPrefix} from '../main';
+    import {$t, call, getQs, glob, load, markDown, notify, pushToGridViewRecentList, setQs, showCmenu, prepareServerUrl} from '../main';
     import {parse, stringify} from 'bson-util';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
     import {AccessPermission, EntityMeta, EntityLink, FileType, GridRowHeaderStyle, IData, Keys, LinkType, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
@@ -175,7 +175,7 @@
             this.headFuncs = [];
             if (this.dec.links) {
                 this.headFuncs = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
-                    return {title: link.title as string, ref: urlInsertPrefix(link.address)};
+                    return {title: link.title as string, ref: prepareServerUrl(link.address, true)};
                 });
             }
         }
@@ -420,7 +420,7 @@
         insert() {
             switch (this.dec.newItemMode) {
                 case NewItemMode.newPage:
-                    let ref = "/" + this.uri + '?n=1';
+                    let ref = prepareServerUrl(this.uri, true) + '?n=1';
                     if (this.dec.newItemDefaults)
                         ref += "&d=" + this.dec.newItemDefaults;
                     main.load(ref, true);
