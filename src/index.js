@@ -18,8 +18,9 @@ import DetailsView from "./components/DetailsView.vue";
 import GridView from "./components/GridView.vue";
 import Function from "./components/Function.vue";
 import NavMenu from "./components/NavMenu.vue";
+import LayoutDefault from "./components/LayoutDefault.vue";
 
 export default {
-    FormView, ...main, ...types, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu,
+    FormView, ...main, ...types, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, LayoutDefault,
     ToolbarModifyButtons, HelperObjects, AppHeader, App, DashboardInfoBox, AppChangeRegion, ImagePreview, DetailsView, GridView, Function, NavMenu
 };
