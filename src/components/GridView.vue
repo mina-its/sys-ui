@@ -123,7 +123,7 @@
             if (this.data) // when we explicitly specify the data
                 return this.data;
             else
-                return this.$store.state.data[this.uri] || [];
+                return this["$store"].state.data[this.uri] || [];
         }
 
         refresh() {
@@ -561,7 +561,7 @@
                             console.error(state);
                             return;
                         }
-                        let href = main.prepareServerUrl(`${this.dec.ref}/${state._id}`);
+                        let href = main.prepareServerUrl(`${this.dec.ref}/${state._id}`, true);
                         main.load(href, true);
                         break;
                     }
@@ -599,7 +599,7 @@
 
         rowMove(up: boolean, uri: string) {
             let item = this.items.find(item => item._.marked);
-            main.commitReorderItems(this.$store, this.items, up, uri, item);
+            main.commitReorderItems(this["$store"], this.items, up, uri, item);
         }
     }
 </script>
