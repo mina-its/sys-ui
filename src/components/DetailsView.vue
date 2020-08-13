@@ -41,9 +41,9 @@
 </template>
 
 <script lang="ts">
-    import {ChangeType, HeadFunc, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
+    import {ChangeType, ExecContext, HeadFunc, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {AccessPermission, EntityLink, Context, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
+    import {AccessPermission, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
     import {$t, getNewItemTitle, glob, loadObjectViewData, markDown, prepareServerUrl} from '../main';
     import * as main from '../main';
     import ObjectView from "./ObjectView.vue";
@@ -209,7 +209,7 @@
             return !this.level && this.dec.detailsViewType == ObjectDetailsViewType.Tabular;
         }
 
-        execLink(cn: Context) {
+        execLink(cn: ExecContext) {
             let data = {data: this.item};
             main.ajax("/" + cn.name, data, null, main.handleResponse, (err) => {
                     main.notify(err);
@@ -279,7 +279,7 @@
             if (this.data) // when we explicitly specify the data
                 return this.data;
             else
-                return this.$store.state.data[this.uri];
+                return this["$store"].state.data[this.uri];
         }
 
         get groups() {

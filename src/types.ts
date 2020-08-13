@@ -7,8 +7,6 @@ import {
     AppStateConfig,
     FormDto,
     IData,
-    Task,
-    TaskView,
     Note,
     mFile
 } from '../../sys/src/types';
@@ -79,6 +77,12 @@ export class MenuItem {
     title: string;
     hover?: boolean;
     _cs?: string;
+}
+
+export class ExecContext {
+    data?: any;
+    event?: any;
+    name?: string;
 }
 
 export class StateChange {
@@ -289,22 +293,4 @@ export class AppStateLog {
     message?: string;
     ref?: string;
     type?: LogType;
-}
-
-export class TaskGroupData {
-    _z: number;
-    title: string;
-    subtitle?: string;
-    concern: TaskView;
-    value: any;
-    milestone: string;
-    icon?: string;
-    style?: string;
-    tasks: Task[];
-}
-
-export class TaskEvent {
-    ev: any;
-    task: Task;
-    group: TaskGroupData;
 }
