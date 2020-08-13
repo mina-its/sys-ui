@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'nav-menu d-flex align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="!glob.config.headerMenu || glob.screen==1">
+    <div :class="{'nav-menu d-flex align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="(!glob.config.headerMenu || glob.screen==1) && glob.config.menu.length">
         <ul class="pt-4 mb-auto w-100">
             <li v-for="item of glob.config.menu" :title="item.title" class="nav-item text-uppercase">
                 <div v-if="item.title=='-'" class="d-block separator"></div>

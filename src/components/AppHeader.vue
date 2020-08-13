@@ -2,8 +2,8 @@
     <header class="app-header">
         <nav class="d-flex h-100 text-white align-items-center" :style="{'background-color':navColor || 'black'}">
 
-            <!-- Nav Menu Toggle -->
-            <a v-if="!glob.config.headerMenu || glob.screen==1" title="Toggle navigation menu" class="px-3 header-link align-items-center d-flex" @click="glob.showNavMenu=!glob.showNavMenu">
+            <!-- Nav Menu Toggle --><!-- If: 'not header menu' or 'not mobile mode' and 'has menu'  -->
+            <a v-if="(!glob.config.headerMenu || glob.screen==1) && glob.config.menu.length" title="Toggle navigation menu" class="px-3 header-link align-items-center d-flex" @click="glob.showNavMenu=!glob.showNavMenu">
                 <i class="fal fa-bars fa-lg"></i>
             </a>
 
