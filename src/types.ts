@@ -225,6 +225,9 @@ export class Global {
     showProgress: boolean = false;
     showNavMenu: boolean = true;
     screen: ScreenSize = ScreenSize.md;
+
+    // Service specific data
+    service = null;
 }
 
 export enum ScreenSize {

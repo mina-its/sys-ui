@@ -804,7 +804,9 @@ function call(funcName, data, done) {
     data = data || {};
     data._ = data._ || {};
     data._.ref = location.href;
-    ajax(setQs('m', types_2.RequestMode.inline, false, prepareServerUrl(funcName, true)), data, null, res => done(null, res), err => done(err));
+    let href = prepareServerUrl(funcName, true);
+    href = setQs('m', types_2.RequestMode.inline, false, href);
+    ajax(href, data, null, res => done(null, res), err => done(err));
 }
 exports.call = call;
 function load(href, pushState = false) {

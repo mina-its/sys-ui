@@ -118,6 +118,8 @@ class Global {
         this.showProgress = false;
         this.showNavMenu = true;
         this.screen = ScreenSize.md;
+        // Service specific data
+        this.service = null;
     }
 }
 exports.Global = Global;

@@ -94,6 +94,7 @@
 
             i {
                 text-align: center;
+                color: #bbc;
                 width: 3.2rem;
                 min-width: 3.2rem;
                 margin-inline-end: .5rem;

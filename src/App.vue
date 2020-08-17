@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex h-100 flex-column">
-        <app-header />
+        <app-header/>
         <main class="d-flex overflow-auto">
             <NavMenu/>
             <object-view v-if="objectElemUri" :uri="objectElemUri" :level="0"/>
@@ -265,6 +265,10 @@
         user-select: none;
         /* Non-prefixed version, currently
                                          supported by Chrome, Edge, Opera and Firefox */
+    }
+
+    .bg-gray {
+        background-color: #f1f1f1 !important;
     }
 
     .main-bg-image {
