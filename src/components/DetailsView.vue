@@ -43,7 +43,7 @@
 <script lang="ts">
     import {ChangeType, ExecContext, HeadFunc, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
-    import {AccessPermission, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
+    import {AccessAction, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
     import {$t, getNewItemTitle, glob, loadObjectViewData, markDown, prepareServerUrl} from '../main';
     import * as main from '../main';
     import ObjectView from "./ObjectView.vue";
@@ -61,7 +61,7 @@
         private currentGroup: string = this.groups[0];
         private groupPropertyLink: string = null;
         private headFuncs: HeadFunc[] = [];
-        private AccessPermission_Edit = AccessPermission.Edit;
+        private AccessPermission_Edit = AccessAction.Edit;
         private ObjectDetailsViewType_Tabular = ObjectDetailsViewType.Tabular;
 
         comment() {

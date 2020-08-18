@@ -40,6 +40,7 @@
         update(e, clicked) {
             if (this.readOnly) return;
             let val = (e.target as any).value;
+            console.log(1);
             showPropRefMenu(this.prop, this.doc, clicked ? "" : val, this.$refs.ctrl, false, (item: MenuItem) => {
                 if (item == null) { // Esc
                     this.refreshText();
@@ -74,6 +75,6 @@
     $right: right;
 
     .prop-reference:not([readonly]):hover {
-        background: url("/sys/images/updown.png") no-repeat $right 0 center;
+        background: url("/sy/images/updown.png") no-repeat $right 0 center;
     }
 </style>

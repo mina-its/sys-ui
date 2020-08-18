@@ -1,6 +1,6 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {ObjectDec, ObjectDetailsViewType, ObjectListsViewType, AccessPermission} from "../../../sys/src/types";
+    import {ObjectDec, ObjectDetailsViewType, ObjectListsViewType, AccessAction} from "../../../sys/src/types";
     import {glob} from '../main';
 
     @Component({name: 'ObjectView'})
@@ -14,7 +14,7 @@
                 return ce('div', '...');
             }
 
-            let data = this.$store.state.data[this.uri];
+            let data = this["$store"].state.data[this.uri];
             const dec = glob.form.declarations[this.uri];
             if (!dec) {
                 console.log("glob.form.declarations", glob.form.declarations);

@@ -369,6 +369,12 @@ function showPropRefMenu(prop, instance, phrase, ctrl, removeCurrentValues, item
                 highlightItem = emptyItem;
             items.unshift(emptyItem);
         }
+        if (!items || !items.length) { // To reset the value
+            let emptyItem = { ref: null, title: "" };
+            if (!highlightItem)
+                highlightItem = emptyItem;
+            items.unshift(emptyItem);
+        }
         if (highlightItem)
             highlightItem.hover = true;
         showCmenu(items, items, { ctrl }, (state, item) => {

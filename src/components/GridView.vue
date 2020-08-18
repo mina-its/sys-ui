@@ -93,7 +93,7 @@
     import {$t, call, getQs, glob, load, markDown, notify, pushToGridViewRecentList, setQs, showCmenu, prepareServerUrl} from '../main';
     import {parse, stringify} from 'bson-util';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
-    import {AccessPermission, EntityMeta, EntityLink, FileType, GridRowHeaderStyle, IData, Keys, LinkType, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
+    import {AccessAction, EntityMeta, EntityLink, FileType, GridRowHeaderStyle, IData, Keys, LinkType, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
 
     declare let $: JQuery;
 
@@ -141,7 +141,7 @@
         }
 
         checkForAddButton() {
-            this.addButton = (this.dec.access & AccessPermission.NewItem) && this.dec.newItemMode == NewItemMode.newPage;
+            this.addButton = (this.dec.access & AccessAction.NewItem) && this.dec.newItemMode == NewItemMode.newPage;
         }
 
         clickRecentItem(item: Pair) {
