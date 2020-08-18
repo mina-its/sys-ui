@@ -829,7 +829,7 @@ function load(href, pushState = false) {
 exports.load = load;
 function loadNotes(url) {
     exports.glob.infoPanel.notes = [];
-    ajax("/getNotes?m=1", { url }, null, (res) => {
+    ajax(prepareServerUrl("getNotes?m=1", true), { url }, null, (res) => {
         exports.glob.infoPanel.notes = res.data || [];
     });
 }

@@ -1,9 +1,8 @@
 <script lang="ts">
-    import {FunctionExecEventArg} from '@/types';
+    import {FunctionExecEventArg} from '../types';
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {FunctionDec, LogType, StatusCode} from "../../../sys/src/types";
-    import * as main from '../main';
-    import {glob} from '@/main';
+    import main, {ajax, getDec, glob, handleResponse, notify, prepareServerUrl, setPropertyEmbeddedError} from '../main';
 
     @Component({name: 'Function'})
     export default class Function extends Vue {
@@ -36,18 +35,18 @@
         }
 
         validate(data) {
-            let dec = main.getDec(data) as FunctionDec;
+            let dec = getDec(data) as FunctionDec;
             if (dec && dec.properties) {
                 let requiredProps = dec.properties.filter(p => p.required);
                 let error = "";
                 for (const prop of requiredProps) {
                     if (data[prop.name] === null || data[prop.name] === "") {
                         error = error || `Field <strong>${prop.title}</strong> is required`;
-                        main.setPropertyEmbeddedError(data, prop.name, `* mandatory`);
+                        setPropertyEmbeddedError(data, prop.name, `* mandatory`);
                     }
                 }
                 if (error) {
-                    main.notify(error, LogType.Error);
+                    notify(error, LogType.Error);
                     return false;
                 }
             }
@@ -65,7 +64,7 @@
                 if (this.$listeners && this.$listeners.exec) {
                     let $this = this;
                     let arg: FunctionExecEventArg = {
-                        name: this.name, event: e, data: this.$store.state.data, stopProgress() {
+                        name: this.name, event: e, data: this["$store"].state.data, stopProgress() {
                             $this.showProgress = false;
                         }
                     };
@@ -74,25 +73,25 @@
                     let functionName = this.name;
                     if (!this.data) throw `data must be set for 'Function' element '${functionName}'`;
 
-                    let dec = main.getDec(this.data) as FunctionDec;
+                    let dec = getDec(this.data) as FunctionDec;
                     if (!this.validate(this.data)) return;
 
-                    main.log(`calling '${this.name}' ...`, this.data);
-                    main.ajax("/" + this.name, this.data, null, (res) => {
+                    console.log(`calling '${this.name}' ...`, this.data);
+                    ajax(prepareServerUrl(this.name, true), this.data, null, (res) => {
                         this.showProgress = false;
                         if (dec.interactive && res.code == StatusCode.Accepted)
                             return;
                         else if (res.code != StatusCode.Ok)
-                            main.notify(res.message, LogType.Error);
+                            notify(res.message, LogType.Error);
                         else {
                             glob.modal = false;
                             setTimeout(() => {
-                                main.handleResponse(res);
+                                handleResponse(res);
                             }, 100);
                         }
                     }, (err) => {
                         this.showProgress = false;
-                        main.notify(err);
+                        notify(err);
                     });
                 }
             } catch (ex) {
