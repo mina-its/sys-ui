@@ -15,7 +15,7 @@
                 <img class="m-4 mx-5" :src="profilePhoto"/>
                 <h2>{{glob.config.user.title}}</h2>
                 <div>{{glob.config.user.email}}</div>
-                <a class="m-2 btn btn-outline-secondary profile-button" :href="glob.config.user.accountUrl">{{$t('my-account')}}</a>
+                <a class="m-2 btn btn-outline-secondary profile-button" target="_blank" href="/my-account">{{$t('my-account')}}</a>
                 <hr>
                 <a class="m-2 btn btn-secondary" :href="signoutUrl">{{$t('sign-out')}}</a>
                 <hr>

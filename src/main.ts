@@ -979,7 +979,7 @@ function startVue(res: WebResponse, params?: StartParams) {
         });
 
         handleResponse(res);
-        console.log('glob.socket initing ...');
+        // console.log('glob.socket initing ...');
         if (typeof io != "undefined") glob.socket = io();
         Object.assign(Vue.config, {productionTip: false, devtools: true});
         Vue.prototype.glob = glob;

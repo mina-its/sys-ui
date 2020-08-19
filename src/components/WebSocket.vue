@@ -19,7 +19,7 @@
 
         mounted() {
             if (glob.config.interactive) {
-                console.log("web-socket initing ...");
+                // console.log("web-socket initing ...");
                 if (glob.socket)
                     glob.socket.on('cmd', this.handleCommand);
                 else

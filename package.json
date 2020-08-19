@@ -51,8 +51,5 @@
   "browserslist": [
     "last 2 versions",
     "> 1%"
-  ],
-  "mina": {
-    "packageType": "static-website"
-  }
+  ]
 }

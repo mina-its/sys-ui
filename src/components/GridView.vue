@@ -657,6 +657,7 @@
 
             &:first-child {
                 min-width: 3rem;
+                height: 2.1rem;
             }
         }
 
@@ -701,12 +702,21 @@
     }
 
     @media (max-width: 576px) {
-        .toolbar {
-            flex: none;
-        }
-        .toolbar-filter {
-            width: 100%;
-            margin: .5rem 0;
+        .grid-view {
+            .toolbar {
+                flex: none;
+            }
+
+            .toolbar-filter {
+                width: 100%;
+                margin: .5rem 0;
+            }
+
+            th {
+                &:first-child {
+                    height: 3rem;
+                }
+            }
         }
     }
 </style>

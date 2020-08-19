@@ -7,7 +7,7 @@
             <div class="d-flex p-2 align-items-center btn-toolbar toolbar" role="toolbar" aria-label="Toolbar with button groups">
 
                 <!--  Breadcrumb -->
-                <Breadcrumb :breadcrumb="glob.form.breadcrumb" :title="glob.form.breadcrumbLast"/>
+                <Breadcrumb :breadcrumb="glob.form.breadcrumb" :title="title||glob.form.breadcrumbLast"/>
 
                 <!--  Toolbar Apply/Cancel -->
                 <ToolbarModifyButtons/>
@@ -101,6 +101,7 @@
         @Prop() private configMenu: MenuItem[];
         @Prop() private justContent: boolean;
         @Prop() private showSideMenu: boolean;
+        @Prop() private title: string;
         private showInfoPanel = true;
         private newNote: string = null;
 
