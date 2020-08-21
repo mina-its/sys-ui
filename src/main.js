@@ -1250,12 +1250,14 @@ function startServiceWorker() {
 }
 function start(params) {
     console.log('Starting ...');
-    const mainState = $('#main-state').html();
-    // console.log('mainState', mainState);
-    const res = bson_util_1.parse(mainState, true, types_1.ID);
+    let mainState = $('#main-state').html();
     startServiceWorker();
-    if (res)
+    if (mainState) {
+        // Used for SEO mode
+        mainState = decodeURI(mainState);
+        const res = bson_util_1.parse(mainState, true, types_1.ID);
         startVue(res, params);
+    }
     else {
         let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname + location.search : types_1.Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);

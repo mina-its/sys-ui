@@ -1287,14 +1287,15 @@ function startServiceWorker() {
 
 export function start(params?: StartParams) {
     console.log('Starting ...');
-    const mainState = $('#main-state').html();
-    // console.log('mainState', mainState);
-    const res: WebResponse = parse(mainState, true, ID);
+    let mainState = $('#main-state').html();
     startServiceWorker();
 
-    if (res)
+    if (mainState) {
+        // Used for SEO mode
+        mainState = decodeURI(mainState);
+        const res: WebResponse = parse(mainState, true, ID);
         startVue(res, params);
-    else {
+    } else {
         let uri = setQs('m', RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname + location.search : Constants.defaultAddress);
         uri = setQs('t', Math.random(), false, uri);
         if (getQs(Constants.QUERY_LOCALE))

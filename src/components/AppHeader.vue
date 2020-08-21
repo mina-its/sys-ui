@@ -1,6 +1,6 @@
 <template>
     <header class="app-header">
-        <nav class="d-flex h-100 text-white align-items-center" :style="{'background-color':navColor || 'black'}">
+        <nav class="d-flex h-100 text-white align-items-center" :style="{'background-color':navColor || '#222'}">
 
             <!-- Nav Menu Toggle --><!-- If: 'not header menu' or 'not mobile mode' and 'has menu'  -->
             <a v-if="(!glob.config.headerMenu || glob.screen==1) && glob.config.menu.length" title="Toggle navigation menu" class="px-3 header-link align-items-center d-flex" @click="glob.showNavMenu=!glob.showNavMenu">
@@ -8,7 +8,7 @@
             </a>
 
             <!-- Brand -->
-            <a class="brand text-nowrap text-decoration-none text-white mx-2" :style="{paddingInlineStart: glob.config.headerMenu && glob.screen>1 ? '.5rem':'unset'}" href="_default">
+            <a class="brand d-flex align-items-center text-nowrap text-decoration-none text-white mx-2" :style="{paddingInlineStart: glob.config.headerMenu && glob.screen>1 ? '.5rem':'unset'}" href="_default">
                 <img v-if="glob.config.brandingLogo" alt="logo" class='branding-logo mr-2 img-responsive' :src="glob.config.brandingLogo"/>
                 <span class="app-title">{{glob.config.appTitle}}</span>
             </a>

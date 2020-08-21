@@ -412,4 +412,27 @@
         }
     }
 
+    .line-center-text {
+        width: 100%;
+        height: 1px;
+        position: relative;
+        background-color: #2222;
+        text-align: center;
+        margin: 2rem 0;
+
+        span {
+            color: #525c69;
+            background: #fff;
+            padding: 0 1rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+    }
+
 </style>
