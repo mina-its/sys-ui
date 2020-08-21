@@ -1,5 +1,5 @@
 <template>
-    <layout-default :justContent="!!level" :globalFunctions="headFuncs" :showSideMenu="showSideMenu">
+    <layout-default :justContent="!!level" :globalFunctions="globalFunctions" :showSideMenu="showSideMenu">
 
         <!--  Side Menu -->
         <template slot="side-menu">
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-    import {ChangeType, ExecContext, HeadFunc, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
+    import {ChangeType, ExecContext, GlobalFunction, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
     import {AccessAction, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
     import {$t, getNewItemTitle, glob, loadObjectViewData, markDown, prepareServerUrl} from '../main';
@@ -60,7 +60,7 @@
 
         private currentGroup: string = this.groups[0];
         private groupPropertyLink: string = null;
-        private headFuncs: HeadFunc[] = [];
+        private globalFunctions: GlobalFunction[] = [];
         private AccessPermission_Edit = AccessAction.Edit;
         private ObjectDetailsViewType_Tabular = ObjectDetailsViewType.Tabular;
 
@@ -90,10 +90,10 @@
         }
 
         resetHeadFuncs() {
-            this.headFuncs = [];
+            this.globalFunctions = [];
             if (this.dec.links) {
-                this.headFuncs = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
-                    return {title: link.title as string, ref: prepareServerUrl(link.address, true)};
+                this.globalFunctions = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
+                    return {title: link.title as string, style: link.style, ref: prepareServerUrl(link.address, true)};
                 });
             }
         }
@@ -157,8 +157,8 @@
             }
 
             let props = this.getProps(this.currentGroup);
-            let newItemLink = this.headFuncs.find(i => i.name == "new-item");
-            if (newItemLink) this.headFuncs.splice(this.headFuncs.indexOf(newItemLink), 1);
+            let newItemLink = this.globalFunctions.find(i => i.name == "new-item");
+            if (newItemLink) this.globalFunctions.splice(this.globalFunctions.indexOf(newItemLink), 1);
 
             // The Group is a list property
             if (props && props.length == 1 && props[0].isList) {
@@ -166,7 +166,7 @@
                 switch (prop.referType) {
                     case PropertyReferType.inlineData:
                         let title = getNewItemTitle(prop.title);
-                        this.headFuncs.push({
+                        this.globalFunctions.push({
                             title, name: "new-item", exec: () => {
                                 let uri = this.uri + "/" + prop.name;
                                 let dec = glob.form.declarations[uri];

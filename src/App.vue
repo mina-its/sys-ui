@@ -41,7 +41,6 @@
 
 <style lang="scss">
     @import '../node_modules/bootstrap/scss/bootstrap.scss';
-    @import '../src/css/rtl';
     @import '../src/css/fonts';
     @import url('https://fonts.googleapis.com/css?family=Roboto');
 
@@ -145,10 +144,30 @@
         width: inherit;
     }
 
+    .navbar-brand {
+        margin-right: unset !important;
+        margin-inline-end: 1rem;
+    }
+
     /* Bootstrap extensions */
     .btn-light {
         background-color: #ededed;
         border-color: #ededed;
+    }
+
+    .btn-rounded-gray {
+        border-radius: 20px;
+        border: none;
+        background-color: #789;
+        color: white;
+        padding-left: .8rem !important;
+        padding-right: 1.2rem !important;
+        font-weight: bold;
+
+        &:hover {
+            color: #789;
+            background-color: #ddd;
+        }
     }
 
     .rtl {

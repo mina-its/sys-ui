@@ -9,23 +9,26 @@
                 <!--  Breadcrumb -->
                 <Breadcrumb :breadcrumb="glob.form.breadcrumb" :title="title||glob.form.breadcrumbLast"/>
 
+                <slot name="toolbar-customs"></slot>
+
                 <!--  Toolbar Apply/Cancel -->
                 <ToolbarModifyButtons/>
 
                 <!--  Inline message box -->
-                <div class="inline-message-box small font-weight-bold px-2 d-none">
+                <div v-show="glob.inlineMessage" class="inline-message-box small font-weight-bold px-2">
                     <i class="fal mx-1 fa-lg fa-comment-alt-lines"></i>
-                    <span></span>
+                    <span>{{glob.inlineMessage}}</span>
                 </div>
-
-                <slot name="toolbar-customs"></slot>
 
                 <div class="mr-auto"></div>
 
                 <!--  Global functions -->
                 <div class="mx-2 global-funcs">
                     <template v-for="func in globalFunctions">
-                        <a :href="func.ref" :class="`${func.style||'btn btn-success mx-1 px-4'}`" v-if="func.ref">{{func.title}}</a>
+                        <a :href="func.ref" :class="`${func.style||'btn btn-outline-primary mx-1 px-4'}`" v-if="func.ref">
+                            <i class="fa"></i>
+                            {{func.title}}
+                        </a>
                         <Function v-else styles="btn-outline-secondary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
                     </template>
                 </div>
@@ -90,14 +93,14 @@
 
 <script lang="ts">
     import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
-    import {HeadFunc, MenuItem} from "../types";
+    import {GlobalFunction, MenuItem} from "../types";
     import {$t, call, glob, hideCmenu, load, markDown, showCmenu} from "../main";
 
     declare let moment: any;
 
     @Component({name: "LayoutDefault"})
     export default class LayoutDefault extends Vue {
-        @Prop() private globalFunctions: HeadFunc[];
+        @Prop() private globalFunctions: GlobalFunction[];
         @Prop() private configMenu: MenuItem[];
         @Prop() private justContent: boolean;
         @Prop() private showSideMenu: boolean;

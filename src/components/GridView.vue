@@ -1,5 +1,5 @@
 <template>
-    <layout-default class="grid-view" :justContent="!!level" :globalFunctions="headFuncs" :showSideMenu="!level && (recentItems || dec.filterDec)">
+    <layout-default class="grid-view" :justContent="!!level" :globalFunctions="globalFuctions" :showSideMenu="!level && (recentItems || dec.filterDec)">
         <!-- Toolbar -->
         <template slot="toolbar-customs">
             <!-- Filter -->
@@ -9,7 +9,7 @@
             </div>
 
             <!-- Add button -->
-            <button v-if="addButton" class="btn btn-success mx-1 px-4" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>Add</button>
+            <button v-if="addButton" class="btn btn-rounded-gray mx-1" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>Add</button>
         </template>
 
         <!-- Side Menu -->
@@ -92,7 +92,7 @@
     import * as main from '../main';
     import {$t, call, getQs, glob, load, markDown, notify, pushToGridViewRecentList, setQs, showCmenu, prepareServerUrl} from '../main';
     import {parse, stringify} from 'bson-util';
-    import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, HeadFunc, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
+    import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, GlobalFunction, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
     import {AccessAction, EntityMeta, EntityLink, FileType, GridRowHeaderStyle, IData, Keys, LinkType, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
 
     declare let $: JQuery;
@@ -113,7 +113,7 @@
         private filterDoc = {};
         private filteringProp: Property = null;
         private filteredProps: Property[] = [];
-        private headFuncs: HeadFunc[] = [];
+        private globalFuctions: GlobalFunction[] = [];
 
         getDec(item: IData) {
             return this.dec || item._.dec;
@@ -133,7 +133,7 @@
         @Watch('uri') // Switching between forms
         onUriReset() {
             this.resetFilterParameters();
-            this.resetHeadFuncs();
+            this.resetGlobalFuctions();
             this.resetRecentItems();
             this.checkForAddButton();
             this.latest_z = this.items.length ? Math.max(...this.items.map(item => item._z || 0)) : 0;
@@ -171,10 +171,10 @@
             load(ref, true);
         }
 
-        resetHeadFuncs() {
-            this.headFuncs = [];
+        resetGlobalFuctions() {
+            this.globalFuctions = [];
             if (this.dec.links) {
-                this.headFuncs = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
+                this.globalFuctions = this.dec.links.filter(link => !link.disable && !link.type).map(link => {
                     return {title: link.title as string, ref: prepareServerUrl(link.address, true)};
                 });
             }
@@ -182,7 +182,7 @@
 
         mounted() {
             // console.log("this.items", this.items);
-            this.resetHeadFuncs();
+            this.resetGlobalFuctions();
             this.resetRecentItems();
             this.checkForAddButton();
             this.latest_z = this.items.length ? Math.max(...this.items.map(item => item._z || 0)) : 0;
