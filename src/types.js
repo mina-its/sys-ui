@@ -1,14 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AppStateLog = exports.AppStateQuestion = exports.QuestionOptions = exports.AppStateFileGallery = exports.FilterOperator = exports.Modify = exports.ScreenSize = exports.Global = exports.TreeViewAttribute = exports.TreeViewLine = exports.TreeViewNode = exports.PropertyLabelMode = exports.AppStateCmenu = exports.FilterChangeEventArg = exports.ItemChangeEventArg = exports.FunctionExecEventArg = exports.ItemEventArg = exports.PropEventArg = exports.StartParams = exports.AppStateGeoMap = exports.ChangeType = exports.StateChange = exports.ExecContext = exports.MenuItem = exports.GlobalFunction = exports.ChartColors = exports.Constants = exports.ID = void 0;
 const types_1 = require("../../sys/src/types");
 const bson_util_1 = require("bson-util");
-exports.ID = bson_util_1.ID;
+Object.defineProperty(exports, "ID", { enumerable: true, get: function () { return bson_util_1.ID; } });
 exports.Constants = {
     redirectBack: '_back',
     errorEmbedProperty: 'e',
     redirectSelf: '_self',
     defaultAddress: '/_default',
     contextMenuVisibleItems: 10,
+    inlineMessageDuration: 5000,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg", "svg"],
     uniqueFilenameRegex: /^[a-fA-F0-9]{24}__/,
     QUERY_LOCALE: 'e',
@@ -23,9 +25,9 @@ exports.ChartColors = [
     'rgba(153, 102, 255, 0.8)',
     'rgba(231,233,237, 0.8)' // grey:
 ];
-class HeadFunc {
+class GlobalFunction {
 }
-exports.HeadFunc = HeadFunc;
+exports.GlobalFunction = GlobalFunction;
 class MenuItem {
 }
 exports.MenuItem = MenuItem;
@@ -117,6 +119,7 @@ class Global {
         this.showProgress = false;
         this.showNavMenu = true;
         this.screen = ScreenSize.md;
+        this.inlineMessage = null;
         // Service specific data
         this.service = null;
     }

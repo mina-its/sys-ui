@@ -713,11 +713,8 @@ function notify(content, type) {
         $("#app").html(`<div style="color:red; font-family: monospace;padding: 40px;"><h1>Fatal error</h1>${content}</div>`);
     else {
         if (type == types_2.LogType.Debug) {
-            $(".inline-message-box span").text(message);
-            $(".inline-message-box").show();
-            setTimeout(function () {
-                $(".inline-message-box").hide();
-            }, 5000);
+            exports.glob.inlineMessage = message;
+            setTimeout(() => exports.glob.inlineMessage = null, types_1.Constants.inlineMessageDuration);
         }
         else if ($(".notify-message-container").length) {
             $(".notify-message-container").html(`<div class="notify-message-type-${type}">${message}</div>`);

@@ -49,6 +49,7 @@ export const Constants = {
     redirectSelf: '_self',
     defaultAddress: '/_default',
     contextMenuVisibleItems: 10,
+    inlineMessageDuration: 5000,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg", "svg"],
     uniqueFilenameRegex: /^[a-fA-F0-9]{24}__/,
     QUERY_LOCALE: 'e',
@@ -65,8 +66,9 @@ export const ChartColors = [
     'rgba(231,233,237, 0.8)'    // grey:
 ];
 
-export class HeadFunc {
+export class GlobalFunction {
     title: string;
+    style?: string;
     name?: string;
     ref?: string;
     exec?: (...args: any) => void;
@@ -225,6 +227,7 @@ export class Global {
     showProgress: boolean = false;
     showNavMenu: boolean = true;
     screen: ScreenSize = ScreenSize.md;
+    inlineMessage: string = null;
 
     // Service specific data
     service = null;
