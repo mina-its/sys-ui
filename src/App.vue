@@ -155,19 +155,17 @@
         border-color: #ededed;
     }
 
-    .btn-rounded-gray {
-        border-radius: 20px;
-        border: none;
+    .bg-grayblue {
         background-color: #789;
-        color: white;
-        padding-left: .8rem !important;
-        padding-right: 1.2rem !important;
-        font-weight: bold;
+    }
 
-        &:hover {
-            color: #789;
-            background-color: #ddd;
-        }
+    .bg-gray {
+        background-color: #f1f1f1 !important;
+    }
+
+    .border-chip {
+        border-radius: 3rem;
+        white-space: nowrap;
     }
 
     .rtl {
@@ -284,10 +282,6 @@
         user-select: none;
         /* Non-prefixed version, currently
                                          supported by Chrome, Edge, Opera and Firefox */
-    }
-
-    .bg-gray {
-        background-color: #f1f1f1 !important;
     }
 
     .main-bg-image {

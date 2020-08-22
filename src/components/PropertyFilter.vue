@@ -119,7 +119,6 @@
         }
 
         keydown(e: ItemEventArg) {
-            console.log(1);
             if (e.event.keyCode == Keys.enter) {
                 let val;
                 if (this.prop._.gtype == GlobalType.string)

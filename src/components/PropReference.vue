@@ -40,7 +40,6 @@
         update(e, clicked) {
             if (this.readOnly) return;
             let val = (e.target as any).value;
-            console.log(1);
             showPropRefMenu(this.prop, this.doc, clicked ? "" : val, this.$refs.ctrl, false, (item: MenuItem) => {
                 if (item == null) { // Esc
                     this.refreshText();

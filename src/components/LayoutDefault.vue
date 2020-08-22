@@ -15,7 +15,7 @@
                 <ToolbarModifyButtons/>
 
                 <!--  Inline message box -->
-                <div v-show="glob.inlineMessage" class="inline-message-box small font-weight-bold px-2">
+                <div v-show="glob.inlineMessage" class="inline-message-box mx-2 text-center small border-chip bg-gray">
                     <i class="fal mx-1 fa-lg fa-comment-alt-lines"></i>
                     <span>{{glob.inlineMessage}}</span>
                 </div>
@@ -186,6 +186,11 @@
 <style lang="scss">
     .nav-panel {
         min-width: 12rem;
+    }
+
+    .inline-message-box {
+        padding: 0.64rem 1rem;
+        min-width: 13rem;
     }
 
     .info-panel {

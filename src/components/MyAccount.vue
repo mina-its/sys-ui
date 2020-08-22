@@ -1,17 +1,8 @@
 <template>
     <layout-default title="My Account">
         <template slot="main-content">
-            <div v-if="userDec" class="my-account p-4 w-100">
-                <div class="bg-white border p-4 rounded-bottom">
-                    <DetailsView @changed="changed" :data="user" :dec="userDec" :level="1"/>
-
-                    <hr>
-                    <span class="pr-3 mr-3 border-right" v-if="modify">
-                <Function styles="btn-success" @exec="apply" name="apply" :title="$t('save-changes')"></Function>
-            </span>
-                    <a href="/resetPassword?f=1" class="btn btn-success">Change Password</a>
-                    <a href="/signout?f=1" class="mx-2 btn btn-dark">Signout</a>
-                </div>
+            <div v-if="userDec" class="my-account p-4 bg-white border">
+                <DetailsView @changed="changed" :data="user" :dec="userDec" :level="1"/>
             </div>
         </template>
     </layout-default>

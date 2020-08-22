@@ -9,7 +9,7 @@
             </div>
 
             <!-- Add button -->
-            <button v-if="addButton" class="btn btn-rounded-gray mx-1" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>Add</button>
+            <button v-if="addButton" style="width: 6rem" class="btn border-chip btn-secondary bg-grayblue mx-1" @click="clickNewItem"><i :class="{'fal fa-plus-circle':1,'pr-2':ltr, 'pl-2':rtl}"></i>Add</button>
         </template>
 
         <!-- Side Menu -->
