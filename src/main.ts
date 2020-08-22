@@ -863,9 +863,10 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         dataType: "text",
         transformResponse: res => res,
         method: config.method || (data ? WebMethod.post : WebMethod.get),
-        headers: {'Content-Type': "text/plain"},
+        headers: {'Content-Type': "text/plain", 'Referrer-Policy': "unsafe-url"},
         withCredentials: true
     };
+    console.log("hi");
 
     // extract files raw data
     let multipart = false;

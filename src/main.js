@@ -850,9 +850,10 @@ function ajax(url, data, config, done, fail) {
         dataType: "text",
         transformResponse: res => res,
         method: config.method || (data ? types_2.WebMethod.post : types_2.WebMethod.get),
-        headers: { 'Content-Type': "text/plain" },
+        headers: { 'Content-Type': "text/plain", 'Referrer-Policy': "unsafe-url" },
         withCredentials: true
     };
+    console.log("hi");
     // extract files raw data
     let multipart = false;
     if (data) {

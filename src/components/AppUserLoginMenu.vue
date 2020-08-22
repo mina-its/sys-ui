@@ -39,7 +39,7 @@
         @Prop() private buttonClass?: string;
 
         goToSignout() {
-            location.href = glob.config.user.signoutUrl;
+            location.href = glob.config.user.signoutUrl + "?back=" + encodeURI(location.href);
         }
 
         goToSignin() {
