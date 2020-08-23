@@ -34,6 +34,9 @@
 
                     case ObjectListsViewType.Card:
                         return ce('card-view', {props});
+
+                    case ObjectListsViewType.Bars:
+                        return ce('bars-view', {props});
                 }
             } else {
                 let viewType = (dec as ObjectDec).detailsViewType || ObjectDetailsViewType.Tabular;

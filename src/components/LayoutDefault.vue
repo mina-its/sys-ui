@@ -25,11 +25,11 @@
                 <!--  Global functions -->
                 <div class="mx-2 global-funcs">
                     <template v-for="func in globalFunctions">
-                        <a :href="func.ref" :class="`${func.style||'btn btn-outline-primary mx-1 px-4'}`" v-if="func.ref">
+                        <a :href="func.ref" :class="`${func.style||'btn border-chip btn-outline-primary mx-1 px-4'}`" v-if="func.ref">
                             <i class="fa"></i>
                             {{func.title}}
                         </a>
-                        <Function v-else styles="btn-outline-secondary mx-1" :name="func.name" @exec="func.exec" :title="func.title"/>
+                        <Function v-else :styles="func.style||'btn-outline-secondary mx-1'" :name="func.name" @exec="func.exec" :title="func.title"/>
                     </template>
                 </div>
 

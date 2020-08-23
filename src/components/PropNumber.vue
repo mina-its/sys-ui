@@ -9,11 +9,13 @@
     import {ItemChangeEventArg, PropEventArg} from '@/types';
     import {digitGroup} from '@/main';
     import * as main from '../main';
+    import {PropertyLabelMode} from "../types";
 
     @Component({name: 'PropText'})
     export default class PropText extends Vue {
         @Prop() private doc: any;
         @Prop() private viewType: string;
+        @Prop() private labelMode: PropertyLabelMode;
         @Prop() private prop: Property;
         @Prop() private readOnly: boolean;
         private focused: boolean = false;
@@ -63,8 +65,11 @@
         }
 
         get placeholder() {
+            let ph = null;
+            if (this.labelMode == PropertyLabelMode.PlaceHolder) ph = this.prop.title + ":";
+
             if (!this.doc || this.prop.formula)
-                return null;
+                return ph;
 
             let val = this.doc[this.prop.name];
             if (val && typeof val === "object") {
@@ -72,7 +77,7 @@
                 if (!val[locale])
                     return val["en"] || val[Object.keys(val)[0]];
             }
-            return null;
+            return ph;
         }
 
     }

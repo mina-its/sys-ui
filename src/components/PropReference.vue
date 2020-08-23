@@ -1,6 +1,6 @@
 <template>
     <input @focus="focus" ref="ctrl" v-bind:type="type" @keydown="keydown" :readonly="readOnly"
-           :value="value" @blur="refreshText" @input="update" @click="click" class="form-control">
+           :placeholder="placeholder" :value="value" @blur="refreshText" @input="update" @click="click" class="form-control">
 </template>
 
 <script lang="ts">
@@ -9,7 +9,7 @@
     import * as main from '../main';
     import {parse, processThisExpression, showPropRefMenu} from '../main';
     import {call, glob, notify} from '@/main';
-    import {Constants, ID, ItemChangeEventArg, MenuItem, PropEventArg} from '../types';
+    import {Constants, ID, ItemChangeEventArg, MenuItem, PropertyLabelMode, PropEventArg} from '../types';
 
     @Component({name: 'PropReference'})
     export default class PropReference extends Vue {
@@ -17,6 +17,11 @@
         @Prop() private doc: any;
         @Prop() private prop: Property;
         @Prop() private readOnly: boolean;
+        @Prop() private labelMode: PropertyLabelMode;
+
+        get placeholder() {
+            return this.labelMode == PropertyLabelMode.PlaceHolder ? this.prop.title + ":" : null;
+        }
 
         @Emit('keydown')
         keydown(e): PropEventArg {
@@ -74,6 +79,6 @@
     $right: right;
 
     .prop-reference:not([readonly]):hover {
-        background: url("/sy/images/updown.png") no-repeat $right 0 center;
+        background: url("/sys-public/images/updown.png") no-repeat $right 0 center;
     }
 </style>

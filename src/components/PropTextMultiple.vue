@@ -1,5 +1,6 @@
 <template>
     <div @click="focus" :class="styles + ' prop-text-multi px-1 pb-0'">
+        <span v-if="placeholder" class="text-muted px-1">{{placeholder}}</span>
         <div v-for="item in items"
              :class="{'ref-multi-item rounded-lg rmI d-inline-block mb-1 px-1 border text-nowrap':1,'mr-1':ltr,'ml-1':rtl}">
             <i @click="remove(item)" class="text-black-50 mx-1 rmD fa fa-times" style="cursor:pointer"></i>
@@ -13,7 +14,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {Property, Keys} from "../../../sys/src/types";
-    import {ItemChangeEventArg} from '../types';
+    import {ItemChangeEventArg, PropertyLabelMode} from '../types';
 
     declare let $: any;
 
@@ -24,7 +25,12 @@
         @Prop() private prop: Property;
         @Prop() private styles: string;
         @Prop() private readOnly: boolean;
+        @Prop() private labelMode: PropertyLabelMode;
         private phrase: string = '';
+
+        get placeholder() {
+            return this.labelMode == PropertyLabelMode.PlaceHolder && (!this.items || !this.items.length) ? this.prop.title : null;
+        }
 
         keypress(e) {
             switch (e.which) {

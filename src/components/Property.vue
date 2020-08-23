@@ -74,7 +74,19 @@
             let title = this.prop.title || this.prop.name;
             let labelNoWrap = (this.prop.text && this.prop.text.editor);
             let labelClass = "prop-label align-top pt-2" + (labelNoWrap ? " text-nowrap" : "") + (this.prop._.gtype == GlobalType.boolean ? " prop-label-boolean" : "");
-            let label = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": labelClass}}, title);
+            let label = null;
+            switch (this.labelMode) {
+                case PropertyLabelMode.Hidden:
+                    break;
+
+                case PropertyLabelMode.PlaceHolder:
+                    break;
+
+                default:
+                    label = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": labelClass}}, title);
+                    ;
+                    break;
+            }
             let children = [label, vl, msg];
 
             // Property comment
@@ -97,7 +109,18 @@
             let msg = ce('prop-message', {props: {"message": this.item._error}});
             let cmt = this.prop.comment ? ce('small', {attrs: {"class": "property-comment p-3 text-muted d-block"}}, this.prop.comment) : null;
             let title = this.prop.title || this.prop.name;
-            let label = this.labelMode == PropertyLabelMode.Hidden ? null : (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "mr-1 tree-view-attr-label"}}, title + ":");
+            let label = null;
+            switch (this.labelMode) {
+                case PropertyLabelMode.Hidden:
+                    break;
+
+                case PropertyLabelMode.PlaceHolder:
+                    break;
+
+                default:
+                    label = (main.someProps(this.prop)) ? null : ce('label', {attrs: {"class": "mr-1 tree-view-attr-label"}}, title + ":");
+                    break;
+            }
 
             let styles = "d-inline-block";
             if (this.prop._.gtype == GlobalType.boolean)
@@ -108,7 +131,7 @@
 
         renderValue(ce, styles: string) {
             let pr = {
-                doc: this.item, name: this.prop.name, prop: this.prop, viewType: this.viewType,
+                doc: this.item, name: this.prop.name, prop: this.prop, viewType: this.viewType, labelMode: this.labelMode,
                 styles,
                 readOnly: this.readonly || this.prop.editMode == PropertyEditMode.Readonly || (this.prop.editMode == PropertyEditMode.OnceOnly && this.item[this.prop.name] != null && !this.item._new)
             };
@@ -270,6 +293,10 @@
 
         .prop-error {
             color: red;
+        }
+
+        &::placeholder {
+            font-size: smaller;
         }
     }
 

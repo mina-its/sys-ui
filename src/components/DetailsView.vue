@@ -105,7 +105,7 @@
 
         getGroupId(group: string) {
             if (!this.level)
-                return 'gp-' + group.replace(/\s/g, '-');
+                return 'gp-' + this.uri.replace(/^(\w+).+/, "$1") + "-" + group.replace(/\s/g, '-');
             else
                 return undefined;
         }
@@ -167,7 +167,7 @@
                     case PropertyReferType.inlineData:
                         let title = getNewItemTitle(prop.title);
                         this.globalFunctions.push({
-                            title, name: "new-item", exec: () => {
+                            title, style: "border-chip btn-secondary", name: "new-item", exec: () => {
                                 let uri = this.uri + "/" + prop.name;
                                 let dec = glob.form.declarations[uri];
                                 let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec} as EntityMeta};
@@ -262,7 +262,7 @@
         get sideMenu() {
             let menus = [];
             for (const grp of this.groups) {
-                menus.push({uri: "#gp-" + grp.replace(/\s/g, "-"), title: grp});
+                menus.push({uri: "#gp-" + this.uri.replace(/^(\w+).+/, "$1") + "-" + grp.replace(/\s/g, "-"), title: grp});
             }
 
             let propertyGroupLinks = this.dec.links ? this.dec.links.filter(link => !link.disable && link.type == LinkType.PropertyGroupLink).map(link => {
@@ -328,6 +328,48 @@
             outline: none;
             position: relative;
             padding: 30px;
+        }
+
+        #gp-roles-Permissions {
+            .form-group {
+                display: inline-block;
+            }
+
+            .p_resourceType {
+                .prop-value {
+                    width: 6rem;
+                    text-align: center;
+                    background-color: #eee;
+                }
+            }
+
+            .p_objAction {
+                .prop-value {
+                    width: 5rem;
+                    text-align: center;
+                }
+            }
+
+            .p_funcAction {
+                .prop-value {
+                    width: 5rem;
+                    text-align: center;
+                }
+            }
+
+            .p_formAction {
+                .prop-value {
+                    text-align: center;
+                    width: 5rem;
+                }
+            }
+
+            .p_driveAction {
+                .prop-value {
+                    text-align: center;
+                    width: 5rem;
+                }
+            }
         }
     }
 

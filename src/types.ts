@@ -177,8 +177,9 @@ export class AppStateCmenu {
 }
 
 export enum PropertyLabelMode {
+    Visible = 0,
     Hidden = 1,
-    Visible = 2,
+    PlaceHolder = 2,
 }
 
 export class TreeViewNode {

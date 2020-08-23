@@ -84,8 +84,9 @@ class AppStateCmenu {
 exports.AppStateCmenu = AppStateCmenu;
 var PropertyLabelMode;
 (function (PropertyLabelMode) {
+    PropertyLabelMode[PropertyLabelMode["Visible"] = 0] = "Visible";
     PropertyLabelMode[PropertyLabelMode["Hidden"] = 1] = "Hidden";
-    PropertyLabelMode[PropertyLabelMode["Visible"] = 2] = "Visible";
+    PropertyLabelMode[PropertyLabelMode["PlaceHolder"] = 2] = "PlaceHolder";
 })(PropertyLabelMode = exports.PropertyLabelMode || (exports.PropertyLabelMode = {}));
 class TreeViewNode {
 }
