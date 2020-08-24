@@ -5,32 +5,45 @@
                 <DetailsView @changed="changed" :data="user" :dec="userDec" :level="1"/>
             </div>
         </template>
+        <template slot="toolbar-customs">
+            <div v-if="modify" role="group" class="border-left border-2 mx-2 px-2">
+                <button style="width: 6rem" class="btn border-chip btn-success mx-1" @click="apply"><i class="fal fa-check-circle"></i> {{$t('apply')}}</button>
+                <button style="width: 6rem" class="btn border-chip btn-light mx-1" @click="cancel" name="cancel">{{$t('cancel')}}</button>
+            </div>
+        </template>
     </layout-default>
 </template>
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {LogType, WebMethod, StatusCode, ObjectDec, UserProfile} from '../../../sys/src/types';
-    import {$t, ajax, call, notify, prepareServerUrl} from "../main";
-    import {ItemChangeEventArg, Modify} from "../types";
+    import {AccessAction, LogType, ObjectDec, StatusCode, UserProfile, WebMethod} from '../../../sys/src/types';
+    import {$t, call, notify} from "../main";
+    import {ItemChangeEventArg} from "../types";
 
     @Component({name: 'MyAccount'})
     export default class MyAccount extends Vue {
         private userDec: ObjectDec = null;
         private user: UserProfile = null;
-        private changes: UserProfile = null;
-        private modify: Modify = null;
+        private modify: {} = null;
 
         changed(e: ItemChangeEventArg) {
-            this.modify = this.modify || {data: {}, type: e.type, ref: "users/" + this.user._id, state: this.user} as Modify;
-            this.modify.data[e.prop.name] = e.val || null;
+            this.modify = this.modify || {};
+            this.modify[e.prop.name] = e.val || null;
+        }
+
+        cancel() {
+            location.href = location.href;
         }
 
         apply(e) {
-            ajax(prepareServerUrl(this.modify.ref), this.modify.data, {method: WebMethod.patch}, (res) => {
+            call("updateUserAccountInfo", {user: this.modify}, (err, res) => {
+                if (err) {
+                    notify(err, LogType.Error);
+                    return;
+                }
                 this.modify = null;
                 notify($t('saved'), LogType.Debug);
-            }, notify);
+            });
         }
 
         created() {
@@ -44,7 +57,9 @@
                     return;
                 }
 
-                this.userDec = res.form.declarations[ref];
+                let dec = res.form.declarations[ref];
+                dec.access = AccessAction.Full;
+                this.userDec = dec;
                 this.user = res.data[ref];
             });
         }

@@ -45,6 +45,14 @@
     @import url('https://fonts.googleapis.com/css?family=Roboto');
 
     :root {
+        /* nav-menu */
+        --nav-menu-bg: #3b3b3b;
+        --nav-menu-link: #FFF;
+        --nav-menu-link-hover-bg: #555;
+        --nav-menu-link-active: #bbc;
+        --nav-menu-link-active-bg: #222;
+        --nav-menu-icon: #bbc;
+
         --primary: #0072C6;
         --mina-blue: #007bff;
         --danger: #ff4136;
@@ -62,8 +70,7 @@
         --form-label: #666;
         --layout-border: #ddd;
         /*--nav-menu-bg: #1a486b;*/
-        --nav-menu-bg: #3b3b3b;
-        --nav-menu-color: #fff;
+
         --breadcrumb-separator: #aaa;
         --link-color: #4285f4;
         --main-bg: #eee;
@@ -71,15 +78,19 @@
         --font-size-base: 1rem;
         --badge-padding-x: 0.25rem;
 
-        --left: left;
-        --right: right;
-
         --wide-props-width: 30rem;
         --text-multiline-height: 10rem;
     }
 
-    $left: var(--left);
-    $right: var(--right);
+    body.theme-light {
+        /* nav-menu */
+        --nav-menu-bg: #fff;
+        --nav-menu-icon: #999;
+        --nav-menu-link: #464646;
+        --nav-menu-link-active: #ccc;
+        --nav-menu-link-hover-bg: #777;
+        --nav-menu-link-active-bg: #444;
+    }
 
     .cs- {
         &obj {
@@ -190,10 +201,10 @@
     }
 
     .dropdown-menu {
-        text-align: $left;
+        text-align: left;
         z-index: 10000;
-        #{$left}: 0;
-        #{$right}: inherit;
+        left: 0;
+        right: inherit;
         box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
         border-radius: 0 0 .25rem .25rem;
         border: none !important;

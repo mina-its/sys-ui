@@ -605,9 +605,6 @@
 </script>
 
 <style lang="scss">
-    $left: var(--left);
-    $right: var(--right);
-
     .grid-view {
         .toolbar-filter {
             border-radius: 18px;
@@ -669,7 +666,7 @@
 
         .filter-item {
             cursor: pointer;
-            margin-#{$right}: var(--badge-padding-x);
+            margin-right: var(--badge-padding-x);
             font-size: var(--font-size-base);
             font-weight: normal;
 
@@ -685,18 +682,18 @@
 
         .page-item {
             &:last-child .page-link {
-                border-top-#{$right}-radius: 0.25rem;
-                border-bottom-#{$right}-radius: 0.25rem;
-                border-top-#{$left}-radius: inherit;
-                border-bottom-#{$left}-radius: inherit;
+                border-top-right-radius: 0.25rem;
+                border-bottom-right-radius: 0.25rem;
+                border-top-left-radius: inherit;
+                border-bottom-left-radius: inherit;
             }
 
             &:first-child .page-link {
-                margin-#{$left}: 0;
-                border-top-#{$left}-radius: 0.25rem;
-                border-bottom-#{$left}-radius: 0.25rem;
-                border-top-#{$right}-radius: inherit;
-                border-bottom-#{$right}-radius: inherit;
+                margin-left: 0;
+                border-top-left-radius: 0.25rem;
+                border-bottom-left-radius: 0.25rem;
+                border-top-right-radius: inherit;
+                border-bottom-right-radius: inherit;
             }
         }
     }

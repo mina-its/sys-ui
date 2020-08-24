@@ -274,9 +274,6 @@
 </script>
 
 <style lang="scss">
-    $left: left;
-    $right: right;
-
     .prop-label {
         width: 10rem;
     }
@@ -390,7 +387,7 @@
 
     .form-check {
         .prop-comment {
-            margin-#{$left}: -1.25rem;
+            margin-left: -1.25rem;
         }
     }
 

@@ -76,9 +76,7 @@
 </script>
 
 <style lang="scss">
-    $right: right;
-
     .prop-reference:not([readonly]):hover {
-        background: url("/sys-public/images/updown.png") no-repeat $right 0 center;
+        background: url("/sys-public/images/updown.png") no-repeat right 0 center;
     }
 </style>

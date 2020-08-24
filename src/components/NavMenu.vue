@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'nav-menu d-flex align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="(!glob.config.headerMenu || glob.screen==1) && glob.config.menu.length">
+    <div :class="{'nav-menu d-flex border-right align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="(!glob.config.headerMenu || glob.screen==1) && glob.config.menu.length">
         <ul class="pt-4 mb-auto w-100">
             <li v-for="item of glob.config.menu" :title="item.title" class="nav-item text-uppercase">
                 <div v-if="item.title=='-'" class="d-block separator"></div>
@@ -72,16 +72,16 @@
         }
 
         a {
-            color: var(--nav-menu-color);
+            color: var(--nav-menu-link);
 
             &:hover {
-                color: var(--nav-menu-color);
-                background-color: #555;
+                color: var(--nav-menu-link-active);
+                background-color: var(--nav-menu-link-hover-bg);
             }
 
             &.active {
-                color: var(--nav-menu-color);
-                background-color: #222;
+                color: var(--nav-menu-link-active);
+                background-color: var(--nav-menu-link-active-bg);
             }
         }
 
@@ -94,7 +94,7 @@
 
             i {
                 text-align: center;
-                color: #bbc;
+                color: var(--nav-menu-icon);
                 width: 3.2rem;
                 min-width: 3.2rem;
                 margin-inline-end: .5rem;
