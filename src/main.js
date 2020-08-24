@@ -853,7 +853,6 @@ function ajax(url, data, config, done, fail) {
         headers: { 'Content-Type': "text/plain", 'Referrer-Policy': "unsafe-url" },
         withCredentials: true
     };
-    console.log("hi");
     // extract files raw data
     let multipart = false;
     if (data) {

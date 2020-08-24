@@ -866,7 +866,6 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         headers: {'Content-Type': "text/plain", 'Referrer-Policy': "unsafe-url"},
         withCredentials: true
     };
-    console.log("hi");
 
     // extract files raw data
     let multipart = false;

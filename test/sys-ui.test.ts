@@ -389,7 +389,6 @@ describe('Security check', function () {
   test('remove access to a property', async ()=>{
 
     let res= await page.$$eval('th',(elements)=>{
-      console.log("hi");
       console.log(elements);
       elements.forEach(el=>{
         console.log(el);

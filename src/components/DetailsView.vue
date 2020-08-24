@@ -104,10 +104,7 @@
         }
 
         getGroupId(group: string) {
-            if (!this.level)
-                return 'gp-' + this.uri.replace(/^(\w+).+/, "$1") + "-" + group.replace(/\s/g, '-');
-            else
-                return undefined;
+            return this.level ? undefined : this.getGroupUri(group);
         }
 
         @Watch('uri')
@@ -259,10 +256,17 @@
                 this.dec.detailsViewType == ObjectDetailsViewType.Tabular);
         }
 
+        getGroupUri(group: string) {
+            let uri = "gp-";
+            if (this.uri) uri += this.uri.replace(/^(\w+).+/, "$1") + "-";
+            uri += group.replace(/\s/g, "-");
+            return uri;
+        }
+
         get sideMenu() {
             let menus = [];
             for (const grp of this.groups) {
-                menus.push({uri: "#gp-" + this.uri.replace(/^(\w+).+/, "$1") + "-" + grp.replace(/\s/g, "-"), title: grp});
+                menus.push({uri: this.getGroupUri(grp), title: grp});
             }
 
             let propertyGroupLinks = this.dec.links ? this.dec.links.filter(link => !link.disable && link.type == LinkType.PropertyGroupLink).map(link => {
