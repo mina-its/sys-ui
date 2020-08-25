@@ -1,9 +1,7 @@
 let index = {
     // Vuex
     "Modify                         ": dispatchStoreModify,
-    "Server: Dispatch Changes       ": dispatchRequestServerModify,
-    "Server: Commit Changes         ": commitServerChangeResponse,
-    "Reorder Items                  ": commitReorderItems,
+    "Apply                          ": _dispatchRequestServerModify,
 
     // Vue
     "Registers Components           ": registerComponents,
@@ -237,13 +235,6 @@ export function onlyUnique(value, index, self) {
 
 export function handleResponse(res: WebResponse) {
     if (!res) throw "handleResponse: res is empty";
-    // if (typeof res != "object") {
-    //     console.warn("handleResponse res", res);
-    //     throw "handleResponse: res must be object";
-    // }
-
-    // console.log("res", res);
-
     if (res.config) {
         glob.config = res.config;
         if (res.config.style)
@@ -704,7 +695,7 @@ export function joinUri(...parts: string[]): string {
     for (const part of parts) {
         uri += '/' + (part || '').replace(/^\//, '').replace(/\/$/, '');
     }
-    return uri.substr(1);
+    return parts[0].indexOf('/') == 0 ? uri : uri.substr(1);
 }
 
 export function notify(content: string | IError, type?: LogType) {

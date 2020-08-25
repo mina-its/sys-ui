@@ -55,7 +55,7 @@
                 </aside>
 
                 <!-- Main Content -->
-                <div class="flex-grow-1 p-4 main-bg-image main-content overflow-auto" @scroll="onScroll()">
+                <div :class="{'flex-grow-1 main-bg-image main-content overflow-auto':1, 'p-4':!mainNoPadding}" @scroll="onScroll()">
                     <slot name="main-content"></slot>
                 </div>
 
@@ -104,6 +104,7 @@
         @Prop() private configMenu: MenuItem[];
         @Prop() private justContent: boolean;
         @Prop() private showSideMenu: boolean;
+        @Prop() private mainNoPadding: boolean;
         @Prop() private title: string;
         private showInfoPanel = true;
         private newNote: string = null;

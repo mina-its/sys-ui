@@ -214,7 +214,10 @@ export class Global {
     question = new AppStateQuestion();
     fileGallery = new AppStateFileGallery();
     fileBrowsed: (files: mFile[]) => void = null;
-    imagePreview = {show: false, url: null};
+    imagePreview: {
+        show: boolean,
+        url: string
+    } = {show: false, url: null};
     logs: AppStateLog[] = [];
     modal: boolean = false;
     config = new AppStateConfig();

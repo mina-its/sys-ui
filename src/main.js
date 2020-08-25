@@ -5,9 +5,7 @@ const tslib_1 = require("tslib");
 let index = {
     // Vuex
     "Modify                         ": dispatchStoreModify,
-    "Server: Dispatch Changes       ": dispatchRequestServerModify,
-    "Server: Commit Changes         ": commitServerChangeResponse,
-    "Reorder Items                  ": commitReorderItems,
+    "Apply                          ": _dispatchRequestServerModify,
     // Vue
     "Registers Components           ": registerComponents,
     "Reset Form Data                ": vueResetFormData,
@@ -233,11 +231,6 @@ exports.onlyUnique = onlyUnique;
 function handleResponse(res) {
     if (!res)
         throw "handleResponse: res is empty";
-    // if (typeof res != "object") {
-    //     console.warn("handleResponse res", res);
-    //     throw "handleResponse: res must be object";
-    // }
-    // console.log("res", res);
     if (res.config) {
         exports.glob.config = res.config;
         if (res.config.style)
@@ -694,7 +687,7 @@ function joinUri(...parts) {
     for (const part of parts) {
         uri += '/' + (part || '').replace(/^\//, '').replace(/\/$/, '');
     }
-    return uri.substr(1);
+    return parts[0].indexOf('/') == 0 ? uri : uri.substr(1);
 }
 exports.joinUri = joinUri;
 function notify(content, type) {

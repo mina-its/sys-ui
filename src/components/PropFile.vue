@@ -74,7 +74,7 @@
                     break;
 
                 case "remove":
-                    this.changed(ChangeType.DeleteFile);
+                    this.changed(ChangeType.DeleteFile, null);
                     break;
 
                 case "select":
