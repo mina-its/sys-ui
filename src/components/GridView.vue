@@ -428,7 +428,7 @@
 
                 default:
                     if (getQs(Constants.QUERY_NEW)) {
-                        notify("Please save your changes before!", LogType.Warning);
+                        notify("Please save your changes before!", LogType.Warn);
                         return;
                     }
                     let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec: this.dec} as EntityMeta} as any;

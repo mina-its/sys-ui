@@ -70,11 +70,14 @@
         }
 
         .profile-brief {
-            width: 300px;
+            width: 20rem;
         }
 
         .profile-brief img {
-            width: 120px;
+            width: 8rem;
+            height: 8rem;
+            object-position: center;
+            object-fit: cover;
             border-radius: 50%;
         }
 

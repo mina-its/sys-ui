@@ -22,15 +22,8 @@ export interface JQuery {
     (selector: string | any): any;
 }
 
-export interface Axios {
-    (params: any): any;
-
-    get: any;
-    defaults: any;
-}
-
 export interface Socket {
-    (): any;
+    (params: any): any;
 
     close: any;
     on: any;

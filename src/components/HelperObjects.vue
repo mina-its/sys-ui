@@ -3,7 +3,6 @@
         <FileGallery/>
         <BrowseFile/>
         <NotifyBox/>
-        <WebSocket/>
         <QuestionBox/>
         <ContextMenu/>
         <ProgressBar/>

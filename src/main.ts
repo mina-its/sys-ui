@@ -18,12 +18,12 @@ let index = {
 import {getBsonValue, parse, stringify} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {Axios, ChangeType, Constants, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, ScreenSize, Socket, StartParams, StateChange} from './types';
-import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
+import {ChangeType, Constants, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, ScreenSize, Socket, StartParams, StateChange} from './types';
+import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse, ClientCommand} from '../../sys/src/types';
 import App from './App.vue';
 import pluralize = require('pluralize');
 
-declare let $: JQuery, axios: Axios, io: Socket, marked: any;
+declare let $: JQuery, axios, marked: any, io: Socket;
 export let glob: Global = window["__glob"] || new Global();
 export {parse, stringify, getBsonValue};
 window["__glob"] = glob;
@@ -58,6 +58,56 @@ export function $t(text: string): string {
 export function clone(obj: any) {
     return parse(stringify(obj, true), true, ID);
 }
+
+function socketConnect() {
+    if (glob.config.interactive && typeof io != "undefined") {
+        glob.socket = io({autoConnect: true});
+        glob.socket.on('cmd', handleSocketCommand);
+        // glob.socket.on('disconnect', () => {
+        //     console.log('Socket disconnected!');
+        // });
+        glob.socket.on('connect', () => {
+            console.log('Socket connected!');
+        });
+    }
+}
+
+function handleSocketCommand(command: ClientCommand, ...args: any[]) {
+    switch (command) {
+        case ClientCommand.Log:
+            glob.logs.push({message: args[0], type: args[1], ref: args[2]});
+            break;
+
+        case ClientCommand.PingAck:
+            console.log('socket is ready');
+            break;
+
+        case ClientCommand.Notification:
+            notify(args[0], args[1]);
+            break;
+
+        case ClientCommand.Question:
+            question(args[0] /*title*/, args[1] /*message*/, args[2] /*buttons*/, {questionId: args[3]}, (ref: string) => {
+                glob.socket.emit('cmd', ClientCommand.Answer, args[3], ref);
+            });
+            break;
+
+        case ClientCommand.FunctionDone:
+            glob.logs.push({message: "done!", type: LogType.Info});
+            glob.logs.push(null);
+            break;
+
+        case ClientCommand.Download:
+            window.open(args[0]);
+            break;
+
+        case ClientCommand.FunctionFailed:
+            glob.logs.push({message: args[0], type: LogType.Error});
+            glob.logs.push(null);
+            break;
+    }
+}
+
 
 export function evalExpression($this: any, expression: string): any {
     try {
@@ -153,7 +203,7 @@ function validateData(data: IData, ref: string): boolean {
     let requiredProps = meta.dec.properties.filter(p => p.required);
     for (const prop of requiredProps) {
         if (data[prop.name] == null) {
-            notify(`Property '${prop.title}' is required.`, LogType.Warning);
+            notify(`Property '${prop.title}' is required.`, LogType.Warn);
             // if (!Array.isArray(glob.glob.form.dataset[ref]))
             // 	data._error = `Property '${prop.name}' is required.`;
             return false;
@@ -263,7 +313,7 @@ export function handleResponse(res: WebResponse) {
         $('.details-view').scrollTop(0);
         $(window).scrollTop(0);
     } else {
-        notify("WHAT should I do now?", LogType.Warning);
+        notify("WHAT should I do now?", LogType.Warn);
         console.log(res);
     }
 
@@ -816,7 +866,7 @@ export function call(funcName: string, data: any, done: (err, res?) => void) {
 
 export function load(href: string, pushState = false) {
     if (glob.dirty) {
-        notify($t('save-before'), LogType.Warning);
+        notify($t('save-before'), LogType.Warn);
         return;
     }
 
@@ -967,8 +1017,6 @@ function startVue(res: WebResponse, params?: StartParams) {
         });
 
         handleResponse(res);
-        // console.log('glob.socket initing ...');
-        if (typeof io != "undefined") glob.socket = io();
         Object.assign(Vue.config, {productionTip: false, devtools: true});
         Vue.prototype.glob = glob;
         Vue.prototype.$t = $t;
@@ -983,6 +1031,7 @@ function startVue(res: WebResponse, params?: StartParams) {
 
         if (glob.config.rtl) $("html").attr("dir", "rtl");
         registerComponents(Vue, params ? params.components : null);
+        socketConnect();
 
         new Vue({data: glob, store, render: h => h((params ? params.app : null) || App)}).$mount('#app');
     } catch (err) {

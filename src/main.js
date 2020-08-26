@@ -61,6 +61,47 @@ function clone(obj) {
     return bson_util_1.parse(bson_util_1.stringify(obj, true), true, types_1.ID);
 }
 exports.clone = clone;
+function socketConnect() {
+    if (exports.glob.config.interactive && typeof io != "undefined") {
+        exports.glob.socket = io({ autoConnect: true });
+        exports.glob.socket.on('cmd', handleSocketCommand);
+        // glob.socket.on('disconnect', () => {
+        //     console.log('Socket disconnected!');
+        // });
+        exports.glob.socket.on('connect', () => {
+            console.log('Socket connected!');
+        });
+    }
+}
+function handleSocketCommand(command, ...args) {
+    switch (command) {
+        case types_2.ClientCommand.Log:
+            exports.glob.logs.push({ message: args[0], type: args[1], ref: args[2] });
+            break;
+        case types_2.ClientCommand.PingAck:
+            console.log('socket is ready');
+            break;
+        case types_2.ClientCommand.Notification:
+            notify(args[0], args[1]);
+            break;
+        case types_2.ClientCommand.Question:
+            question(args[0] /*title*/, args[1] /*message*/, args[2] /*buttons*/, { questionId: args[3] }, (ref) => {
+                exports.glob.socket.emit('cmd', types_2.ClientCommand.Answer, args[3], ref);
+            });
+            break;
+        case types_2.ClientCommand.FunctionDone:
+            exports.glob.logs.push({ message: "done!", type: types_2.LogType.Info });
+            exports.glob.logs.push(null);
+            break;
+        case types_2.ClientCommand.Download:
+            window.open(args[0]);
+            break;
+        case types_2.ClientCommand.FunctionFailed:
+            exports.glob.logs.push({ message: args[0], type: types_2.LogType.Error });
+            exports.glob.logs.push(null);
+            break;
+    }
+}
 function evalExpression($this, expression) {
     try {
         if (expression == null)
@@ -152,7 +193,7 @@ function validateData(data, ref) {
     let requiredProps = meta.dec.properties.filter(p => p.required);
     for (const prop of requiredProps) {
         if (data[prop.name] == null) {
-            notify(`Property '${prop.title}' is required.`, types_2.LogType.Warning);
+            notify(`Property '${prop.title}' is required.`, types_2.LogType.Warn);
             // if (!Array.isArray(glob.glob.form.dataset[ref]))
             // 	data._error = `Property '${prop.name}' is required.`;
             return false;
@@ -257,7 +298,7 @@ function handleResponse(res) {
         $(window).scrollTop(0);
     }
     else {
-        notify("WHAT should I do now?", types_2.LogType.Warning);
+        notify("WHAT should I do now?", types_2.LogType.Warn);
         console.log(res);
     }
     // must be set after binding to Vue
@@ -807,7 +848,7 @@ function call(funcName, data, done) {
 exports.call = call;
 function load(href, pushState = false) {
     if (exports.glob.dirty) {
-        notify($t('save-before'), types_2.LogType.Warning);
+        notify($t('save-before'), types_2.LogType.Warn);
         return;
     }
     if (pushState && location.href != href) {
@@ -954,9 +995,6 @@ function startVue(res, params) {
             }
         });
         handleResponse(res);
-        // console.log('glob.socket initing ...');
-        if (typeof io != "undefined")
-            exports.glob.socket = io();
         Object.assign(vue_1.default.config, { productionTip: false, devtools: true });
         vue_1.default.prototype.glob = exports.glob;
         vue_1.default.prototype.$t = $t;
@@ -972,6 +1010,7 @@ function startVue(res, params) {
         if (exports.glob.config.rtl)
             $("html").attr("dir", "rtl");
         registerComponents(vue_1.default, params ? params.components : null);
+        socketConnect();
         new vue_1.default({ data: exports.glob, store, render: h => h((params ? params.app : null) || App_vue_1.default) }).$mount('#app');
     }
     catch (err) {
