@@ -120,10 +120,8 @@
         }
 
         get items(): IData[] {
-            if (this.data) // when we explicitly specify the data
-                return this.data;
-            else
-                return this["$store"].state.data[this.uri] || [];
+            let data = this.data || this["$store"].state.data[this.uri] || [];
+            return data;
         }
 
         refresh() {
