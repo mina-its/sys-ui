@@ -1333,7 +1333,7 @@ export function start(params?: StartParams) {
         const res: WebResponse = parse(mainState, true, ID);
         startVue(res, params);
     } else {
-        let uri = setQs('m', RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname + location.search : Constants.defaultAddress);
+        let uri = setQs('m', RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname + location.search : "_default");
         uri = setQs('t', Math.random(), false, uri);
         if (getQs(Constants.QUERY_LOCALE))
             uri = setQs(Constants.QUERY_LOCALE, getQs(Constants.QUERY_LOCALE), false, uri);
