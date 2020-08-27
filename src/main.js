@@ -1288,7 +1288,7 @@ function start(params) {
         startVue(res, params);
     }
     else {
-        let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname + location.search : types_1.Constants.defaultAddress);
+        let uri = setQs('m', types_2.RequestMode.inlineDev, false, (location.pathname && location.pathname != '/') ? location.pathname + location.search : "_default");
         uri = setQs('t', Math.random(), false, uri);
         if (getQs(types_1.Constants.QUERY_LOCALE))
             uri = setQs(types_1.Constants.QUERY_LOCALE, getQs(types_1.Constants.QUERY_LOCALE), false, uri);

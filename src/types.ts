@@ -40,7 +40,6 @@ export const Constants = {
     redirectBack: '_back',
     errorEmbedProperty: 'e',
     redirectSelf: '_self',
-    defaultAddress: '/_default',
     contextMenuVisibleItems: 10,
     inlineMessageDuration: 5000,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg", "svg"],

@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex h-100 flex-column">
+    <div :class="'d-flex app-container h-100 flex-column theme-' + glob.config.user.theme">
         <app-header/>
         <main class="d-flex overflow-auto">
             <NavMenu/>
@@ -82,7 +82,8 @@
         --text-multiline-height: 10rem;
     }
 
-    body.theme-light {
+    /*Light Theme*/
+    .app-container.theme-light {
         /* nav-menu */
         --nav-menu-bg: #fff;
         --nav-menu-icon: #999;

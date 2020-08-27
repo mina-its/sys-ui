@@ -8,7 +8,7 @@
             </a>
 
             <!-- Brand -->
-            <a class="brand d-flex align-items-center text-nowrap text-decoration-none text-white mx-2" :style="{paddingInlineStart: glob.config.headerMenu && glob.screen>1 ? '.5rem':'unset'}" href="_default">
+            <a class="brand d-flex align-items-center text-nowrap text-decoration-none text-white mx-2" :style="{paddingInlineStart: glob.config.headerMenu && glob.screen>1 ? '.5rem':'unset'}" href="/">
                 <img v-if="glob.config.brandingLogo" alt="logo" class='branding-logo mr-2 img-responsive' :src="glob.config.brandingLogo"/>
                 <span class="app-title">{{glob.config.appTitle}}</span>
             </a>
