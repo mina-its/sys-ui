@@ -17,7 +17,7 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {AccessAction, LogType, ObjectDec, StatusCode, UserProfile, WebMethod} from '../../../sys/src/types';
-    import {$t, call, notify} from "../main";
+    import {$t, call, glob, notify} from "../main";
     import {ItemChangeEventArg} from "../types";
 
     @Component({name: 'MyAccount'})
@@ -53,7 +53,7 @@
                     return notify(err, LogType.Error);
 
                 if (res.code == StatusCode.Unauthorized) {
-                    location.href = "/signin";
+                    location.href = glob.config.user.signinUrl;
                     return;
                 }
 
