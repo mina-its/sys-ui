@@ -19,7 +19,7 @@
                 <DetailsView :dec="dec.filterDec" :data="dec.filterData" :level="level?level+1:1" @changed="objectFilterChanged"></DetailsView>
             </div>
             <div v-if="recentItems" class="recent-items pt-3">
-                <label class="text-muted small mx-3 mt-3 font-weight-bold">Recent {{glob.form.breadcrumbLast}}:</label>
+                <label class="text-muted small w-100 bg-gray px-3 py-1 mt-3 font-weight-bold">Recent {{glob.form.breadcrumbLast}}:</label>
                 <ul class="nav flex-column">
                     <li v-for="item in recentItems" class="nav-item">
                         <a @click="clickRecentItem(item)" class="text-nowrap nav-link" :href="item.ref">{{item.title}}</a>
@@ -321,7 +321,8 @@
         }
 
         clickNewItem() {
-            main.load(location.pathname + '?n=1', true);
+            let ref = setQs(ReqParams.newItem, "1", false, location.pathname);
+            load(ref, true);
         }
 
         clickObjectMenu(e) {
@@ -418,9 +419,10 @@
         insert() {
             switch (this.dec.newItemMode) {
                 case NewItemMode.newPage:
-                    let ref = prepareServerUrl(this.uri, true) + '?n=1';
+                    let ref = setQs(ReqParams.newItem, "1", false, this.uri);
+                    ref = prepareServerUrl(ref, true);
                     if (this.dec.newItemDefaults)
-                        ref += "&d=" + this.dec.newItemDefaults;
+                        ref = setQs(ReqParams.newItemDefaults, this.dec.newItemDefaults, false, ref);
                     main.load(ref, true);
                     break;
 

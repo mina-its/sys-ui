@@ -21,7 +21,7 @@
     @Component({name: 'AppLocaleMenu'})
     export default class AppLocaleMenu extends Vue {
         changeLocale(locale: Pair) {
-            console.log(locale);
+            // console.log(locale);
             location.href = setQs('e', locale.ref, true);
         }
     }

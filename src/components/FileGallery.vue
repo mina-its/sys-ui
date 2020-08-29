@@ -1,5 +1,5 @@
 <template>
-    <div v-if="glob.fileGallery.show" id="file-gallery">
+    <div v-if="glob && glob.fileGallery.show" id="file-gallery">
         <transition name="fade">
             <div class="modal-mask">
                 <div class="modal-wrapper align-middle">
@@ -61,10 +61,6 @@
 
     @Component({name: 'FileGallery', components: {}})
     export default class FileGallery extends Vue {
-        get glob() {
-            return glob;
-        }
-
         isSelected(item: DirFile) {
             return glob.fileGallery.selected == item;
         }

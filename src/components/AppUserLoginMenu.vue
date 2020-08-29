@@ -29,8 +29,7 @@
 
 <script lang="ts">
     import {Component, Vue, Prop} from 'vue-property-decorator';
-    import {glob} from "@/main";
-    import {prepareServerUrl} from "../main";
+    import {glob, prepareServerUrl} from "@/main";
 
     declare let $: any;
 
@@ -47,7 +46,10 @@
         }
 
         get profilePhoto(): string {
-            return glob.config.user.photoUrl || 'https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5bed565…/5f7abfa5-a174-45b5-a5a5-68a91a876506/128';
+            if (glob && glob.config && glob.config.user.photoUrl)
+                return glob.config.user.photoUrl;
+            else
+                return 'https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5bed565…/5f7abfa5-a174-45b5-a5a5-68a91a876506/128';
         }
 
         mounted() {

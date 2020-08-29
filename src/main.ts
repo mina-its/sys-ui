@@ -20,12 +20,12 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import {ChangeType, Constants, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, ScreenSize, Socket, StartParams, StateChange} from './types';
 import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse, ClientCommand} from '../../sys/src/types';
-import App from './App.vue';
 import pluralize = require('pluralize');
+import App from './App.vue';
 
 declare let $: JQuery, axios, marked: any, io: Socket;
-export let glob: Global = window["__glob"] || new Global();
 export {parse, stringify, getBsonValue};
+export let glob: Global = window["__glob"] || new Global();
 window["__glob"] = glob;
 let store;
 
@@ -1323,7 +1323,7 @@ function startServiceWorker() {
 }
 
 export function start(params?: StartParams) {
-    console.log('Starting ...');
+    console.log('Starting ....');
     let mainState = $('#main-state').html();
     startServiceWorker();
 

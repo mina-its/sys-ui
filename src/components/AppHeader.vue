@@ -8,7 +8,8 @@
             </a>
 
             <!-- Brand -->
-            <a class="brand d-flex align-items-center text-nowrap text-decoration-none text-white mx-2" :style="{paddingInlineStart: glob.config.headerMenu && glob.screen>1 ? '.5rem':'unset'}" href="/">
+            <a class="brand d-flex align-items-center text-nowrap text-decoration-none text-white mx-2" :style="{paddingInlineStart: glob.config.headerMenu && glob.screen>1 ? '.5rem':'unset'}"
+               :href="'/'+(glob.config.prefix || '')">
                 <img v-if="glob.config.brandingLogo" alt="logo" class='branding-logo mr-2 img-responsive' :src="glob.config.brandingLogo"/>
                 <span class="app-title">{{glob.config.appTitle}}</span>
             </a>
@@ -31,10 +32,10 @@
             <div class="mr-auto"></div>
 
             <!-- Language -->
-            <AppLocaleMenu v-if="glob.config.headerMenu && glob.screen>1" class="mx-0 mx-lg-2" />
+            <AppLocaleMenu v-if="glob.config.headerMenu && glob.screen>1" class="mx-0 mx-lg-2"/>
 
             <!-- Login -->
-            <AppUserLoginMenu class="header-link align-items-center d-flex" />
+            <AppUserLoginMenu class="header-link align-items-center d-flex"/>
 
             <!-- Apps Menu -->
             <div v-if="glob.config.apps.length>1" class="dropdown h-100 apps-menu">

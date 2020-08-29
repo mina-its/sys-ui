@@ -25,7 +25,7 @@
 
         created() {
             call("getAppServices", null, (err, res) => {
-                console.log(res);
+                // console.log(res);
                 this.services = res.data;
             });
         }
