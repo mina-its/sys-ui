@@ -19,7 +19,7 @@ import {getBsonValue, parse, stringify} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import {ChangeType, Constants, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, ScreenSize, Socket, StartParams, StateChange} from './types';
-import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse, ClientCommand} from '../../sys/src/types';
+import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse, ClientCommand, ReqParams} from '../../sys/src/types';
 import pluralize = require('pluralize');
 import App from './App.vue';
 
@@ -228,11 +228,9 @@ export function someProps(prop): boolean {
 }
 
 export function prepareServerUrl(ref: string, addPrefix: boolean = false): string {
+    let locale = getQs(ReqParams.locale);
+    if (locale) ref = setQs(ReqParams.locale, locale, false, ref);
     ref = (ref || "").replace(/^\//, "");
-    let locale = getQs('e');
-    if (locale) {
-        ref += '?e=' + locale;
-    }
     if (addPrefix && glob.config.prefix)
         ref = glob.config.prefix + "/" + ref;
     return "/" + ref;

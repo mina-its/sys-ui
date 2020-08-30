@@ -12,7 +12,7 @@
   "version": "0.1",
   "orientation": "portrait",
   "icons": [{
-    "src": "/sys-public/images/logo.png",
+    "src": "/sys/public/images/logo.png",
     "sizes": "144x144"
   }]
 }

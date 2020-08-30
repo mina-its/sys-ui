@@ -220,11 +220,10 @@ function someProps(prop) {
 }
 exports.someProps = someProps;
 function prepareServerUrl(ref, addPrefix = false) {
+    let locale = getQs(types_2.ReqParams.locale);
+    if (locale)
+        ref = setQs(types_2.ReqParams.locale, locale, false, ref);
     ref = (ref || "").replace(/^\//, "");
-    let locale = getQs('e');
-    if (locale) {
-        ref += '?e=' + locale;
-    }
     if (addPrefix && exports.glob.config.prefix)
         ref = exports.glob.config.prefix + "/" + ref;
     return "/" + ref;

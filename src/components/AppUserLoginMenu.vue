@@ -1,9 +1,9 @@
 <template>
     <div class="app-user-login">
-        <div v-if="glob.config.user.signinUrl">
+        <div v-if="!glob.config.user.authenticated">
             <button class="my-2 my-sm-0 btn btn-link text-white" @click="goToSignin">
                 <i class="fal fa-user mx-1"></i>
-                <span v-if="glob.config.user.loginTitle">{{glob.config.user.loginTitle}}</span>
+                <span v-if="glob.config.user.signinTitle">{{glob.config.user.signinTitle}}</span>
             </button>
         </div>
         <div v-else class="dropdown d-flex">
@@ -29,7 +29,7 @@
 
 <script lang="ts">
     import {Component, Vue, Prop} from 'vue-property-decorator';
-    import {glob, prepareServerUrl} from "@/main";
+    import {glob, prepareServerUrl} from "../main";
 
     declare let $: any;
 
