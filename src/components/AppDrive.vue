@@ -162,7 +162,7 @@
                 this.uri = res.data.uri;
                 this.list = res.data.list;
 
-                document.title = `App Drive: ${main.joinUri(this.drive.name, this.path)}`;
+                document.title = `App Drive: ${main.uriJoin(this.drive.name, this.path)}`;
             });
         }
 
@@ -195,7 +195,7 @@
                             break;
                         case "preview":
                         case "download":
-                            window.open(main.joinUri(this.uri, item.name), '_blank');
+                            window.open(main.uriJoin(this.uri, item.name), '_blank');
                             break;
 
                         case "refresh":
@@ -259,8 +259,8 @@
                     break;
 
                 case DirFileType.Folder:
-                    this.path = main.joinUri(this.path, this.selected.name);
-                    let url = main.joinUri("app-drive", this.drive.name, this.path);
+                    this.path = main.uriJoin(this.path, this.selected.name);
+                    let url = main.uriJoin("app-drive", this.drive.name, this.path);
                     history.pushState(null, null, "/" + url);
                     break;
 
@@ -280,7 +280,7 @@
 
             let ext = item.name.split('.').pop().toLowerCase();
             if (this.gridView && Constants.imageExtensions.includes(ext))
-                return main.joinUri(this.uri, this.path, item.name);
+                return main.uriJoin(this.uri, this.path, item.name);
 
             let css = "fal " + (this.gridView ? 'fa-2x ' : 'fa-lg text-black-50 mx-2 ');
             switch (ext) {

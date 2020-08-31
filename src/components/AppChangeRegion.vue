@@ -4,7 +4,7 @@
             <i style="font-size: 16px" class="fal fa-globe text-white px-1"></i>{{$t("change-region")}}
         </a>
 
-        <div class="modal fade" id="changeRegion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal" id="changeRegion" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -36,7 +36,7 @@
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {Country, Locale} from "../../../sys/src/types";
-    import {$t, onlyUnique, call, setQs} from "@/main";
+    import {$t, onlyUnique, call, setQs} from "../main";
 
     @Component({name: 'AppChangeRegion'})
     export default class AppChangeRegion extends Vue {

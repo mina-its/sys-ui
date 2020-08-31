@@ -97,6 +97,8 @@
     .prop-text-editor {
         .CodeMirror {
             border: 1px solid #dee2e6;
+            height: auto;
+            max-width: 60rem;
         }
     }
 </style>

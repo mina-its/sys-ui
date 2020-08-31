@@ -2,7 +2,7 @@
     <div class="app-services-menu d-flex apps-list overflow-auto flex-wrap p-5 align-content-start">
         <a target="_self" :href="getServiceUrl(service)" class="small bg-white m-3 business-app cursor-pointer" v-for="service of services" style="width: 8rem">
             <div class="text-center p-2">
-                <div class="app-icon p-3 text-white" :style="{'background-color':service.iconColor}"><i :class="service.iconStyle + ' fa-4x'"></i></div>
+                <div class="app-icon p-3 text-white" :style="{'background-color':service.iconColor}"><i :class="service.iconStyle + ' text-shadow-black fa-4x'"></i></div>
                 <label class="pt-2 font-weight-bold" style="color: #444;font-size: .7rem">{{service.title}}</label>
             </div>
         </a>

@@ -4,8 +4,8 @@
             <li v-for="item of glob.config.menu" :title="item.title" class="nav-item text-uppercase">
                 <div v-if="item.title=='-'" class="d-block separator"></div>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
-                <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-nowrap nav-link':1,'has-child':item.items}">
-                    <i :class="item._cs"></i>
+                <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-shadow-black text-nowrap nav-link':1,'has-child':item.items}">
+                    <i :class="item._cs+' text-shadow-black'"></i>
                     <span>{{item.title}}</span>
                 </a>
                 <ul class="list-unstyled" style="padding-inline-start: 6rem">

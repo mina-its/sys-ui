@@ -31,7 +31,7 @@
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
     import {DirFile, IData, LogType, mFile, Property, RequestMode, ObjectViewType} from "../../../sys/src/types";
     import {Constants, ItemChangeEventArg, FunctionExecEventArg, ID, MenuItem, ChangeType} from '../types';
-    import main, {$t, browseFile, glob, hideCmenu, joinUri, notify, openFileGallery, showCmenu, toFriendlyFileSizeString} from '../main';
+    import main, {$t, browseFile, glob, hideCmenu, uriJoin, notify, openFileGallery, showCmenu, toFriendlyFileSizeString} from '../main';
 
     @Component({name: 'PropFile', components: {}})
     export default class PropFile extends Vue {
@@ -84,7 +84,7 @@
         }
 
         selectFromGallery(path: string, item: DirFile) {
-            let uri = `http://${joinUri(this.prop._.fileUri, path, item.name)}`;
+            let uri = `http://${uriJoin(this.prop._.fileUri, path, item.name)}`;
             let file = {
                 path,
                 _: {uri},
@@ -187,7 +187,7 @@
             if (Constants.uniqueFilenameRegex.test(file.name))
                 return file.name.replace(Constants.uniqueFilenameRegex, "");
 
-            return file.path ? joinUri(file.path, file.name) : file.name;
+            return file.path ? uriJoin(file.path, file.name) : file.name;
         }
 
         resetFileInfo(e, file: mFile) {

@@ -11,7 +11,7 @@
             <a class="brand d-flex align-items-center text-nowrap text-decoration-none text-white mx-2" :style="{paddingInlineStart: glob.config.headerMenu && glob.screen>1 ? '.5rem':'unset'}"
                :href="'/'+(glob.config.prefix || '')">
                 <img v-if="glob.config.brandingLogo" alt="logo" class='branding-logo mr-2 img-responsive' :src="glob.config.brandingLogo"/>
-                <span class="app-title">{{glob.config.appTitle}}</span>
+                <span class="app-title text-shadow-black">{{glob.config.appTitle}}</span>
             </a>
 
             <!-- Header Menu -->
@@ -56,7 +56,9 @@
                     <div class="d-flex apps-list overflow-auto flex-wrap p-5 align-content-end">
                         <a target="_self" :href="getAppUrl(app)" class="small bg-white m-3 business-app cursor-pointer" v-for="app of glob.config.apps" style="width: 8rem">
                             <div class="text-center p-2">
-                                <div class="app-icon p-3 text-white" :style="{'background-color':app.iconColor}"><i :class="app.iconStyle + ' fa-4x'"></i></div>
+                                <div class="app-icon p-3 text-white" :style="{'background-color':app.iconColor}">
+                                    <i :class="app.iconStyle + ' fa-4x'" style="text-shadow: 0 0 5px #333;"></i>
+                                </div>
                                 <label class="pt-2 font-weight-bold" style="color: #444;font-size: .7rem">{{app.title}}</label>
                             </div>
                         </a>
@@ -105,7 +107,6 @@
 
         .app-title {
             font-size: 1.5rem;
-            text-shadow: 0px 0px 10px #FFFB;
         }
 
         .header-link {

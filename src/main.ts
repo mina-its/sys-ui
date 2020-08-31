@@ -227,13 +227,26 @@ export function someProps(prop): boolean {
     return Array.isArray(prop.properties) && prop.properties.length;
 }
 
+export function trimSlash(path: string, insertSlash: boolean = false) {
+    path = (path || "").replace(/^\/|\/$/g, "");
+    return insertSlash ? "/" + path : path;
+}
+
+export function uriJoin(...parts: string[]): string {
+    let uri = "";
+    for (const part of parts) {
+        if (part) uri += trimSlash(part, true);
+    }
+    return trimSlash(uri);
+}
+
 export function prepareServerUrl(ref: string, addPrefix: boolean = false): string {
     let locale = getQs(ReqParams.locale);
     if (locale) ref = setQs(ReqParams.locale, locale, false, ref);
-    ref = (ref || "").replace(/^\//, "");
+    ref = trimSlash(ref);
     if (addPrefix && glob.config.prefix)
         ref = glob.config.prefix + "/" + ref;
-    return "/" + ref;
+    return trimSlash(ref, true);
 }
 
 export function loadObjectViewData(address: string, item, done) {
@@ -640,7 +653,7 @@ export function setQs(key: string, value: any, fullPath: boolean, href?: string)
     let search, el;
     if (href) {
         el = document.createElement('a');
-        el.href = href;
+        el.href = trimSlash(href, true);
         search = el.search;
     } else {
         search = location.search;
@@ -736,14 +749,6 @@ export function toFriendlyFileSizeString(size: number): string {
     } else {
         return (size / 1024 / 1024).toFixed(1) + ' MB';
     }
-}
-
-export function joinUri(...parts: string[]): string {
-    let uri = '';
-    for (const part of parts) {
-        uri += '/' + (part || '').replace(/^\//, '').replace(/\/$/, '');
-    }
-    return parts[0].indexOf('/') == 0 ? uri : uri.substr(1);
 }
 
 export function notify(content: string | IError, type?: LogType) {
@@ -894,7 +899,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
     if (config.showProgress)
         glob.showProgress = true;
     fail = fail || notify;
-    if (glob.config.host) url = joinUri(glob.config.host, url);
+    if (glob.config.host) url = uriJoin(glob.config.host, url);
 
     // ajax params
     let params: any = {

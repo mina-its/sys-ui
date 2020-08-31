@@ -171,6 +171,14 @@
         background-color: #789;
     }
 
+    .text-shadow-black {
+        text-shadow: 0 0 .5rem #000A;
+    }
+
+    .text-shadow-white {
+        text-shadow: 0 0 .5rem #FFF;
+    }
+
     .bg-gray {
         background-color: #f1f1f1 !important;
     }

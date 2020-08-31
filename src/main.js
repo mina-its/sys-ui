@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.loadNotes = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.joinUri = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.glob = exports.getBsonValue = exports.stringify = exports.parse = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.loadNotes = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.uriJoin = exports.trimSlash = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.glob = exports.getBsonValue = exports.stringify = exports.parse = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -219,14 +219,28 @@ function someProps(prop) {
     return Array.isArray(prop.properties) && prop.properties.length;
 }
 exports.someProps = someProps;
+function trimSlash(path, insertSlash = false) {
+    path = (path || "").replace(/^\/|\/$/g, "");
+    return insertSlash ? "/" + path : path;
+}
+exports.trimSlash = trimSlash;
+function uriJoin(...parts) {
+    let uri = "";
+    for (const part of parts) {
+        if (part)
+            uri += trimSlash(part, true);
+    }
+    return trimSlash(uri);
+}
+exports.uriJoin = uriJoin;
 function prepareServerUrl(ref, addPrefix = false) {
     let locale = getQs(types_2.ReqParams.locale);
     if (locale)
         ref = setQs(types_2.ReqParams.locale, locale, false, ref);
-    ref = (ref || "").replace(/^\//, "");
+    ref = trimSlash(ref);
     if (addPrefix && exports.glob.config.prefix)
         ref = exports.glob.config.prefix + "/" + ref;
-    return "/" + ref;
+    return trimSlash(ref, true);
 }
 exports.prepareServerUrl = prepareServerUrl;
 function loadObjectViewData(address, item, done) {
@@ -624,7 +638,7 @@ function setQs(key, value, fullPath, href) {
     let search, el;
     if (href) {
         el = document.createElement('a');
-        el.href = href;
+        el.href = trimSlash(href, true);
         search = el.search;
     }
     else {
@@ -722,14 +736,6 @@ function toFriendlyFileSizeString(size) {
     }
 }
 exports.toFriendlyFileSizeString = toFriendlyFileSizeString;
-function joinUri(...parts) {
-    let uri = '';
-    for (const part of parts) {
-        uri += '/' + (part || '').replace(/^\//, '').replace(/\/$/, '');
-    }
-    return parts[0].indexOf('/') == 0 ? uri : uri.substr(1);
-}
-exports.joinUri = joinUri;
 function notify(content, type) {
     if (!content) {
         return;
@@ -876,7 +882,7 @@ function ajax(url, data, config, done, fail) {
         exports.glob.showProgress = true;
     fail = fail || notify;
     if (exports.glob.config.host)
-        url = joinUri(exports.glob.config.host, url);
+        url = uriJoin(exports.glob.config.host, url);
     // ajax params
     let params = {
         url,

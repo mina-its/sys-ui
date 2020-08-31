@@ -2,13 +2,13 @@
     import {Component, Prop as ComProp, Vue} from 'vue-property-decorator';
     import {Elem, ElemType, ObjectViewType, FunctionDec} from "../../../sys/src/types";
     import * as main from '../main';
-    import {ChangeType, ItemChangeEventArg, StateChange} from '@/types';
+    import {ChangeType, ItemChangeEventArg, StateChange} from '../types';
 
     @Component({name: 'FormElem', components: {}})
     export default class FormElem extends Vue {
         @ComProp() private elem: Elem;
 
-        render(ce: (...args: any) => void) {
+        render(ce: (...args: any[]) => void) {
             if (!this.$store) {
                 console.error('FormElem this.$store is empty, Maybe you need to call Vue.use(Vuex) before registering the components.');
                 return null;
@@ -72,11 +72,7 @@
 
                 case ElemType.Text:
                     console.assert(!!this.elem.text, 'incomplete text elem: ', this.elem);
-
-                    if (this.elem.text.markdown)
-                        return ce('markdown', {props: {"content": this.elem.text.content, "styles": this.elem.styles}});
-                    else
-                        return ce('span', {attrs: {"class": this.elem.styles}}, this.elem.text.content);
+                    return ce('markdown', {props: {"content": this.elem.text.content, "styles": this.elem.styles}});
 
                 case ElemType.Document:
                     return ce('document-editor', {

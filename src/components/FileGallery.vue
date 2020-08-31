@@ -132,7 +132,7 @@
                             break;
                         case "preview":
                         case "download":
-                            window.open(main.joinUri(glob.fileGallery.uri, item.name), '_blank');
+                            window.open(main.uriJoin(glob.fileGallery.uri, item.name), '_blank');
                             break;
 
                         case "refresh":
@@ -167,7 +167,7 @@
 
             let ext = item.name.split('.').pop().toLowerCase();
             if (Constants.imageExtensions.includes(ext))
-                return main.joinUri(glob.fileGallery.uri, item.name);
+                return main.uriJoin(glob.fileGallery.uri, item.name);
 
             switch (ext) {
                 case "doc":
@@ -214,7 +214,7 @@
             if (e.stopProgress) e.stopProgress();
 
             if (glob.fileGallery.selected && glob.fileGallery.selected.type == DirFileType.Folder) {
-                glob.fileGallery.path = main.joinUri(glob.fileGallery.path, glob.fileGallery.selected.name);
+                glob.fileGallery.path = main.uriJoin(glob.fileGallery.path, glob.fileGallery.selected.name);
                 main.refreshFileGallery(null);
             } else {
                 glob.fileGallery.show = false;

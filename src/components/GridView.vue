@@ -90,7 +90,7 @@
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import * as main from '../main';
-    import {$t, call, getQs, glob, load, markDown, notify, pushToGridViewRecentList, setQs, showCmenu, prepareServerUrl} from '../main';
+    import {$t, call, getQs, glob, load, markDown, notify, pushToGridViewRecentList, setQs, showCmenu, prepareServerUrl, trimSlash} from '../main';
     import {parse, stringify} from 'bson-util';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, GlobalFunction, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
     import {AccessAction, EntityMeta, EntityLink, FileType, GridRowHeaderStyle, IData, Keys, LinkType, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
@@ -143,11 +143,11 @@
         }
 
         clickRecentItem(item: Pair) {
-            pushToGridViewRecentList(location.pathname.replace(/^\//, ""), item.ref, item.title);
+            pushToGridViewRecentList(trimSlash(location.pathname), item.ref, item.title);
         }
 
         resetRecentItems() {
-            let recent = localStorage.getItem("gridView-recentItems-" + location.pathname.replace(/^\//, ""));
+            let recent = localStorage.getItem("gridView-recentItems-" + trimSlash(location.pathname));
             this.recentItems = recent ? JSON.parse(recent) : null;
         }
 
@@ -420,9 +420,9 @@
             switch (this.dec.newItemMode) {
                 case NewItemMode.newPage:
                     let ref = setQs(ReqParams.newItem, "1", false, this.uri);
-                    ref = prepareServerUrl(ref, true);
                     if (this.dec.newItemDefaults)
                         ref = setQs(ReqParams.newItemDefaults, this.dec.newItemDefaults, false, ref);
+                    ref = prepareServerUrl(ref, true);
                     main.load(ref, true);
                     break;
 
