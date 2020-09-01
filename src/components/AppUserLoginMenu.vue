@@ -37,8 +37,9 @@
     export default class AppUserLoginMenu extends Vue {
         @Prop() private buttonClass?: string;
 
-        signOut(){
-          location.href = `/signout?back=${encodeURI(location.href)}`;
+        signOut() {
+            console.log(location.href);
+            location.href = `/signout?back=${encodeURI(location.href)}`;
         }
 
         get profilePhoto(): string {
