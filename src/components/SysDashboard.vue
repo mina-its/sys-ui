@@ -11,11 +11,11 @@
                               class="m-4"></DashboardInfoBox>
         </div>
 
-<!--        <div class="p-4">-->
-<!--            <div class="world-map p-4 bg-white">-->
-<!--                <img src="/images/world.svg">-->
-<!--            </div>-->
-<!--        </div>-->
+        <!--        <div class="p-4">-->
+        <!--            <div class="world-map p-4 bg-white">-->
+        <!--                <img src="/images/world.svg">-->
+        <!--            </div>-->
+        <!--        </div>-->
     </div>
 </template>
 
@@ -23,13 +23,9 @@
     import {Component, Prop, Vue} from 'vue-property-decorator';
     import {SysDashboardInfo} from "../../../sys/src/types";
 
-    @Component({
-        name: 'SysDashboard',
-        components: {}
-    })
+    @Component({name: 'SysDashboard', components: {}})
     export default class SysDashboard extends Vue {
         @Prop() private data: SysDashboardInfo;
-
     }
 </script>
 
