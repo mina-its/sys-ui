@@ -21,7 +21,7 @@
                             "class": this.elem.styles || null,
                         },
                         props: {
-                            title: this.elem.title,
+                            title: document.title,
                             bodyElems,
                             footerElems,
                             // todo: message: e.panel.modal.message
