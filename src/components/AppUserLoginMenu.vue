@@ -1,10 +1,10 @@
 <template>
     <div class="app-user-login">
         <div v-if="!glob.config.user.authenticated">
-            <button class="my-2 my-sm-0 btn btn-link text-white" @click="goToSignin">
+            <a class="my-2 my-sm-0 btn btn-link text-white" target="_blank" href="/authCheck">
                 <i class="fal fa-user mx-1"></i>
                 <span v-if="glob.config.user.signinTitle">{{glob.config.user.signinTitle}}</span>
-            </button>
+            </a>
         </div>
         <div v-else class="dropdown d-flex">
             <button class="avatar bg-transparent border-0 outline-0 dropdown-toggle" id="dropdownProfileBrief" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -17,7 +17,7 @@
                 <div>{{glob.config.user.email}}</div>
                 <a class="m-2 btn btn-outline-secondary profile-button" target="_blank" href="/my-account">{{$t('my-account')}}</a>
                 <hr>
-                <button class="m-2 btn btn-secondary" @click="goToSignout">{{$t('sign-out')}}</button>
+                <button class="m-2 btn btn-secondary" @click="signOut">{{$t('sign-out')}}</button>
                 <hr>
                 <a class="m-2 text-secondary small" href="/privacy-policy">Privacy Policy</a>
                 -
@@ -37,12 +37,8 @@
     export default class AppUserLoginMenu extends Vue {
         @Prop() private buttonClass?: string;
 
-        goToSignout() {
-            location.href = glob.config.user.signoutUrl + "?back=" + encodeURI(location.href);
-        }
-
-        goToSignin() {
-            location.href = glob.config.user.signinUrl + "?back=" + encodeURI(location.href);
+        signOut(){
+          location.href = `/signout?back=${encodeURI(location.href)}`;
         }
 
         get profilePhoto(): string {

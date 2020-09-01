@@ -53,7 +53,7 @@
                     return notify(err, LogType.Error);
 
                 if (res.code == StatusCode.Unauthorized) {
-                    location.href = glob.config.user.signinUrl;
+                    location.href = `/authCheck?back=${location.href}`;
                     return;
                 }
 
