@@ -4,6 +4,7 @@
   "description": "sys-ui",
   "main": "./public/js/sys.main.js",
   "scripts": {
+    "test": "jest",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --report src/index.js ",
     "inspect": "vue-cli-service inspect",
@@ -14,6 +15,12 @@
   "keywords": [
     "sys-ui"
   ],
+  "jest": {
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "verbose": true
+  },
   "dependencies": {
     "axios": "^0.19.2",
     "bson-util": "^1.0.14",
