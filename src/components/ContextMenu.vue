@@ -1,6 +1,6 @@
 <template>
     <div v-if="glob.cmenu.show" :style="style" class="dropdown-menu py-0 show overflow-auto context-menu text-start">
-        <DateTimePicker v-if="glob.cmenu.datePicker" :format="glob.cmenu.datePicker.format" :value="glob.cmenu.datePicker.value" @changed="dateChanged" @canceled="glob.cmenu.show=false" />
+        <DateTimePicker v-if="glob.cmenu.datePicker" :format="glob.cmenu.datePicker.format" :value="glob.cmenu.datePicker.value" @changed="dateChanged" @canceled="glob.cmenu.show=false"/>
         <div v-else class="py-2">
             <template v-for="item in glob.cmenu.items">
                 <div v-if="item.title==='-'" class="dropdown-divider"></div>
@@ -13,11 +13,11 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {glob, isRtl} from '@/main';
-
-    declare let $: JQuery;
+    import {glob} from '../main';
     import * as main from '../main';
-    import {ItemChangeEventArg, JQuery, MenuItem} from "@/types";
+    import {MenuItem} from "../types";
+
+    declare let $: any;
 
     @Component({name: 'ContextMenu'})
     export default class ContextMenu extends Vue {
