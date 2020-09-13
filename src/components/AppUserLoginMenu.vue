@@ -1,7 +1,7 @@
 <template>
     <div class="app-user-login">
         <div v-if="!glob.config.user.authenticated">
-            <a class="my-2 my-sm-0 btn btn-link text-white" target="_blank" href="/authCheck">
+            <a class="my-2 my-sm-0 btn btn-link text-white" target="_parent" href="/authCheck">
                 <i class="fal fa-user mx-1"></i>
                 <span v-if="glob.config.user.signinTitle">{{glob.config.user.signinTitle}}</span>
             </a>
