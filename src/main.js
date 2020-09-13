@@ -221,7 +221,7 @@ function someProps(prop) {
 exports.someProps = someProps;
 function trimSlash(path, insertSlash = false) {
     path = (path || "").replace(/^\/|\/$/g, "");
-    return insertSlash ? "/" + path : path;
+    return insertSlash && !/^http:/.test(path) ? "/" + path : path;
 }
 exports.trimSlash = trimSlash;
 function uriJoin(...parts) {
@@ -433,7 +433,7 @@ function showPropRefMenu(prop, instance, phrase, ctrl, removeCurrentValues, item
             itemSelected(item);
         });
     };
-    if (prop._.isRef) {
+    if (prop._.isRef && !prop._.enum) {
         if (prop.referType == types_2.PropertyReferType.InnerSelectType) {
             let match = prop._.ref.match(/^(\w+\/\w+)/);
             instance = exports.glob.data[match[1]];
@@ -448,7 +448,11 @@ function showPropRefMenu(prop, instance, phrase, ctrl, removeCurrentValues, item
         });
     }
     else {
-        let items = phrase == null || (prop._.items.length < types_1.Constants.contextMenuVisibleItems && phrase == this.value) ? prop._.items : prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(phrase.toLowerCase()) > -1);
+        let items;
+        if (phrase == null || (prop._.items.length < types_1.Constants.contextMenuVisibleItems && phrase == this.value))
+            items = prop._.items;
+        else
+            items = prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(phrase.toLowerCase()) > -1);
         items.forEach(item => item.hover = phrase == item.title);
         showDropDown(items);
     }
@@ -860,7 +864,8 @@ function load(href, pushState = false) {
         history.pushState(null, null, href);
     }
     exports.glob.notify = null;
-    ajax(setQs('m', types_2.RequestMode.inline, false, href), null, { showProgress: true }, (res) => {
+    let url = setQs('m', types_2.RequestMode.inline, false, href);
+    ajax(url, null, { showProgress: true }, (res) => {
         // Hide menu on mobile mode after load object
         if (exports.glob.screen == types_1.ScreenSize.xs)
             exports.glob.showNavMenu = false;

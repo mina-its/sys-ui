@@ -229,7 +229,7 @@ export function someProps(prop): boolean {
 
 export function trimSlash(path: string, insertSlash: boolean = false) {
     path = (path || "").replace(/^\/|\/$/g, "");
-    return insertSlash ? "/" + path : path;
+    return insertSlash && !/^http:/.test(path) ? "/" + path : path;
 }
 
 export function uriJoin(...parts: string[]): string {
@@ -445,7 +445,7 @@ export function showPropRefMenu(prop: Property, instance: any, phrase: string, c
         });
     };
 
-    if (prop._.isRef) {
+    if (prop._.isRef && !prop._.enum) {
         if (prop.referType == PropertyReferType.InnerSelectType) {
             let match = prop._.ref.match(/^(\w+\/\w+)/);
             instance = glob.data[match[1]];
@@ -461,7 +461,11 @@ export function showPropRefMenu(prop: Property, instance: any, phrase: string, c
                 showDropDown(res.data);
         });
     } else {
-        let items = phrase == null || (prop._.items.length < Constants.contextMenuVisibleItems && phrase == this.value) ? prop._.items : prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(phrase.toLowerCase()) > -1);
+        let items;
+        if (phrase == null || (prop._.items.length < Constants.contextMenuVisibleItems && phrase == this.value))
+            items = prop._.items
+        else
+            items = prop._.items.filter(item => item.title && item.title.toLowerCase().indexOf(phrase.toLowerCase()) > -1);
         items.forEach(item => (item as MenuItem).hover = phrase == item.title);
         showDropDown(items);
     }
@@ -878,7 +882,8 @@ export function load(href: string, pushState = false) {
     }
 
     glob.notify = null;
-    ajax(setQs('m', RequestMode.inline, false, href), null, {showProgress: true}, (res) => {
+    let url = setQs('m', RequestMode.inline, false, href);
+    ajax(url, null, {showProgress: true}, (res) => {
 
         // Hide menu on mobile mode after load object
         if (glob.screen == ScreenSize.xs) glob.showNavMenu = false;
