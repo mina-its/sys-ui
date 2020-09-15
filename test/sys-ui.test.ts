@@ -215,7 +215,7 @@ describe('e2e crud test', () => {
       slowMo: 30
     });
     page = await browser.newPage();
-    await page.goto('http://localhost:3400/dev-tools', {waitUntil: 'networkidle0'});
+    await page.goto(`http://localhost:${process.env.PORT}/dev-tools`, {waitUntil: 'networkidle0'});
 
   });
 
