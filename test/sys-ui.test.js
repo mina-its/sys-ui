@@ -91,6 +91,7 @@ async function submitRecord(row, disabled, name, age, birthday, language, codes)
     for (let code of codes) {
         await page.waitFor(`tbody>:nth-child(${row})>:nth-child(7)>div>:last-child`);
         await click(page, `tbody>:nth-child(${row})>:nth-child(7)>div>:last-child`);
+        await click(page, `tbody>:nth-child(${row})>:nth-child(7)>div>:last-child`); //for small devices need!
         await waitForSelector(page, `a`, code);
         await click(page, `a`, code);
     }
@@ -193,6 +194,12 @@ describe('e2e crud test', () => {
         await page.type('input[name="email"]', 'jila.amini@gmail.com');
         await page.type('input[name="password"]', 'Mina1234');
         await click(page, 'button[class="btn btn-primary m-1"]');
+        // For too many redirect issue(I guess it is a kinds of a speed problem) needs to refresh 4 times!
+        await page.waitFor(1000);
+        await page.reload();
+        await page.reload();
+        await page.reload();
+        await page.reload();
     });
     test('Loading testObject', async () => {
         await page.waitFor('a[href="/dev-tools/tests"]');
