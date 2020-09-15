@@ -1009,6 +1009,11 @@ function startVue(res: WebResponse, params?: StartParams) {
         handleWindowEvents();
         checkScreenSize();
 
+        if (!Vue) {
+            console.error(`Vue is null!`);
+            return;
+        }
+
         Vue.use(Vuex);
         store = new Vuex.Store({
             state: {data: null},

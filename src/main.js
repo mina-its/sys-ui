@@ -990,6 +990,10 @@ function startVue(res, params) {
     try {
         handleWindowEvents();
         checkScreenSize();
+        if (!vue_1.default) {
+            console.error(`Vue is null!`);
+            return;
+        }
         vue_1.default.use(vuex_1.default);
         store = new vuex_1.default.Store({
             state: { data: null },
