@@ -152,8 +152,10 @@ async function checkCorrectness(row, disabled, name, age, birthday, language, co
 async function deleteRecord(page, type, row) {
     if (!row)
         row = 1;
+    await page.waitFor(1000);
     //await page.waitFor('text-secondary.fa-lg.fal.fa-plus-circle');
     let hasRow = await page.$(`tbody>:nth-child(${row})>:nth-child(1)`);
+    await page.waitFor(1000);
     if (hasRow) {
         // open context menu
         await click(page, `tbody>:nth-child(${row})>:nth-child(1)`);
@@ -162,6 +164,7 @@ async function deleteRecord(page, type, row) {
         else
             await click(page, 'a', "Select");
         // delete
+        await page.waitFor('button> i.fa-trash');
         await click(page, 'button> i.fa-trash');
         // save
         await saveRefresh(page);
@@ -212,12 +215,15 @@ describe('e2e crud test', () => {
         await click(page, 'i.fa-plus-circle');
         //insert row 1
         await submitRecord(1, true, "Shila", 35, '2020/01/01', "English", ["Not Implemented", "Not Found"]);
+        await page.waitFor(1000);
         await click(page, 'i.fa-plus-circle');
         //insert row 2
         await submitRecord(2, false, "Farhad", 40, 'today', 'فارسی', ["Not Found"]);
+        await page.waitFor(1000);
         await click(page, 'i.fa-plus-circle');
         //insert row 3
         await submitRecord(3, true, "Asghar", 45, '', 'العربية', ["Ok"]);
+        await page.waitFor(1000);
         await saveRefresh(page);
         // testing saved successfully and correctly
         await checkCorrectness(1, true, "Shila", 35, '2020/01/01', "English", ["Not Implemented", "Not Found"]);

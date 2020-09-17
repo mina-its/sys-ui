@@ -4,7 +4,7 @@
   "description": "sys-ui",
   "main": "./public/js/sys.main.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --json --forceExit",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --report src/index.js ",
     "inspect": "vue-cli-service inspect",
