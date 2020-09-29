@@ -77,7 +77,6 @@
 
     @Component({name: 'AppHeader'})
     export default class AppHeader extends Vue {
-
         getAppUrl(app) {
             return prepareServerUrl(app.prefix);
         }
