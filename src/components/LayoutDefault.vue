@@ -22,6 +22,8 @@
 
                 <div class="mr-auto"></div>
 
+                <slot name="toolbar-customs-end"></slot>
+
                 <!--  Global functions -->
                 <div class="mx-2 global-funcs">
                     <template v-for="func in globalFunctions">
@@ -69,7 +71,7 @@
                     <slot name="info-panel"></slot>
 
                     <!-- Quick Notes -->
-                    <div class="url-notes px-3 mb-2 border-2 border-bottom">
+                    <div v-if="showQuickNote" class="url-notes px-3 mb-2 border-2 border-bottom">
                         <h5>Quick Notes</h5>
                         <div v-if="glob.infoPanel.notes.length">
                             <div class="border-primary border border-2 p-1 mb-2" v-for="note of glob.infoPanel.notes">
@@ -104,6 +106,7 @@
         @Prop() private configMenu: MenuItem[];
         @Prop() private justContent: boolean;
         @Prop() private showSideMenu: boolean;
+        @Prop() private showQuickNote: boolean;
         @Prop() private mainNoPadding: boolean;
         @Prop() private title: string;
         private showInfoPanel = true;
