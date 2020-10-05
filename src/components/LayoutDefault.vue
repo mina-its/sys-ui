@@ -43,8 +43,8 @@
                     <button class="btn btn-link text-secondary px-2" @click="clickConfigMenu"><i class="fal fa-cog fa-lg"></i></button>
 
                     <!-- Info Panel -->
-                    <button title="Show info panel" v-if="!showInfoPanel" @click="toggleShowInfoPanel(true)" class="btn close-panel btn-link px-2">
-                        <i class="fal fa-info-circle fa-lg"></i>
+                    <button title="Show/Hide Info Panel" @click="toggleShowInfoPanel()" :class="{'btn close-panel btn-link px-2':1, 'disabled':this.hideInfoPanel}">
+                        <i :class="{'fal fa-lg':1,'fa-arrow-alt-from-left text-secondary':showInfoPanel,'fa-arrow-alt-from-right':!showInfoPanel}"></i>
                     </button>
                 </div>
             </div>
@@ -61,12 +61,12 @@
                     <slot name="main-content"></slot>
                 </div>
 
-                <aside v-if="showInfoPanel" class="info-panel border-start separator-line bg-white">
-                    <!--  Close button -->
-                    <div class="d-flex py-1">
-                        <div class="mr-auto"></div>
-                        <button @click="toggleShowInfoPanel(false)" title="Hide info panel" class="btn close-panel btn-link p-2"><i class="fal fa-times fa-lg"></i></button>
-                    </div>
+                <aside v-if="showInfoPanel && !hideInfoPanel" class="info-panel border-start separator-line bg-white">
+<!--                    &lt;!&ndash;  Close button &ndash;&gt;-->
+<!--                    <div class="d-flex py-1">-->
+<!--                        <div class="mr-auto"></div>-->
+<!--                        <button @click="toggleShowInfoPanel(false)" title="Hide info panel" class="btn close-panel btn-link p-2"><i class="fal fa-times fa-lg"></i></button>-->
+<!--                    </div>-->
 
                     <slot name="info-panel"></slot>
 
@@ -108,6 +108,7 @@
         @Prop() private showSideMenu: boolean;
         @Prop() private showQuickNote: boolean;
         @Prop() private mainNoPadding: boolean;
+        @Prop() private hideInfoPanel: boolean;
         @Prop() private title: string;
         private showInfoPanel = true;
         private newNote: string = null;
@@ -116,9 +117,10 @@
             this.showInfoPanel = localStorage.getItem('show-info-panel') != "hide";
         }
 
-        toggleShowInfoPanel(show) {
-            this.showInfoPanel = show;
-            localStorage.setItem('show-info-panel', !show ? "hide" : null);
+        toggleShowInfoPanel() {
+            if (this.hideInfoPanel) return;
+            this.showInfoPanel = !this.showInfoPanel;
+            localStorage.setItem('show-info-panel', !this.showInfoPanel ? "hide" : null);
         }
 
         @Emit('selectConfigMenuItem')
