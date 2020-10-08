@@ -1,7 +1,7 @@
 <template>
     <div :class="{'nav-menu d-flex border-right align-items-start flex-column':1,'collapse-nav':!glob.showNavMenu}" v-if="(!glob.config.headerMenu || glob.screen==1) && glob.config.menu.length">
         <ul class="pt-4 mb-auto w-100">
-            <li v-for="item of glob.config.menu" :title="item.title" class="nav-item text-uppercase">
+            <li v-for="item of glob.config.menu" :title="item.title" :class="{'nav-item':1, 'text-uppercase':uppercase}">
                 <div v-if="item.title=='-'" class="d-block separator"></div>
                 <a v-else-if="!item.ref" class="nav-link font-weight-bold"><i :class="item._cs"></i>{{item.title}}</a>
                 <a v-else :href="item.ref" @click="clickLink($event, item)" :class="{'text-shadow-black text-nowrap nav-link':1,'has-child':item.items}">
@@ -26,6 +26,8 @@
 
     @Component({name: 'NavMenu'})
     export default class NavMenu extends Vue {
+        @Prop private uppercase: boolean
+
         toggleSideNav() {
             glob.showNavMenu = false;
             // localStorage.setItem('sys-sidenav-collapse', this.collapse ? "1" : null);

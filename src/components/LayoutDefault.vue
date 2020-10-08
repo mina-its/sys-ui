@@ -62,12 +62,6 @@
                 </div>
 
                 <aside v-if="showInfoPanel && !hideInfoPanel" class="info-panel border-start separator-line bg-white">
-<!--                    &lt;!&ndash;  Close button &ndash;&gt;-->
-<!--                    <div class="d-flex py-1">-->
-<!--                        <div class="mr-auto"></div>-->
-<!--                        <button @click="toggleShowInfoPanel(false)" title="Hide info panel" class="btn close-panel btn-link p-2"><i class="fal fa-times fa-lg"></i></button>-->
-<!--                    </div>-->
-
                     <slot name="info-panel"></slot>
 
                     <!-- Quick Notes -->

@@ -175,6 +175,10 @@
         text-shadow: 0 0 .5rem #000A;
     }
 
+    .text-shadow-gray {
+        text-shadow: 0 0 .3rem #6668;
+    }
+
     .text-shadow-white {
         text-shadow: 0 0 .5rem #FFF;
     }
