@@ -26,7 +26,7 @@
 
     @Component({name: 'NavMenu'})
     export default class NavMenu extends Vue {
-        @Prop private uppercase: boolean
+        @Prop() private uppercase: boolean
 
         toggleSideNav() {
             glob.showNavMenu = false;

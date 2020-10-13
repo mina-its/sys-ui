@@ -20,9 +20,10 @@ import Function from "./components/Function.vue";
 import NavMenu from "./components/NavMenu.vue";
 import LayoutDefault from "./components/LayoutDefault.vue";
 import AppChart from "./components/AppChart.vue";
+import SwitchBox from "./components/SwitchBox.vue";
 import HeaderMenu from "./components/HeaderMenu.vue";
 
 export default {
-    FormView, ...main, ...types, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, LayoutDefault,
+    FormView, ...main, ...types, CheckBox, Property, AppLocaleMenu, AppUserLoginMenu, BrowseFile, ContextMenu, LayoutDefault, SwitchBox,
     ToolbarModifyButtons, HeaderMenu, HelperObjects, AppHeader, App, DashboardInfoBox, AppChangeRegion, ImagePreview, DetailsView, GridView, Function, NavMenu, AppChart
 };
