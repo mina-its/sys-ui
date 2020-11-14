@@ -70,6 +70,7 @@ export class MenuItem {
     ref?: any;
     title: string;
     hover?: boolean;
+    icon?: string;
     _cs?: string;
 }
 

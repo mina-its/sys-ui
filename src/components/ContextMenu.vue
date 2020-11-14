@@ -5,7 +5,9 @@
             <template v-for="item in glob.cmenu.items">
                 <div v-if="item.title==='-'" class="dropdown-divider"></div>
                 <div v-else-if="item.ref==null && item.title" class="dropdown-header" v-html="getTitle(item)"></div>
-                <a v-else :class="getStyle(item)" @click="click(item)" href="javascript:;" v-html="getTitle(item)"></a>
+                <a v-else :class="getStyle(item)" @click="click(item)" href="javascript:;" v-html="getTitle(item)">
+                    <i v-if="item.icon" :class="item.icon"></i>
+                </a>
             </template>
         </div>
     </div>
