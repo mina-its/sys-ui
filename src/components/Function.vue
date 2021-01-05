@@ -1,8 +1,10 @@
 <script lang="ts">
-    import {FunctionExecEventArg} from '../types';
-    import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {FunctionDec, LogType, StatusCode} from "../../../sys/src/types";
-    import main, {ajax, getDec, glob, handleResponse, notify, prepareServerUrl, setPropertyEmbeddedError} from '../main';
+    import {FunctionExecEventArg, QuestionOptions} from '../types';
+    import {Component, Emit, Prop, Vue} from 'vue-property-decorator';
+    import {FunctionDec, FunctionMode, LogType, StatusCode} from "../../../sys/src/types";
+    import {$t, ajax, getDec, glob, handleResponse, notify, prepareServerUrl, question, setPropertyEmbeddedError} from '../main';
+
+    declare const $: any;
 
     @Component({name: 'Function'})
     export default class Function extends Vue {
@@ -85,9 +87,17 @@
                             notify(res.message, LogType.Error);
                         else {
                             glob.modal = false;
-                            setTimeout(() => {
-                                handleResponse(res);
-                            }, 100);
+                            const dec = this.data._.dec as FunctionDec;
+
+                            if (res.message && !res.redirect && dec.mode == FunctionMode.OpenPage)
+                                // BID project, stateCreation function
+                                question(null, res.message, [{title: $t("close"), ref: ""}], null, (ref: any) => {
+                                    location.href = location.href;
+                                });
+                            else
+                                setTimeout(() => {
+                                    handleResponse(res);
+                                }, 100);
                         }
                     }, (err) => {
                         this.showProgress = false;

@@ -64,12 +64,14 @@
 
     declare let $: any;
 
-    @Component({name: 'AppHeader',
-        components: {HeaderMenu}
-    })
+    @Component({name: 'AppHeader', components: {HeaderMenu}})
     export default class AppHeader extends Vue {
         getAppUrl(app) {
             return prepareServerUrl(app.prefix);
+        }
+
+        created() {
+            console.log('glob.config', glob.config);
         }
 
         get navColor() {
