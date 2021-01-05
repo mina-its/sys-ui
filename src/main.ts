@@ -19,9 +19,9 @@ import {getBsonValue, parse, stringify} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import {ChangeType, Constants, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, ScreenSize, Socket, StartParams, StateChange} from './types';
-import {AjaxConfig, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, RequestMode, StatusCode, WebMethod, WebResponse, ClientCommand, ReqParams} from '../../sys/src/types';
-import pluralize = require('pluralize');
+import {AjaxConfig, ClientCommand, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, ReqParams, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
 import App from './App.vue';
+import pluralize = require('pluralize');
 
 declare let $: JQuery, axios, marked: any, io: Socket;
 export {parse, stringify, getBsonValue};
@@ -209,7 +209,7 @@ function validateData(data: IData, ref: string): boolean {
             return false;
         }
     }
-    return true;
+    return validateAllProperties(data, meta.dec as ObjectDec);
 }
 
 export function validate(dataset: any): boolean {
@@ -1075,6 +1075,8 @@ function _commitStoreChange(state, change: StateChange) {
         case ChangeType.DeleteFile:
         case ChangeType.EditProp:
             change.item[change.prop.name] = change.value;
+            validatePropertyValue(change.item, change.prop);
+
             // todo : multi language text
             // if (change.prop._.gtype === GlobalType.string && change.prop.text && change.prop.text.multiLanguage && change.value && typeof (change.value) == "object") {
             //     for (let locale in change.value) {
@@ -1194,6 +1196,27 @@ function modifyOrder(item: any, uri: string) {
 
 export function dispatchStoreModify(vue: Vue, change: StateChange) {
     vue["$store"].dispatch('_dispatchStoreModify', change);
+}
+
+function validatePropertyValue(item: any, prop: Property) {
+    if (prop.validation) {
+        if (!evalExpression(item, prop.validation)) {
+            const message = $t(prop.validationError) || $t("property-validation-error") + " " + prop.title;
+            notify(message, LogType.Error);
+            console.error(message);
+            console.log("validation:", item, prop.validation);
+            return false;
+        }
+    }
+    return true;
+}
+
+export function validateAllProperties(item: any, dec: ObjectDec) {
+    for (const prop of dec.properties) {
+        if (!validatePropertyValue(item, prop))
+            return false;
+    }
+    return true;
 }
 
 function _dispatchStoreModify(store, change: StateChange) {

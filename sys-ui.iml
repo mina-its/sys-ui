@@ -12,6 +12,7 @@
       <excludePattern pattern="*.md" />
       <excludePattern pattern="vue.config.js" />
       <excludePattern pattern="*.map" />
+      <excludePattern pattern="*.npmignore" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
