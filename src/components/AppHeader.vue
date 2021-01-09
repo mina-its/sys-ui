@@ -71,7 +71,6 @@
         }
 
         created() {
-            console.log('glob.config', glob.config);
         }
 
         get navColor() {

@@ -19,7 +19,7 @@ import {getBsonValue, parse, stringify} from 'bson-util';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import {ChangeType, Constants, Global, ID, JQuery, MenuItem, Modify, QuestionOptions, ScreenSize, Socket, StartParams, StateChange} from './types';
-import {AjaxConfig, ClientCommand, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, ReqParams, RequestMode, StatusCode, WebMethod, WebResponse} from '../../sys/src/types';
+import {AjaxConfig, ClientCommand, DirFile, FunctionDec, IData, IError, Keys, Locale, LogType, mFile, MultilangText, ObjectDec, Pair, Property, PropertyReferType, ReqParams, RequestMode, StatusCode, WebMethod, WebResponse, NewItemMode, EntityMeta} from '../../sys/src/types';
 import App from './App.vue';
 import pluralize = require('pluralize');
 
@@ -697,6 +697,42 @@ export function browseFile(fileBrowsed?: (files: mFile[]) => void) {
 
 export function refreshFileGallery(file?: string) {
     openFileGallery(glob.fileGallery.drive, file, glob.fileGallery.path, glob.fileGallery.fixedPath, glob.fileGallery.fileSelectCallback);
+}
+
+export function onListAddNewItem(vue: Vue, dec: ObjectDec, uri : string) {
+    switch (dec.newItemMode) {
+        case NewItemMode.newPage:
+            let ref = setQs(ReqParams.newItem, "1", false, uri);
+            if (dec.newItemDefaults)
+                ref = setQs(ReqParams.newItemDefaults, dec.newItemDefaults, false, ref);
+            ref = prepareServerUrl(ref, true);
+            load(ref, true);
+            break;
+
+        default:
+            if (getQs(Constants.QUERY_NEW)) {
+                notify("Please save your changes before!", LogType.Warn);
+                return;
+            }
+            let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec} as EntityMeta} as any;
+
+            if (dec.newItemDefaults) {
+                let defaults = parse(dec.newItemDefaults, true, ID);
+                Object.assign(newItem, defaults);
+            }
+            dec.properties.forEach(prop => newItem[prop.name] = null);
+
+            dispatchStoreModify(vue, {
+                type: ChangeType.InsertItem, item: newItem, uri, vue
+            } as StateChange);
+            return newItem;
+
+        case NewItemMode.modal:
+            notify('not supported!', LogType.Error);
+            break;
+    }
+
+    return null;
 }
 
 export function getNewItemTitle(title: string) {

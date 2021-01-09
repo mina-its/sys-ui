@@ -52,6 +52,7 @@
 
                 <tbody>
                 <grid-view-row :dec="getDec(item)" @selected="rowSelected" :selectable="rowHeaderStyle===2" @keydown="keydown" @headerClick="showRowMenu" v-for="item in items" :item="item" :readonly="!(dec.access&2)" @changed="changed"/>
+
                 </tbody>
 
                 <!-- Footer -->
@@ -60,10 +61,10 @@
                     <td class="border-0" colspan="100">
                         <div class="align-items-center d-flex">
                             <!-- Add -->
-                            <Function v-if="dec.access & 4" styles="text-secondary fa-lg fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"></Function>
+                            <Function v-if="showAddButton" styles="text-secondary fa-lg fal fa-plus-circle" @exec="insert" name="newItem" :title="$t('add')"/>
 
                             <!-- Delete -->
-                            <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"></Function>
+                            <Function v-if="rowHeaderStyle===2" styles="fas fa-trash" @exec="deleteItems" name="deleteItems" :title="$t('delete')"/>
 
                             <!-- Paging -->
                             <div class="flex-grow-1 d-flex align-items-center">
@@ -90,10 +91,10 @@
 <script lang="ts">
     import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
     import * as main from '../main';
-    import {$t, call, getQs, glob, load, markDown, notify, pushToGridViewRecentList, setQs, showCmenu, prepareServerUrl, trimSlash} from '../main';
+    import {$t, call, getQs, glob, load, notify, pushToGridViewRecentList, setQs, showCmenu, prepareServerUrl, trimSlash, onListAddNewItem} from '../main';
     import {parse, stringify} from 'bson-util';
     import {ChangeType, Constants, FilterChangeEventArg, FilterOperator, GlobalFunction, ID, ItemChangeEventArg, ItemEventArg, JQuery, MenuItem, StateChange} from '../types';
-    import {AccessAction, EntityMeta, EntityLink, FileType, GridRowHeaderStyle, IData, Keys, LinkType, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
+    import {AccessAction, EntityMeta, PermissionObjectAction, EntityLink, FileType, GridRowHeaderStyle, IData, Keys, LinkType, LogType, NewItemMode, ObjectDec, ObjectViewType, Pair, Property, ReqParams} from '../../../sys/src/types';
 
     declare let $: JQuery;
 
@@ -103,6 +104,10 @@
         @Prop() private data: IData[];
         @Prop() private dec: ObjectDec;
         @Prop() private level: number;
+
+        get showAddButton() {
+            return (this.dec.access & PermissionObjectAction.Add);
+        }
 
         private rowHeaderStyle = GridRowHeaderStyle.empty;
         private recentItems: Pair[] = null;
@@ -417,39 +422,9 @@
         }
 
         insert() {
-            switch (this.dec.newItemMode) {
-                case NewItemMode.newPage:
-                    let ref = setQs(ReqParams.newItem, "1", false, this.uri);
-                    if (this.dec.newItemDefaults)
-                        ref = setQs(ReqParams.newItemDefaults, this.dec.newItemDefaults, false, ref);
-                    ref = prepareServerUrl(ref, true);
-                    main.load(ref, true);
-                    break;
-
-                default:
-                    if (getQs(Constants.QUERY_NEW)) {
-                        notify("Please save your changes before!", LogType.Warn);
-                        return;
-                    }
-                    let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec: this.dec} as EntityMeta} as any;
-
-                    if (this.dec.newItemDefaults) {
-                        let defaults = parse(this.dec.newItemDefaults, true, ID);
-                        Object.assign(newItem, defaults);
-                    }
-                    this.dec.properties.forEach(prop => newItem[prop.name] = null);
-                    if (this.dec.reorderable)
-                        newItem._z = ++this.latest_z;
-
-                    main.dispatchStoreModify(this, {
-                        type: ChangeType.InsertItem, item: newItem, uri: this.uri, vue: this
-                    } as StateChange);
-                    break;
-
-                case NewItemMode.modal:
-                    main.notify('not supported!', LogType.Error);
-                    break;
-            }
+            const newItem = onListAddNewItem(this, this.dec, this.uri);
+            if (this.dec.reorderable && newItem)
+                newItem._z = ++this.latest_z;
         }
 
         goBack() {

@@ -36,9 +36,6 @@
                 </div>
 
                 <div>
-                    <!--                    &lt;!&ndash;  Refresh &ndash;&gt;-->
-                    <!--                    <button class="btn btn-link text-secondary px-2" @click="refresh"><i class="fas fa-sync"></i></button>-->
-
                     <!--  Object Menu -->
                     <button class="btn btn-link text-secondary px-2" @click="clickConfigMenu"><i class="fal fa-cog fa-lg"></i></button>
 

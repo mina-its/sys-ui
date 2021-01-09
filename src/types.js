@@ -11,6 +11,8 @@ exports.Constants = {
     contextMenuVisibleItems: 10,
     inlineMessageDuration: 5000,
     imageExtensions: ["png", "tiff", "ico", "gif", "jpg", "jpeg", "svg"],
+    Jalali_Months: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+    Jalali_Week_Days: ["یکشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"],
     uniqueFilenameRegex: /^[a-fA-F0-9]{24}__/,
     QUERY_LOCALE: 'e',
     QUERY_NEW: 'n',

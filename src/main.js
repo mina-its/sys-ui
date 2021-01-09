@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.validateAllProperties = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.loadNotes = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.uriJoin = exports.trimSlash = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.glob = exports.getBsonValue = exports.stringify = exports.parse = void 0;
+exports.start = exports.markDown = exports.dispatchRequestServerModify = exports.validateAllProperties = exports.dispatchStoreModify = exports.commitReorderItems = exports.sort = exports.commitServerChangeResponse = exports.commitStoreChange = exports.clearModifies = exports.ajax = exports.loadNotes = exports.load = exports.call = exports.getPropertyEmbedError = exports.setPropertyEmbeddedError = exports.delLink = exports.loadBodyLink = exports.addHeadLink = exports.delScript = exports.loadBodyScript = exports.loadHeadScript = exports.question = exports.notify = exports.toFriendlyFileSizeString = exports.invoke = exports.log = exports.openFileGallery = exports.getNewItemTitle = exports.onListAddNewItem = exports.refreshFileGallery = exports.browseFile = exports.checkPropDependencyOnChange = exports.setQs = exports.getQs = exports.handleCmenuKeys = exports.handleImagesPreview = exports.pushToGridViewRecentList = exports.newID = exports.hideCmenu = exports.showCmenu = exports.isRtl = exports.handleResponseRedirect = exports.showPropRefMenu = exports.getPropReferenceValue = exports.equalID = exports.getPropTextValue = exports.digitGroup = exports.handleResponse = exports.onlyUnique = exports.loadObjectViewData = exports.prepareServerUrl = exports.uriJoin = exports.trimSlash = exports.someProps = exports.validate = exports.getDec = exports.assignNullToEmptyProperty = exports.processThisExpression = exports.evalExpression = exports.clone = exports.$t = exports.getText = exports.glob = exports.getBsonValue = exports.stringify = exports.parse = void 0;
 const tslib_1 = require("tslib");
 let index = {
     // Vuex
@@ -686,6 +686,37 @@ function refreshFileGallery(file) {
     openFileGallery(exports.glob.fileGallery.drive, file, exports.glob.fileGallery.path, exports.glob.fileGallery.fixedPath, exports.glob.fileGallery.fileSelectCallback);
 }
 exports.refreshFileGallery = refreshFileGallery;
+function onListAddNewItem(vue, dec, uri) {
+    switch (dec.newItemMode) {
+        case types_2.NewItemMode.newPage:
+            let ref = setQs(types_2.ReqParams.newItem, "1", false, uri);
+            if (dec.newItemDefaults)
+                ref = setQs(types_2.ReqParams.newItemDefaults, dec.newItemDefaults, false, ref);
+            ref = prepareServerUrl(ref, true);
+            load(ref, true);
+            break;
+        default:
+            if (getQs(types_1.Constants.QUERY_NEW)) {
+                notify("Please save your changes before!", types_2.LogType.Warn);
+                return;
+            }
+            let newItem = { _id: types_1.ID.generateByBrowser(), _new: true, _: { marked: false, dec } };
+            if (dec.newItemDefaults) {
+                let defaults = bson_util_1.parse(dec.newItemDefaults, true, types_1.ID);
+                Object.assign(newItem, defaults);
+            }
+            dec.properties.forEach(prop => newItem[prop.name] = null);
+            dispatchStoreModify(vue, {
+                type: types_1.ChangeType.InsertItem, item: newItem, uri, vue
+            });
+            return newItem;
+        case types_2.NewItemMode.modal:
+            notify('not supported!', types_2.LogType.Error);
+            break;
+    }
+    return null;
+}
+exports.onListAddNewItem = onListAddNewItem;
 function getNewItemTitle(title) {
     switch (exports.glob.config.locale) {
         case types_2.Locale[types_2.Locale.en]:

@@ -44,7 +44,7 @@
     import {ChangeType, ExecContext, GlobalFunction, ID, ItemChangeEventArg, MenuItem, StateChange} from '../types';
     import {Component, Emit, Prop, Vue, Watch} from 'vue-property-decorator';
     import {AccessAction, EntityMeta, GlobalType, LinkType, ObjectDec, ObjectDetailsViewType, ObjectListsViewType, PropertyReferType} from "../../../sys/src/types";
-    import {$t, getNewItemTitle, glob, loadObjectViewData, markDown, prepareServerUrl} from '../main';
+    import {$t, getNewItemTitle, glob, loadObjectViewData, markDown, onListAddNewItem, parse, prepareServerUrl} from '../main';
     import * as main from '../main';
     import ObjectView from "./ObjectView.vue";
     import LayoutDefault from "./LayoutDefault.vue";
@@ -166,21 +166,18 @@
                         this.globalFunctions.push({
                             title, style: "border-chip btn-secondary", name: "new-item", exec: () => {
                                 let uri = this.uri + "/" + prop.name;
-                                let dec = glob.form.declarations[uri];
-                                let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec} as EntityMeta};
-                                this.dec.properties.forEach(p => newItem[p.name] = null);
-                                // if (this.dec.reorderable)
-                                //     newItem['_z'] = (Math.max(...val.map(item => item._z)) || 0) + 1;
+                                let dec = glob.form.declarations[uri] as ObjectDec;
 
                                 if (this.data) {
+                                    let newItem = {_id: ID.generateByBrowser(), _new: true, _: {marked: false, dec} as EntityMeta} as any;
+                                    if (dec.newItemDefaults) {
+                                        let defaults = parse(dec.newItemDefaults, true, ID);
+                                        Object.assign(newItem, defaults);
+                                    }
+                                    dec.properties.forEach(prop => newItem[prop.name] = null);
                                     this.data[uri].push(newItem);
                                 } else
-                                    main.dispatchStoreModify(this, {
-                                        type: ChangeType.InsertItem,
-                                        item: newItem,
-                                        uri,
-                                        vue: this
-                                    } as StateChange);
+                                    onListAddNewItem(this, dec as ObjectDec, uri);
                             }
                         });
                         break;

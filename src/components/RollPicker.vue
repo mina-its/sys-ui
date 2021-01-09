@@ -1,16 +1,13 @@
 <template>
     <div class="roll-picker d-flex">
-        <hr class="position-absolute" style="margin-top: 100px;">
-        <hr class="position-absolute" style="margin-top: 150px;">
+        <hr class="position-absolute mb-0" style="margin-top: 100px;">
+        <hr class="position-absolute mb-0" style="margin-top: 150px;">
         <span class="px-1 caption position-absolute text-secondary" style="margin-top: 100px;">{{caption}}</span>
-        <div @scroll="scroll" ref="sc" class="scroll-content w-100" :style="{'padding': (itemHeight*2)+'px 0'}">
-            <ul class="p-0 mb-0">
-                <li @click="click(index)"
-                    :class="{'px-3 text-center pt-2':true, 'level0': itemStyle(index, 0), 'level1': itemStyle(index, 1), 'level2': itemStyle(index, 2)}"
-                    :style="{'height': itemHeight+'px'}"
-                    v-for="(item, index) in items">{{item}}
-                </li>
-            </ul>
+        <div @scroll="scroll" ref="sc" class="scroll-content w-100">
+            <div @click="click(index)"
+                 :class="{'px-3 roll-item text-center':true, 'level0': itemStyle(index, 0), 'level1': itemStyle(index, 1), 'level2': itemStyle(index, 2)}"
+                 v-for="(item, index) in items">{{item}}
+            </div>
         </div>
     </div>
 </template>
@@ -54,9 +51,10 @@
 
         scroll() {
             this.scrollTop = this.$refs.sc.scrollTop;
-            let index = Math.round(this.scrollTop / this.itemHeight);
-            if (this.index != index)
-                this.change(index);
+            let index = Math.floor(this.scrollTop / this.itemHeight);
+            //if (this.index != index) {
+            this.change(index);
+            //}
         }
     }
 </script>
@@ -79,13 +77,16 @@
         -ms-overflow-style: none;
         font-size: 24px;
         height: 250px;
-
+        padding: 100px 0;
 
         &::-webkit-scrollbar {
             display: none;
         }
 
-        li {
+        .roll-item {
+            height: 50px;
+            max-height: 50px;
+            padding-top: 10px;
             cursor: pointer;
             white-space: nowrap;
 

@@ -24,9 +24,9 @@
         @Prop() private selectable: boolean;
         @Prop() private readonly: boolean;
 
-        focused(e: PropEventArg) {
+        focused(ev: PropEventArg) {
             $("td.active").removeClass("active");
-            $(e.event.target).closest("td").addClass("active");
+            $(ev.event.target).closest("td").addClass("active");
         }
 
         clickCell(e) {

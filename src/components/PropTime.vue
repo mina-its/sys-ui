@@ -1,7 +1,7 @@
 <template>
     <div class="prop-time">
         <div class="d-flex">
-            <input ref="ctrl" @focus="$emit('focus', $event)" type="text" :value="value"
+            <input ref="ctrl" @focus="focus" type="text" :value="value"
                    :placeholder="placeHolder" @keydown.esc="escape" @keydown.enter="update"
                    :name="viewType!=1 ? prop.name : null" :readonly="readOnly" @input="dirty=true"
                    @blur="update" :class="{'w-100 flex-grow-1 border-0':1,'prop-error':hasError}">
@@ -13,10 +13,11 @@
 </template>
 
 <script lang="ts">
-    import {AppStateCmenu, ItemChangeEventArg} from '../types';
+    import {AppStateCmenu, ItemChangeEventArg, PropEventArg} from '../types';
     import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-    import {Property, LogType, TimeFormat} from "../../../sys/src/types";
+    import {Property, Locale, TimeFormat} from "../../../sys/src/types";
     import {$t, glob, notify} from "../main";
+    import Jalali = require('jalali-moment');
 
     declare let $, moment: any;
     @Component({name: 'PropTime', components: {}})
@@ -49,6 +50,12 @@
             }
         }
 
+        @Emit('focus')
+        focus(e): PropEventArg {
+            // this.focused = true;
+            return {prop: this.prop, event: e};
+        }
+
         @Emit('changed')
         changed(val: { value: Date }): ItemChangeEventArg {
             return {prop: this.prop, val: val.value, vue: this};
@@ -61,13 +68,19 @@
         click(e) {
             glob.cmenu = {
                 show: true,
-                datePicker: {
+                datePicker: glob.config.locale != Locale[Locale.fa] ? {
                     value: this.value,
                     format: this.format
-                },
+                } : null,
+                jalaliDatePicker: glob.config.locale == Locale[Locale.fa] ? {
+                    value: this.value,
+                    format: this.format
+                } : null,
                 state: this,
                 event: {ctrl: this.$refs.ctrl},
-                handler: (state, val) => state.changed(val)
+                handler: (state, val) => {
+                    state.changed(val);
+                }
             } as AppStateCmenu;
         }
 
@@ -75,31 +88,56 @@
             if (this.prop.time) {
                 if (this.prop.time.customFormat) return this.prop.time.customFormat;
                 else if (this.prop.time.format) {
-                    switch (this.prop.time.format) {
-                        case TimeFormat.YearMonthDayHourMinute:
-                            return "YYYY/MM/DD - HH:mm";
+                    if (glob.config.locale == "fa") {
+                        switch (this.prop.time.format) {
+                            case TimeFormat.YearMonthDayHourMinute:
+                                return "jYYYY/jMM/jDD - HH:mm";
 
-                        case TimeFormat.DateWithDayOfWeek:
-                            return "YYYY/MM/DD";
+                            case TimeFormat.DateWithDayOfWeek:
+                                return "jYYYY/jMM/jDD";
 
-                        case TimeFormat.HourMinute:
-                            return "HH:mm";
+                            case TimeFormat.HourMinute:
+                                return "HH:mm";
 
-                        case TimeFormat.YearMonthDay:
-                            return "YYYY/MM/DD";
+                            case TimeFormat.YearMonthDay:
+                                return "jYYYY/jMM/jDD";
 
-                        case TimeFormat.DayMonthNameYear:
-                            return "DD MMM YYYY";
+                            case TimeFormat.DayMonthNameYear:
+                                return "jDD jMMM jYYYY";
+                        }
+                    } else {
+                        switch (this.prop.time.format) {
+                            case TimeFormat.YearMonthDayHourMinute:
+                                return "YYYY/MM/DD - HH:mm";
+
+                            case TimeFormat.DateWithDayOfWeek:
+                                return "YYYY/MM/DD";
+
+                            case TimeFormat.HourMinute:
+                                return "HH:mm";
+
+                            case TimeFormat.YearMonthDay:
+                                return "YYYY/MM/DD";
+
+                            case TimeFormat.DayMonthNameYear:
+                                return "DD MMM YYYY";
+                        }
                     }
                 }
             }
-            return "YYYY/MM/DD";
+
+            if (glob.config.locale == Locale[Locale.fa])
+                return "jYYYY/jMM/jDD";
+            else
+                return "YYYY/MM/DD";
         }
 
         get value(): string {
             if (this.hasError) return $(this.$refs.ctrl).val();
             let val = this.doc[this.prop.name];
-            return val ? moment(val).format(this.format) : "";
+
+            const mom = glob.config.locale == Locale[Locale.fa] ? Jalali(val) : moment(val);
+            return val ? mom.format(this.format) : "";
         }
     }
 </script>
