@@ -699,13 +699,14 @@ export function refreshFileGallery(file?: string) {
     openFileGallery(glob.fileGallery.drive, file, glob.fileGallery.path, glob.fileGallery.fixedPath, glob.fileGallery.fileSelectCallback);
 }
 
-export function onListAddNewItem(vue: Vue, dec: ObjectDec, uri : string) {
+export function onListAddNewItem(vue: Vue, dec: ObjectDec, uri: string) {
     switch (dec.newItemMode) {
         case NewItemMode.newPage:
             let ref = setQs(ReqParams.newItem, "1", false, uri);
             if (dec.newItemDefaults)
                 ref = setQs(ReqParams.newItemDefaults, dec.newItemDefaults, false, ref);
             ref = prepareServerUrl(ref, true);
+            ref = setQs("back", location.href, false, ref);
             load(ref, true);
             break;
 
@@ -948,7 +949,7 @@ export function ajax(url: string, data, config: AjaxConfig, done: (res: WebRespo
         dataType: "text",
         transformResponse: res => res,
         method: config.method || (data ? WebMethod.post : WebMethod.get),
-        headers: {'Content-Type': "text/plain", 'Referrer-Policy': "unsafe-url"},
+        headers: {'Content-Type': "text/plain", 'Referrer-Policy': "unsafe-url", "x-origin": location.href},
         withCredentials: true
     };
 

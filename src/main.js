@@ -693,6 +693,7 @@ function onListAddNewItem(vue, dec, uri) {
             if (dec.newItemDefaults)
                 ref = setQs(types_2.ReqParams.newItemDefaults, dec.newItemDefaults, false, ref);
             ref = prepareServerUrl(ref, true);
+            ref = setQs("back", location.href, false, ref);
             load(ref, true);
             break;
         default:
@@ -925,7 +926,7 @@ function ajax(url, data, config, done, fail) {
         dataType: "text",
         transformResponse: res => res,
         method: config.method || (data ? types_2.WebMethod.post : types_2.WebMethod.get),
-        headers: { 'Content-Type': "text/plain", 'Referrer-Policy': "unsafe-url" },
+        headers: { 'Content-Type': "text/plain", 'Referrer-Policy': "unsafe-url", "x-origin": location.href },
         withCredentials: true
     };
     // extract files raw data

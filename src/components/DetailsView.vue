@@ -15,8 +15,9 @@
         <!--  Main Content -->
         <template slot="main-content">
             <!--  Group Property Link -->
-            <div v-if="groupPropertyLink" class="p-4 group-property-link grid-view-box">
-                <object-view :level="2" :uri="groupPropertyLink"></object-view>
+            <div v-if="groupPropertyLink" class="group-property-link grid-view-box">
+                <!-- I removed class 'p-4' because of bid.estates  -->
+                <object-view :level="1" :uri="groupPropertyLink"></object-view>
             </div>
 
             <!--  Main -->
@@ -139,6 +140,7 @@
         }
 
         selectGroup(item) {
+            console.log('selectGroup');
             this.currentGroup = item.title;
             this.saveLastGroup(item);
 

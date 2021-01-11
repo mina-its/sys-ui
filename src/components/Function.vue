@@ -61,6 +61,7 @@
         }
 
         click(e) {
+            console.log('click');
             try {
                 this.showProgress = true;
                 if (this.$listeners && this.$listeners.exec) {
