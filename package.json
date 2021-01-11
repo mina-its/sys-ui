@@ -6,11 +6,11 @@
   "scripts": {
     "test": "jest --json --forceExit",
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --report src/index.js ",
+    "justbuild": "vue-cli-service build --target lib --report src/index.js ",
     "inspect": "vue-cli-service inspect",
     "lint": "vue-cli-service lint",
     "buildcopy": "cp dist/sys-ui.umd.min.js public/js/sys.main.js & cp dist/sys-ui.css public/css/sys.main.css & cp src/sw.js public/js/sw.js",
-    "buildcopywin": "vue-cli-service build --target lib --report src/index.js & copy dist\\sys-ui.umd.min.js \"public/js/sys.main.js\"  & copy dist\\sys-ui.css \"public/css/sys.main.css\"  "
+    "build": "vue-cli-service build --target lib --report src/index.js & copy dist\\sys-ui.umd.min.js \"public/js/sys.main.js\"  & copy dist\\sys-ui.css \"public/css/sys.main.css\"  "
   },
   "keywords": [
     "sys-ui"
